@@ -1,0 +1,6 @@
+﻿@model digiozPortal.Web.Models.ViewModels.CommentsMenuViewModel
+
+@if (Model != null && Model.CommentsEnabled == true)
+{
+    Html.RenderAction("List", "Comments", new { referenceId = Model.ReferenceId, referenceType = Model.ReferenceType });
+}

@@ -1,0 +1,35 @@
+﻿@model List<digiozPortal.BO.Menu>
+
+
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+        if (!string.IsNullOrEmpty(item.Controller))
+        {
+            var controllerSelected = ViewContext.RouteData.Values["Controller"];
+            var actionSelected = ViewContext.RouteData.Values["Action"];
+
+            if (controllerSelected == item.Controller && actionSelected == item.Action)
+            {
+                <li class="active">
+                    @Html.ActionLink(@item.Name, @item.Action, @item.Controller, new { area = "" }, null)
+                </li>
+            }
+            else
+            {
+                <li>
+                    @Html.ActionLink(@item.Name, @item.Action, @item.Controller, new { area = "" }, null)
+                </li>
+            }
+        }
+        else
+        {
+            <li><a href="@item.URL" target="@item.Target">@item.Name</a></li>
+        }
+    }
+}
+else
+{
+    <li class="active">@Html.ActionLink("Home", "Index", "Home")</li>
+}

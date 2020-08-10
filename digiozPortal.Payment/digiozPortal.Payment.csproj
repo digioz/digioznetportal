@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AuthorizeNet" Version="2.0.1" />
+    <PackageReference Include="PayPal" Version="1.9.1" />
+    <PackageReference Include="PayPalCoreSDK" Version="1.7.1" />
+    <PackageReference Include="PayPalMerchantSDK" Version="2.16.250" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\digiozPortal.BLL\digiozPortal.BLL.csproj" />
+    <ProjectReference Include="..\digiozPortal.BO\digiozPortal.BO.csproj" />
+    <ProjectReference Include="..\digiozPortal.Utilities\digiozPortal.Utilities.csproj" />
+  </ItemGroup>
+
+</Project>

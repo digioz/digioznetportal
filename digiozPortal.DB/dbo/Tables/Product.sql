@@ -1,0 +1,27 @@
+﻿CREATE TABLE [dbo].[Product] (
+    [ID]                NVARCHAR (128)  NOT NULL,
+    [ProductCategoryID] NVARCHAR (128)  NOT NULL,
+    [Name]              NVARCHAR (100)  NOT NULL,
+    [Make]              NVARCHAR (50)   NULL,
+    [Model]             NVARCHAR (50)   NULL,
+    [SKU]               NVARCHAR (50)   NULL,
+    [Image]             NVARCHAR (50)   NULL,
+    [Price]             DECIMAL (18, 2) NOT NULL,
+    [Cost]              DECIMAL (18, 2) NULL,
+    [QuantityPerUnit]   INT             NULL,
+    [Weight]            NVARCHAR (20)   NULL,
+    [Dimensions]        NVARCHAR (50)   NULL,
+    [Sizes]             NVARCHAR (50)   NULL,
+    [Colors]            NVARCHAR (50)   NULL,
+    [MaterialType]      NVARCHAR (50)   NULL,
+    [PartNumber]        NVARCHAR (50)   NULL,
+    [ShortDescription]  NVARCHAR (255)  NOT NULL,
+    [Description]       NVARCHAR (MAX)  NOT NULL,
+    [ManufacturerURL]   NVARCHAR (MAX)  NULL,
+    [UnitsInStock]      INT             NOT NULL,
+    [OutOfStock]        BIT             NOT NULL,
+    [Notes]             NVARCHAR (MAX)  NULL,
+    [Visible]           BIT             NOT NULL,
+    CONSTRAINT [PK_dbo.Product] PRIMARY KEY CLUSTERED ([ID] ASC)
+);
+

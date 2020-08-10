@@ -1,0 +1,7 @@
+﻿CREATE TABLE [dbo].[PollAnswer] (
+    [Id]      UNIQUEIDENTIFIER NOT NULL,
+    [Answer]  NVARCHAR (MAX)   NULL,
+    [Poll_Id] UNIQUEIDENTIFIER NOT NULL,
+    CONSTRAINT [PK_dbo.PollAnswer] PRIMARY KEY CLUSTERED ([Id] ASC)
+);
+
