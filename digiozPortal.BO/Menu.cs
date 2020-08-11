@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace digiozPortal.BO
 {
-    [Table("Product")]
+    [Table("Menu")]
     public partial class Menu
     {
         public int Id { get; set; }
