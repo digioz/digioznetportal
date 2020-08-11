@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace digiozPortal.BO
 {
+    [Table("Module")]
     public partial class Module
     {
         public int Id { get; set; }

@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace digiozPortal.BO
 {
+    [Table("ShoppingCart")]
     public partial class ShoppingCart
     {
         public string Id { get; set; }

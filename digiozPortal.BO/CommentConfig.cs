@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace digiozPortal.BO
 {
+    [Table("CommentConfig")]
     public partial class CommentConfig
     {
         public string Id { get; set; }

@@ -13,12 +13,7 @@ using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Web;
 using digiozPortal.Web.Models.ViewModels;
-using MaxMind.Db;
-using Newtonsoft.Json;
-using System.Reflection;
 using System.ServiceModel.Syndication;
 using System.Xml;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -26,27 +21,26 @@ using digiozPortal.BO;
 using digiozPortal.BLL;
 using Microsoft.AspNetCore.Http;
 using digiozPortal.Web.Models;
-using MaxMind.Db;
 using digiozPortal.Payment;
 
 namespace digiozPortal.Web.Helpers
 {
     public static class Utility
     {
-        public static bool CreateUserProfileCustomRecord(string userID, string email)
-        {
-            Profile profile = new Profile
-            {
-                UserID = userID,
-                Email = email
-            };
+        //public static bool CreateUserProfileCustomRecord(string userID, string email)
+        //{
+        //    Profile profile = new Profile
+        //    {
+        //        UserID = userID,
+        //        Email = email
+        //    };
 
-            // Create Profile
-            var logic = new ProfileLogic();
-            logic.Add(profile);
+        //    // Create Profile
+        //    var logic = new ProfileLogic();
+        //    logic.Add(profile);
 
-            return true;
-        }
+        //    return true;
+        //}
 
         public static bool IsImage(IFormFile postedFile)
         {
@@ -77,123 +71,123 @@ namespace digiozPortal.Web.Helpers
             return true;
         }
 
-        public static bool SubmitMail(EmailModel email)
-        {
+        //public static bool SubmitMail(EmailModel email)
+        //{
 
-            bool result = false;
+        //    bool result = false;
 
-            try
-            {
-                SmtpClient smtpClient = null;
-                MailMessage message = null;
-                System.Net.Mail.Attachment attachment = null;
-                smtpClient = new SmtpClient(email.SMTPServer);
-                smtpClient.Credentials = new NetworkCredential(email.SMTPUsername, email.SMTPPassword);
+        //    try
+        //    {
+        //        SmtpClient smtpClient = null;
+        //        MailMessage message = null;
+        //        System.Net.Mail.Attachment attachment = null;
+        //        smtpClient = new SmtpClient(email.SMTPServer);
+        //        smtpClient.Credentials = new NetworkCredential(email.SMTPUsername, email.SMTPPassword);
 
-                if (email.SMTPPort > 0)
-                {
-                    smtpClient.Port = Convert.ToInt32(email.SMTPPort);
-                }
+        //        if (email.SMTPPort > 0)
+        //        {
+        //            smtpClient.Port = Convert.ToInt32(email.SMTPPort);
+        //        }
 
-                message = new MailMessage(email.FromEmail, email.ToEmail, email.Subject, email.Message);
+        //        message = new MailMessage(email.FromEmail, email.ToEmail, email.Subject, email.Message);
 
-                message.BodyEncoding = Encoding.UTF8;
-                message.IsBodyHtml = true;
-                message.Priority = MailPriority.Normal;
+        //        message.BodyEncoding = Encoding.UTF8;
+        //        message.IsBodyHtml = true;
+        //        message.Priority = MailPriority.Normal;
 
-                if (!string.IsNullOrEmpty(email.Attachment))
-                {
-                    attachment = new System.Net.Mail.Attachment(email.Attachment);
-                    message.Attachments.Add(attachment);
-                }
+        //        if (!string.IsNullOrEmpty(email.Attachment))
+        //        {
+        //            attachment = new System.Net.Mail.Attachment(email.Attachment);
+        //            message.Attachments.Add(attachment);
+        //        }
 
-                smtpClient.Send(message);
+        //        smtpClient.Send(message);
 
-                result = true;
-            }
-            catch (Exception ex)
-            {
-                AddLogEntry(ex.Message + email.ToEmail + "|" + email.Message);
-                string lsException = ex.Message;
-                result = false;
-            }
+        //        result = true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        AddLogEntry(ex.Message + email.ToEmail + "|" + email.Message);
+        //        string lsException = ex.Message;
+        //        result = false;
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
 
-        public static bool AddLogEntry(string message)
-        {
-            try
-            {
-                Log log = new Log();
-                log.Message = message;
-                log.Timestamp = DateTime.Now;
+        //public static bool AddLogEntry(string message)
+        //{
+        //    try
+        //    {
+        //        Log log = new Log();
+        //        log.Message = message;
+        //        log.Timestamp = DateTime.Now;
 
-                var logic = new LogLogic();
-                logic.Add(log);
-            }
-            catch
-            {
-                // Do nothing
-            }
+        //        var logic = new LogLogic();
+        //        logic.Add(log);
+        //    }
+        //    catch
+        //    {
+        //        // Do nothing
+        //    }
 
-            return true;
-        }
+        //    return true;
+        //}
 
-        public static bool ForgotPasswordEmail(ForgotPasswordModel forgotPassword)
-        {
-            bool result = false;
-            var logic = new ProfileLogic();
-            Profile profile = logic.GetProfileByEmail(forgotPassword.Email);
-            EmailModel loEmail = new EmailModel();
+        //public static bool ForgotPasswordEmail(ForgotPasswordModel forgotPassword)
+        //{
+        //    bool result = false;
+        //    var logic = new ProfileLogic();
+        //    Profile profile = logic.GetProfileByEmail(forgotPassword.Email);
+        //    EmailModel loEmail = new EmailModel();
 
-            var logicConfig = new ConfigLogic();
-            var config = logicConfig.GetConfig();
+        //    var logicConfig = new ConfigLogic();
+        //    var config = logicConfig.GetConfig();
 
-            if (profile != null)
-            {
-                try
-                {
-                    loEmail.SMTPServer = config["SMTPServer"];
-                    loEmail.SMTPUsername = config["SMTPUsername"];
-                    loEmail.SMTPPassword = config["SMTPPassword"];
-                    loEmail.FromEmail = config["WebmasterEmail"];
+        //    if (profile != null)
+        //    {
+        //        try
+        //        {
+        //            loEmail.SMTPServer = config["SMTPServer"];
+        //            loEmail.SMTPUsername = config["SMTPUsername"];
+        //            loEmail.SMTPPassword = config["SMTPPassword"];
+        //            loEmail.FromEmail = config["WebmasterEmail"];
 
-                    loEmail.ToEmail = profile.Email;
-                    loEmail.Subject = config["SiteName"] + " Account Password Reset Request";
-                    loEmail.Message = "Dear User,<br /><br />"
-                                        + "We have received a password reset request from someone specifying your email account.<br />"
-                                        + "If you requested this password reset, you can now reset your password by clicking on the following link: <br /><br />"
-                                        + config["SiteURL"] + "/Account/ResetPassword/" + profile.UserID + "<br /><br />"
-                                        + "Thanks,<br />"
-                                        + "The " + config["SiteName"] + " Management Team";
+        //            loEmail.ToEmail = profile.Email;
+        //            loEmail.Subject = config["SiteName"] + " Account Password Reset Request";
+        //            loEmail.Message = "Dear User,<br /><br />"
+        //                                + "We have received a password reset request from someone specifying your email account.<br />"
+        //                                + "If you requested this password reset, you can now reset your password by clicking on the following link: <br /><br />"
+        //                                + config["SiteURL"] + "/Account/ResetPassword/" + profile.UserID + "<br /><br />"
+        //                                + "Thanks,<br />"
+        //                                + "The " + config["SiteName"] + " Management Team";
 
-                    bool resultEmailSubmit = SubmitMail(loEmail);
+        //            bool resultEmailSubmit = SubmitMail(loEmail);
 
-                    if (resultEmailSubmit)
-                    {
-                        result = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    string msg = "Send Email Error: " + ex.Message + " Stack Trace: " + ex.StackTrace.ToString();
-                    AddLogEntry(msg);
-                    result = false;
-                }
-            }
+        //            if (resultEmailSubmit)
+        //            {
+        //                result = true;
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            string msg = "Send Email Error: " + ex.Message + " Stack Trace: " + ex.StackTrace.ToString();
+        //            AddLogEntry(msg);
+        //            result = false;
+        //        }
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
 
-        public static bool DoesUserExist(string userID)
-        {
-            var logic = new ProfileLogic();
-            var profile = logic.GetProfileByUserId(userID);
-            bool result = profile != null && profile.UserID == userID;
+        //public static bool DoesUserExist(string userID)
+        //{
+        //    var logic = new ProfileLogic();
+        //    var profile = logic.GetProfileByUserId(userID);
+        //    bool result = profile != null && profile.UserID == userID;
 
-            return result;
-        }
+        //    return result;
+        //}
 
         public static string GetCurrentTimestamp()
         {
@@ -1275,52 +1269,52 @@ namespace digiozPortal.Web.Helpers
             return ext;
         }
 
-        public static void WriteVisitorSession(string sessionId, string pageUrl, string userName, string ipAddress)
-        {
-            try
-            {
-                var logic = new VisitorSessionLogic();
-                var prevSession = logic.GetAll().SingleOrDefault(x => x.SessionId == sessionId);
+        //public static void WriteVisitorSession(string sessionId, string pageUrl, string userName, string ipAddress)
+        //{
+        //    try
+        //    {
+        //        var logic = new VisitorSessionLogic();
+        //        var prevSession = logic.GetAll().SingleOrDefault(x => x.SessionId == sessionId);
 
-                if (prevSession != null)
-                {
-                    prevSession.PageUrl = pageUrl;
+        //        if (prevSession != null)
+        //        {
+        //            prevSession.PageUrl = pageUrl;
 
-                    if (!string.IsNullOrEmpty(userName))
-                    {
-                        prevSession.UserName = userName;
-                    }
+        //            if (!string.IsNullOrEmpty(userName))
+        //            {
+        //                prevSession.UserName = userName;
+        //            }
 
-                    prevSession.DateModified = DateTime.Now;
-                    logic.Edit(prevSession);
-                }
-                else
-                {
-                    VisitorSession session = new VisitorSession();
+        //            prevSession.DateModified = DateTime.Now;
+        //            logic.Edit(prevSession);
+        //        }
+        //        else
+        //        {
+        //            VisitorSession session = new VisitorSession();
 
-                    if (ipAddress != null)
-                    {
-                        session.IpAddress = ipAddress;
-                        session.PageUrl = pageUrl;
-                        session.SessionId = sessionId;
+        //            if (ipAddress != null)
+        //            {
+        //                session.IpAddress = ipAddress;
+        //                session.PageUrl = pageUrl;
+        //                session.SessionId = sessionId;
 
-                        if (!string.IsNullOrEmpty(userName))
-                        {
-                            session.UserName = userName;
-                        }
+        //                if (!string.IsNullOrEmpty(userName))
+        //                {
+        //                    session.UserName = userName;
+        //                }
 
-                        session.DateCreated = DateTime.Now;
-                        session.DateModified = session.DateCreated;
-                    }
+        //                session.DateCreated = DateTime.Now;
+        //                session.DateModified = session.DateCreated;
+        //            }
 
-                    logic.Add(session);
-                }
-            }
-            catch
-            {
-                // Ignore for now
-            }
-        }
+        //            logic.Add(session);
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        // Ignore for now
+        //    }
+        //}
 
         public static string ReadTextFile(string path)
         {
@@ -1567,10 +1561,10 @@ namespace digiozPortal.Web.Helpers
         /// and fetches the contents of them returning a List of Content Objects
         /// </summary>
         /// <returns></returns>
-        public static List<RSSViewModel> GetRSSFeeds()
+        public static List<RSSViewModel> GetRSSFeeds(List<Rss> rssList)
         {
-            var rssLogic = new RssLogic();
-            var rssList = rssLogic.GetAll();
+            //var rssLogic = new RssLogic();
+            //var rssList = rssLogic.GetAll();
             var rssContentList = new List<RSSViewModel>();
 
             foreach (var rss in rssList)

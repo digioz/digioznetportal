@@ -23,6 +23,11 @@ namespace digiozPortal.Payment.AuthNet
 
     public class AuthNetMakePayment : IMakePayment
     {
+        public PayResponse ProcessPayment(Pay pay, PaymentType payType, PaymentTypeKey key, List<PayLineItem> payLineItems) 
+        {
+            throw new NotImplementedException();
+        }
+
         public PayResponse ProcessPayment(Pay pay, PaymentTypeKey key, List<PayLineItem> payLineItems)
         {
             PayResponse payResponse = new PayResponse();

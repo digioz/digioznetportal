@@ -1,58 +1,45 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-
 using Dapper.Contrib.Extensions;
 using digiozPortal.Utilities;
-using digiozPortal.BO;
 
-namespace digiozPortal.DAL
+
+namespace digiozPortal.DAL.Interfaces
 {
-    public class MenuRepo
+    public class AbstractRepo<T> : IRepo<T> where T : class
     {
         private string _connectionString;
 
-        public MenuRepo() {
-            var config = new ConfigHelper();
-
-            _connectionString = config.GetConnectionString("DefaultConnection");
+        public AbstractRepo(IConfigHelper config) {
+            _connectionString = config.GetConnectionString();
         }
 
-        public Menu Get(int id) {
-            var model = new Menu();
-
+        public T Get(int id) {
             using (var connection = new SqlConnection(_connectionString)) {
-                model = connection.Get<Menu>(id);
+                return connection.Get<T>(id);
             }
-
-            return model;
         }
 
-        public List<BO.Menu> GetAll() {
-            var models = new List<Menu>();
-
+        public List<T> GetAll() {
             using (var connection = new SqlConnection(_connectionString)) {
-                models = connection.GetAll<BO.Menu>().ToList();
+                return connection.GetAll<T>().ToList();
             }
-
-            return models;
         }
 
-        public void Add(Menu model) {
+        public void Add(T model) {
             using (var connection = new SqlConnection(_connectionString)) {
                 connection.Insert(model);
             }
         }
 
-        public void Edit(Menu model) {
+        public void Edit(T model) {
             using (var connection = new SqlConnection(_connectionString)) {
                 connection.Update(model);
             }
         }
 
-        public void Delete(Menu model) {
+        public void Delete(T model) {
             using (var connection = new SqlConnection(_connectionString)) {
                 connection.Delete(model);
             }

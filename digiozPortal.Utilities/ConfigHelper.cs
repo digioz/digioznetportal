@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Text;
-using Microsoft.Extensions.Configuration;
-
-namespace digiozPortal.Utilities
+﻿namespace digiozPortal.Utilities
 {
-    public class ConfigHelper
+    public class ConfigHelper : IConfigHelper
     {
-        private readonly IConfiguration _configuration;
-
-        public string GetConnectionString(string connectionName) {
-            string connectionString = _configuration.GetConnectionString(connectionName);
-
-            return connectionString;
+        private readonly string _connectionString;
+        public ConfigHelper(string connectionString) {
+            _connectionString = connectionString;
+        }
+        public string GetConnectionString() {
+            return _connectionString;
         }
     }
+
 }

@@ -28,6 +28,7 @@ namespace digiozPortal.Web
                     .AddDefaultTokenProviders();
             //services.AddDefaultIdentity<IdentityUser>()
             //        .AddDapperStores();
+            DependencyConfig.AddDependencies(ref services, Configuration);
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

@@ -1,19 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
-using digiozPortal.Utilities;
-using PayPal;
 using PayPal.Api;
-using PayPal.PayPalAPIInterfaceService;
-using digiozPortal.BLL;
-using PayPal.Exception;
+using digiozPortal.BLL.Interfaces;
+using System;
 
 namespace digiozPortal.Payment.PayPalPay
 {
     public class PaypalMakePayment : IMakePayment
     {
+        IConfigLogic _configLogic;
+        public PaypalMakePayment(IConfigLogic configLogic) 
+        {
+            _configLogic = configLogic;
+        }
+        public PayResponse ProcessPayment(Pay pay, PaymentType payType, PaymentTypeKey key, List<PayLineItem> payLineItems) 
+        {
+            throw new NotImplementedException();
+        }
+
         // American Express Test Card:  370000000000002
         // Discover Test Card:          6011000000000012
         // Visa Test Card:              4007000000027
@@ -25,8 +29,7 @@ namespace digiozPortal.Payment.PayPalPay
         public PayResponse ProcessPayment(Pay pay, PaymentTypeKey key, List<PayLineItem> payLineItems) {
             /* Assumptions: Tax=0, Shipping=0 */
             PayResponse payResponse = new PayResponse();
-            var logicConfig = new ConfigLogic();
-            var config = logicConfig.GetConfig();
+            var config = _configLogic.GetConfig();
             Dictionary<string, string> paypalConfigs = new Dictionary<string, string>();
             paypalConfigs.Add("clientId", config["PaypalClientId"]);
             paypalConfigs.Add("clientSecret", config["PaypalClientSecret"]);

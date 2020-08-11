@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using digiozPortal.Payment.AuthNet;
-using digiozPortal.Payment.PayPalPay;
 
 namespace digiozPortal.Payment
 {
@@ -17,8 +13,18 @@ namespace digiozPortal.Payment
         ElectronicCheck
     }
 
-    public class MakePayment
+    public class MakePayment : IMakePayment
     {
+        IMakePayment _makePayment;
+        public MakePayment(IMakePayment makePayment) 
+        {
+            _makePayment = makePayment;
+        }
+
+        public PayResponse ProcessPayment(Pay pay, PaymentTypeKey key, List<PayLineItem> payLineItems) 
+        {
+            throw new NotImplementedException();
+        }
         public PayResponse ProcessPayment(Pay pay, PaymentType payType, PaymentTypeKey key, List<PayLineItem> payLineItems )
         {
             IMakePayment makePayment;
@@ -32,9 +38,7 @@ namespace digiozPortal.Payment
             }
             if (payType == PaymentType.PayPal)
             {
-                makePayment = new PaypalMakePayment();
-
-                payResponse = makePayment.ProcessPayment(pay, key, payLineItems);
+                payResponse = _makePayment.ProcessPayment(pay, key, payLineItems);
             }
 
             return payResponse;

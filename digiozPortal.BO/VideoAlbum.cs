@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace digiozPortal.BO
 {
+    [Table("VideoAlbum")]
     public partial class VideoAlbum
     {
         public long Id { get; set; }

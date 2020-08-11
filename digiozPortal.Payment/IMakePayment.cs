@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace digiozPortal.Payment
 {
-    interface IMakePayment
+    public interface IMakePayment
     {
         PayResponse ProcessPayment(Pay pay, PaymentTypeKey key, List<PayLineItem> payLineItems);
+        PayResponse ProcessPayment(Pay pay, PaymentType payType, PaymentTypeKey key, List<PayLineItem> payLineItems);
     }
 }

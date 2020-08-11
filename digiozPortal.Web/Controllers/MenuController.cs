@@ -1,20 +1,58 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using digiozPortal.BO;
-using digiozPortal.BLL;
 using digiozPortal.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System.Linq;
 using System;
 using digiozPortal.Utilities;
 using digiozPortal.Web.Models.ViewModels;
 using digiozPortal.Web.Helpers;
+using digiozPortal.BLL.Interfaces;
 
 namespace digiozPortal.Web.Controllers
 {
     public class MenuController : BaseController
     {
+        ILogic<Menu> _menuLogic;
+        ILogic<Plugin> _pluginLogic;
+        IConfigLogic _configLogic;
+        ILogic<Poll> _pollLogic;
+        ILogic<VisitorSession> _visitorSessionLogic;
+        ILogic<Module> _moduleLogic;
+        ILogic<SlideShow> _slideShowLogic;
+        ILogic<CommentConfig> _commentConfigLogic;
+        ILogic<Picture> _pictureLogic;
+        ILogic<ProductCategory> _productCategoryLogic;
+        ILogic<Rss> _rssLogic;
+
+
+        public MenuController(
+            ILogic<Menu> menuLogic,
+            ILogic<Plugin> pluginLogic,
+            IConfigLogic configLogic,
+            ILogic<Poll> pollLogic,
+            ILogic<VisitorSession> visitorSessionLogic,
+            ILogic<Module> moduleLogic,
+            ILogic<SlideShow> slideShowLogic,
+            ILogic<CommentConfig> commentConfigLogic,
+            ILogic<Picture> pictureLogic,
+            ILogic<ProductCategory> productCategoryLogic,
+            ILogic<Rss> rssLogic
+        ) 
+        {
+            _menuLogic = menuLogic;
+            _pluginLogic = pluginLogic;
+            _configLogic = configLogic;
+            _pollLogic = pollLogic;
+            _visitorSessionLogic = visitorSessionLogic;
+            _moduleLogic = moduleLogic;
+            _slideShowLogic = slideShowLogic;
+            _commentConfigLogic = commentConfigLogic;
+            _pictureLogic = pictureLogic;
+            _productCategoryLogic = productCategoryLogic;
+            _rssLogic = rssLogic;
+    }
+
         //
         // GET: /Menu/
         public ActionResult Index()
@@ -24,8 +62,7 @@ namespace digiozPortal.Web.Controllers
 
         public ActionResult TopMenu()
         {
-            var logic = new MenuLogic();
-            var topMenus = logic.GetAll();; //.Where(x => x.Location == "TopMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
+            var topMenus = _menuLogic.GetAll();; //.Where(x => x.Location == "TopMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
 
             return PartialView("TopMenu", topMenus);
         }
@@ -33,8 +70,7 @@ namespace digiozPortal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
         public ActionResult PluginMenu()
         {
-            var logic = new PluginLogic();
-            var plugins = logic.GetAll().Where(x => x.IsEnabled == true);
+            var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true);
 
             return PartialView("PluginMenu", plugins);
         }
@@ -42,8 +78,8 @@ namespace digiozPortal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
         public ActionResult LeftMenu()
         {
-            var logic = new MenuLogic();
-            var leftMenus = logic.GetAll().Where(x => x.Location == "LeftMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
+            //var logic = new MenuLogic();
+            var leftMenus = _menuLogic.GetAll().Where(x => x.Location == "LeftMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
 
             return PartialView("LeftMenu", leftMenus);
         }
@@ -51,8 +87,7 @@ namespace digiozPortal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
         public ActionResult StoreMenu()
         {
-            var logic = new PluginLogic();
-            var plugins = logic.GetAll().Where(x => x.Name == "Store" && x.IsEnabled == true).ToList();
+            var plugins = _pluginLogic.GetAll().Where(x => x.Name == "Store" && x.IsEnabled == true).ToList();
             ViewBag.ShowStore = false;
 
             if (plugins.Count > 0)
@@ -60,8 +95,7 @@ namespace digiozPortal.Web.Controllers
                 ViewBag.ShowStore = true;
             }
 
-            var logicProductCategory = new ProductCategoryLogic(); // ProductCategoryLogic();
-            var productCategories = logicProductCategory.GetAll(); 
+            var productCategories = _productCategoryLogic.GetAll(); 
 
             return PartialView("StoreMenu", productCategories);
         }
@@ -69,8 +103,7 @@ namespace digiozPortal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
         public ActionResult PollMenu()
         {
-            var logic = new PollLogic();
-            var polls = logic.GetAll().Where(x => x.Featured == true);
+            var polls = _pollLogic.GetAll().Where(x => x.Featured == true);
             polls = polls.OrderByDescending(x => x.DateCreated).ToList();
             var poll = polls.Take(1).SingleOrDefault();
 
@@ -82,16 +115,14 @@ namespace digiozPortal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
         public ActionResult TwitterMenu()
         {
-            var logic = new PluginLogic();
-            var plugins = logic.GetAll().Where(x => x.IsEnabled == true && x.Name == "Twitter");
+            var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true && x.Name == "Twitter");
 
             if (plugins.Any())
             {
                 //Check config table for twitter handle
-                var logicConfig = new ConfigLogic();
-                var configs = logicConfig.GetAll().Where(x => x.ConfigKey == "TwitterHandle");
+                var configs = _configLogic.GetAll().Where(x => x.ConfigKey == "TwitterHandle");
                 var twitterHandleConfig = configs.Take(1).SingleOrDefault();
-                configs = logicConfig.GetAll().Where(x => x.ConfigKey == "TwitterWidgetID");
+                configs = _configLogic.GetAll().Where(x => x.ConfigKey == "TwitterWidgetID");
 
                 if (twitterHandleConfig != null)
                 {
@@ -107,11 +138,9 @@ namespace digiozPortal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
         public ActionResult WhoIsOnlineMenu()
         {
-            var logic = new PluginLogic();
-            var configWhoIsOnline = logic.GetAll().SingleOrDefault(x => x.Name == "WhoIsOnline");
+            var configWhoIsOnline = _pluginLogic.GetAll().SingleOrDefault(x => x.Name == "WhoIsOnline");
 
-            var logicVisitors = new VisitorSessionLogic();
-            var latestVisitors = logicVisitors.GetAll().Where(x => x.DateModified >= DateTime.Now.AddMinutes(-10)).ToList();
+            var latestVisitors = _visitorSessionLogic.GetAll().Where(x => x.DateModified >= DateTime.Now.AddMinutes(-10)).ToList();
             var visitorRegistered = latestVisitors.Where(x => x.UserName != null).DistinctBy(x => x.UserName).ToList();
 
             ViewBag.VisitorCount = latestVisitors.Count();
@@ -132,8 +161,7 @@ namespace digiozPortal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
         public ActionResult ZoneMenu(string zoneType)
         {
-            var logic = new ModuleLogic();
-            var modules = logic.GetAll().Where(x => x.Location == zoneType).ToList();
+            var modules = _moduleLogic.GetAll().Where(x => x.Location == zoneType).ToList();
             ViewBag.SelectedZone = zoneType;
 
             return PartialView("ZoneMenu", modules);
@@ -143,13 +171,11 @@ namespace digiozPortal.Web.Controllers
         public ActionResult SlideShow()
         {
             var slides = new List<SlideShow>();
-            var logic = new PluginLogic();
-            var plugins = logic.GetAll().SingleOrDefault(x => x.IsEnabled == true &&  x.Name == "SlideShow");
+            var plugins = _pluginLogic.GetAll().SingleOrDefault(x => x.IsEnabled == true &&  x.Name == "SlideShow");
 
             if (plugins != null)
             {
-                var logicSlideShow = new SlideShowLogic();
-                slides = logicSlideShow.GetAll();
+                slides = _slideShowLogic.GetAll();
             }
 
             return PartialView("SlideShow", slides);
@@ -164,10 +190,8 @@ namespace digiozPortal.Web.Controllers
             commentVM.Likes = 0;
             commentVM.CommentsEnabled = false;
 
-            var logic = new PluginLogic();
-            var plugins = logic.GetAll().SingleOrDefault(x => x.IsEnabled == true && x.Name == "Comments");
-            var logicConfig = new ConfigLogic();
-            var configs = logicConfig.GetAll().Where(x => x.ConfigKey == "EnableCommentsOnAllPages");
+            var plugins = _pluginLogic.GetAll().SingleOrDefault(x => x.IsEnabled == true && x.Name == "Comments");
+            var configs = _configLogic.GetAll().Where(x => x.ConfigKey == "EnableCommentsOnAllPages");
             var enableCommentsOnAllPages = configs.Take(1).SingleOrDefault();
 
             if (enableCommentsOnAllPages != null && enableCommentsOnAllPages.ConfigValue == "true")
@@ -176,8 +200,7 @@ namespace digiozPortal.Web.Controllers
             }
             else
             {
-                var logicCommentConfig = new CommentConfigLogic();
-                var commentConfigs = logicCommentConfig.GetAll().Where(x => x.ReferenceId == referenceId && x.ReferenceType == referenceType).ToList();
+                var commentConfigs = _commentConfigLogic.GetAll().Where(x => x.ReferenceId == referenceId && x.ReferenceType == referenceType).ToList();
 
                 if (commentConfigs.Count > 0)
                 {
@@ -191,13 +214,14 @@ namespace digiozPortal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
         public ActionResult RSSFeed()
         {
-            var logic = new PluginLogic();
-            var plugins = logic.GetAll().Where(x => x.IsEnabled == true && x.Name == "RSSFeed");
+            var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true && x.Name == "RSSFeed");
             var feedContent = new List<RSSViewModel>();
+
+            var rssList = _rssLogic.GetAll();
 
             if (plugins.Any())
             {
-                feedContent = Utility.GetRSSFeeds();
+                feedContent = Utility.GetRSSFeeds(rssList);
             }
 
             return PartialView("RSSFeed", feedContent);
@@ -205,15 +229,13 @@ namespace digiozPortal.Web.Controllers
 
         public ActionResult LatestPictures()
         {
-            var logic = new PluginLogic();
-            var plugins = logic.GetAll().Where(x => x.IsEnabled == true && x.Name == "LatestPictures");
+            var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true && x.Name == "LatestPictures");
             var latestPictures = new List<Picture>();
             ViewBag.ShowLatestPictures = false;
 
             if (plugins.Any())
             {
-                var logicPicture = new PictureLogic();
-                latestPictures = logicPicture.GetAll().Take(9).ToList();
+                latestPictures = _pictureLogic.GetAll().Take(9).ToList();
                 ViewBag.ShowLatestPictures = true;
             }
 

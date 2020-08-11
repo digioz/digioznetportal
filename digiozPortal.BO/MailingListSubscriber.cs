@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace digiozPortal.BO
 {
+    [Table("MailingListSubscriber")]
     public partial class MailingListSubscriber
     {
         public Guid Id { get; set; }
