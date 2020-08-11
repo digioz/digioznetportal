@@ -62,7 +62,7 @@ namespace digiozPortal.Web.Controllers
 
         public ActionResult TopMenu()
         {
-            var topMenus = _menuLogic.GetAll();; //.Where(x => x.Location == "TopMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
+            var topMenus = _menuLogic.GetAll().Where(x => x.Location == "TopMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
 
             return PartialView("TopMenu", topMenus);
         }
