@@ -39,14 +39,11 @@
     <div class="container body-content">
         <div class="row">
             <div class="col-md-3">
-                <div class="card bg-light mb-3">
-                    <div class="card-header">Menu</div>
-                    <div class="card-body">
-                        <ul>
-                            <li>@Html.ActionLink("Home", "Index")</li>
-                        </ul>
-                    </div>
-                </div>
+
+                @Html.RenderAction("LeftMenu", "Menu")
+
+                @Html.RenderAction("UserMenu", "Menu")
+
             </div>
             <div class="col-md-9">
                 <div class="card bg-light mb-5">

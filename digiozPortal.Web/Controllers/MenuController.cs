@@ -60,11 +60,17 @@ namespace digiozPortal.Web.Controllers
             return View();
         }
 
+        [ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
         public ActionResult TopMenu()
         {
             var topMenus = _menuLogic.GetAll().Where(x => x.Location == "TopMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
 
             return PartialView("TopMenu", topMenus);
+        }
+
+        public ActionResult UserMenu() 
+        {
+            return PartialView("UserMenu");
         }
 
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
