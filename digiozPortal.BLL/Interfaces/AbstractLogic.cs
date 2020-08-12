@@ -9,7 +9,7 @@ namespace digiozPortal.BLL.Interfaces
         public AbstractLogic(IRepo<T> repo) {
             _repo = repo;
         }
-        public T Get(int id) {
+        public T Get(object id) {
             return _repo.Get(id);
         }
 

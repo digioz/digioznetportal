@@ -15,7 +15,7 @@ namespace digiozPortal.DAL.Interfaces
             _connectionString = config.GetConnectionString();
         }
 
-        public T Get(int id) {
+        public T Get(object id) {
             using (var connection = new SqlConnection(_connectionString)) {
                 return connection.Get<T>(id);
             }

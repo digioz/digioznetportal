@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace digiozPortal.DAL.Interfaces
 {
     public interface IRepo<T>  
     {
-        T Get(int id);
+        T Get(object id);
         List<T> GetAll();
         void Add(T entity);
         void Edit(T entity);
