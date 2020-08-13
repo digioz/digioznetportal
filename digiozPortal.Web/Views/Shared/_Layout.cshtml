@@ -27,7 +27,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             
-                @Html.RenderAction("TopMenu", "Menu")
+                @Html.RenderAction("TopMenu", "Menu", new { area = "" })
             
             <form class="form-inline mt-2 mt-md-0">
                 <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
@@ -40,18 +40,33 @@
         <div class="row">
             <div class="col-md-3">
 
-                @Html.RenderAction("LeftMenu", "Menu")
+                @Html.RenderAction("LeftMenu", "Menu", new { area = "" })
 
-                @Html.RenderAction("UserMenu", "Menu")
+                @Html.RenderAction("UserMenu", "Menu", new { area = "" })
+
+                @Html.RenderAction("WhoIsOnlineMenu", "Menu", new { area = "" })
+
+                
+
+                @Html.RenderAction("ZoneMenu", "Menu", new { zoneType = "Left" })
 
             </div>
             <div class="col-md-9">
+
+                @Html.RenderAction("ZoneMenu", "Menu", new { zoneType = "BodyTop" })
+
+                @RenderSection("featured", required: false)
+
+                @RenderSection("RSSFeed", required: false)
+
                 <div class="card bg-light mb-5">
                     <div class="card-header" style="background-color:#428BCA;color:#ffffff;">@ViewBag.Title</div>
                     <div class="card-body">
                         @RenderBody()
                     </div>
                 </div>
+
+                @Html.RenderAction("ZoneMenu", "Menu", new { zoneType = "BodyBottom" })
             </div>
         </div>
 

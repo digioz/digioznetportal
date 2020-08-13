@@ -10,14 +10,6 @@ namespace digiozPortal.Web.Controllers
         public string ConnectionString;
 
         public override void OnActionExecuting(ActionExecutingContext filterContext) {
-            //ConnectionString = _configuration.GetConnectionString("DefaultConnection");
-
-            string projectPath = AppDomain.CurrentDomain.BaseDirectory.Split(new String[] { @"bin\" }, StringSplitOptions.None)[0];
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(projectPath)
-                .AddJsonFile("appsettings.json")
-                .Build();
-            ConnectionString = configuration.GetConnectionString("DefaultConnection");
 
 
         }

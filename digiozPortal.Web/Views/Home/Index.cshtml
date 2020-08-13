@@ -1,8 +1,58 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model digiozPortal.Web.Models.ViewModels.HomeIndexViewModel
+
+@{
+    ViewBag.Title = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@section keywords {
+    @if (Model.Page != null && Model.Page.Keywords != null)
+    {
+        <meta name="keywords" content="@Model.Page.Keywords" />
+    }
+}
+
+@section description {
+    @if (Model.Page != null && Model.Page.Description != null)
+    {
+        <meta name="description" content="@Model.Page.Description" />
+    }
+}
+
+@if (Model.Announcements != null)
+{
+    @section featured {
+
+        @{ Html.RenderAction("SlideShow", "Menu", new { zoneType = "BodyTop" });}
+
+        @foreach (var item in @Model.Announcements)
+        {
+            <div class="card bg-light mb-3">
+                <div class="card-header">@item.Title</div>
+                <div class="card-body">
+                    @Html.Raw(item.Body)
+                </div>
+                <div>
+                    @{ Html.RenderAction("CommentsMenu", "Menu", new { referenceId = item.Id, referenceType = "Announcement" }); }
+                </div>
+            </div>
+        }
+        <div class="text-center">@Html.ActionLink("View More", "Announcements", "Home", null, new { @class = "btn btn-xs btn-primary" })</div>
+        <br />
+
+        @{ Html.RenderAction("LatestPictures", "Menu");}
+
+    }
+}
+
+@section RSSFeed {
+    @{ Html.RenderAction("RSSFeed", "Menu");}
+}
+
+@{
+    if (Model.Page != null)
+    {
+        @Html.Raw(Model.Page.Body)
+    }
+
+    Html.RenderAction("CommentsMenu", "Menu", new { referenceId = Model.Page.Id, referenceType = "Page" });
+}

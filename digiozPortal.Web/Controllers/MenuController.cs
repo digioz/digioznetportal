@@ -51,7 +51,7 @@ namespace digiozPortal.Web.Controllers
             _pictureLogic = pictureLogic;
             _productCategoryLogic = productCategoryLogic;
             _rssLogic = rssLogic;
-    }
+        }
 
         //
         // GET: /Menu/
