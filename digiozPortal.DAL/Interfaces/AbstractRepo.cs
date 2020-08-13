@@ -9,7 +9,7 @@ namespace digiozPortal.DAL.Interfaces
 {
     public class AbstractRepo<T> : IRepo<T> where T : class
     {
-        private string _connectionString;
+        protected string _connectionString;
 
         public AbstractRepo(IConfigHelper config) {
             _connectionString = config.GetConnectionString();

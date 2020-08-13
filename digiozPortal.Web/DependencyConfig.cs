@@ -55,6 +55,7 @@ namespace digiozPortal.Web
             services.AddSingleton<IRepo<VisitorInfo>, BaseRepo<VisitorInfo>>();
             services.AddSingleton<IRepo<VisitorSession>, BaseRepo<VisitorSession>>();
             services.AddSingleton<IRepo<Zone>, BaseRepo<Zone>>();
+            services.AddSingleton<IChatRepo, ChatRepo>();
 
 
             services.AddSingleton<ILogic<Announcement>, BaseLogic<Announcement>>();
@@ -96,6 +97,7 @@ namespace digiozPortal.Web
             services.AddSingleton<ILogic<VisitorInfo>, BaseLogic<VisitorInfo>>();
             services.AddSingleton<ILogic<VisitorSession>, BaseLogic<VisitorSession>>();
             services.AddSingleton<ILogic<Zone>, BaseLogic<Zone>>();
+            services.AddSingleton<IChatLogic, ChatLogic>();
 
             services.AddSingleton<IConfigLogic, ConfigLogic>();
         }
