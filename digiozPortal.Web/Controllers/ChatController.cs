@@ -16,18 +16,18 @@ namespace digioz.Portal.Web.Controllers
     public class ChatController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
-        ILogic<Chat> _chatLogic;
+        IChatLogic _chatLogic;
         ILogic<Config> _configLogic;
         ILogic<VisitorSession> _visitorSessionLogic;
 
         public ChatController(
             ILogger<HomeController> logger,
-            ILogic<Chat> pageLogic,
+            IChatLogic chatLogic,
             ILogic<Config> configLogic,
             ILogic<VisitorSession> visitorSessionLogic
         ) {
             _logger = logger;
-            _chatLogic = pageLogic;
+            _chatLogic = chatLogic;
             _configLogic = configLogic;
             _visitorSessionLogic = visitorSessionLogic;
         }
@@ -36,7 +36,7 @@ namespace digioz.Portal.Web.Controllers
         [Authorize]
         public ActionResult Index()
         {
-            var chats = new List<Chat>(); // _chatLogic.GetLatestChats();
+            var chats = _chatLogic.GetLatestChats();
 
             return View(chats);
         }

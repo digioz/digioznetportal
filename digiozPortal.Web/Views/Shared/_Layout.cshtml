@@ -48,12 +48,12 @@
 
                 
 
-                @Html.RenderAction("ZoneMenu", "Menu", new { zoneType = "Left" })
+                @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "Left" })
 
             </div>
             <div class="col-md-9">
 
-                @Html.RenderAction("ZoneMenu", "Menu", new { zoneType = "BodyTop" })
+                @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "BodyTop" })
 
                 @RenderSection("featured", required: false)
 
@@ -66,7 +66,7 @@
                     </div>
                 </div>
 
-                @Html.RenderAction("ZoneMenu", "Menu", new { zoneType = "BodyBottom" })
+                @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "BodyBottom" })
             </div>
         </div>
 
