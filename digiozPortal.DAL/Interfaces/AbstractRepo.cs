@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using Dapper;
 using Dapper.Contrib.Extensions;
+using digiozPortal.BO;
 using digiozPortal.Utilities;
 
 
@@ -43,6 +45,28 @@ namespace digiozPortal.DAL.Interfaces
             using (var connection = new SqlConnection(_connectionString)) {
                 connection.Delete(model);
             }
+        }
+
+        public IEnumerable<T> Get(Query query) 
+        {
+            var queryString = GetQuery(query);
+            using (var connection = new SqlConnection(_connectionString)) {
+                return connection.Query<T>(queryString);
+            }
+        }
+
+        public IEnumerable<T> Get(string query) {
+            using (var connection = new SqlConnection(_connectionString)) {
+                return connection.Query<T>(query);
+            }
+        }
+        private string GetQuery(Query query) 
+        {
+            string queryString = $"SELECT {(query.Top > 0 ? $"TOP {query.Top}" : "")} {query.Select} {typeof(T).Name} " +
+                (!string.IsNullOrWhiteSpace(query.Where) ? " WHERE " + query.Where : "") + 
+                (!string.IsNullOrWhiteSpace(query.OrderBy) ? " ORDERBY " + query.OrderBy : "");
+
+            return queryString;
         }
     }
 }
