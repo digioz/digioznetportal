@@ -62,9 +62,10 @@ namespace digiozPortal.DAL.Interfaces
         }
         private string GetQuery(Query query) 
         {
-            string queryString = $"SELECT {(query.Top > 0 ? $"TOP {query.Top}" : "")} {query.Select} {typeof(T).Name} " +
+            string queryString = $"SELECT {(query.Top > 0 ? $"TOP {query.Top}" : "")} " +
+                (string.IsNullOrWhiteSpace(query.Select) ? " * " : query.Select)  + " FROM " + typeof(T).Name +
                 (!string.IsNullOrWhiteSpace(query.Where) ? " WHERE " + query.Where : "") + 
-                (!string.IsNullOrWhiteSpace(query.OrderBy) ? " ORDERBY " + query.OrderBy : "");
+                (!string.IsNullOrWhiteSpace(query.OrderBy) ? " ORDER BY " + query.OrderBy : "");
 
             return queryString;
         }

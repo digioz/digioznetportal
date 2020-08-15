@@ -13,7 +13,7 @@ namespace digiozPortal.DAL
         public CommentRepo(IConfigHelper config) : base(config) { }
 
         public List<Comment> GetCommentPostsByReference(int referenceId, string referenceType) {
-            string sqlChats = $"SELECT * FROM Comment WHERE ReferenceId = {referenceId} AND ReferenceType = {referenceType};";
+            string sqlChats = $"SELECT * FROM Comment WHERE ReferenceId = {referenceId} AND ReferenceType = '{referenceType}';";
             using (var connection = new SqlConnection(_connectionString)) {
                 return connection.Query<Comment>(sqlChats).OrderBy(x => x.ModifiedDate).ToList();
             }
