@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace digioz.Portal.Web.Controllers
+namespace digiozPortal.Web.Controllers
 {
     public class ChatController : BaseController
     {

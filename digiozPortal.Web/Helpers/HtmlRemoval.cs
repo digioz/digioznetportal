@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 
-namespace digioz.Portal.Web.Helpers
+namespace digiozPortal.Web.Helpers
 {
     /// <summary>
     /// Methods to remove HTML from strings.

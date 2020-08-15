@@ -25,7 +25,6 @@ namespace digiozPortal.Web.Controllers
         ILogic<ProductCategory> _productCategoryLogic;
         ILogic<Rss> _rssLogic;
 
-
         public MenuController(
             ILogic<Menu> menuLogic,
             ILogic<Plugin> pluginLogic,
@@ -190,7 +189,7 @@ namespace digiozPortal.Web.Controllers
         public ActionResult CommentsMenu(string referenceType, string referenceId)
         {
             CommentsMenuViewModel commentVM = new CommentsMenuViewModel();
-            commentVM.ReferenceId = referenceId;
+            commentVM.ReferenceId = Convert.ToInt32(referenceId);
             commentVM.ReferenceType = referenceType;
             commentVM.Count = 0;
             commentVM.Likes = 0;

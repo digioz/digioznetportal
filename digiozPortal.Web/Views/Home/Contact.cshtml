@@ -26,8 +26,8 @@
 
     if (ViewBag.ShowContactForm == true)
     {
-        Html.RenderAction("ContactUs", "Home");
+        @Html.RenderAction("ContactUs", "Home");
     }
 }
 
-@{ Html.RenderAction("CommentsMenu", "Menu", new { referenceId = Model.Id, referenceType = "Page" }); }
+@Html.RenderAction("CommentsMenu", "Menu", new { referenceId = Model.Id, referenceType = "Page" })

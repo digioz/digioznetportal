@@ -5,7 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Xml.Serialization;
 
-namespace digioz.Portal.Web.Helpers
+namespace digiozPortal.Web.Helpers
 {
     public class Serializer
     {

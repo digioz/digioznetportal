@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using digioz.Portal.Web.Helpers;
+using digiozPortal.Web.Helpers;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using digiozPortal.Payment;
 using digiozPortal.Web.Helpers;

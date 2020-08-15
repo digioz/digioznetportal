@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 
-namespace digioz.Portal.Web.Helpers
+namespace digiozPortal.Web.Helpers
 {
     public class ImageSaveData
     {

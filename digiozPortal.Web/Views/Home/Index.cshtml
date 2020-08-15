@@ -22,7 +22,7 @@
 {
     @section featured {
 
-        @{ Html.RenderAction("SlideShow", "Menu", new { zoneType = "BodyTop" });}
+        @Html.RenderAction("SlideShow", "Menu", new { zoneType = "BodyTop" })
 
         @foreach (var item in @Model.Announcements)
         {
@@ -32,20 +32,20 @@
                     @Html.Raw(item.Body)
                 </div>
                 <div>
-                    @{ Html.RenderAction("CommentsMenu", "Menu", new { referenceId = item.Id, referenceType = "Announcement" }); }
+                    @Html.RenderAction("CommentsMenu", "Menu", new { referenceId = item.Id, referenceType = "Announcement" })
                 </div>
             </div>
         }
         <div class="text-center">@Html.ActionLink("View More", "Announcements", "Home", null, new { @class = "btn btn-xs btn-primary" })</div>
         <br />
 
-        @{ Html.RenderAction("LatestPictures", "Menu");}
+        @Html.RenderAction("LatestPictures", "Menu")
 
     }
 }
 
 @section RSSFeed {
-    @{ Html.RenderAction("RSSFeed", "Menu");}
+    @Html.RenderAction("RSSFeed", "Menu");
 }
 
 @{
@@ -54,5 +54,5 @@
         @Html.Raw(Model.Page.Body)
     }
 
-    Html.RenderAction("CommentsMenu", "Menu", new { referenceId = Model.Page.Id, referenceType = "Page" });
+    @Html.RenderAction("CommentsMenu", "Menu", new { referenceId = Model.Page.Id, referenceType = "Page" })
 }

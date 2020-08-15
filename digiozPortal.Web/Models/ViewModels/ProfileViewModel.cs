@@ -8,7 +8,7 @@ using digiozPortal.Web.Helpers;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Http;
 
-namespace digioz.Portal.Web.Models.ViewModels
+namespace digiozPortal.Web.Models.ViewModels
 {
     public class ProfileViewModel
     {

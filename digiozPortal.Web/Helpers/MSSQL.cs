@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 using System.Data.Common;
 using System.Linq;
 
-namespace digioz.Portal.Web.Helpers
+namespace digiozPortal.Web.Helpers
 {
     /// <summary>
     /// MSSQL Database Communication Class
