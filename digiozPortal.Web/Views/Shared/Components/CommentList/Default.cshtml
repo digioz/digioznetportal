@@ -3,7 +3,7 @@
 <div class="detailBox">
     <div class="titleBox">
         <label>Comments (@Model.Count())</label>
-        <button type="button" class="btn btn-default btn-xs" data-toggle="collapse" data-target="#@ViewBag.ReferenceType@ViewBag.ReferenceId" style="float:right;">View</button>
+        <button type="button" class="btn btn-info btn-sm collapsed" data-toggle="collapse" data-target="#@ViewBag.ReferenceType@ViewBag.ReferenceId" style="float:right;">View</button>
     </div>
 
     <div id="@ViewBag.ReferenceType@ViewBag.ReferenceId" class="collapse">
@@ -25,7 +25,7 @@
                                 <span style="padding:0px;font-size:x-small">Likes (<b>@comment.Likes</b>)</span>
                                 @if (User.Identity.IsAuthenticated)
                                 {
-                                    <a href="@Url.Action("Like","Comments", new { id = comment.Id })"><img src="~/Content/images/icons/20x20/Like.png" /></a>
+                                    <a href="@Url.Action("Like","Comments", new { id = comment.Id })"><img src="~/img/images/icons/20x20/Like.png" /></a>
                                 }
                             </td>
                         </tr>
@@ -69,7 +69,7 @@
                     <input type="hidden" id="referenceType" name="referenceType" value="@ViewBag.ReferenceType">
                     <textarea id="comment" name="comment" class="form-control" placeholder="Your comments" style="width:100%"></textarea>
                     <div class="form-group" style="float:right;height:100px;">
-                        <button type="submit" class="btn btn-primary">Post Comments</button>
+                        <button type="submit" class="btn btn-info btn-sm">Post Comments</button>
                     </div>
                 }
             </div>

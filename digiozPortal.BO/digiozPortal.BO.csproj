@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper.Contrib" Version="2.0.35" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
   </ItemGroup>
 

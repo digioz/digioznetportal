@@ -82,11 +82,17 @@ namespace digiozPortal.Web.Controllers
         {
             // Add the Like to the Comment
             var commentLike = new CommentLike() {
+                Id = Guid.NewGuid().ToString(),
                 UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
                 CommentId = id
             };
 
             _commentLikeLogic.Add(commentLike);
+
+            // Update Count on Comment Record
+            var comment = _commentLogic.Get(id);
+            comment.Likes += 1;
+            _commentLogic.Edit(comment);
 
             return Redirect(Request.Headers["Referer"].ToString());
         }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+using Dapper.Contrib.Extensions;
 
 namespace digiozPortal.BO
 {
     [Table("Comment")]
     public partial class Comment
     {
+        [ExplicitKey]
         public string Id { get; set; }
         public string ParentId { get; set; }
         public string UserId { get; set; }
