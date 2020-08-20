@@ -31,7 +31,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var serviceProvider = services.BuildServiceProvider();
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
             var dbConnectionContextOptions = new DapperStoreOptions {
-                ConnectionString = configuration.GetConnectionString("DefaultConnection"),
+                ConnectionString = configuration.GetConnectionString("DigiozportalConnection"),
                 DbConnectionFactory = new SqlServerDbConnectionFactory(),
                 Services = services
             };
