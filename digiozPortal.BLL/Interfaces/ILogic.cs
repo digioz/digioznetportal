@@ -8,6 +8,6 @@ namespace digiozPortal.BLL.Interfaces
         List<T> GetAll();
         void Add(T entity);
         void Edit(T entity);
-        void Delete(int id);
+        void Delete(T entity);
     }
 }

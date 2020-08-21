@@ -25,8 +25,7 @@ namespace digiozPortal.BLL.Interfaces
             _repo.Edit(entity);
         }
 
-        public void Delete(int id) {
-            var entity = _repo.Get(id);
+        public void Delete(T entity) {
             if (entity != null) {
                 _repo.Delete(entity);
             }
