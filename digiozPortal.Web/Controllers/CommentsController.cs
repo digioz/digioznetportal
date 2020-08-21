@@ -19,18 +19,15 @@ namespace digiozPortal.Web.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly ICommentLogic _commentLogic;
         private readonly ILogic<CommentLike> _commentLikeLogic;
-        private readonly ILogic<Config> _configLogic;
 
         public CommentsController(
             ILogger<HomeController> logger,
             ICommentLogic commentLogic,
-            ILogic<CommentLike> commentLike,
-            ILogic<Config> configLogic
+            ILogic<CommentLike> commentLike
         ) {
             _logger = logger;
             _commentLogic = commentLogic;
             _commentLikeLogic = commentLike;
-            _configLogic = configLogic;
         }
 
         // GET: Comments
