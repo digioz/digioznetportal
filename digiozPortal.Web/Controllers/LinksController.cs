@@ -13,8 +13,8 @@ namespace digiozPortal.Web.Controllers
     public class LinksController : BaseController
     {
         private readonly ILogger<LinksController> _logger;
-        ILogic<Link> _linkLogic;
-        ILogic<LinkCategory> _linkCategoryLogic;
+        private readonly ILogic<Link> _linkLogic;
+        private readonly ILogic<LinkCategory> _linkCategoryLogic;
 
         public LinksController(
             ILogger<LinksController> logger,

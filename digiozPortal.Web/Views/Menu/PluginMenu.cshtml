@@ -2,8 +2,8 @@
 
 @foreach (var item in Model)
 {
-    var controller = ViewContext.RouteData.Values["Controller"];
-    var action = ViewContext.RouteData.Values["Action"];
+    var controller = ViewContext.RouteData.Values["Controller"].ToString();
+    var action = ViewContext.RouteData.Values["Action"].ToString();
 
     <li @if (controller == item.Name && action == "Index")
         { <text> class="active" </text>  }>

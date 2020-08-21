@@ -65,8 +65,8 @@ namespace Microsoft.AspNetCore.Mvc.Rendering
                     content = task.Exception.Message;
                 } else if (task.IsCompleted) {
                     newHttpContext.Response.Body.Position = 0;
-                    using (var reader = new StreamReader(newHttpContext.Response.Body))
-                        content = reader.ReadToEnd();
+                    using var reader = new StreamReader(newHttpContext.Response.Body);
+                    content = reader.ReadToEnd();
                 }
             });
 

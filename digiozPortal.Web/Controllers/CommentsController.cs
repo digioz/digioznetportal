@@ -17,9 +17,9 @@ namespace digiozPortal.Web.Controllers
     public class CommentsController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
-        ICommentLogic _commentLogic;
-        ILogic<CommentLike> _commentLikeLogic;
-        ILogic<Config> _configLogic;
+        private readonly ICommentLogic _commentLogic;
+        private readonly ILogic<CommentLike> _commentLikeLogic;
+        private readonly ILogic<Config> _configLogic;
 
         public CommentsController(
             ILogger<HomeController> logger,
@@ -57,7 +57,7 @@ namespace digiozPortal.Web.Controllers
             {
                 var guid = Guid.NewGuid();
 
-                Comment comment = new Comment()
+                var comment = new Comment()
                 {
                     Id = guid.ToString(),
                     ReferenceId = form["referenceId"].ToString(),

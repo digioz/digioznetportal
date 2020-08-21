@@ -5,7 +5,7 @@ namespace digiozPortal.BLL.Interfaces
 {
     public abstract class AbstractLogic<T> : ILogic<T>
     {
-        private IRepo<T> _repo;
+        private readonly IRepo<T> _repo;
         public AbstractLogic(IRepo<T> repo) {
             _repo = repo;
         }

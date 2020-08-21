@@ -15,9 +15,9 @@ namespace digiozPortal.Web.Controllers
     public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
-        ILogic<Page> _pageLogic;
-        ILogic<Config> _configLogic;
-        ILogic<Announcement> _announcementLogic;
+        private readonly ILogic<Page> _pageLogic;
+        private readonly ILogic<Config> _configLogic;
+        private readonly ILogic<Announcement> _announcementLogic;
 
         public HomeController(
             ILogger<HomeController> logger,
@@ -34,9 +34,10 @@ namespace digiozPortal.Web.Controllers
 
         public IActionResult Index() {
 
-            HomeIndexViewModel model = new HomeIndexViewModel();
-            model.Page = _pageLogic.GetAll().SingleOrDefault(x => x.Url == "/Home/Index" && x.Visible == true);
-            int numberOfAnnouncements = 1;
+            var model = new HomeIndexViewModel {
+                Page = _pageLogic.GetAll().SingleOrDefault(x => x.Url == "/Home/Index" && x.Visible == true)
+            };
+            var numberOfAnnouncements = 1;
             var configs = _configLogic.GetAll().Where(x => x.ConfigKey == "NumberOfAnnouncements");
             if (configs != null) {
                 numberOfAnnouncements = int.Parse(configs.Take(1).SingleOrDefault().ConfigValue);
@@ -51,7 +52,7 @@ namespace digiozPortal.Web.Controllers
         }
 
         public ActionResult About() {
-            Page page = _pageLogic.GetAll().SingleOrDefault(x => x.Url == "/Home/About" && x.Visible == true);
+            var page = _pageLogic.GetAll().SingleOrDefault(x => x.Url == "/Home/About" && x.Visible == true);
             return View(page);
         }
 
@@ -72,7 +73,7 @@ namespace digiozPortal.Web.Controllers
                 }
             }
 
-            Page page = _pageLogic.GetAll().SingleOrDefault(x => x.Url == "/Home/Contact" && x.Visible == true);
+            var page = _pageLogic.GetAll().SingleOrDefault(x => x.Url == "/Home/Contact" && x.Visible == true);
             return View(page);
         }
 

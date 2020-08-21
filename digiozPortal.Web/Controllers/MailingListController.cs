@@ -15,26 +15,23 @@ namespace digiozPortal.Web.Controllers
     public class MailingListController : BaseController
     {
         private readonly ILogger<MailingListController> _logger;
-        ILogic<MailingList> _mailingListLogic;
-        ILogic<MailingListCampaign> _mailingListCampaignsLogic;
-        ILogic<MailingListSubscriber> _mailingListSubscriberLogic;
-        ILogic<MailingListSubscriberRelation> _mailingListSubscriberRelationLogic;
-        IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogic<MailingList> _mailingListLogic;
+        private readonly ILogic<MailingListCampaign> _mailingListCampaignsLogic;
+        private readonly ILogic<MailingListSubscriber> _mailingListSubscriberLogic;
+        private readonly ILogic<MailingListSubscriberRelation> _mailingListSubscriberRelationLogic;
 
         public MailingListController(
             ILogger<MailingListController> logger,
             ILogic<MailingList> mailingListLogic,
             ILogic<MailingListCampaign> mailingListCampaignsLogic,
             ILogic<MailingListSubscriber> mailingListSubscriberLogic,
-            ILogic<MailingListSubscriberRelation> mailingListSubscriberRelationLogic,
-            IHttpContextAccessor httpContextAccessor
+            ILogic<MailingListSubscriberRelation> mailingListSubscriberRelationLogic
         ) {
             _logger = logger;
             _mailingListLogic = mailingListLogic;
             _mailingListCampaignsLogic = mailingListCampaignsLogic;
             _mailingListSubscriberLogic = mailingListSubscriberLogic;
             _mailingListSubscriberRelationLogic = mailingListSubscriberRelationLogic;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: MailingList
@@ -49,10 +46,11 @@ namespace digiozPortal.Web.Controllers
 
             if (model == null)
             {
-                model = new MailingListCampaign();
-                model.Subject = string.Empty;
-                model.Banner = string.Empty;
-                model.Body = string.Empty;
+                model = new MailingListCampaign {
+                    Subject = string.Empty,
+                    Banner = string.Empty,
+                    Body = string.Empty
+                };
             }
 
             // Update Count
@@ -62,11 +60,10 @@ namespace digiozPortal.Web.Controllers
                 _mailingListCampaignsLogic.Edit(model);
             }
 
-            var request = _httpContextAccessor.HttpContext.Request; 
             var address = string.Format("{0}://{1}{2}", Request.Scheme, Request.Host, Request.PathBase);
             ViewBag.EmailDisplayUrl = address + "/MailingList/EmailDisplay/" + model.Id; 
             ViewBag.UnsubscribeUrl = address + "/MailingList/Unsubscribe";
-            string bannerUrl = string.Empty;
+            var bannerUrl = string.Empty;
 
             if (!string.IsNullOrEmpty(model.Banner)) {
                 bannerUrl = address + "/Content/Emails/uploads/Full/" + model.Banner;
@@ -79,8 +76,9 @@ namespace digiozPortal.Web.Controllers
 
         public ActionResult Unsubscribe()
         {
-            var subscriptionVM = new UnsubscribeViewModel();
-            subscriptionVM.Unsubscribe = true;
+            var subscriptionVM = new UnsubscribeViewModel {
+                Unsubscribe = true
+            };
 
             return View(subscriptionVM);
         }

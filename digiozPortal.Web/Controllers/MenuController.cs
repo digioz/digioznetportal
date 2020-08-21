@@ -13,17 +13,17 @@ namespace digiozPortal.Web.Controllers
 {
     public class MenuController : BaseController
     {
-        ILogic<Menu> _menuLogic;
-        ILogic<Plugin> _pluginLogic;
-        IConfigLogic _configLogic;
-        ILogic<Poll> _pollLogic;
-        ILogic<VisitorSession> _visitorSessionLogic;
-        ILogic<Module> _moduleLogic;
-        ILogic<SlideShow> _slideShowLogic;
-        ILogic<CommentConfig> _commentConfigLogic;
-        ILogic<Picture> _pictureLogic;
-        ILogic<ProductCategory> _productCategoryLogic;
-        ILogic<Rss> _rssLogic;
+        private readonly ILogic<Menu> _menuLogic;
+        private readonly ILogic<Plugin> _pluginLogic;
+        private readonly IConfigLogic _configLogic;
+        private readonly ILogic<Poll> _pollLogic;
+        private readonly ILogic<VisitorSession> _visitorSessionLogic;
+        private readonly ILogic<Module> _moduleLogic;
+        private readonly ILogic<SlideShow> _slideShowLogic;
+        private readonly ILogic<CommentConfig> _commentConfigLogic;
+        private readonly ILogic<Picture> _pictureLogic;
+        private readonly ILogic<ProductCategory> _productCategoryLogic;
+        private readonly ILogic<Rss> _rssLogic;
 
         public MenuController(
             ILogic<Menu> menuLogic,
@@ -131,7 +131,7 @@ namespace digiozPortal.Web.Controllers
 
                 if (twitterHandleConfig != null)
                 {
-                    Twitter twitterFeed = new Twitter(twitterHandleConfig.ConfigValue, true);
+                    var twitterFeed = new Twitter(twitterHandleConfig.ConfigValue, true);
                     ViewBag.TwitterHandle = twitterFeed.TwitterHandle;
                     ViewBag.TwitterUser = twitterFeed.TwitterUser;
                     return PartialView("TwitterMenu", twitterFeed);
@@ -188,12 +188,13 @@ namespace digiozPortal.Web.Controllers
 
         public ActionResult CommentsMenu(string referenceType, string referenceId)
         {
-            CommentsMenuViewModel commentVM = new CommentsMenuViewModel();
-            commentVM.ReferenceId = Convert.ToInt32(referenceId);
-            commentVM.ReferenceType = referenceType;
-            commentVM.Count = 0;
-            commentVM.Likes = 0;
-            commentVM.CommentsEnabled = false;
+            var commentVM = new CommentsMenuViewModel {
+                ReferenceId = Convert.ToInt32(referenceId),
+                ReferenceType = referenceType,
+                Count = 0,
+                Likes = 0,
+                CommentsEnabled = false
+            };
 
             var plugins = _pluginLogic.GetAll().SingleOrDefault(x => x.IsEnabled == true && x.Name == "Comments");
             var configs = _configLogic.GetAll().Where(x => x.ConfigKey == "EnableCommentsOnAllPages");

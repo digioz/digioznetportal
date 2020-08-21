@@ -16,19 +16,16 @@ namespace digiozPortal.Web.Controllers
     public class ChatController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
-        IChatLogic _chatLogic;
-        ILogic<Config> _configLogic;
-        ILogic<VisitorSession> _visitorSessionLogic;
+        private readonly IChatLogic _chatLogic;
+        private readonly ILogic<VisitorSession> _visitorSessionLogic;
 
         public ChatController(
             ILogger<HomeController> logger,
             IChatLogic chatLogic,
-            ILogic<Config> configLogic,
             ILogic<VisitorSession> visitorSessionLogic
         ) {
             _logger = logger;
             _chatLogic = chatLogic;
-            _configLogic = configLogic;
             _visitorSessionLogic = visitorSessionLogic;
         }
 
@@ -45,9 +42,9 @@ namespace digiozPortal.Web.Controllers
         [HttpPost]
         public JsonResult Add(string message)
         {
-            if (!String.IsNullOrEmpty(message) && message != "[object HTMLInputElement]")
+            if (!string.IsNullOrEmpty(message) && message != "[object HTMLInputElement]")
             {
-                Chat chat = new Chat
+                var chat = new Chat
                 {
                     Timestamp = DateTime.Now,
                     Message = HttpUtility.HtmlEncode(message),

@@ -7,8 +7,8 @@
             {
                 if (!string.IsNullOrEmpty(item.Controller))
                 {
-                    var controllerSelected = ViewContext.RouteData.Values["Controller"];
-                    var actionSelected = ViewContext.RouteData.Values["Action"];
+                    var controllerSelected = ViewContext.RouteData.Values["Controller"].ToString();
+                    var actionSelected = ViewContext.RouteData.Values["Action"].ToString();
 
                     if (controllerSelected == item.Controller && actionSelected == item.Action)
                     {
