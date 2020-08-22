@@ -23,10 +23,10 @@
 
                 @if (User.IsInRole("Administrator"))
                 {
-                    <li>@Html.ActionLink("Admin Dashboard", "Index", "Dashboard", new { area = "Admin" }, null)</li>
+                    <li class="nav-item">@Html.ActionLink("Admin Dashboard", "Index", "Home", new { area = "Admin" }, null)</li>
                 }
             </ul>
-            <p>Logged in as @Html.ActionLink(@User.Identity.Name, "Index", "Profile", new { area = "" }, null).</p>
+            <p>Logged in as @Html.ActionLink(@User.Identity.Name, "Index", "Profile", new { area = "" }).</p>
         }
         else
         {
