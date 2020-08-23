@@ -51,9 +51,6 @@ namespace digiozPortal.Web
                 endpoints.MapControllerRoute(
                     name: "areas",
                     pattern: "{area:exists}/{controller=Home}/{action=Index}");
-                //endpoints.MapAreaControllerRoute(
-                //    name: "areas", "admin",
-                //    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
                 endpoints.MapControllerRoute(
                     name: "default", 
