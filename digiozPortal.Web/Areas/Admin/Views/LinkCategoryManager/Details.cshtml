@@ -1,0 +1,49 @@
+﻿@model digiozPortal.BO.LinkCategory
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<main>
+    <div class="container-fluid">
+        <h2>Link Category Details</h2>
+
+        <div>
+            <h4>LinkCategory</h4>
+            <hr />
+            <dl class="dl-horizontal">
+                <dt>
+                    @Html.DisplayNameFor(model => model.Name)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Name)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.Visible)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Visible)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.Timestamp)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Timestamp)
+                </dd>
+
+            </dl>
+        </div>
+        <p>
+            @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+            @Html.ActionLink("Back to List", "Index")
+        </p>
+    </div>
+</main>
+
+

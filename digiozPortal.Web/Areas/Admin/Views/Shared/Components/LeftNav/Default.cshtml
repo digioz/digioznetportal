@@ -52,7 +52,7 @@
                 <div class="collapse" id="collapseSocial" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="layout-static.html">Chats</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Links</a>
+                        <a class="nav-link" href="@Url.Action("Index", "LinkManager", new { area = "Admin" })">Links</a>
                         <a class="nav-link" href="layout-sidenav-light.html">Polls</a>
                         <a class="nav-link" href="layout-sidenav-light.html">Mailing Lists</a>
                         <a class="nav-link" href="layout-sidenav-light.html">Comments</a>
@@ -84,6 +84,7 @@
                         <a class="nav-link" href="layout-sidenav-light.html">File Manager</a>
                     </nav>
                 </div>
+
 
                 @*<div class="sb-sidenav-menu-heading">Core</div>
         <a class="nav-link" href="@Url.Action("Index", "Home", new { area = "admin" })">

@@ -3,7 +3,7 @@
 @foreach (var link in Model)
 {
         <li class="list-group-item">
-            <a href="@link.Url" target="_blank"><h4 class="list-group-item-heading">@link.Name</h4></a>
+            <a href="@link.URL" target="_blank"><h4 class="list-group-item-heading">@link.Name</h4></a>
             <p class="list-group-item-text">@Html.Raw(link.Description)</p>
         </li>
 }

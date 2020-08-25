@@ -1,0 +1,77 @@
+﻿@model digiozPortal.BO.Link
+
+@{
+    ViewBag.Title = "Link Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<main>
+    <div class="container-fluid">
+		<div class="card mb-4">
+			<div class="card-header">
+				Link Details
+			</div>
+            <div class="card-body">
+                <div>
+                    <hr />
+                    <dl class="dl-horizontal">
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Name)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Name)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.URL)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.URL)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Description)
+                        </dt>
+
+                        <dd>
+                            @Html.Raw(Model.Description)
+                        </dd>
+
+                        <dt>
+                            Category
+                        </dt>
+
+                        <dd>
+                            @ViewBag.LinkCategory.Name
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Visible)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Visible)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Timestamp)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Timestamp)
+                        </dd>
+
+                    </dl>
+                </div>
+                <p>
+                    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+                    @Html.ActionLink("Back to List", "List")
+                </p>
+            </div>
+		</div>
+	</div>
+</main>
+
+

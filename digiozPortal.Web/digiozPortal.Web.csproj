@@ -39,6 +39,7 @@
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Install\MSSQL\1.0.0.0\" />
+    <Folder Include="Extensions\" />
     <Folder Include="wwwroot\img\" />
   </ItemGroup>
 </Project>
