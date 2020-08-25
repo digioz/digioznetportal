@@ -91,7 +91,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind("ID", "Name", "Visible", "Timestamp")] LinkCategory linkCategory)
+        public ActionResult Edit([Bind("Id", "Name", "Visible", "Timestamp")] LinkCategory linkCategory)
         {
             linkCategory.Timestamp = DateTime.Now;
 

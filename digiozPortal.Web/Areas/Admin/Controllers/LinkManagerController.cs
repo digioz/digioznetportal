@@ -119,11 +119,10 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind("ID", "Name", "URL", "Description", "Category", "Visible", "Timestamp", "LinkCategoryId")] Link link)
+        public ActionResult Edit([Bind("Id", "Name", "URL", "Description", "Category", "Visible", "Timestamp", "LinkCategoryId")] Link link)
         {
             if (ModelState.IsValid)
             {
-                link.Timestamp = DateTime.Now;
                 _linkLogic.Edit(link);
 
                 return RedirectToAction("Index");
