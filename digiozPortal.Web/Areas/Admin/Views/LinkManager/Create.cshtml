@@ -1,74 +1,71 @@
 ﻿@model digiozPortal.BO.Link
 
 @{
-    ViewBag.Title = "Create Link";
+    ViewBag.Title = "Create Link1";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<div class="container">
+<div class="container-fluid">
     <div class="row">
-        <div class="col-12">
+        <div class="col-md-4">
             <h2>Create Link</h2>
 
             @using (Html.BeginForm())
             {
                 @Html.AntiForgeryToken()
 
-            <div class="form-horizontal">
-                @Html.ValidationSummary(true)
+                <div class="form-horizontal">
+                    @Html.ValidationSummary(true)
 
-                <div class="form-group">
-                    @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.Name)
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Name)
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(model => model.URL, new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.TextAreaFor(model => model.URL, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.URL)
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.URL, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(model => model.URL, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.URL)
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(model => model.Description, new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.Description)
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Description, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Description)
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label class="control-label col-md-2" for="LinkCategoryId">Category</label>
-                    <div class="col-md-10">
-                        @Html.DropDownList("LinkCategoryId", String.Empty)
-                        @Html.ValidationMessageFor(model => model.LinkCategoryId)
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="LinkCategoryId">Category</label>
+                        <div class="col-md-10">
+                            @Html.DropDownList("LinkCategoryId", String.Empty)
+                            @Html.ValidationMessageFor(model => model.LinkCategoryId)
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(model => model.Visible, new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.Visible)
-                        @Html.ValidationMessageFor(model => model.Visible)
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Visible, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.Visible)
+                            @Html.ValidationMessageFor(model => model.Visible)
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Create" class="btn btn-sm btn-primary" />
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Create" class="btn btn-sm btn-primary" />
+                        </div>
                     </div>
-                </div>
-            </div>}
+                </div>}
 
             <div>
-                @Html.ActionLink("Back to List", "List")
+                @Html.ActionLink("Back to List1", "List")
             </div>
-
         </div>
-    </div>
-</div>
 
