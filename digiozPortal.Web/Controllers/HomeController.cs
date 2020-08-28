@@ -35,7 +35,7 @@ namespace digiozPortal.Web.Controllers
         public IActionResult Index() {
 
             var model = new HomeIndexViewModel {
-                Page = _pageLogic.GetAll().SingleOrDefault(x => x.Url == "/Home/Index" && x.Visible == true)
+                Page = _pageLogic.GetAll().SingleOrDefault(x => x.URL == "/Home/Index" && x.Visible == true)
             };
             var numberOfAnnouncements = 1;
             var configs = _configLogic.GetAll().Where(x => x.ConfigKey == "NumberOfAnnouncements");
@@ -52,7 +52,7 @@ namespace digiozPortal.Web.Controllers
         }
 
         public ActionResult About() {
-            var page = _pageLogic.GetAll().SingleOrDefault(x => x.Url == "/Home/About" && x.Visible == true);
+            var page = _pageLogic.GetAll().SingleOrDefault(x => x.URL == "/Home/About" && x.Visible == true);
             return View(page);
         }
 
@@ -73,7 +73,7 @@ namespace digiozPortal.Web.Controllers
                 }
             }
 
-            var page = _pageLogic.GetAll().SingleOrDefault(x => x.Url == "/Home/Contact" && x.Visible == true);
+            var page = _pageLogic.GetAll().SingleOrDefault(x => x.URL == "/Home/Contact" && x.Visible == true);
             return View(page);
         }
 

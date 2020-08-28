@@ -12,16 +12,13 @@ namespace digiozPortal.Web.Controllers
 {
     public class LinksController : BaseController
     {
-        private readonly ILogger<LinksController> _logger;
         private readonly ILogic<Link> _linkLogic;
         private readonly ILogic<LinkCategory> _linkCategoryLogic;
 
         public LinksController(
-            ILogger<LinksController> logger,
             ILogic<Link> linkLogic,
             ILogic<LinkCategory> linkCategoryLogic
         ) {
-            _logger = logger;
             _linkLogic = linkLogic;
             _linkCategoryLogic = linkCategoryLogic;
         }

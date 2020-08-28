@@ -10,7 +10,7 @@ namespace digiozPortal.BO
         public int Id { get; set; }
         public string UserId { get; set; }
         public string Title { get; set; }
-        public string Url { get; set; }
+        public string URL { get; set; }
         public string Body { get; set; }
         public string Keywords { get; set; }
         public string Description { get; set; }
