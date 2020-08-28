@@ -158,7 +158,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Link link = _linkLogic.Get(id);
+            var link = _linkLogic.Get(id);
             _linkLogic.Delete(link);
 
             return RedirectToAction("Index");

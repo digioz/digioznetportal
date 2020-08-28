@@ -17,14 +17,11 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
     [Authorize(Roles = "Administrator")]
     public class LinkCategoryManagerController : Controller
     {
-        private readonly ILogger<LinkCategoryManagerController> _logger;
         private readonly ILogic<LinkCategory> _linkCategoryLogic;
 
         public LinkCategoryManagerController(
-            ILogger<LinkCategoryManagerController> logger,
             ILogic<LinkCategory> linkCategoryLogic
         ) {
-            _logger = logger;
             _linkCategoryLogic = linkCategoryLogic;
         }
 

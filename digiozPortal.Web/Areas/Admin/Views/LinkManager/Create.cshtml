@@ -5,9 +5,9 @@
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<div class="container-fluid">
+<div class="container">
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-12">
             <h2>Create Link</h2>
 
             @using (Html.BeginForm())
@@ -68,4 +68,5 @@
                 @Html.ActionLink("Back to List1", "List")
             </div>
         </div>
-
+    </div>
+</div>
