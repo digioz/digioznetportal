@@ -49,12 +49,6 @@ namespace digiozPortal.Web
             app.UseAuthorization();
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllerRoute(
-                    "PageByName",
-                    "Page/{name}",
-                    new { controller = "Page", action = "ByName", name = "" }
-                );
-
-                endpoints.MapControllerRoute(
                     name: "areas",
                     pattern: "{area:exists}/{controller=Home}/{action=Index}");
 

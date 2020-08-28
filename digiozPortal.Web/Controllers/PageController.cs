@@ -20,35 +20,22 @@ namespace digiozPortal.Web.Controllers
             _pageLogic = pageLogic;
         }
 
-        //
-        // GET: /Page/
-        public ActionResult Index(int id)
-        {
-            var loPage = _pageLogic.GetAll().SingleOrDefault(x => x.Id == id);
-            return View(loPage);
-        }
-
-        public ActionResult ByID(int? id)
-        {
-            var loPage = _pageLogic.GetAll().SingleOrDefault(x => x.Id == id);
-            return View(loPage);
-        }
-
-        public ActionResult ByName(string name)
+        [Route("/page/{id}")]
+        public ActionResult Index(string id)
         {
             var loPage = new Page();
 
-            try
-            {
-                loPage = _pageLogic.GetAll().SingleOrDefault(x => x.URL == name);
-            }
-            catch
-            {
+            try {
+                if (Utilities.StringUtils.IsNumeric(id)) {
+                    loPage = _pageLogic.GetAll().SingleOrDefault(x => x.Id == Convert.ToInt32(id));
+                } else {
+                    loPage = _pageLogic.GetAll().SingleOrDefault(x => x.URL.ToLower() == id.ToLower());
+                }
+            } catch {
                 return RedirectToAction("Index", "Home");
             }
 
-            if (loPage == null)
-            {
+            if (loPage == null) {
                 return RedirectToAction("Index", "Home");
             }
 
