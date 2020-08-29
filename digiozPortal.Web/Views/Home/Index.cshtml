@@ -54,5 +54,5 @@
         @Html.Raw(Model.Page.Body)
     }
 
-    @Html.RenderAction("CommentsMenu", "Menu", new { referenceId = Model.Page.Id, referenceType = "Page" })
+    @Html.RenderAction("CommentsMenu", "Menu", new { referenceId = Model.Page.ID, referenceType = "Page" })
 }

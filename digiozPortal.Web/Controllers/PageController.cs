@@ -27,7 +27,7 @@ namespace digiozPortal.Web.Controllers
 
             try {
                 if (Utilities.StringUtils.IsNumeric(id)) {
-                    loPage = _pageLogic.GetAll().SingleOrDefault(x => x.Id == Convert.ToInt32(id));
+                    loPage = _pageLogic.GetAll().SingleOrDefault(x => x.ID == Convert.ToInt32(id));
                 } else {
                     loPage = _pageLogic.GetAll().SingleOrDefault(x => x.URL.ToLower() == id.ToLower());
                 }

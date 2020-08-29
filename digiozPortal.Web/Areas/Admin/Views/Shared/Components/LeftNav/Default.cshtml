@@ -10,8 +10,8 @@
                 <div class="collapse" id="collapseAuthentication" aria-labelledby="headingOne" data-parent="#collapseAuthentication">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="layout-static.html">Users</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Roles</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">User Roles</a>
+                        <a class="nav-link" href="">Roles</a>
+                        <a class="nav-link" href="">User Roles</a>
                     </nav>
                 </div>
 
@@ -23,11 +23,11 @@
                 <div class="collapse" id="collapseContent" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="layout-static.html">Announcements</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Pages</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Pictures</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Videos</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Slide Shows</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">News</a>
+                        <a class="nav-link" href="@Url.Action("Index", "PageManager", new { area = "Admin" })">Pages</a>
+                        <a class="nav-link" href="">Pictures</a>
+                        <a class="nav-link" href="">Videos</a>
+                        <a class="nav-link" href="">Slide Shows</a>
+                        <a class="nav-link" href="">News</a>
                     </nav>
                 </div>
 
@@ -39,8 +39,8 @@
                 <div class="collapse" id="collapseCommerce" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="layout-static.html">Orders</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Products</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Product Categories</a>
+                        <a class="nav-link" href="">Products</a>
+                        <a class="nav-link" href="">Product Categories</a>
                     </nav>
                 </div>
 
@@ -51,12 +51,12 @@
                 </a>
                 <div class="collapse" id="collapseSocial" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="layout-static.html">Chats</a>
+                        <a class="nav-link" href="">Chats</a>
                         <a class="nav-link" href="@Url.Action("Index", "LinkManager", new { area = "Admin" })">Links</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Polls</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Mailing Lists</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Comments</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Forums</a>
+                        <a class="nav-link" href="">Polls</a>
+                        <a class="nav-link" href="">Mailing Lists</a>
+                        <a class="nav-link" href="">Comments</a>
+                        <a class="nav-link" href="">Forums</a>
                     </nav>
                 </div>
 
@@ -67,9 +67,9 @@
                 </a>
                 <div class="collapse" id="collapseSettings" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="layout-static.html">Configurations</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Plugins</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">Modules</a>
+                        <a class="nav-link" href="">Configurations</a>
+                        <a class="nav-link" href="">Plugins</a>
+                        <a class="nav-link" href="">Modules</a>
                     </nav>
                 </div>
 
@@ -80,69 +80,10 @@
                 </a>
                 <div class="collapse" id="collapseUtilities" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="layout-static.html">Database</a>
-                        <a class="nav-link" href="layout-sidenav-light.html">File Manager</a>
+                        <a class="nav-link" href="">Database</a>
+                        <a class="nav-link" href="">File Manager</a>
                     </nav>
                 </div>
-
-
-                @*<div class="sb-sidenav-menu-heading">Core</div>
-        <a class="nav-link" href="@Url.Action("Index", "Home", new { area = "admin" })">
-            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-            Home
-        </a>
-        <div class="sb-sidenav-menu-heading">Interface</div>
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
-            <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-            Layouts
-            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-        </a>
-        <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
-            <nav class="sb-sidenav-menu-nested nav">
-                <a class="nav-link" href="layout-static.html">Static Navigation</a>
-                <a class="nav-link" href="layout-sidenav-light.html">Light Sidenav</a>
-            </nav>
-        </div>
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-            <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-            Pages
-            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-        </a>
-        <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
-            <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#pagesCollapseAuth" aria-expanded="false" aria-controls="pagesCollapseAuth">
-                    Authentication
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse" id="pagesCollapseAuth" aria-labelledby="headingOne" data-parent="#sidenavAccordionPages">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="login.html">Login</a>
-                        <a class="nav-link" href="register.html">Register</a>
-                        <a class="nav-link" href="password.html">Forgot Password</a>
-                    </nav>
-                </div>
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#pagesCollapseError" aria-expanded="false" aria-controls="pagesCollapseError">
-                    Error
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse" id="pagesCollapseError" aria-labelledby="headingOne" data-parent="#sidenavAccordionPages">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="401.html">401 Page</a>
-                        <a class="nav-link" href="404.html">404 Page</a>
-                        <a class="nav-link" href="500.html">500 Page</a>
-                    </nav>
-                </div>
-            </nav>
-        </div>
-        <div class="sb-sidenav-menu-heading">Addons</div>
-        <a class="nav-link" href="charts.html">
-            <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-            Charts
-        </a>
-        <a class="nav-link" href="tables.html">
-            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-            Tables
-        </a>*@
             </div>
         </div>
         <div class="sb-sidenav-footer">
