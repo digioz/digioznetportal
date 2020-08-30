@@ -24,6 +24,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+    <PackageReference Include="NonFactors.Grid.Mvc6" Version="6.2.0" />
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="4.7.0" />
   </ItemGroup>
@@ -37,7 +38,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Install\MSSQL\1.0.0.0\" />
     <Folder Include="Extensions\" />
     <Folder Include="wwwroot\img\" />
