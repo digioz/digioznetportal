@@ -38,14 +38,14 @@
                 .Grid(Model)
                 .Build(columns =>
                 {
-                    columns.Add(model => model.UserName).Titled("UserName");
+                    columns.Add(model => model.UserName).Titled("UserName").UsingDefaultFilterMethod("equals"); ;
 
-                    columns.Add(model => model.EmailConfirmed).Titled("Email Confirmed");
-                    columns.Add(model => model.PhoneNumber).Titled("Phone");
+                    columns.Add(model => model.EmailConfirmed).Titled("Email Confirmed").UsingDefaultFilterMethod("equals"); ;
+                    columns.Add(model => model.PhoneNumber).Titled("Phone").UsingDefaultFilterMethod("equals"); ;
 
-                    columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Details/{model.Id}' id=\"details\"  asp-action=\"Details\" asp-route-id=\"@item.Id\" class=\"btn btn-sm btn-info\" '>Details<span class='glyphicon glyphicon-user'></span></a>").Encoded(false);
-                    columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Edit/{model.Id}' id=\"edit\"  asp-action=\"Edit\" asp-route-id=\"@item.Id\" class=\"btn btn-sm btn-info\" '>Edit<span class='glyphicon glyphicon-user'></span></a>").Encoded(false);
-                    columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Delete/{model.Id}' id=\"delete\"  asp-action=\"Delete\" asp-route-id=\"@item.Id\" class=\"btn btn-sm btn-info\" '>Delete<span class='glyphicon glyphicon-user'></span></a>").Encoded(false);
+                    columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Details/{model.Id}' id=\"details\"  asp-action=\"Details\" asp-route-id=\"@item.Id\" class=\"btn btn-sm btn-info\" '>Details<span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+                                       + $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Edit/{model.Id}' id=\"edit\"  asp-action=\"Edit\" asp-route-id=\"@item.Id\" class=\"btn btn-sm btn-info\" '>Edit<span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+                                       + $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Delete/{model.Id}' id=\"delete\"  asp-action=\"Delete\" asp-route-id=\"@item.Id\" class=\"btn btn-sm btn-info\" '>Delete<span class='glyphicon glyphicon-user'></span></a>").Encoded(false);
 
                 })
                     .Empty("No users found.")

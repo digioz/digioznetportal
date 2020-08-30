@@ -33,7 +33,13 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
         [HttpGet]
         [Route("/admin/usermanager/details/{id}")]
         public ActionResult Details(string id) {
-            return View();
+            var model = _userLogic.Get(id);
+            var vm = new UserManagerViewModel() {
+                Id = model.Id,
+                UserName = model.UserName
+            };
+
+            return View(vm);
         }
 
         public ActionResult Create() {
@@ -69,7 +75,12 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
         [HttpGet]
         [Route("/admin/usermanager/delete/{id}")]
         public ActionResult Delete(string id) {
-            return View();
+            var model = _userLogic.Get(id);
+            var vm = new UserManagerViewModel() {
+                Id = model.Id,
+                UserName = model.UserName
+            };
+            return View(vm);
         }
 
         [HttpPost]
