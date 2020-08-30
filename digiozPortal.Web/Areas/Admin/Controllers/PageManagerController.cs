@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Net;
 using System.Security.Claims;
-using System.Web;
-using digiozPortal.BLL;
 using digiozPortal.BLL.Interfaces;
 using digiozPortal.BO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace digiozPortal.Web.Areas.Admin.Controllers
 {
@@ -20,16 +13,16 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
     {
         private readonly ILogic<Page> _pageLogic;
         private readonly IConfigLogic _configLogic;
-        // private readonly ILogic<AspNetUsers> _userLogic;
+        private readonly ILogic<AspNetUsers> _userLogic;
 
         public PageManagerController(
             ILogic<Page> pageLogic,
-            IConfigLogic configLogic
-            // ILogic<AspNetUsers> userLogic
+            IConfigLogic configLogic,
+            ILogic<AspNetUsers> userLogic
         ) {
             _pageLogic = pageLogic;
             _configLogic = configLogic;
-            //_userLogic = userLogic;
+            _userLogic = userLogic;
         }
 
         public ActionResult Index()
