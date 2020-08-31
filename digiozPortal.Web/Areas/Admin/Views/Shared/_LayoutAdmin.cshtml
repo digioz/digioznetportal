@@ -9,6 +9,7 @@
     <title>Admin Dashboard - DigiOz Portal</title>
     <link href="~/admin/css/styles.css" rel="stylesheet" />
     <script src="~/admin/js/all.min.js"></script>
+    <link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet">
     @RenderSection("HeaderScripts", required: false)
 </head>
 <body class="sb-nav-fixed">
@@ -41,6 +42,10 @@
         @await Component.InvokeAsync("LeftNav", null)
         <div id="layoutSidenav_content">
             @RenderBody()
+            <script src="~/js/mvc-grid/mvc-grid.js"></script>
+            <script>
+                document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+            </script>
         </div>
     </div>
     <script src="~/admin/js/jquery-3.5.1.min.js"></script>
