@@ -11,72 +11,80 @@
             <h2>Page Details</h2>
 
             <div>
-                <dl class="dl-horizontal">
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Title)
-                    </dt>
+                <table class="table border-bottom">
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Title)
+                        </td>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.Title)
-                    </dd>
+                        <td>
+                            @Html.DisplayFor(model => model.Title)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.URL)
+                        </td>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.URL)
-                    </dt>
+                        <td>
+                            @Html.DisplayFor(model => model.URL)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Body)
+                        </td>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.URL)
-                    </dd>
+                        <td>
+                            @Html.Raw(Model.Body)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Keywords)
+                        </td>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Body)
-                    </dt>
+                        <td>
+                            @Html.DisplayFor(model => model.Keywords)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Description)
+                        </td>
 
-                    <dd>
-                        @Html.Raw(Model.Body)
-                    </dd>
+                        <td>
+                            @Html.DisplayFor(model => model.Description)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Visible)
+                        </td>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Keywords)
-                    </dt>
+                        <td>
+                            @Html.DisplayFor(model => model.Visible)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Timestamp)
+                        </td>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.Keywords)
-                    </dd>
+                        <td>
+                            @Html.DisplayFor(model => model.Timestamp)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            Username
+                        </td>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Description)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.Description)
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Visible)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.Visible)
-                    </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Timestamp)
-                    </dt>
-
-                    <dd>
-                        @Html.DisplayFor(model => model.Timestamp)
-                    </dd>
-
-                    @*<dt>
-                    @Html.DisplayNameFor(model => model.AspNetUser.UserName)
-                </dt>
-
-                <dd>
-                    @Html.DisplayFor(model => model.AspNetUser.UserName)
-                </dd>*@
-
-                </dl>
+                        <td>
+                            @ViewBag.UserName
+                        </td>
+                    </tr>
+                </table>
             </div>
             <p>
                 @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |

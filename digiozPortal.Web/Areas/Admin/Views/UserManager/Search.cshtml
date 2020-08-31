@@ -41,9 +41,9 @@
                     columns.Add(model => model.EmailConfirmed).Titled("Email Confirmed");
                     columns.Add(model => model.PhoneNumber).Titled("Phone");
 
-                    columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Details/{model.Id}' id=\"details\"  asp-action=\"Details\" asp-route-id=\"@item.Id\" class=\"btn btn-sm btn-info\" '>Details<span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
-                                       + $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Edit/{model.Id}' id=\"edit\"  asp-action=\"Edit\" asp-route-id=\"@item.Id\" class=\"btn btn-sm btn-info\" '>Edit<span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
-                                       + $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Delete/{model.Id}' id=\"delete\"  asp-action=\"Delete\" asp-route-id=\"@item.Id\" class=\"btn btn-sm btn-info\" '>Delete<span class='glyphicon glyphicon-user'></span></a>").Encoded(false);
+                    columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Details/{model.Id}' id=\"details\"  asp-action=\"Details\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"/img/images/icons/16x16/Search.png\" alt=\"Details\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+                                       + $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Edit/{model.Id}' id=\"edit\"  asp-action=\"Edit\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"/img/images/icons/16x16/Edit.png\" alt=\"Edit\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+                                       + $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Delete/{model.Id}' id=\"delete\"  asp-action=\"Delete\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"/img/images/icons/16x16/Cancel.png\" alt=\"Delete\"><span class='glyphicon glyphicon-user'></span></a>").Encoded(false);
                 })
                     .Empty("No users found.")
                     .Filterable()

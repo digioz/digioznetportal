@@ -15,56 +15,62 @@
                 <h3>Are you sure you want to delete this?</h3>
                 <div>
                     <hr />
-                    <dl class="dl-horizontal">
-                        <dt>
-                            @Html.DisplayNameFor(model => model.Name)
-                        </dt>
+                    <table class="table border-bottom">
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Name)
+                            </td>
 
-                        <dd>
-                            @Html.DisplayFor(model => model.Name)
-                        </dd>
+                            <td>
+                                @Html.DisplayFor(model => model.Name)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.URL)
+                            </td>
 
-                        <dt>
-                            @Html.DisplayNameFor(model => model.URL)
-                        </dt>
+                            <td>
+                                @Html.DisplayFor(model => model.URL)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Description)
+                            </td>
 
-                        <dd>
-                            @Html.DisplayFor(model => model.URL)
-                        </dd>
+                            <td>
+                                @Html.Raw(Model.Description)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                Category
+                            </td>
 
-                        <dt>
-                            @Html.DisplayNameFor(model => model.Description)
-                        </dt>
+                            <td>
+                                @ViewBag.LinkCategory.Name
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Visible)
+                            </td>
 
-                        <dd>
-                            @Html.Raw(Model.Description)
-                        </dd>
+                            <td>
+                                @Html.DisplayFor(model => model.Visible)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Timestamp)
+                            </td>
 
-                        <dt>
-                            Category
-                        </dt>
-
-                        <dd>
-                            @ViewBag.LinkCategory.Name
-                        </dd>
-
-                        <dt>
-                            @Html.DisplayNameFor(model => model.Visible)
-                        </dt>
-
-                        <dd>
-                            @Html.DisplayFor(model => model.Visible)
-                        </dd>
-
-                        <dt>
-                            @Html.DisplayNameFor(model => model.Timestamp)
-                        </dt>
-
-                        <dd>
-                            @Html.DisplayFor(model => model.Timestamp)
-                        </dd>
-
-                    </dl>
+                            <td>
+                                @Html.DisplayFor(model => model.Timestamp)
+                            </td>
+                        </tr>
+                    </table>
 
                     @using (Html.BeginForm())
                     {

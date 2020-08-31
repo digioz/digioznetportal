@@ -39,6 +39,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
             }
 
             var page = _pageLogic.Get(id.GetValueOrDefault());
+            ViewBag.UserName = _userLogic.Get(page.UserID).UserName;
 
             if (page == null)
             {
@@ -127,7 +128,10 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
             {
                 return BadRequest();
             }
+
             var page = _pageLogic.Get(id.GetValueOrDefault());
+            ViewBag.UserName = _userLogic.Get(page.UserID).UserName;
+
             if (page == null)
             {
                 return NotFound();
