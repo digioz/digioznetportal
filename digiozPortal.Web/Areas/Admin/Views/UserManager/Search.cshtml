@@ -1,13 +1,21 @@
 ﻿@model IEnumerable<digiozPortal.BO.AspNetUsers>
 @using NonFactors.Mvc.Grid
 
-@{ ViewBag.Title = "User Search Results";
-                Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml"; }
+@{
+    ViewBag.Title = "User Search Results";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
 
-@*@section HeaderScripts {
+@section HeaderScripts {
     <link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet">
+}
+
+@section FooterScripts {
     <script src="~/js/mvc-grid/mvc-grid.js"></script>
-}*@
+    <script>
+        document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+    </script>
+}
 
 <main>
     <div class="container-fluid">

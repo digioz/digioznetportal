@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using digiozPortal.BLL.Interfaces;
 using digiozPortal.BO;
+using digiozPortal.Utilities;
 using digiozPortal.Web.Areas.Admin.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -96,8 +97,8 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
         public ActionResult Search(string searchString = "") {
             var usersViewModel = new List<UserManagerViewModel>();
 
-            if (searchString == "") {
-                RedirectToAction("Index", "Home");
+            if (searchString.IsNullEmpty()) {
+                return RedirectToAction("Index", "UserManager");
             }
 
             // Search Records
