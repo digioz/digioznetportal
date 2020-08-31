@@ -6,10 +6,10 @@
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-@section HeaderScripts {
+@*@section HeaderScripts {
     <link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet">
     <script src="~/js/mvc-grid/mvc-grid.js"></script>
-}
+}*@
 
 <main>
     <div class="container-fluid">
@@ -38,7 +38,7 @@
                 .Grid(Model)
                 .Build(columns =>
                 {
-                    columns.Add(model => model.UserName).Titled("UserName").UsingDefaultFilterMethod("equals"); ;
+                    columns.Add(model => model.UserName).Titled("UserName").Filterable(true);
 
                     columns.Add(model => model.EmailConfirmed).Titled("Email Confirmed").UsingDefaultFilterMethod("equals"); ;
                     columns.Add(model => model.PhoneNumber).Titled("Phone").UsingDefaultFilterMethod("equals"); ;
@@ -53,7 +53,6 @@
                     .Sortable()
                     .Pageable()
                 )
-
                 <div id='myModal' class='modal fade in'>
                     <div class="modal-dialog">
                         <div class="modal-content">
