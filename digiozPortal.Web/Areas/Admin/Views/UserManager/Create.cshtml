@@ -26,10 +26,10 @@
                     @Html.ValidationSummary(true)
 
                     <div class="form-group">
-                        @Html.LabelFor(model => model.UserName, new { @class = "control-label col-md-2" })
+                        @Html.LabelFor(model => model.Email, new { @class = "control-label col-md-2" })
                         <div class="col-md-10">
-                            @Html.TextBoxFor(model => model.UserName, new { @class = "form-control" })
-                            @Html.ValidationMessageFor(model => model.UserName)
+                            @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Email)
                         </div>
                     </div>
 
@@ -62,14 +62,6 @@
                         <div class="col-md-10">
                             @Html.PasswordFor(model => model.PasswordConfirm, new { @class = "form-control" })
                             @Html.ValidationMessageFor(model => model.PasswordConfirm)
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.Email, new { @class = "control-label col-md-2" })
-                        <div class="col-md-10">
-                            @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
-                            @Html.ValidationMessageFor(model => model.Email)
                         </div>
                     </div>
 

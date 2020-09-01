@@ -163,9 +163,10 @@
                 </table>
                 @if (Model.UserName != "admin")
                 {
-                    using (Html.BeginForm())
+                    using (Html.BeginForm("DeletePost", "UserManager"))
                     {
                         @Html.AntiForgeryToken()
+                        @Html.HiddenFor(model => model.Id)
 
                         <div class="form-actions no-color">
                             <input type="submit" value="Delete" class="btn btn-primary" /> |
