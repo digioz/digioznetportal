@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using digiozPortal.BLL.Interfaces;
@@ -8,6 +10,7 @@ using digiozPortal.Utilities;
 using digiozPortal.Web.Areas.Admin.Models;
 using digiozPortal.Web.Areas.Admin.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,18 +25,40 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
         private readonly ILogic<Profile> _profileLogic;
         private UserManager<IdentityUser> _userManager;
         private IPasswordHasher<IdentityUser> _passwordHasher;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public UserManagerController(
             ILogic<AspNetUsers> userLogic,
             ILogic<Profile> profileLogic,
             UserManager<IdentityUser> usrManager,
-            IPasswordHasher<IdentityUser> passwordHasher
+            IPasswordHasher<IdentityUser> passwordHasher,
+            IWebHostEnvironment webHostEnvironment
         ) 
         {
             _userLogic = userLogic;
             _profileLogic = profileLogic;
             _userManager = usrManager;
             _passwordHasher = passwordHasher;
+            _webHostEnvironment = webHostEnvironment;
+        }
+
+        private string GetImageFolderPath() {
+            string webRootPath = _webHostEnvironment.WebRootPath;
+            string contentRootPath = _webHostEnvironment.ContentRootPath;
+
+            string path = "";
+            path = Path.Combine(webRootPath, "img");
+
+            return path;
+        }
+
+        private async Task CropImageAndSave(UserManagerViewModel userVM, string path, int width, int height) {
+            using (var memoryStream = new MemoryStream()) {
+                await userVM.AvatarImage.CopyToAsync(memoryStream);
+                using (var img = Image.FromStream(memoryStream)) {
+                    Helpers.ImageHelper.SaveImageWithCrop(img, width, height, path);
+                }
+            }
         }
 
         public ActionResult Index() {
@@ -77,14 +102,37 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
                     ModelState.AddModelError("", "Password confirmation does not match.");
                 }
                 else {
-                    var appUser = new IdentityUser {
+                    var user = new IdentityUser {
                         UserName = userVM.Email,
                         Email = userVM.Email
                     };
 
-                    IdentityResult result = await _userManager.CreateAsync(appUser, userVM.Password);
+                    IdentityResult result = await _userManager.CreateAsync(user, userVM.Password);
+                    string profileAvatarNew = string.Empty;
 
                     if (result.Succeeded) {
+                        // Avatar Image Upload
+                        if (userVM.AvatarImage != null && userVM.AvatarImage.Length > 0 && Helpers.Utility.IsImage(userVM.AvatarImage)) {
+                            var imgFolder = GetImageFolderPath();
+                            var lsFileName = Guid.NewGuid() + Path.GetExtension(userVM.AvatarImage.FileName);
+                            var pathFull = Path.Combine(imgFolder, "Avatar", "Full", lsFileName);
+                            var pathThumb = Path.Combine(imgFolder, "Avatar", "Thumb", lsFileName);
+
+                            // Save Images
+                            await CropImageAndSave(userVM, pathFull, 200, 200);
+                            await CropImageAndSave(userVM, pathThumb, 100, 100);
+
+                            profileAvatarNew = lsFileName;
+                        }
+
+                        var profileNew = new Profile();
+                        var excludes = new List<string>(new string[] { "Id" });
+                        ValueInjecter.CopyPropertiesTo(userVM, profileNew, excludes);
+                        profileNew.UserID = user.Id;
+                        profileNew.Avatar = profileAvatarNew;
+
+                        _profileLogic.Add(profileNew);
+
                         return RedirectToAction("Index");
                     }
                     else {
@@ -122,10 +170,9 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPost([Bind("Id", "UserID", "Email", "Birthday", "BirthdayVisible", "Address", "Address2", "City", 
-                                                    "State", "Zip", "Country", "Signature", "Avatar", "FirstName", "LastName")] UserManagerViewModel userVM) {
+                                                    "State", "Zip", "Country", "Signature", "Avatar", "FirstName", "LastName", "AvatarImage")] UserManagerViewModel userVM) {
             var user = await _userManager.FindByIdAsync(userVM.Id);
 
-            // ToDo - Handle Avatar File Upload
             if (user != null) {
                 if (!string.IsNullOrEmpty(userVM.Email)) {
                     user.Email = userVM.Email;
@@ -147,12 +194,28 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
                     IdentityResult result = await _userManager.UpdateAsync(user);
                     if (result.Succeeded) {
                         var profile = _profileLogic.GetAll().Where(x => x.UserID == user.Id).SingleOrDefault();
+                        var profileAvatarNew = string.Empty;
+
+                        // Avatar Image Upload
+                        if (userVM.AvatarImage != null && userVM.AvatarImage.Length > 0 && Helpers.Utility.IsImage(userVM.AvatarImage)) {
+                            var imgFolder = GetImageFolderPath();
+                            var lsFileName = Guid.NewGuid() + Path.GetExtension(userVM.AvatarImage.FileName);
+                            var pathFull = Path.Combine(imgFolder, "Avatar", "Full", lsFileName);
+                            var pathThumb = Path.Combine(imgFolder, "Avatar", "Thumb", lsFileName);
+
+                            // Save Images
+                            await CropImageAndSave(userVM, pathFull, 200, 200);
+                            await CropImageAndSave(userVM, pathThumb, 100, 100);
+
+                            profileAvatarNew = lsFileName;
+                        }
 
                         if (profile == null) {
                             var profileNew = new Profile();
                             var excludes = new List<string>(new string[] { "Id" });
                             ValueInjecter.CopyPropertiesTo(userVM, profileNew, excludes);
                             profileNew.UserID = user.Id;
+                            profileNew.Avatar = profileAvatarNew;
 
                             _profileLogic.Add(profileNew);
                         }
@@ -160,6 +223,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
                             var excludes = new List<string>(new string[] { "Id" });
                             ValueInjecter.CopyPropertiesTo(userVM, profile, excludes);
                             profile.UserID = user.Id;
+                            profile.Avatar = profileAvatarNew;
 
                             _profileLogic.Edit(profile);
                         }
