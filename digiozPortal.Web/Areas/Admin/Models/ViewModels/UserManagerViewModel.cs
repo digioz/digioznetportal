@@ -10,7 +10,7 @@ namespace digiozPortal.Web.Areas.Admin.Models.ViewModels
     public class UserManagerViewModel
     {
         public string Id { get; set; }
-        public string ProfileID { get; set; }
+        public int ProfileID { get; set; }
         [Required]
         [Display(Name = "User name")]
         public string UserName { get; set; }

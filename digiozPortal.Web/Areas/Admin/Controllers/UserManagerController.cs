@@ -55,18 +55,9 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
             };
 
             if (profile != null) {
-                vm.Birthday = profile.Birthday;
-                vm.BirthdayVisible = profile.BirthdayVisible;
-                vm.Address = profile.Address;
-                vm.Address2 = profile.Address2;
-                vm.City = profile.City;
-                vm.State = profile.State;
-                vm.Zip = profile.Zip;
-                vm.Country = profile.Country;
-                vm.Signature = profile.Signature;
-                vm.Avatar = profile.Avatar;
-                vm.FirstName = profile.FirstName;
-                vm.LastName = profile.LastName;
+                var excludes = new List<string>(new string[] { "Id" });
+                ValueInjecter.CopyPropertiesTo(profile, vm, excludes);
+                vm.Id = user.Id;
             }
 
             return View(vm);
@@ -120,21 +111,9 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
                 Email = user.Email
             };
 
-            // ToDo - Use Value Injector
             if (profile != null) {
-                vm.Email = profile.Email;
-                vm.Birthday = profile.Birthday;
-                vm.BirthdayVisible = profile.BirthdayVisible;
-                vm.Address = profile.Address;
-                vm.Address2 = profile.Address2;
-                vm.City = profile.City;
-                vm.State = profile.State;
-                vm.Zip = profile.Zip;
-                vm.Country = profile.Country;
-                vm.Signature = profile.Signature;
-                vm.Avatar = profile.Avatar;
-                vm.FirstName = profile.FirstName;
-                vm.LastName = profile.LastName;
+                var excludes = new List<string>(new string[] { "Id" });
+                ValueInjecter.CopyPropertiesTo(profile, vm, excludes);
             }
 
             return View(vm);
@@ -170,39 +149,17 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
                         var profile = _profileLogic.GetAll().Where(x => x.UserID == user.Id).SingleOrDefault();
 
                         if (profile == null) {
-                            var profileNew = new Profile() {
-                                UserID = userVM.Id,
-                                Email = userVM.Email,
-                                Birthday = userVM.Birthday,
-                                BirthdayVisible = userVM.BirthdayVisible,
-                                Address = userVM.Address,
-                                Address2 = userVM.Address2,
-                                City = userVM.City,
-                                State = userVM.State,
-                                Zip = userVM.Zip,
-                                Country = userVM.Country,
-                                Signature = userVM.Signature,
-                                Avatar = userVM.Avatar,
-                                FirstName = userVM.FirstName,
-                                LastName = userVM.LastName
-                            };
+                            var profileNew = new Profile();
+                            var excludes = new List<string>(new string[] { "Id" });
+                            ValueInjecter.CopyPropertiesTo(userVM, profileNew, excludes);
+                            profileNew.UserID = user.Id;
 
                             _profileLogic.Add(profileNew);
                         }
                         else {
-                            profile.Email = profile.Email;
-                            profile.Birthday = profile.Birthday;
-                            profile.BirthdayVisible = profile.BirthdayVisible;
-                            profile.Address = profile.Address;
-                            profile.Address2 = profile.Address2;
-                            profile.City = profile.City;
-                            profile.State = profile.State;
-                            profile.Zip = profile.Zip;
-                            profile.Country = profile.Country;
-                            profile.Signature = profile.Signature;
-                            profile.Avatar = profile.Avatar;
-                            profile.FirstName = profile.FirstName;
-                            profile.LastName = profile.LastName;
+                            var excludes = new List<string>(new string[] { "Id" });
+                            ValueInjecter.CopyPropertiesTo(userVM, profile, excludes);
+                            profile.UserID = user.Id;
 
                             _profileLogic.Edit(profile);
                         }
@@ -231,18 +188,9 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
             };
 
             if (profile != null) {
-                vm.Birthday = profile.Birthday;
-                vm.BirthdayVisible = profile.BirthdayVisible;
-                vm.Address = profile.Address;
-                vm.Address2 = profile.Address2;
-                vm.City = profile.City;
-                vm.State = profile.State;
-                vm.Zip = profile.Zip;
-                vm.Country = profile.Country;
-                vm.Signature = profile.Signature;
-                vm.Avatar = profile.Avatar;
-                vm.FirstName = profile.FirstName;
-                vm.LastName = profile.LastName;
+                var excludes = new List<string>(new string[] { "Id" });
+                ValueInjecter.CopyPropertiesTo(profile, vm, excludes);
+                vm.Id = user.Id;
             }
 
             return View(vm);
