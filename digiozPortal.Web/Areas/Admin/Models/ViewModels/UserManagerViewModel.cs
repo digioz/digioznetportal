@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using digiozPortal.Web.Helpers;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace digiozPortal.Web.Areas.Admin.Models.ViewModels
 {
     public class UserManagerViewModel
     {
+        public UserManagerViewModel() {
+            Countries = Utility.CCGetCountryList();
+        }
+
         public string Id { get; set; }
         public int ProfileID { get; set; }
         [Required]
@@ -38,7 +44,9 @@ namespace digiozPortal.Web.Areas.Admin.Models.ViewModels
         public string Avatar { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-
         public IFormFile AvatarImage { get; set; }
+
+        public bool UseGravatar { get; set; }
+        public List<SelectListItem> Countries { get; set; }
     }
 }
