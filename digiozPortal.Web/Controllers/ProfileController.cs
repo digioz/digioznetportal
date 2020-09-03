@@ -24,48 +24,37 @@ namespace digiozPortal.Web.Controllers
     {
         private readonly ILogic<AspNetUsers> _userLogic;
         private readonly ILogic<Profile> _profileLogic;
-        private UserManager<IdentityUser> _userManager;
-        private IPasswordHasher<IdentityUser> _passwordHasher;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
         public ProfileController(
             ILogic<AspNetUsers> userLogic,
             ILogic<Profile> profileLogic,
-            UserManager<IdentityUser> usrManager,
-            IPasswordHasher<IdentityUser> passwordHasher,
             IWebHostEnvironment webHostEnvironment
         ) {
             _userLogic = userLogic;
             _profileLogic = profileLogic;
-            _userManager = usrManager;
-            _passwordHasher = passwordHasher;
             _webHostEnvironment = webHostEnvironment;
         }
 
         private string GetImageFolderPath() {
-            string webRootPath = _webHostEnvironment.WebRootPath;
-            string contentRootPath = _webHostEnvironment.ContentRootPath;
-
-            string path = "";
-            path = Path.Combine(webRootPath, "img");
+            var webRootPath = _webHostEnvironment.WebRootPath;
+            var path = Path.Combine(webRootPath, "img");
 
             return path;
         }
 
         private async Task CropImageAndSave(UserManagerViewModel userVM, string path, int width, int height) {
-            using (var memoryStream = new MemoryStream()) {
-                await userVM.AvatarImage.CopyToAsync(memoryStream);
-                using (var img = Image.FromStream(memoryStream)) {
-                    Helpers.ImageHelper.SaveImageWithCrop(img, width, height, path);
-                }
-            }
+            using var memoryStream = new MemoryStream();
+            await userVM.AvatarImage.CopyToAsync(memoryStream);
+            using var img = Image.FromStream(memoryStream);
+            Helpers.ImageHelper.SaveImageWithCrop(img, width, height, path);
         }
 
         [Authorize]
         [Route("/profile/index")]
         public ActionResult Edit()
         {
-            string userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var profile = _profileLogic.GetAll().Where(x => x.UserID == userID).SingleOrDefault();
 
             var user = _userLogic.Get(userID);
@@ -90,8 +79,8 @@ namespace digiozPortal.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditPost(UserManagerViewModel userVM)
         {
-            string userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            string profileAvatarNew = string.Empty;
+            var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var profileAvatarNew = string.Empty;
 
             if (userID == userVM.Id)
             {
@@ -115,11 +104,11 @@ namespace digiozPortal.Web.Controllers
                     if (userVM.Email != null)
                     {
                         // Fetch Gravatar and upload it to folder
-                        string gravatarHash = Helpers.Utility.HashEmailForGravatar(userVM.Email);
-                        string gravatar = $"http://www.gravatar.com/avatar/{gravatarHash}";
-                        string ext = Helpers.Utility.GetRemoteImageExtension(gravatar);
+                        var gravatarHash = Helpers.Utility.HashEmailForGravatar(userVM.Email);
+                        var gravatar = $"http://www.gravatar.com/avatar/{gravatarHash}";
+                        var ext = Helpers.Utility.GetRemoteImageExtension(gravatar);
 
-                        string lsFileName = gravatarHash + "." + ext;
+                        var lsFileName = gravatarHash + "." + ext;
                         var imgFolder = GetImageFolderPath();
                         var pathFull = Path.Combine(imgFolder, "Avatar", "Full", lsFileName);
                         var pathThumb = Path.Combine(imgFolder, "Avatar", "Thumb", lsFileName);
@@ -158,7 +147,7 @@ namespace digiozPortal.Web.Controllers
             return View("Edit");
         }
 
-        public ActionResult ShowDetails(string userId, string userName)
+        public ActionResult ShowDetails(string userId)
         {
             var user = _userLogic.Get(userId);
             var profile = _profileLogic.GetAll().Where(x => x.UserID == user.Id).SingleOrDefault();
@@ -185,8 +174,8 @@ namespace digiozPortal.Web.Controllers
             var imgFolder = GetImageFolderPath();
             var path = Path.Combine(imgFolder, "Avatar", "Full");
 
-            string avatarUrl = Path.Combine(path, "Default.png");
-            string mimeType = "image/png";
+            var avatarUrl = Path.Combine(path, "Default.png");
+            var mimeType = "image/png";
 
             if (profile != null && profile.Avatar != null)
             {

@@ -23,8 +23,8 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
     {
         private readonly ILogic<AspNetUsers> _userLogic;
         private readonly ILogic<Profile> _profileLogic;
-        private UserManager<IdentityUser> _userManager;
-        private IPasswordHasher<IdentityUser> _passwordHasher;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly IPasswordHasher<IdentityUser> _passwordHasher;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
         public UserManagerController(
@@ -43,22 +43,18 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
         }
 
         private string GetImageFolderPath() {
-            string webRootPath = _webHostEnvironment.WebRootPath;
-            string contentRootPath = _webHostEnvironment.ContentRootPath;
-
-            string path = "";
-            path = Path.Combine(webRootPath, "img");
+            var webRootPath = _webHostEnvironment.WebRootPath;
+            //var contentRootPath = _webHostEnvironment.ContentRootPath;
+            var path = Path.Combine(webRootPath, "img");
 
             return path;
         }
 
         private async Task CropImageAndSave(UserManagerViewModel userVM, string path, int width, int height) {
-            using (var memoryStream = new MemoryStream()) {
-                await userVM.AvatarImage.CopyToAsync(memoryStream);
-                using (var img = Image.FromStream(memoryStream)) {
-                    Helpers.ImageHelper.SaveImageWithCrop(img, width, height, path);
-                }
-            }
+            using var memoryStream = new MemoryStream();
+            await userVM.AvatarImage.CopyToAsync(memoryStream);
+            using var img = Image.FromStream(memoryStream);
+            Helpers.ImageHelper.SaveImageWithCrop(img, width, height, path);
         }
 
         public ActionResult Index() {
@@ -107,8 +103,8 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
                         Email = userVM.Email
                     };
 
-                    IdentityResult result = await _userManager.CreateAsync(user, userVM.Password);
-                    string profileAvatarNew = string.Empty;
+                    var result = await _userManager.CreateAsync(user, userVM.Password);
+                    var profileAvatarNew = string.Empty;
 
                     if (result.Succeeded) {
                         // Avatar Image Upload
@@ -136,7 +132,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
                         return RedirectToAction("Index");
                     }
                     else {
-                        foreach (IdentityError error in result.Errors) {
+                        foreach (var error in result.Errors) {
                             ModelState.AddModelError("", error.Description);
                         }
                     }
@@ -191,7 +187,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
                 }
 
                 if (!string.IsNullOrEmpty(userVM.Email)) {
-                    IdentityResult result = await _userManager.UpdateAsync(user);
+                    var result = await _userManager.UpdateAsync(user);
                     if (result.Succeeded) {
                         var profile = _profileLogic.GetAll().Where(x => x.UserID == user.Id).SingleOrDefault();
                         var profileAvatarNew = string.Empty;
