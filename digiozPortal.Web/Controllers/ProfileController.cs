@@ -138,8 +138,6 @@ namespace digiozPortal.Web.Controllers
                     _profileLogic.Edit(profile);
                 }
                     
-                _profileLogic.Edit(profile);
-
                 TempData["Saved"] = true;
                 return RedirectToAction("Edit");
             }
