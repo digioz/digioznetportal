@@ -25,15 +25,18 @@ namespace digiozPortal.Web.Controllers
         private readonly ILogic<AspNetUsers> _userLogic;
         private readonly ILogic<Profile> _profileLogic;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ILogic<Picture> _pictureLogic;
 
         public ProfileController(
             ILogic<AspNetUsers> userLogic,
             ILogic<Profile> profileLogic,
-            IWebHostEnvironment webHostEnvironment
+            IWebHostEnvironment webHostEnvironment,
+            ILogic<Picture> pictureLogic
         ) {
             _userLogic = userLogic;
             _profileLogic = profileLogic;
             _webHostEnvironment = webHostEnvironment;
+            _pictureLogic = pictureLogic;
         }
 
         private string GetImageFolderPath() {
@@ -43,7 +46,7 @@ namespace digiozPortal.Web.Controllers
             return path;
         }
 
-        private async Task CropImageAndSave(UserManagerViewModel userVM, string path, int width, int height) {
+        private static async Task CropImageAndSave(UserManagerViewModel userVM, string path, int width, int height) {
             using var memoryStream = new MemoryStream();
             await userVM.AvatarImage.CopyToAsync(memoryStream);
             using var img = Image.FromStream(memoryStream);
@@ -194,51 +197,42 @@ namespace digiozPortal.Web.Controllers
 
 		public ActionResult Pictures(string userId, string userName)
 		{
-            //MembershipUser user = null;
-            //List<Picture> pictures = null;
+            AspNetUsers user = null;
+            List<Picture> pictures = null;
 
-            //if (userId != null)
-            //{
-            //	user = AccountLogic.GetMembershipUser(userId);
+            if (userId != null) {
+                user = _userLogic.Get(userId);
 
-            //}
-            //else if (userName != null)
-            //{
-            //	user = AccountLogic.GetMembershipUserByUsername(userName);
-            //	userId = user.Id;
-            //}
-            //else
-            //{
-            //	var username = User.Identity.GetUserName();
-            //	user = AccountLogic.GetMembershipUserByUsername(username);
-            //}
+            } else if (userName != null) {
+                user = _userLogic.GetAll().Where(x => x.UserName == userName).SingleOrDefault();
+                userId = user.Id;
+            } else {
+                var username = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                user = user = _userLogic.GetAll().Where(x => x.UserName == userName).SingleOrDefault();
+            }
 
-            //if (user != null)
-            //{
-            //	pictures = PictureLogic.GetAll().Where(x => x.UserID == user.Id).OrderByDescending(x => x.ID).ToList();
-            //	ViewBag.Username = user.UserName;
-            //}			
+            if (user != null) {
+                pictures = _pictureLogic.GetAll().Where(x => x.UserID == user.Id).OrderByDescending(x => x.Id).ToList();
+                ViewBag.Username = user.UserName;
+            }
 
-            //return View(pictures);
-
-            return View();
+            return View(pictures);
 		}
 
 		public ActionResult PictureDelete(long id)
 		{
 			if (User.Identity.IsAuthenticated)
 			{
-				// Check to make sure user owns picture
-				//var picture = PictureLogic.Get(id);
-				//var username = User.Identity.GetUserName();
-				//var user = AccountLogic.GetMembershipUserByUsername(username);
+               // Check to make sure user owns picture
+               var picture = _pictureLogic.Get(id);
+                var username = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = _userLogic.GetAll().Where(x => x.UserName == username).SingleOrDefault();
 
-				//if (user != null && picture != null && user.Id == picture.UserID)
-				//{
-				//	// Delete Picture
-				//	PictureLogic.Delete(picture.ID);
-				//}
-			}
+                if (user != null && picture != null && user.Id == picture.UserID) {
+                    // Delete Picture
+                    _pictureLogic.Delete(picture);
+                }
+            }
 
 			// Redirect back to Pictures
 			return RedirectToAction("Pictures");

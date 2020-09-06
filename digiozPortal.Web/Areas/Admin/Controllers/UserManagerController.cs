@@ -50,7 +50,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
             return path;
         }
 
-        private async Task CropImageAndSave(UserManagerViewModel userVM, string path, int width, int height) {
+        private static async Task CropImageAndSave(UserManagerViewModel userVM, string path, int width, int height) {
             using var memoryStream = new MemoryStream();
             await userVM.AvatarImage.CopyToAsync(memoryStream);
             using var img = Image.FromStream(memoryStream);
@@ -84,7 +84,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
             return View(vm);
         }
 
-        public async Task<IActionResult> Create() {
+        public IActionResult Create() {
             return View();
         }
 
@@ -145,7 +145,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("/admin/usermanager/edit/{id}")]
-        public async Task<IActionResult> Edit(string id) {
+        public IActionResult Edit(string id) {
             var user = _userLogic.Get(id);
             var profile = _profileLogic.GetAll().Where(x => x.UserID == user.Id).SingleOrDefault();
 

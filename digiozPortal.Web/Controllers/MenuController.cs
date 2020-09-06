@@ -148,7 +148,7 @@ namespace digiozPortal.Web.Controllers
             var latestVisitors = _visitorSessionLogic.GetAll().Where(x => x.DateModified >= DateTime.Now.AddMinutes(-10)).ToList();
             var visitorRegistered = latestVisitors.Where(x => x.UserName != null).DistinctBy(x => x.UserName).ToList();
 
-            ViewBag.VisitorCount = latestVisitors.Count();
+            ViewBag.VisitorCount = latestVisitors.Count;
             ViewBag.RegisteredVisitors = visitorRegistered;
 
             if (configWhoIsOnline == null || configWhoIsOnline.IsEnabled == false)
