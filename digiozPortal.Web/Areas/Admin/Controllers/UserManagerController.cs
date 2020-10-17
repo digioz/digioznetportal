@@ -283,5 +283,12 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
 
             return View(users);
         }
+
+        [HttpGet]
+        [Route("/admin/usermanager/roles/{id}")]
+        public ActionResult Roles() {
+
+            return View();
+        }
     }
 }
