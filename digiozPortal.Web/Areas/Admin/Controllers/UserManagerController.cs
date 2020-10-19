@@ -7,11 +7,10 @@ using System.Threading.Tasks;
 using digiozPortal.BLL.Interfaces;
 using digiozPortal.BO;
 using digiozPortal.Utilities;
-using digiozPortal.Web.Areas.Admin.Models;
 using digiozPortal.Web.Areas.Admin.Models.ViewModels;
+using digiozPortal.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,20 +25,25 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IPasswordHasher<IdentityUser> _passwordHasher;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ILogic<AspNetRoles> _roleLogic;
+        private readonly ILogic<AspNetUserRoles> _userRolesLogic;
 
         public UserManagerController(
             ILogic<AspNetUsers> userLogic,
             ILogic<Profile> profileLogic,
             UserManager<IdentityUser> usrManager,
             IPasswordHasher<IdentityUser> passwordHasher,
-            IWebHostEnvironment webHostEnvironment
-        ) 
-        {
+            IWebHostEnvironment webHostEnvironment,
+            ILogic<AspNetRoles> roleLogic,
+            ILogic<AspNetUserRoles> userRolesLogic
+        ) {
             _userLogic = userLogic;
             _profileLogic = profileLogic;
             _userManager = usrManager;
             _passwordHasher = passwordHasher;
             _webHostEnvironment = webHostEnvironment;
+            _roleLogic = roleLogic;
+            _userRolesLogic = userRolesLogic;
         }
 
         private string GetImageFolderPath() {
@@ -96,8 +100,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
             if (!string.IsNullOrEmpty(userVM.Email)) {
                 if (userVM.Password != userVM.PasswordConfirm) {
                     ModelState.AddModelError("", "Password confirmation does not match.");
-                }
-                else {
+                } else {
                     var user = new IdentityUser {
                         UserName = userVM.Email,
                         Email = userVM.Email
@@ -130,8 +133,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
                         _profileLogic.Add(profileNew);
 
                         return RedirectToAction("Index");
-                    }
-                    else {
+                    } else {
                         foreach (var error in result.Errors) {
                             ModelState.AddModelError("", error.Description);
                         }
@@ -165,7 +167,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPost([Bind("Id", "UserID", "Email", "Birthday", "BirthdayVisible", "Address", "Address2", "City", 
+        public async Task<IActionResult> EditPost([Bind("Id", "UserID", "Email", "Birthday", "BirthdayVisible", "Address", "Address2", "City",
                                                     "State", "Zip", "Country", "Signature", "Avatar", "FirstName", "LastName", "AvatarImage")] UserManagerViewModel userVM) {
             var user = await _userManager.FindByIdAsync(userVM.Id);
 
@@ -173,8 +175,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
                 if (!string.IsNullOrEmpty(userVM.Email)) {
                     user.Email = userVM.Email;
                     user.UserName = userVM.Email;
-                }
-                else {
+                } else {
                     ModelState.AddModelError("", "Email cannot be empty.");
                 }
 
@@ -214,8 +215,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
                             profileNew.Avatar = profileAvatarNew;
 
                             _profileLogic.Add(profileNew);
-                        }
-                        else {
+                        } else {
                             var excludes = new List<string>(new string[] { "Id" });
                             ValueInjecter.CopyPropertiesTo(userVM, profile, excludes);
                             profile.UserID = user.Id;
@@ -227,8 +227,7 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
                         return RedirectToAction("Index");
                     }
                 }
-            } 
-            else {
+            } else {
                 ModelState.AddModelError("", "User Not Found");
             }
 
@@ -279,16 +278,47 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
             }
 
             // Search Records
-            var users = _userLogic.GetAll().Where(x => x.UserName.Contains(searchString.Trim())).ToList(); 
+            var users = _userLogic.GetAll().Where(x => x.UserName.Contains(searchString.Trim())).ToList();
 
             return View(users);
         }
 
         [HttpGet]
         [Route("/admin/usermanager/roles/{id}")]
-        public ActionResult Roles() {
+        public async Task<ActionResult> RolesAsync(string id) {
+            var user = await _userManager.FindByIdAsync(id);
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var roles = _roleLogic.GetAll();
+            var currentUserRoles = new List<UserRoleViewModel>(); 
 
-            return View();
+            foreach (var item in userRoles) {
+                var currentUserRole = new UserRoleViewModel() {
+                    UserId = id,
+                    RoleId = roles.Where(x => x.Name == item).SingleOrDefault().Id,
+                    RoleName = item
+                };
+                currentUserRoles.Add(currentUserRole);
+            }
+
+            return View(currentUserRoles);
+        }
+
+        [HttpGet]
+        [Route("/admin/usermanager/roledelete/{id}/{userId}")]
+        public async Task<ActionResult> RoleDeleteAsync(string id, string userId) {
+            var user = await _userManager.FindByIdAsync(userId);
+            var role = _roleLogic.Get(id);
+            await _userManager.RemoveFromRoleAsync(user, role.Name); // ToDo: Does not remove! 
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        [Route("/admin/usermanager/roleadd/{id}/{userId}")]
+        public ActionResult RoleAdd(string id, string userId) {
+            // ToDo - Add Role to User
+
+            return RedirectToAction("Index");
         }
     }
 }

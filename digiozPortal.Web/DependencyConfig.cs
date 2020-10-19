@@ -19,6 +19,7 @@ namespace digiozPortal.Web
             services.AddSingleton<IRepo<Announcement>, BaseRepo<Announcement>>();
             services.AddSingleton<IRepo<AspNetUsers>, BaseRepo<AspNetUsers>>();
             services.AddSingleton<IRepo<AspNetRoles>, BaseRepo<AspNetRoles>>();
+            services.AddSingleton<IRepo<AspNetUserRoles>, BaseRepo<AspNetUserRoles>>();
             services.AddSingleton<IRepo<Chat>, BaseRepo<Chat>>();
             services.AddSingleton<IRepo<CommentConfig>, BaseRepo<CommentConfig>>();
             services.AddSingleton<IRepo<CommentLike>, BaseRepo<CommentLike>>();
@@ -61,10 +62,10 @@ namespace digiozPortal.Web
             services.AddSingleton<IChatRepo, ChatRepo>();
             services.AddSingleton<ICommentRepo, CommentRepo>();
 
-
             services.AddSingleton<ILogic<Announcement>, BaseLogic<Announcement>>();
             services.AddSingleton<ILogic<AspNetUsers>, BaseLogic<AspNetUsers>>();
             services.AddSingleton<ILogic<AspNetRoles>, BaseLogic<AspNetRoles>>();
+            services.AddSingleton<ILogic<AspNetUserRoles>, BaseLogic<AspNetUserRoles>>();
             services.AddSingleton<ILogic<Chat>, BaseLogic<Chat>>();
             services.AddSingleton<ILogic<CommentConfig>, BaseLogic<CommentConfig>>();
             services.AddSingleton<ILogic<CommentLike>, BaseLogic<CommentLike>>();
