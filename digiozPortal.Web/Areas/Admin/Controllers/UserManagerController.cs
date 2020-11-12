@@ -308,8 +308,8 @@ namespace digiozPortal.Web.Areas.Admin.Controllers
         public async Task<ActionResult> RoleDeleteAsync(string id, string userId) {
             var user = await _userManager.FindByIdAsync(userId);
             var role = _roleLogic.Get(id);
-            await _userManager.RemoveFromRoleAsync(user, role.Name); // ToDo: Does not remove! 
-
+            var userRole = _userRolesLogic.GetAll().Where(item => item.RoleId == id && item.UserId == userId).FirstOrDefault();
+            _userRolesLogic.Delete(userRole);
             return RedirectToAction("Index");
         }
 
