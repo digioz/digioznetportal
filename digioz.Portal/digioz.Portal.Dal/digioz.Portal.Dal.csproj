@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\digioz.Portal.Bo\digioz.Portal.Bo.csproj" />
+    <ProjectReference Include="..\digioz.Portal.Utilities\digioz.Portal.Utilities.csproj" />
   </ItemGroup>
 
 </Project>

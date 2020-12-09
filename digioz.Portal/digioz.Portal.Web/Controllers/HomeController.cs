@@ -21,10 +21,6 @@ namespace digioz.Portal.Web.Controllers
 
         public IActionResult Index()
         {
-            var db = new digiozPortalContext();
-            var menus = db.Menus.ToList();
-
-
             return View();
         }
 
