@@ -1,3 +1,4 @@
+using System;
 using digiozPortal.Web.Data;
 using digiozPortal.Web.Data.Tables;
 
@@ -58,6 +59,10 @@ namespace digiozPortal.Web
 
                 endpoints.MapRazorPages();
             });
+        }
+
+        public void Session_Start(object sender, EventArgs e) {
+            // place holder to solve endless loop issue
         }
     }
 }
