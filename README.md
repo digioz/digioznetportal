@@ -1,5 +1,5 @@
 # DigiOz .NET Portal
-ASP.NET MVC Core Portal
+ASP.NET MVC Core Portal written with .NET 5.0.
 
 # Default Accounts
 By default the system will create two accounts for you if you run the tables and inserts scripts for version 1.0.0.0.
@@ -10,11 +10,8 @@ o Username: admin@domain.com
 
 o Password: Pass@word1
 
+# Setup Database
+Open PowerShell and navigate to the directory your Web Project is at, and run the following command: 
 
-
-- **User**
-
-o Username: user1@mail.com
-
-o Password: Pass@word1
+> dotnet ef database update --context ApplicationDbContext
 
