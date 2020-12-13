@@ -1,0 +1,20 @@
+﻿@model List<digiozPortal.BO.Menu>
+
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+        if (item.Controller != null && item.Controller.Length > 0)
+        {
+            <li>@Html.ActionLink(@item.Name, @item.Action, @item.Controller, new { area = "" }, null)</li>
+        }
+        else
+        {
+            <li><a href="@item.URL" target="@item.Target">@item.Name</a></li>
+        }
+    }
+}
+else
+{
+    <li class="active">@Html.ActionLink("Home", "Index", "Home")</li>
+}

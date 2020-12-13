@@ -1,0 +1,32 @@
+﻿
+@{
+    if (ViewBag.WhoIsOnlineEnabled == true)
+    {
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Who Is Online</h3>
+            </div>
+            <div class="panel-body">
+                <div>
+                    <span>Visitors: </span>@ViewBag.VisitorCount<br />
+                    @{ 
+                        var visitors = ViewBag.RegisteredVisitors;
+
+                        if (visitors.Count > 0)
+                        {
+                            <span>Logged In: </span>
+
+                            foreach (var visitor in visitors)
+                            {
+                                <a href="@Url.Action("ShowDetails", "Profile", new { userName = visitor.UserName })">@visitor.UserName</a><span>, </span>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+
+
+
