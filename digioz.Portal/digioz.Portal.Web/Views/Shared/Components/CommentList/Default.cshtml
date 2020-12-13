@@ -1,0 +1,85 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Comment>
+
+<div class="detailBox">
+    <div class="titleBox">
+        <label>Comments (@Model.Count())</label>
+        <button type="button" class="btn btn-info btn-sm collapsed" data-toggle="collapse" data-target="#@ViewBag.ReferenceType@ViewBag.ReferenceId" style="float:right;">View</button>
+    </div>
+
+    <div id="@ViewBag.ReferenceType@ViewBag.ReferenceId" class="collapse">
+        @if (!Model.Any())
+        {
+            <div class="commentBox" style="padding-top:10px;padding-left:10px;">
+                <p class="taskDescription" style="font-size:small;">No Comments yet.</p>
+            </div>
+        }
+        else
+        {
+            <div class="actionBox">
+
+                @foreach (var comment in Model)
+                {
+                    <table style="width:100%;">
+                        <tr style="border-bottom: 1px solid #C0C0C0;">
+                            <td style="text-align:right;vertical-align:middle;">
+                                <span style="padding:0px;font-size:x-small">Likes (<b>@comment.Likes</b>)</span>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <a href="@Url.Action("Like","Comments", new { id = comment.Id })"><img src="~/img/images/icons/20x20/Like.png" /></a>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <ul class="commentList">
+                                    <li>
+                                        <div class="commenterImage">
+                                            @if (comment.UserId != null)
+                                            {
+                                                <a href="@Url.Action("ShowDetails", "Profile", new { userId = comment.UserId })">
+                                                    <img src="@Url.Action("ShowAvatar", "Profile", new { userId = comment.UserId })" />
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <img src="@Url.Action("ShowAvatar", "Profile")" />
+                                            }
+                                        </div>
+                                        <div class="commentText">
+                                            <p class="">@comment.Body</p>
+                                            <span class="date sub-text">
+                                                <a href="@Url.Action("ShowDetails", "Profile", new { userId = comment.UserId })">@comment.Username</a> on @comment.ModifiedDate
+                                            </span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </table>
+                }
+            </div>
+        }
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div style="padding:20px; width:100%;">
+                @using (Html.BeginForm("Add", "Comments"))
+                {
+                    <input type="hidden" id="referenceId" name="referenceId" value="@ViewBag.ReferenceId">
+                    <input type="hidden" id="referenceType" name="referenceType" value="@ViewBag.ReferenceType">
+                    <textarea id="comment" name="comment" class="form-control" placeholder="Your comments" style="width:100%"></textarea>
+                    <div class="form-group" style="float:right;height:100px;">
+                        <button type="submit" class="btn btn-info btn-sm">Post Comments</button>
+                    </div>
+                }
+            </div>
+            <p>&nbsp;</p>
+        }
+        else
+        {
+            <div style="font-size:xx-small;color:#C0C0C0;font-style:italic;padding-left:20px;">Please log in to post comments.</div>
+        }
+    </div>
+</div>
+
+

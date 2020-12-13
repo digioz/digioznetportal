@@ -1,0 +1,33 @@
+﻿@model digioz.Portal.Bo.Page
+
+@{
+    ViewBag.Title = "Contact";
+}
+
+@section keywords {
+    @if (Model != null && Model.Keywords != null)
+    {
+        <meta name="keywords" content="@Model.Keywords" />
+    }
+}
+
+@section description {
+    @if (Model != null && Model.Description != null)
+    {
+        <meta name="description" content="@Model.Description" />
+    }
+}
+
+@{
+    if (Model != null)
+    {
+        @Html.Raw(Model.Body)
+    }
+
+    if (ViewBag.ShowContactForm == true)
+    {
+        @Html.RenderAction("ContactUs", "Home");
+    }
+}
+
+@Html.RenderAction("CommentsMenu", "Menu", new { referenceId = Model.Id, referenceType = "Page" })

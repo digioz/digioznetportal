@@ -1,0 +1,74 @@
+﻿@model digioz.Portal.Web.Areas.Admin.Models.ViewModels.UserManagerViewModel
+
+@{ 
+    ViewBag.Title = "User Profile for " + Model.UserName;
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+
+<table>
+    <tr>
+        <td style="vertical-align:top;">
+            <a href="@Url.Action("ShowDetails", "Profile", new { userId = Model.Id })">
+                <img src="@Url.Action("ShowAvatar", "Profile", new { userId = Model.Id })" style="width:120px;" />
+            </a>
+        </td>
+        <td>
+            <table>
+                <tr>
+                    <td style="width:100px;padding-left:10px;">
+                        <b>Username: </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.UserName)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-left:10px;">
+                        <b>Name: </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.FirstName) @Html.DisplayFor(model => model.LastName)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-left:10px;">
+                        <b>City: </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.City)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-left:10px;">
+                        <b>Country: </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.Country)
+                    </td>
+                </tr>
+                <tr style="border-bottom-color:#000000;padding-left:10px;">
+                    <td style="vertical-align:top;padding-left:10px;">
+                        <b>Signature: </b>
+                    </td>
+                    <td>
+                        @if (Model.Signature != null)
+                        {
+                            var signature = Model.Signature.Replace(System.Environment.NewLine, "<br />");
+
+            <span>@Html.Raw(signature)</span>}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-left:10px;">
+                        <b>Media:</b>
+                    </td>
+                    <td>
+                        @Html.ActionLink("View Pictures", "Pictures", new { username = Model.UserName })
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+

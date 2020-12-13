@@ -1,0 +1,48 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+
+
+<div class="card bg-light mb-3">
+    <div class="card-header">User</div>
+    <div class="card-body">
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <ul>
+                <li class="nav-item">
+                    <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <button type="submit" class="nav-link btn btn-link" style="padding: 0px;text-align:left;">Logout</button>
+                    </form>
+                </li>
+                <li class="nav-item">@Html.ActionLink("My Profile", "Edit", "Profile", new { area = "" }, null)</li>
+                <li class="nav-item">@Html.ActionLink("My Pictures", "Pictures", "Profile", new { area = "" }, null)</li>
+                <li class="nav-item">@Html.ActionLink("Private Messages", "Index", "PrivateMessages", new { area = "" }, null)</li>
+                <li class="nav-item">@Html.ActionLink("Change Password", "Manage", "Account", new { area = "Identity" }, null)</li>
+
+                @if (User.IsInRole("Administrator"))
+                {
+                    <li class="nav-item">@Html.ActionLink("Admin Dashboard", "Index", "Home", new { area = "Admin" }, null)</li>
+                }
+            </ul>
+            <p>Logged in as @Html.ActionLink(@User.Identity.Name, "Index", "Profile", new { area = "" }).</p>
+        }
+        else
+        {
+            <ul>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Identity" asp-page="/Account/Register" style="padding: 0px;text-align:left;">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="Identity" asp-page="/Account/Login" style="padding: 0px;text-align:left;">Login</a>
+                </li>
+                <li class="nav-item">@Html.ActionLink("Forgot Password", "ForgotPassword", "Account", new { area = "Identity" }, null)</li>
+            </ul>
+        }
+    </div>
+</div>
+
+
+
+

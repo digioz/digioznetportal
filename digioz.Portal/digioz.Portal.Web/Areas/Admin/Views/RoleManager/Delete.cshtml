@@ -1,0 +1,43 @@
+﻿@model Microsoft.AspNetCore.Identity.IdentityRole
+
+@{
+    ViewBag.Title = "Delete Role";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<main>
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header">
+                Delete Role
+            </div>
+            <div class="card-body">
+                <h3>Are you sure you want to delete this?</h3>
+                <div>
+                    <hr />
+                    <table class="table border-bottom">
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Name)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(model => model.Name)
+                            </td>
+                        </tr>
+                    </table>
+
+                    @using (Html.BeginForm())
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-actions no-color">
+                            <input type="submit" value="Delete" class="btn btn-primary" /> |
+                            @Html.ActionLink("Back to Index", "Index")
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

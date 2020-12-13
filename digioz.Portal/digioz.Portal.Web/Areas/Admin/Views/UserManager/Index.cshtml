@@ -1,0 +1,75 @@
+﻿@model IEnumerable<digioz.Portal.Bo.AspNetUser>
+@using NonFactors.Mvc.Grid
+
+@{
+    ViewBag.Title = "User Manager";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@section HeaderScripts {
+    <link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet">
+}
+
+@section FooterScripts {
+    <script src="~/js/mvc-grid/mvc-grid.js"></script>
+    <script>
+        document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+    </script>
+}
+
+<main>
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>User Manager</h2>
+            </div>
+            <div class="card-body">
+                <p>
+                    <a class="btn btn-sm btn-primary" href="@Url.Action("Create", "UserManager", new { area = "Admin" })">Create New</a>
+                </p>
+                <div>
+                    <form class="navbar-form" role="search" action="@Url.Action("Search")">
+                        <div class="form-group">
+                            <table>
+                                <tr>
+                                    <td><input type="text" class="form-control" placeholder="Search" name="searchString" style="width:300px;"></td>
+                                    <td><button type="submit" class="btn btn-info btn-primary">Search</button></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </form>
+                </div>
+                @*https://mvc6-grid.azurewebsites.net/formatting*@
+                @(Html
+                .Grid(Model)
+                .Build(columns =>
+                {
+                    columns.Add(model => model.UserName).Titled("UserName").Filterable(true);
+
+                    columns.Add(model => model.EmailConfirmed).Titled("Email Confirmed").UsingDefaultFilterMethod("equals"); ;
+                    columns.Add(model => model.PhoneNumber).Titled("Phone").UsingDefaultFilterMethod("equals"); ;
+
+                    columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Details/{model.Id}' id=\"details\"  asp-action=\"Details\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"/img/images/icons/16x16/Search.png\" alt=\"Details\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+                                       + $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Edit/{model.Id}' id=\"edit\"  asp-action=\"Edit\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"/img/images/icons/16x16/Edit.png\" alt=\"Edit\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+                                       + $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Delete/{model.Id}' id=\"delete\"  asp-action=\"Delete\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"/img/images/icons/16x16/Cancel.png\" alt=\"Delete\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+                                       + $"<a data-modal='' data-id=\"{model.Id}\" href='UserManager/Roles/{model.Id}' id=\"roles\"  asp-action=\"Roles\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"/img/images/icons/16x16/Key.png\" alt=\"Roles\"><span class='glyphicon glyphicon-user'></span></a>").Encoded(false);
+
+                })
+                    .Empty("No users found.")
+                    .Filterable()
+                    .Sortable()
+                    .Pageable()
+                )
+                <div id='myModal' class='modal fade in'>
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div id='myModalContent'></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+

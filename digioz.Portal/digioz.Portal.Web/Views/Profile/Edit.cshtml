@@ -1,0 +1,161 @@
+﻿@model digioz.Portal.Web.Areas.Admin.Models.ViewModels.UserManagerViewModel 
+@{
+    ViewBag.Title = "My Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (TempData["Saved"] != null)
+{
+    <div class="alert alert-success">Your changes have been saved.</div>
+}
+
+@using (Html.BeginForm(Html.BeginForm("EditPost", "Profile", FormMethod.Post, new { enctype = "multipart/form-data" })))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="form-horizontal">
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.UserName)
+
+        <div class="well">
+            <div class="form-group">
+                @Html.LabelFor(model => model.FirstName, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Email)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.LastName, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.LastName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Email)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Email, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Email)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Birthday, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.Birthday, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Birthday)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BirthdayVisible, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.BirthdayVisible, null, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.BirthdayVisible)
+                </div>
+            </div>
+        </div>
+
+        <div class="well">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Address, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.Address, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Address)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Address2, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.Address2, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Address2)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.City, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.City, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.City)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.State, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.State, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.State)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Zip, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.Zip, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Zip)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Country, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.Country, Model.Countries, string.Empty, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Country)
+                </div>
+            </div>
+        </div>
+
+        <div class="well">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Signature, new {@class = "control-label col-md-2"})
+                <div class="col-md-10">
+                    @Html.TextAreaFor(model => model.Signature, new {@class = "form-control"})
+                    @Html.ValidationMessageFor(model => model.Signature)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.UseGravatar, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.CheckBoxFor(model => model.UseGravatar)
+                    @Html.ValidationMessageFor(model => model.UseGravatar)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Avatar, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @if (!string.IsNullOrEmpty(Model.Avatar))
+                    {
+                        <a href="~/img/Avatar/Full/@Model.Avatar"><img class="img-thumbnail" src="~/img/Avatar/Thumb/@Model.Avatar" /></a><br />
+                    }
+                    else
+                    {
+                        <a href="~/img/Avatar/Full/Default.png"><img class="img-thumbnail" src="~/img/Avatar/Thumb/Default.png" /></a><br />
+                    }
+                    <br />
+                    For best results, use an image with equal width and height.
+                    <input class="form-control" type="file" name="AvatarImage" id="AvatarImage" />
+
+                    @Html.ValidationMessageFor(model => model.Avatar)
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" class="btn btn-primary"/>
+                    @Html.ActionLink("Cancel", "Index", "Home", null, new {@class = "btn btn-danger"})
+                    @Html.ActionLink("Change Password", "Manage", "Account", new { area = "Identity" }, new {@class = "btn btn-warning"})
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

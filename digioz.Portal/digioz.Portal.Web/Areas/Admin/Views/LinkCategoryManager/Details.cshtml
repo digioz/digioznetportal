@@ -1,0 +1,49 @@
+﻿@model digioz.Portal.Bo.LinkCategory
+
+@{
+    ViewBag.Title = "Link Category Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2>Link Category Details</h2>
+            <div>
+                <table class="table border-bottom">
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Name)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Name)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Visible)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Visible)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Timestamp)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Timestamp)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <p>
+                @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+                @Html.ActionLink("Back to List", "Index")
+            </p>
+        </div>
+    </div>
+</div>

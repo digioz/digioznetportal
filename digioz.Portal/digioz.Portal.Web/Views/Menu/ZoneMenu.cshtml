@@ -1,0 +1,36 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Module>
+
+@if (Model != null)
+{
+    if ((ViewBag.SelectedZone == "Top" || ViewBag.SelectedZone == "Bottom") && Model.Any())
+    {
+        @:<div class="container" style="padding: 15px;">
+    }
+
+    foreach (var item in Model)
+    {
+        if (item.Visible)
+        {
+            if (item.DisplayInBox)
+            {
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">@item.Title</h3>
+                    </div>
+                    <div class="panel-body">
+                        @Html.Raw(item.Body)
+                    </div>
+                </div>
+            }
+            else
+            {
+                @Html.Raw(item.Body)
+            }
+        }
+    }
+
+    if ((ViewBag.SelectedZone == "Top" || ViewBag.SelectedZone == "Bottom") && Model.Any())
+    {
+        @:</div>
+    }
+}

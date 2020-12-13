@@ -1,0 +1,83 @@
+﻿@model digioz.Portal.Bo.Link
+
+@{
+    ViewBag.Title = "Link Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<main>
+    <div class="container-fluid">
+		<div class="card mb-4">
+			<div class="card-header">
+				Link Details
+			</div>
+            <div class="card-body">
+                <div>
+                    <hr />
+                    <table class="table border-bottom">
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Name)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(model => model.Name)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Url)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(model => model.Url)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Description)
+                            </td>
+
+                            <td>
+                                @Html.Raw(Model.Description)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                Category
+                            </td>
+
+                            <td>
+                                @ViewBag.LinkCategory.Name
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Visible)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(model => model.Visible)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Timestamp)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(model => model.Timestamp)
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <p>
+                    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+                    @Html.ActionLink("Back to List", "List")
+                </p>
+            </div>
+		</div>
+	</div>
+</main>
+
+

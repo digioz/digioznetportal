@@ -1,0 +1,66 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Picture>
+
+@{
+	ViewBag.Title = "Pictures";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Pictures</h2>
+
+@if (Model != null)
+{
+	if (ViewBag.Username != null & ViewBag.Username == User.Identity.Name)
+	{
+		<div class="btn btn-default col-md-2">@Html.ActionLink("Upload Picture", "Add", "Pictures")</div>
+		<p>&nbsp;</p>
+
+		@*@grid.GetHtml(
+		tableStyle: "table",
+		columns: new[] {
+		grid.Column("Id", "ID"),
+		grid.Column("",
+					header: "Image",
+					format: @<text>
+					<a href="/Content/Pictures/Full/@item.Filename">
+						<img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="/Content/Pictures/Thumb/@item.Filename" />
+					</a>
+					</text>
+		),
+		grid.Column("Description", "Description"),
+		grid.Column("Timestamp", "Timestamp"),
+		grid.Column("Approved", "Approved"),
+		grid.Column("Visible", "Visible"),
+		grid.Column("AspNetUser.UserName", "User"),
+		grid.Column("PictureAlbum.Name", "Album"),
+		grid.Column("",
+					header: "",
+					format: (item) => MvcHtmlString.Create(
+								Html.ActionImage("PictureDelete", new { Id = item.Id }, "~/Content/images/icons/16x16/Cancel.png", imageAttributes: new { alt = "Delete", @class = "icon" },
+									linkAttributes: new { title = "Delete"}).ToString())
+					)
+		})
+	}
+	else
+	{
+		@grid.GetHtml(
+		tableStyle: "table",
+		columns: new[] {
+		grid.Column("Id", "ID"),
+		grid.Column("",
+					header: "Image",
+					format: @<text>
+					<a href="/Content/Pictures/Full/@item.Filename">
+						<img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="/Content/Pictures/Thumb/@item.Filename" />
+					</a>
+					</text>
+		),
+		grid.Column("Description", "Description"),
+		grid.Column("Timestamp", "Timestamp"),
+		grid.Column("AspNetUser.UserName", "User"),
+		grid.Column("PictureAlbum.Name", "Album"),
+		})*@
+	}
+
+
+}
+

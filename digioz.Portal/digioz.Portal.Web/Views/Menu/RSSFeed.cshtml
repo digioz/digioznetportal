@@ -1,0 +1,19 @@
+﻿@using System.Net.Mime
+@model IEnumerable<digioz.Portal.Web.Models.ViewModels.RSSViewModel>
+
+@if (Model.Any())
+{
+    foreach (var feed in Model)
+    {
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">@feed.Title</h3>
+            </div>
+            <div class="panel-body">
+                @Html.Raw(feed.Body)
+
+                <lable style="font-size:8px;">@feed.PublishDate</lable>
+            </div>
+        </div>
+    }
+}

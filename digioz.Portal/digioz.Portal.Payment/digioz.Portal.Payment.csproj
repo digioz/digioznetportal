@@ -4,4 +4,8 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\digioz.Portal.Bll\digioz.Portal.Bll.csproj" />
+  </ItemGroup>
+
 </Project>

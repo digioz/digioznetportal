@@ -1,0 +1,20 @@
+﻿@model List<digioz.Portal.Bo.LinkCategory>
+
+@{
+    ViewBag.Title = "Links";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@foreach (var category in Model)
+{
+    <div class="card" style="width: 90%;">
+        <div class="card-header">
+            @category.Name
+        </div>
+        <ul class="list-group list-group-flush">
+
+            @Html.RenderAction("LinkBox", "Links", new { id = category.Id })
+        </ul>
+    </div>
+}
+

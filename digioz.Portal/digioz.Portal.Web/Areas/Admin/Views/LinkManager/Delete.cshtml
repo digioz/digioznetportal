@@ -1,0 +1,88 @@
+﻿@model digioz.Portal.Bo.Link
+
+@{
+    ViewBag.Title = "Delete Link";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<main>
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header">
+                Delete Link
+            </div>
+            <div class="card-body">
+                <h3>Are you sure you want to delete this?</h3>
+                <div>
+                    <hr />
+                    <table class="table border-bottom">
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Name)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(model => model.Name)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Url)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(model => model.Url)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Description)
+                            </td>
+
+                            <td>
+                                @Html.Raw(Model.Description)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                Category
+                            </td>
+
+                            <td>
+                                @ViewBag.LinkCategory.Name
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Visible)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(model => model.Visible)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold">
+                                @Html.DisplayNameFor(model => model.Timestamp)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(model => model.Timestamp)
+                            </td>
+                        </tr>
+                    </table>
+
+                    @using (Html.BeginForm())
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-actions no-color">
+                            <input type="submit" value="Delete" class="btn btn-primary" /> |
+                            @Html.ActionLink("Back to List", "List")
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

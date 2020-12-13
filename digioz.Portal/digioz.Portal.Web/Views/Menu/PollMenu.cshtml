@@ -1,0 +1,24 @@
+﻿@model digioz.Portal.Bo.Poll
+
+@if (Model != null)
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Polls</h3>
+        </div>
+        <div class="panel-body" style="margin-left: auto; margin-right: auto; float: none; width: 100%;">
+            <span style="font-weight: bold;">@Model.Slug</span>
+            
+            <img src="/PollCharts/Index/@Model.Id.ToString()" style="width: 100%"/>
+
+            <center>
+                @if (!Model.IsClosed)
+                {
+                    <div class="btn btn-primary btn-xs" style="text-align: center;">@Html.ActionLink("Add Vote", "Add", "Polls", new { Area = "", id = Model.Id.ToString() }, new { @style = "color:#ffffff;" })</div>
+
+                }
+                <div class="btn btn-primary btn-xs" style="text-align: center;">@Html.ActionLink("Other Polls", "Index", "Polls", null, new { @style = "color:#ffffff;" })</div>
+            </center>
+        </div>
+    </div>
+}

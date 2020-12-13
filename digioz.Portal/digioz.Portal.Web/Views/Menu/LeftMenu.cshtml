@@ -1,0 +1,28 @@
+﻿@model List<digioz.Portal.Bo.Menu>
+
+            <div class="card bg-light mb-3">
+                <div class="card-header">Menu</div>
+                <div class="card-body">
+                    <ul>
+                        @if (Model != null)
+                        {
+                            foreach (var item in Model)
+                            {
+                                if (item.Controller != null && item.Controller.Length > 0)
+                                {
+                                    <li>@Html.ActionLink(@item.Name, @item.Action, @item.Controller, new { area = "" }, null)</li>
+                                }
+                                else
+                                {
+                                    <li><a href="@item.Url" target="@item.Target">@item.Name</a></li>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <li class="active">@Html.ActionLink("Home", "Index", "Home")</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+

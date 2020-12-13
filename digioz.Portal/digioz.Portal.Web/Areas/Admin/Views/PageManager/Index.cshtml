@@ -1,0 +1,64 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Page>
+
+@{
+    ViewBag.Title = "Page Manager";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<main>
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header">
+                Page Manager
+            </div>
+            <div class="card-body">
+                <p>
+                    <a class="btn btn-sm btn-primary" href="@Url.Action("Create", "PageManager", new { area = "Admin" })">Create New</a>
+                </p>
+
+                <table class="table">
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Title)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Url)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Visible)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Timestamp)
+                        </th>
+                        <th></th>
+                    </tr>
+
+                    @foreach (var item in Model)
+                    {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Url)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Visible)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Timestamp)
+                </td>
+                <td>
+                    <a href="@Url.Action("Details", new { id = item.Id })"><img class="sb-nav-link-icon" src="~/img/images/icons/16x16/Search.png" alt="Details" /></a>
+                    <a href="@Url.Action("Edit", new { id = item.Id })"><img class="sb-nav-link-icon" src="~/img/images/icons/16x16/Edit.png" alt="Edit" /></a>
+                    <a href="@Url.Action("Delete", new { id = item.Id })"><img class="sb-nav-link-icon" src="~/img/images/icons/16x16/Cancel.png" alt="Delete" /></a>
+                </td>
+            </tr>}
+
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+

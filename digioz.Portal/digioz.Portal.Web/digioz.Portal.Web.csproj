@@ -25,6 +25,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.1" />
     <PackageReference Include="NonFactors.Grid.Mvc6" Version="6.2.3" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
