@@ -55,7 +55,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind("ID", "Name", "Visible", "Timestamp")] LinkCategory linkCategory)
+        public ActionResult Create([Bind("Id", "Name", "Visible", "Timestamp")] LinkCategory linkCategory)
         {
             if (ModelState.IsValid)
             {

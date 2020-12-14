@@ -67,7 +67,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         public ActionResult Create()
         {
             var linkCategories = _linkCategoryLogic.GetAll(); 
-            ViewBag.LinkCategoryID = new SelectList(linkCategories, "Id", "Name");
+            ViewBag.LinkCategory = new SelectList(linkCategories, "Id", "Name");
 
             return View();
         }
@@ -77,7 +77,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind("ID", "Name", "URL", "Description", "Category", "Visible", "Timestamp", "LinkCategoryId")] Link link)
+        public ActionResult Create([Bind("Id", "Name", "Url", "Description", "Category", "Visible", "Timestamp", "LinkCategory")] Link link)
         {
             if (ModelState.IsValid)
             {
@@ -88,7 +88,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             }
 
             var linkCategories = _linkCategoryLogic.GetAll();
-            ViewBag.LinkCategoryID = new SelectList(linkCategories, "Id", "Name", link.LinkCategory);
+            ViewBag.LinkCategory = new SelectList(linkCategories, "Id", "Name", link.LinkCategory);
 
             return View(link);
         }
@@ -109,7 +109,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             }
 
             var linkCategories = _linkCategoryLogic.GetAll();
-            ViewBag.LinkCategoryID = new SelectList(linkCategories, "Id", "Name", link.LinkCategory);
+            ViewBag.LinkCategory = new SelectList(linkCategories, "Id", "Name", link.LinkCategory);
 
             return View(link);
         }
@@ -119,17 +119,17 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind("Id", "Name", "URL", "Description", "Category", "Visible", "Timestamp", "LinkCategoryId")] Link link)
+        public ActionResult Edit([Bind("Id", "Name", "Url", "Description", "Category", "Visible", "Timestamp", "LinkCategory")] Link link)
         {
             if (ModelState.IsValid)
             {
                 _linkLogic.Edit(link);
 
-                return RedirectToAction("Index");
+                return RedirectToAction("List");
             }
 
             var linkCategories = _linkCategoryLogic.GetAll();
-            ViewBag.LinkCategoryID = new SelectList(linkCategories, "Id", "Name", link.LinkCategory);
+            ViewBag.LinkCategory = new SelectList(linkCategories, "Id", "Name", link.LinkCategory);
 
             return View(link);
         }
@@ -161,7 +161,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             var link = _linkLogic.Get(id);
             _linkLogic.Delete(link);
 
-            return RedirectToAction("Index");
+            return RedirectToAction("List");
         }
     }
 }

@@ -167,7 +167,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPost([Bind("Id", "UserID", "Email", "Birthday", "BirthdayVisible", "Address", "Address2", "City",
+        public async Task<IActionResult> EditPost([Bind("Id", "UserId", "Email", "Birthday", "BirthdayVisible", "Address", "Address2", "City",
                                                     "State", "Zip", "Country", "Signature", "Avatar", "FirstName", "LastName", "AvatarImage")] UserManagerViewModel userVM) {
             var user = await _userManager.FindByIdAsync(userVM.Id);
 

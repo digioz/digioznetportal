@@ -57,7 +57,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind("ID", "UserID", "Title", "URL", "Body", "Keywords", "Description", "Visible", "Timestamp")] Page page)
+        public ActionResult Create([Bind("Id", "UserId", "Title", "Url", "Body", "Keywords", "Description", "Visible", "Timestamp")] Page page)
         {
             if (ModelState.IsValid)
             {
@@ -96,7 +96,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind("ID", "UserID", "Title", "URL", "Body", "Keywords", "Description", "Visible", "Timestamp")] Page page)
+        public ActionResult Edit([Bind("Id", "UserId", "Title", "Url", "Body", "Keywords", "Description", "Visible", "Timestamp")] Page page)
         {
             if (ModelState.IsValid)
             {
