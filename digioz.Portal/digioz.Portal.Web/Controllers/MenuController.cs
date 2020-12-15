@@ -233,6 +233,7 @@ namespace digioz.Portal.Web.Controllers
             return PartialView("RSSFeed", feedContent);
         }
 
+        [ResponseCache(VaryByHeader = "User-Agent", Duration = 20)]
         public ActionResult LatestPictures()
         {
             var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true && x.Name == "LatestPictures");

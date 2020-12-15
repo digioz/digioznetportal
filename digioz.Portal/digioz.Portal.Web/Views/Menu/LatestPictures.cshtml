@@ -1,47 +1,50 @@
 ﻿@model IEnumerable<digioz.Portal.Bo.Picture>
 
-@if (ViewBag.ShowLatestPictures == true)
+@if (Model.Any())
 {
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h3 class="panel-title">Latest Pictures</h3>
-        </div>
-        <div class="panel-body">
-            <table style="width:95%;">
-                <tr>
-                    @{
-                        int i = 0;
+    if (ViewBag.ShowLatestPictures == true)
+    {
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Latest Pictures</h3>
+            </div>
+            <div class="panel-body">
+                <table style="width:95%;">
+                    <tr>
+                        @{
+                            int i = 0;
 
-                        foreach (var item in Model)
-                        {
-                            <td style="padding:5px;vertical-align:top;">
-                                <div style="text-align:left;padding:10px;background-color:#f3f6fa">
-                                    <center>
-                                        <a href="~/Content/Pictures/Full/@item.Filename">
-                                            <img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="~/Content/Pictures/Thumb/@item.Filename" border="0" />
-                                        </a>
-                                    </center>
-                                </div>
-                            </td>
-
-                            i++;
-
-                            if (i == 3)
+                            foreach (var item in Model)
                             {
-                            @:</tr><tr>
-                                i = 0;
+                                <td style="padding:5px;vertical-align:top;">
+                                    <div style="text-align:left;padding:10px;background-color:#f3f6fa">
+                                        <center>
+                                            <a href="~/Content/Pictures/Full/@item.Filename">
+                                                <img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="~/Content/Pictures/Thumb/@item.Filename" border="0" />
+                                            </a>
+                                        </center>
+                                    </div>
+                                </td>
+
+                                i++;
+
+                                if (i == 3)
+                                {
+                                @:</tr><tr>
+                                    i = 0;
+                                }
                             }
-
                         }
-                    }
-                </tr>
-            </table>
-            <br />
-            <div class="text-center"><a class="btn btn-xs btn-primary" href="@Url.Action("Index", "Pictures")">View More</a></div>
+                    </tr>
+                </table>
+                <br />
+                <div class="text-center"><a class="btn btn-xs btn-primary" href="@Url.Action("Index", "Pictures")">View More</a></div>
+            </div>
         </div>
-    </div>
 
-    <p>&nbsp;</p>
+        <p>&nbsp;</p>
+    }
 }
+
 
 

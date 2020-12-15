@@ -15,3 +15,7 @@ Open PowerShell and navigate to the directory your Web Project is at, and run th
 
 > dotnet ef database update --context ApplicationDbContext
 
+Or if running it from the package manager: 
+
+Update-Database -context ApplicationDbContext
+
