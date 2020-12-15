@@ -11,8 +11,10 @@ using digioz.Portal.Web.Areas.Admin.Models.ViewModels;
 using digioz.Portal.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace digioz.Portal.Web.Areas.Admin.Controllers
 {
@@ -27,6 +29,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogic<AspNetRole> _roleLogic;
         private readonly ILogic<AspNetUserRole> _userRolesLogic;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public UserManagerController(
             ILogic<AspNetUser> userLogic,
@@ -35,7 +38,8 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             IPasswordHasher<IdentityUser> passwordHasher,
             IWebHostEnvironment webHostEnvironment,
             ILogic<AspNetRole> roleLogic,
-            ILogic<AspNetUserRole> userRolesLogic
+            ILogic<AspNetUserRole> userRolesLogic,
+            RoleManager<IdentityRole> roleManager
         ) {
             _userLogic = userLogic;
             _profileLogic = profileLogic;
@@ -44,6 +48,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             _webHostEnvironment = webHostEnvironment;
             _roleLogic = roleLogic;
             _userRolesLogic = userRolesLogic;
+            _roleManager = roleManager;
         }
 
         private string GetImageFolderPath() {
@@ -257,15 +262,26 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpPost, ActionName("DeletePost")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeletePost([Bind("Id")] UserManagerViewModel userVM) {
-            var user = _userLogic.Get(userVM.Id);
+        public async Task<ActionResult> DeletePostAsync([Bind("Id")] UserManagerViewModel userVM) {
+            var user = await _userManager.FindByIdAsync(userVM.Id);
             var profile = _profileLogic.GetAll().Where(x => x.UserId == user.Id).SingleOrDefault();
 
-            if (profile != null) {
-                _profileLogic.Delete(profile);
-            }
+            if (user != null)
+            {
+                if (profile != null) {
+                    _profileLogic.Delete(profile);
+                }
 
-            _userLogic.Delete(user);
+                // Remove user from all roles
+                var userRoles = await _userManager.GetRolesAsync(user);
+
+                foreach (var userRole in userRoles)
+                {
+                    await _userManager.RemoveFromRoleAsync(user, userRole);
+                }
+
+                await _userManager.DeleteAsync(user);
+            }
 
             return RedirectToAction("Index");
         }
@@ -300,6 +316,9 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
                 currentUserRoles.Add(currentUserRole);
             }
 
+            ViewBag.UserId = id;
+            ViewBag.Email = user.Email;
+
             return View(currentUserRoles);
         }
 
@@ -310,15 +329,35 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             var role = _roleLogic.Get(id);
             var userRole = _userRolesLogic.GetAll().Where(item => item.RoleId == id && item.UserId == userId).FirstOrDefault();
             _userRolesLogic.Delete(userRole);
-            return RedirectToAction("Index");
+
+            return RedirectToAction("Roles", "UserManager", new { id = userId });
         }
 
         [HttpGet]
-        [Route("/admin/usermanager/roleadd/{id}/{userId}")]
-        public ActionResult RoleAdd(string id, string userId) {
-            // ToDo - Add Role to User
+        [Route("/admin/usermanager/roleadd/{id}")]
+        public ActionResult RoleAdd(string id) {
+            var roles = _roleManager.Roles.ToList();
+            ViewBag.Roles = new SelectList(roles, "Id", "Name");
+            ViewBag.UserId = id;
 
-            return RedirectToAction("Index");
+            return View(new IdentityRole());
+        }
+
+        [HttpPost, ActionName("RoleAddPost")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RoleAddPostAsync([Bind("Id", "Name")] IdentityRole model, IFormCollection form)
+        {
+            string userId = form["UserId"];
+            string roleId = form["Roles"];
+            var user = await _userManager.FindByIdAsync(userId);
+            var role = _roleManager.Roles.FirstOrDefault(x => x.Id == roleId);
+
+            if (user != null && role != null)
+            {
+                await _userManager.AddToRoleAsync(user, role.Name);
+            }
+
+            return RedirectToAction("Roles", "UserManager", new { id = userId });
         }
     }
 }
