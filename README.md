@@ -17,5 +17,5 @@ Open PowerShell and navigate to the directory your Web Project is at, and run th
 
 Or if running it from the package manager: 
 
-Update-Database -context ApplicationDbContext
+> Update-Database -context ApplicationDbContext
 
