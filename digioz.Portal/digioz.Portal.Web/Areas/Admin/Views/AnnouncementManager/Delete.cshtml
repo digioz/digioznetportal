@@ -1,14 +1,14 @@
-﻿@model digioz.Portal.Bo.Page
+﻿@model digioz.Portal.Bo.Announcement
 
 @{
-    ViewBag.Title = "Delete";
+    ViewData["Title"] = "Delete Announcement";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <h2>Delete Page</h2>
+            <h2>Delete Announcement</h2>
 
             <h4>Are you sure you want to delete this?</h4>
             <div>
@@ -24,38 +24,11 @@
                     </tr>
                     <tr>
                         <td class="font-weight-bold">
-                            @Html.DisplayNameFor(model => model.Url)
-                        </td>
-
-                        <td class="font-weight-bold">
-                            @Html.DisplayFor(model => model.Url)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="font-weight-bold">
                             @Html.DisplayNameFor(model => model.Body)
                         </td>
 
                         <td>
                             @Html.Raw(Model.Body)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="font-weight-bold">
-                            @Html.DisplayNameFor(model => model.Keywords)
-                        </td>
-
-                        <td>
-                            @Html.DisplayFor(model => model.Keywords)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="font-weight-bold">
-                            @Html.DisplayNameFor(model => model.Description)
-                        </td>
-
-                        <td>
-                            @Html.DisplayFor(model => model.Description)
                         </td>
                     </tr>
                     <tr>
@@ -100,5 +73,3 @@
         </div>
     </div>
 </div>
-
-
