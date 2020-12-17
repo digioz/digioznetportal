@@ -49,6 +49,8 @@ namespace digioz.Portal.Web
             services.AddControllersWithViews();
             services.AddRazorPages();
 
+            // Get connection string
+            ConnectionString.Value = Configuration.GetConnectionString("DefaultConnection");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
