@@ -20,19 +20,19 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
     [Authorize(Roles = "Administrator")]
     public class RoleManagerController : Controller
     {
-        private readonly ILogic<AspNetRole> _roleLogic;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
         public RoleManagerController(
-            ILogic<AspNetRole> roleLogic,
-            RoleManager<IdentityRole> roleManager
+            RoleManager<IdentityRole> roleManager,
+            UserManager<IdentityUser> userManager
         ) {
-            _roleLogic = roleLogic;
             _roleManager = roleManager;
+            _userManager = userManager;
         }
 
         public IActionResult Index() {
-            var models = _roleLogic.GetAll(); 
+            var models = _roleManager.Roles.ToList();
 
             return View(models);
         }
@@ -43,24 +43,30 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Id", "Name")] AspNetRole role) {
+        public async Task<IActionResult> CreateAsync([Bind("Id", "Name")] IdentityRole role) {
             if (ModelState.IsValid) {
-                role.Id = Guid.NewGuid().ToString();
-                role.NormalizedName = role.Name;
-                role.ConcurrencyStamp = string.Empty;
-                _roleLogic.Add(role);
 
+                await _roleManager.CreateAsync(role);
                 return RedirectToAction("Index");
             }
 
             return View(role);
         }
 
-        public IActionResult Delete(string id) {
-            var role = _roleLogic.Get(id);
+        public async Task<IActionResult> DeleteAsync(string id) {
+            var role = await _roleManager.FindByIdAsync(id);
 
             if (role != null) {
-                _roleLogic.Delete(role);
+                // Remove all user roles first
+                var usersOfRole = await _userManager.GetUsersInRoleAsync(role.Name);
+
+                foreach (var user in usersOfRole)
+                {
+                    await _userManager.RemoveFromRoleAsync(user, role.Name);
+                }
+
+                // Remove Role
+                await _roleManager.DeleteAsync(role);
 
                 return RedirectToAction("Index");
             }

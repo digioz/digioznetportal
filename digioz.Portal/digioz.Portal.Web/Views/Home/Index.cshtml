@@ -18,7 +18,7 @@
     }
 }
 
-@if (Model.Announcements != null)
+@if (Model.Announcements.Any())
 {
     @section featured {
 
@@ -38,10 +38,10 @@
         }
         <div class="text-center">@Html.ActionLink("View More", "Announcements", "Home", null, new { @class = "btn btn-xs btn-primary" })</div>
         <br />
-
-        @Html.RenderAction("LatestPictures", "Menu")
     }
 }
+
+@Html.RenderAction("LatestPictures", "Menu")
 
 @section RSSFeed {
     @Html.RenderAction("RSSFeed", "Menu")

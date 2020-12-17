@@ -1,16 +1,16 @@
-﻿@model digioz.Portal.Bo.Page
+﻿@model digioz.Portal.Bo.Announcement
 
 @{
-    ViewBag.Title = "Delete";
+    ViewData["Title"] = "Announcement Details";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
+
 
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <h2>Delete Page</h2>
+            <h2>Announcement Details</h2>
 
-            <h4>Are you sure you want to delete this?</h4>
             <div>
                 <table class="table border-bottom">
                     <tr>
@@ -24,38 +24,11 @@
                     </tr>
                     <tr>
                         <td class="font-weight-bold">
-                            @Html.DisplayNameFor(model => model.Url)
-                        </td>
-
-                        <td class="font-weight-bold">
-                            @Html.DisplayFor(model => model.Url)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="font-weight-bold">
                             @Html.DisplayNameFor(model => model.Body)
                         </td>
 
                         <td>
                             @Html.Raw(Model.Body)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="font-weight-bold">
-                            @Html.DisplayNameFor(model => model.Keywords)
-                        </td>
-
-                        <td>
-                            @Html.DisplayFor(model => model.Keywords)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="font-weight-bold">
-                            @Html.DisplayNameFor(model => model.Description)
-                        </td>
-
-                        <td>
-                            @Html.DisplayFor(model => model.Description)
                         </td>
                     </tr>
                     <tr>
@@ -86,19 +59,11 @@
                         </td>
                     </tr>
                 </table>
-
-                @using (Html.BeginForm())
-                {
-                    @Html.AntiForgeryToken()
-
-                    <div class="form-actions no-color">
-                        <input type="submit" value="Delete" class="btn btn-primary" /> |
-                        @Html.ActionLink("Back to List", "Index")
-                    </div>
-                }
             </div>
+            <p>
+                @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+                @Html.ActionLink("Back to List", "Index")
+            </p>
         </div>
     </div>
 </div>
-
-

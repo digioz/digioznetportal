@@ -9,11 +9,11 @@
     <div class="container-fluid">
         <div class="card mb-4">
             <div class="card-header">
-                User Roles
+                <h2>User Roles for @ViewBag.Email</h2>
             </div>
             <div class="card-body">
                 <p>
-                    <a class="btn btn-sm btn-primary" href="@Url.Action("RoleAdd", "UserManager", new { area = "Admin" })">Add Role</a>
+                    <a class="btn btn-sm btn-primary" href="@Url.Action("RoleAdd", "UserManager", new { id = ViewBag.UserId, area = "Admin" })">Add Role</a>
                 </p>
                 <table class="table-bordered" style="width:95%;">
                     <tr>
@@ -39,9 +39,12 @@
                                 <a href="@Url.Action("RoleDelete", new { id = item.RoleId, userId = item.UserId })"><img class="sb-nav-link-icon" src="~/img/images/icons/16x16/Cancel.png" alt="Delete" /></a>
                             </td>
                         </tr>
-}
-
+                    }
                 </table>
+                <br /><br />
+                <div>
+                    @Html.ActionLink("Back to Index", "Index")
+                </div>
             </div>
         </div>
     </div>
