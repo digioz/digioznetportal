@@ -21,8 +21,8 @@
 		grid.Column("",
 					header: "Image",
 					format: @<text>
-					<a href="/Content/Pictures/Full/@item.Filename">
-						<img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="/Content/Pictures/Thumb/@item.Filename" />
+					<a href="/img/Pictures/Full/@item.Filename">
+						<img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="/img/Pictures/Thumb/@item.Filename" />
 					</a>
 					</text>
 		),
@@ -35,7 +35,7 @@
 		grid.Column("",
 					header: "",
 					format: (item) => MvcHtmlString.Create(
-								Html.ActionImage("PictureDelete", new { Id = item.Id }, "~/Content/images/icons/16x16/Cancel.png", imageAttributes: new { alt = "Delete", @class = "icon" },
+								Html.ActionImage("PictureDelete", new { Id = item.Id }, "~/img/images/icons/16x16/Cancel.png", imageAttributes: new { alt = "Delete", @class = "icon" },
 									linkAttributes: new { title = "Delete"}).ToString())
 					)
 		})
@@ -49,8 +49,8 @@
 		grid.Column("",
 					header: "Image",
 					format: @<text>
-					<a href="/Content/Pictures/Full/@item.Filename">
-						<img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="/Content/Pictures/Thumb/@item.Filename" />
+					<a href="/img/Pictures/Full/@item.Filename">
+						<img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="/img/Pictures/Thumb/@item.Filename" />
 					</a>
 					</text>
 		),

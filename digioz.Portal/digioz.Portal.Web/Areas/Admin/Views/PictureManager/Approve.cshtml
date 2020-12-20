@@ -1,0 +1,43 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Picture>
+
+@{
+	ViewBag.Title = "Approve Pictures";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+<h2>Approve Pictures</h2>
+
+@*@grid.GetHtml(
+	tableStyle: "table",
+	columns: new[] {
+	grid.Column("Id", "ID"),
+	grid.Column("",
+				header: "Image",
+				format: @<text>
+	<a href="/img/Pictures/Full/@item.Filename">
+		<img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="/img/Pictures/Thumb/@item.Filename" />
+	</a>
+				</text>
+					),
+					grid.Column("Description", "Description"),
+					grid.Column("Timestamp", "Timestamp"),
+					grid.Column("Approved", "Approved"),
+					grid.Column("Visible", "Visible"),
+					grid.Column("AspNetUser.UserName", "User"),
+					grid.Column("PictureAlbum.Name", "Album"),
+					grid.Column("",
+								header: "",
+								format: (item) => MvcHtmlString.Create(
+											Html.ActionImage("ApprovePictures", new { Id = item.Id }, "~/img/images/icons/16x16/Ok.png", imageAttributes: new { alt = "Approve Picture", @class = "icon" },
+												linkAttributes: new { title = "Approve Picture"}).ToString())
+								)
+							})*@
+
+
+<p>&nbsp;</p>
+
+<div>
+	@Html.ActionLink("Back to Index", "Index")
+
+</div>

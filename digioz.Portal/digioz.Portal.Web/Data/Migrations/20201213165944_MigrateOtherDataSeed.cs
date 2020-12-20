@@ -37,6 +37,7 @@ namespace digioz.Portal.Web.Data.Migrations
             configs.Add(new Config() { Id = "55950eec-2228-43a8-ac87-49a7ab3cb55c", ConfigKey = "PaypalClientSecret", ConfigValue = "EGpl6DrqoaOWVysXEatofIjglg1i1XwHwSIhcw7jZ8duvfgxZAI6SeE8TVmbgHOXxJB7pyKW2O5cOhqj", IsEncrypted = false });
             configs.Add(new Config() { Id = "5d7f4e3d-1674-45af-b51d-9f207f9bd057", ConfigKey = "PaypalConnectionTimeout", ConfigValue = "360000", IsEncrypted = false });
             configs.Add(new Config() { Id = "a490804e-510f-4350-b500-80ec22636f98", ConfigKey = "EnableCommentsOnAllPages", ConfigValue = "true", IsEncrypted = false });
+            configs.Add(new Config() { Id = "a490804e-510f-4350-b500-80ec22636f98", ConfigKey = "TinyMCEApiKey", ConfigValue = "[Enter Key]", IsEncrypted = false });
 
             context.Configs.AddRange(configs);
             context.SaveChanges();

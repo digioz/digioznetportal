@@ -1,0 +1,110 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Picture>
+@using NonFactors.Mvc.Grid
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+@section HeaderScripts {
+    <link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet">
+}
+
+@section FooterScripts {
+    <script src="~/js/mvc-grid/mvc-grid.js"></script>
+    <script>
+        document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+    </script>
+}
+
+<main>
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Picture List</h2>
+            </div>
+            <div class="card-body">
+                <p>
+                    <a class="btn btn-sm btn-primary" href="@Url.Action("Create", "PictureManager", new { area = "Admin" })">Create New</a><br />
+
+                    @using (Html.BeginForm("PictureList", "PictureManager", FormMethod.Get))
+                    {
+                        <div class="col-md-4 col-md-offset-4">
+                            @Html.DropDownList("AlbumId", (IEnumerable<SelectListItem>)ViewBag.AlbumId, "Select Album", htmlAttributes: new { @class = "form-control" })
+                        </div>
+                        <div class="col-md-2">
+                            <input type="submit" value="Filter" class="btn btn-primary" />
+                        </div>
+                    }
+                </p>
+
+                @(Html
+                .Grid(Model)
+                .Build(columns =>
+                {
+                    columns.Add(model => $"<a href='/img/Pictures/Full/" + model.Filename + "'>"
+                                + "<img class='img-thumbnail' alt='120x120' style='width: 120px; height: 120px;' src='/img/Pictures/Thumb/" + model.Filename + "' /></a>"
+                               ).Encoded(false);
+                    columns.Add(model => model.Description).Titled("Description").Filterable(false);
+                    columns.Add(model => model.Timestamp).Titled("Timestamp").UsingDefaultFilterMethod("equals");
+                    columns.Add(model => model.Approved).Titled("Approved").UsingDefaultFilterMethod("equals");
+                    columns.Add(model => model.Visible).Titled("Visible").UsingDefaultFilterMethod("equals");
+                    columns.Add(model => model.UserId).Titled("UserId").UsingDefaultFilterMethod("equals");
+
+                    columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='Details/{model.Id}' id=\"details\"  asp-action=\"Details\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"/img/images/icons/16x16/Search.png\" alt=\"Details\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+                                                   + $"<a data-modal='' data-id=\"{model.Id}\" href='Edit/{model.Id}' id=\"edit\"  asp-action=\"Edit\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"/img/images/icons/16x16/Edit.png\" alt=\"Edit\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+                                                   + $"<a data-modal='' data-id=\"{model.Id}\" href='Delete/{model.Id}' id=\"delete\"  asp-action=\"Delete\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"/img/images/icons/16x16/Cancel.png\" alt=\"Delete\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+                               ).Encoded(false);
+
+                })
+                    .Empty("No users found.")
+                    .Filterable()
+                    .Sortable()
+                    .Pageable()
+                )
+
+                <p>&nbsp;</p>
+
+                <div>
+                    @Html.ActionLink("Back to Index", "Index")
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+
+@*@grid.GetHtml(
+        tableStyle: "table",
+        columns: new[] {
+        grid.Column("Id", "ID"),
+        grid.Column("",
+                    header: "Image",
+                    format: @<text>
+                                <a href="/img/Pictures/Full/@item.Filename">
+                                    <img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="/img/Pictures/Thumb/@item.Filename" />
+                                </a>
+                            </text>
+        ),
+        grid.Column("Description", "Description"),
+        grid.Column("Timestamp", "Timestamp"),
+        grid.Column("Approved", "Approved"),
+        grid.Column("Visible", "Visible"),
+        grid.Column("AspNetUser.UserName", "User"),
+        grid.Column("PictureAlbum.Name", "Album"),
+        grid.Column("",
+                    header: "",
+                    format: (item) => MvcHtmlString.Create(
+                                Html.ActionImage("Details", new { Id = item.Id }, "~/img/images/icons/16x16/Search.png", imageAttributes: new { alt = "Details", @class = "icon" },
+                                    linkAttributes: new { title = "Details" }).ToString() + " " +
+                                Html.ActionImage("Edit", new { Id = item.Id }, "~/img/images/icons/16x16/Edit.png", imageAttributes: new { alt = "Edit", @class = "icon" },
+                                    linkAttributes: new { title = "Edit" }).ToString() + " " +
+                                Html.ActionImage("Delete", new { Id = item.Id }, "~/img/images/icons/16x16/Cancel.png", imageAttributes: new { alt = "Delete", @class = "icon" },
+                                    linkAttributes: new { title = "Delete"}).ToString())
+                    )
+    })*@
+
+
+

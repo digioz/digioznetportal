@@ -380,7 +380,7 @@ namespace digioz.Portal.Web.Data.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<string>(maxLength: 128, nullable: true),
-                    AlbumId = table.Column<string>(maxLength: 128, nullable: true),
+                    AlbumId = table.Column<int>(nullable: true),
                     Filename = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     Approved = table.Column<bool>(nullable: false),
@@ -633,7 +633,7 @@ namespace digioz.Portal.Web.Data.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<string>(maxLength: 128, nullable: true),
-                    AlbumId = table.Column<string>(maxLength: 128, nullable: true),
+                    AlbumId = table.Column<int>(nullable: true),
                     Filename = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     Approved = table.Column<bool>(nullable: false),

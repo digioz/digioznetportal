@@ -66,7 +66,7 @@ namespace digioz.Portal.Web.Controllers
             var bannerUrl = string.Empty;
 
             if (!string.IsNullOrEmpty(model.Banner)) {
-                bannerUrl = address + "/Content/Emails/uploads/Full/" + model.Banner;
+                bannerUrl = address + "/img/Emails/uploads/Full/" + model.Banner;
             }
 
             ViewBag.BannerUrl = bannerUrl;

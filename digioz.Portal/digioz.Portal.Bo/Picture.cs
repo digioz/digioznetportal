@@ -9,7 +9,7 @@ namespace digioz.Portal.Bo
     {
         public int Id { get; set; }
         public string UserId { get; set; }
-        public string AlbumId { get; set; }
+        public int AlbumId { get; set; }
         public string Filename { get; set; }
         public string Description { get; set; }
         public bool Approved { get; set; }
