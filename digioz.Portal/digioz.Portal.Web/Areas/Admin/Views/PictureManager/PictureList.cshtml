@@ -73,38 +73,3 @@
         </div>
     </div>
 </main>
-
-
-
-@*@grid.GetHtml(
-        tableStyle: "table",
-        columns: new[] {
-        grid.Column("Id", "ID"),
-        grid.Column("",
-                    header: "Image",
-                    format: @<text>
-                                <a href="/img/Pictures/Full/@item.Filename">
-                                    <img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="/img/Pictures/Thumb/@item.Filename" />
-                                </a>
-                            </text>
-        ),
-        grid.Column("Description", "Description"),
-        grid.Column("Timestamp", "Timestamp"),
-        grid.Column("Approved", "Approved"),
-        grid.Column("Visible", "Visible"),
-        grid.Column("AspNetUser.UserName", "User"),
-        grid.Column("PictureAlbum.Name", "Album"),
-        grid.Column("",
-                    header: "",
-                    format: (item) => MvcHtmlString.Create(
-                                Html.ActionImage("Details", new { Id = item.Id }, "~/img/images/icons/16x16/Search.png", imageAttributes: new { alt = "Details", @class = "icon" },
-                                    linkAttributes: new { title = "Details" }).ToString() + " " +
-                                Html.ActionImage("Edit", new { Id = item.Id }, "~/img/images/icons/16x16/Edit.png", imageAttributes: new { alt = "Edit", @class = "icon" },
-                                    linkAttributes: new { title = "Edit" }).ToString() + " " +
-                                Html.ActionImage("Delete", new { Id = item.Id }, "~/img/images/icons/16x16/Cancel.png", imageAttributes: new { alt = "Delete", @class = "icon" },
-                                    linkAttributes: new { title = "Delete"}).ToString())
-                    )
-    })*@
-
-
-

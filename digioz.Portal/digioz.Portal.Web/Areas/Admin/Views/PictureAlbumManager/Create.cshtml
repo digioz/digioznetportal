@@ -1,20 +1,21 @@
-﻿@model digioz.Portal.Bo.Link
+﻿@model digioz.Portal.Bo.PictureAlbum
 
 @{
-    ViewBag.Title = "Create Link1";
+    ViewData["Title"] = "Create";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h2>Create Link</h2>
+            <h2>Create Picture Album</h2>
 
             @using (Html.BeginForm())
             {
                 @Html.AntiForgeryToken()
 
                 <div class="form-horizontal">
+                    <hr />
                     @Html.ValidationSummary(true)
 
                     <div class="form-group">
@@ -22,14 +23,6 @@
                         <div class="col-md-10">
                             @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
                             @Html.ValidationMessageFor(model => model.Name)
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.Url, new { @class = "control-label col-md-2" })
-                        <div class="col-md-10">
-                            @Html.TextAreaFor(model => model.Url, new { @class = "form-control" })
-                            @Html.ValidationMessageFor(model => model.Url)
                         </div>
                     </div>
 
@@ -42,10 +35,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="control-label col-md-2" for="LinkCategory">Category</label>
+                        @Html.LabelFor(model => model.Approved, new { @class = "control-label col-md-2" })
                         <div class="col-md-10">
-                            @Html.DropDownList("LinkCategory", String.Empty)
-                            @Html.ValidationMessageFor(model => model.LinkCategory)
+                            @Html.EditorFor(model => model.Approved)
+                            @Html.ValidationMessageFor(model => model.Approved)
                         </div>
                     </div>
 
@@ -59,13 +52,14 @@
 
                     <div class="form-group">
                         <div class="col-md-offset-2 col-md-10">
-                            <input type="submit" value="Create" class="btn btn-sm btn-primary" />
+                            <input type="submit" value="Create" class="btn btn-primary" />
                         </div>
                     </div>
-                </div>}
+                </div>
+            }
 
             <div>
-                @Html.ActionLink("Back to List", "List")
+                @Html.ActionLink("Back to List", "Index")
             </div>
         </div>
     </div>
