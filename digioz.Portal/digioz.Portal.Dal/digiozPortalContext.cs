@@ -2,11 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using digioz.Portal.Bo;
+using System.Configuration;
 
 #nullable disable
 
 namespace digioz.Portal.Dal
 {
+    public static class ConnectionString
+    {
+        public static string Value { get; set; }
+    }
+
     public partial class digiozPortalContext : DbContext
     {
         public digiozPortalContext()
@@ -69,7 +75,7 @@ namespace digioz.Portal.Dal
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=localhost;Database=digiozPortal3;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer(ConnectionString.Value);
             }
         }
 
