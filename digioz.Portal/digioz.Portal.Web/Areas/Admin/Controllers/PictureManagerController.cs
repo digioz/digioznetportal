@@ -315,7 +315,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         [Route("/admin/picturemanager/approvepictures/{id}")]
-        public ActionResult ApprovePictures(long id)
+        public ActionResult ApprovePictures(int id)
         {
             Picture picture = _pictureLogic.Get(id);
 
