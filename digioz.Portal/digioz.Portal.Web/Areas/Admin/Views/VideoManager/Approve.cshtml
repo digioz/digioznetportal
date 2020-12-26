@@ -1,0 +1,60 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Video>
+@using NonFactors.Mvc.Grid
+
+@{
+    ViewBag.Title = "Approve Videos";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+@section HeaderScripts {
+    <link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet">
+}
+
+@section FooterScripts {
+    <script src="~/js/mvc-grid/mvc-grid.js"></script>
+    <script>
+        document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+    </script>
+}
+
+<main>
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Approve Videos</h2>
+            </div>
+            <div class="card-body">
+
+                @(Html
+                .Grid(Model)
+                .Build(columns =>
+                {
+                    columns.Add(model => $"<a href='/img/Videos/Full/" + model.Filename + "'>"
+                                + "<img class='img-thumbnail' alt='240x120' style='width: 240px; height: 120px;' src='/img/Videos/Thumb/" + model.Thumbnail + "' /></a>"
+                               ).Encoded(false);
+                    columns.Add(model => model.Description).Titled("Description").Filterable(false);
+                    columns.Add(model => model.Timestamp).Titled("Timestamp").UsingDefaultFilterMethod("equals");
+                    columns.Add(model => model.Approved).Titled("Approved").UsingDefaultFilterMethod("equals");
+                    columns.Add(model => model.Visible).Titled("Visible").UsingDefaultFilterMethod("equals");
+                    columns.Add(model => model.UserId).Titled("UserId").UsingDefaultFilterMethod("equals");
+
+                    columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='ApproveVideos/{model.Id}' id=\"details\"  asp-action=\"ApproveVideos\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"/img/images/icons/16x16/ok.png\" alt=\"Details\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+                               ).Encoded(false);
+
+                })
+                    .Empty("No users found.")
+                    .Filterable()
+                    .Sortable()
+                    .Pageable()
+                )
+
+                <p>&nbsp;</p>
+
+                <div>
+                    @Html.ActionLink("Back to Index", "Index")
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

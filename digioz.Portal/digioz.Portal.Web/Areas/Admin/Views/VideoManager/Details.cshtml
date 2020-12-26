@@ -1,0 +1,84 @@
+﻿@model digioz.Portal.Bo.Video
+
+@{
+    ViewBag.Title = "Video Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Video Details</h2>
+
+            <div>
+                <hr />
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Filename)
+                    </dt>
+
+                    <dd>
+                        <a href="/img/Videos/Full/@Model.Filename">
+                            <img class="img-thumbnail" alt="240x120" style="width: 240px; height: 120px;" src="/img/Videos/Thumb/@Model.Thumbnail" />
+                        </a>
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Description)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Description)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Timestamp)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Timestamp)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Approved)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Approved)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Visible)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Visible)
+                    </dd>
+
+                    <dt>
+                        User
+                    </dt>
+
+                    <dd>
+                        @ViewBag.User
+                    </dd>
+
+                    <dt>
+                        Album Name
+                    </dt>
+
+                    <dd>
+                        @ViewBag.Album
+                    </dd>
+
+                </dl>
+            </div>
+            <p>
+                @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+                @Html.ActionLink("Back to List", "VideoList")
+            </p>
+        </div>
+    </div>
+</div>
+
+
