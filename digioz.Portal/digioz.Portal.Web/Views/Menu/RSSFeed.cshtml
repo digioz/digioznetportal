@@ -5,11 +5,9 @@
 {
     foreach (var feed in Model)
     {
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">@feed.Title</h3>
-            </div>
-            <div class="panel-body">
+        <div class="card bg-light mb-3">
+            <div class="card-header">@feed.Title</div>
+            <div class="card-body">
                 @Html.Raw(feed.Body)
 
                 <lable style="font-size:8px;">@feed.PublishDate</lable>
