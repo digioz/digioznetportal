@@ -1,0 +1,41 @@
+﻿@model digioz.Portal.Bo.SlideShow
+
+@{
+    ViewBag.Title = "Slide Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Slide Details</h2>
+
+            <div>
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Image)
+                    </dt>
+
+                    <dd>
+                        <a href="~/img/Slides/Full/@Model.Image"><img src="/img/Slides/Thumb/@Model.Image" /></a>
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Description)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Description)
+                    </dd>
+
+                </dl>
+            </div>
+            <p>
+                @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+                @Html.ActionLink("Back to List", "Index")
+            </p>
+        </div>
+    </div>
+</div>
+
+

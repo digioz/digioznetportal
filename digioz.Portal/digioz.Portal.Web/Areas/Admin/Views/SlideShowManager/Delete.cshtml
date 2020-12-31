@@ -1,0 +1,49 @@
+﻿@model digioz.Portal.Bo.SlideShow
+
+@{
+    ViewBag.Title = "Delete Slide";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Delete Slide</h2>
+
+            <p>Are you sure you want to delete this?</p>
+            <div>
+                <hr />
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Image)
+                    </dt>
+
+                    <dd>
+                        <a href="~/img/Slides/Full/@Model.Image"><img src="~/img/Slides/Thumb/@Model.Image" /></a>
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Description)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Description)
+                    </dd>
+
+                </dl>
+
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-actions no-color">
+                        <input type="submit" value="Delete" class="btn btn-sm btn-primary" /> |
+                        @Html.ActionLink("Back to List", "Index")
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
