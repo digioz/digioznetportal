@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using digioz.Portal.Bll.Interfaces;
 using digioz.Portal.Bo;
 using Microsoft.AspNetCore.Authorization;
@@ -25,13 +26,13 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             _userLogic = userLogic;
         }
 
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var pages = _pageLogic.GetAll();
             return View(pages);
         }
 
-        public ActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -48,7 +49,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return View(page);
         }
 
-        public ActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var configKeys = _configLogic.GetConfig();
             ViewBag.TinyMCEApiKey = configKeys["TinyMCEApiKey"];
@@ -57,7 +58,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind("Id", "UserId", "Title", "Url", "Body", "Keywords", "Description", "Visible", "Timestamp")] Page page)
+        public async Task<IActionResult> Create([Bind("Id", "UserId", "Title", "Url", "Body", "Keywords", "Description", "Visible", "Timestamp")] Page page)
         {
             if (ModelState.IsValid)
             {
@@ -75,7 +76,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return View(page);
         }
 
-        public ActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -96,7 +97,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind("Id", "UserId", "Title", "Url", "Body", "Keywords", "Description", "Visible", "Timestamp")] Page page)
+        public async Task<IActionResult> Edit([Bind("Id", "UserId", "Title", "Url", "Body", "Keywords", "Description", "Visible", "Timestamp")] Page page)
         {
             if (ModelState.IsValid)
             {
@@ -122,7 +123,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return View(page);
         }
 
-        public ActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
@@ -141,7 +142,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var page = _pageLogic.Get(id);
             _pageLogic.Delete(page);

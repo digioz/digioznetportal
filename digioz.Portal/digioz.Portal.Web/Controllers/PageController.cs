@@ -7,6 +7,7 @@ using digioz.Portal.Bll;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using digioz.Portal.Bll.Interfaces;
+using System.Threading.Tasks;
 
 namespace digioz.Portal.Web.Controllers
 {
@@ -21,7 +22,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         [Route("/page/{id}")]
-        public ActionResult Index(string id)
+        public async Task<IActionResult> Index(string id)
         {
             var loPage = new Page();
 

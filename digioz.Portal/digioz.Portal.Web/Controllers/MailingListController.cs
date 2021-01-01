@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using digioz.Portal.Bll.Interfaces;
 using digioz.Portal.Bo;
@@ -35,12 +36,12 @@ namespace digioz.Portal.Web.Controllers
         }
 
         // GET: MailingList
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }
 
-        public ActionResult EmailDisplay(Guid id)
+        public async Task<IActionResult> EmailDisplay(Guid id)
         {
             var model = _mailingListCampaignsLogic.Get(id); 
 
@@ -74,7 +75,7 @@ namespace digioz.Portal.Web.Controllers
             return View(model);
         }
 
-        public ActionResult Unsubscribe()
+        public async Task<IActionResult> Unsubscribe()
         {
             var subscriptionVM = new UnsubscribeViewModel {
                 Unsubscribe = true
@@ -85,7 +86,7 @@ namespace digioz.Portal.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Unsubscribe([Bind("Email","Unsubscribe")]UnsubscribeViewModel model)
+        public async Task<IActionResult> Unsubscribe([Bind("Email","Unsubscribe")]UnsubscribeViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -111,7 +112,7 @@ namespace digioz.Portal.Web.Controllers
             return RedirectToAction("UnsubscribeConfirmaiton");
         }
 
-        public ActionResult UnsubscribeConfirmaiton()
+        public async Task<IActionResult> UnsubscribeConfirmaiton()
         {
             return View();
         }

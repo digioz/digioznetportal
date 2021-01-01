@@ -11,7 +11,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
     [Authorize(Roles = "Administrator")]
     public class HomeController : Controller
     {
-        public IActionResult Index() {
+        public async Task<IActionResult> Index() {
             return View();
         }
     }

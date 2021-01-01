@@ -60,7 +60,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/AnnouncementManager/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var configKeys = _configLogic.GetConfig();
             ViewBag.TinyMCEApiKey = configKeys["TinyMCEApiKey"];

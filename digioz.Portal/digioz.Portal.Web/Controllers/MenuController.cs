@@ -8,6 +8,7 @@ using digioz.Portal.Utilities;
 using digioz.Portal.Web.Models.ViewModels;
 using digioz.Portal.Web.Helpers;
 using digioz.Portal.Bll.Interfaces;
+using System.Threading.Tasks;
 
 namespace digioz.Portal.Web.Controllers
 {
@@ -54,26 +55,26 @@ namespace digioz.Portal.Web.Controllers
 
         //
         // GET: /Menu/
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }
 
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
-        public ActionResult TopMenu()
+        public async Task<IActionResult> TopMenu()
         {
             var topMenus = _menuLogic.GetAll().Where(x => x.Location == "TopMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
 
             return PartialView("TopMenu", topMenus);
         }
 
-        public ActionResult UserMenu() 
+        public async Task<IActionResult> UserMenu() 
         {
             return PartialView("UserMenu");
         }
 
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
-        public ActionResult PluginMenu()
+        public async Task<IActionResult> PluginMenu()
         {
             var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true);
 
@@ -81,7 +82,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
-        public ActionResult LeftMenu()
+        public async Task<IActionResult> LeftMenu()
         {
             //var logic = new MenuLogic();
             var leftMenus = _menuLogic.GetAll().Where(x => x.Location == "LeftMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
@@ -90,7 +91,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
-        public ActionResult StoreMenu()
+        public async Task<IActionResult> StoreMenu()
         {
             var plugins = _pluginLogic.GetAll().Where(x => x.Name == "Store" && x.IsEnabled == true).ToList();
             ViewBag.ShowStore = false;
@@ -106,7 +107,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
-        public ActionResult PollMenu()
+        public async Task<IActionResult> PollMenu()
         {
             var polls = _pollLogic.GetAll().Where(x => x.Featured == true);
             polls = polls.OrderByDescending(x => x.DateCreated).ToList();
@@ -118,7 +119,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
-        public ActionResult TwitterMenu()
+        public async Task<IActionResult> TwitterMenu()
         {
             var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true && x.Name == "Twitter");
 
@@ -141,7 +142,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
-        public ActionResult WhoIsOnlineMenu()
+        public async Task<IActionResult> WhoIsOnlineMenu()
         {
             var configWhoIsOnline = _pluginLogic.GetAll().SingleOrDefault(x => x.Name == "WhoIsOnline");
 
@@ -164,7 +165,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
-        public ActionResult ZoneMenu(string zoneType)
+        public async Task<IActionResult> ZoneMenu(string zoneType)
         {
             var modules = _moduleLogic.GetAll().Where(x => x.Location == zoneType).ToList();
             ViewBag.SelectedZone = zoneType;
@@ -173,7 +174,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
-        public ActionResult SlideShow()
+        public async Task<IActionResult> SlideShow()
         {
             var slides = new List<SlideShow>();
             var plugins = _pluginLogic.GetAll().SingleOrDefault(x => x.IsEnabled == true &&  x.Name == "SlideShow");
@@ -186,7 +187,7 @@ namespace digioz.Portal.Web.Controllers
             return PartialView("SlideShow", slides);
         }
 
-        public ActionResult CommentsMenu(string referenceType, string referenceId)
+        public async Task<IActionResult> CommentsMenu(string referenceType, string referenceId)
         {
             var commentVM = new CommentsMenuViewModel {
                 ReferenceId = Convert.ToInt32(referenceId),
@@ -218,7 +219,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
-        public ActionResult RSSFeed()
+        public async Task<IActionResult> RSSFeed()
         {
             var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true && x.Name == "RSSFeed");
             var feedContent = new List<RSSViewModel>();
@@ -234,7 +235,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 20)]
-        public ActionResult LatestPictures()
+        public async Task<IActionResult> LatestPictures()
         {
             var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true && x.Name == "LatestPictures");
             var latestPictures = new List<Picture>();

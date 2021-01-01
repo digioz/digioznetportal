@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 using digioz.Portal.Bll.Interfaces;
 using digioz.Portal.Bo;
@@ -25,13 +26,13 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             _linkCategoryLogic = linkCategoryLogic;
         }
 
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var models = _linkCategoryLogic.GetAll();
             return View(models);
         }
 
-        public ActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -48,14 +49,14 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return View(linkCategory);
         }
 
-        public ActionResult Create()
+        public async Task<IActionResult> Create()
         {
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind("Id", "Name", "Visible", "Timestamp")] LinkCategory linkCategory)
+        public async Task<IActionResult> Create([Bind("Id", "Name", "Visible", "Timestamp")] LinkCategory linkCategory)
         {
             if (ModelState.IsValid)
             {
@@ -68,7 +69,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return View(linkCategory);
         }
 
-        public ActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -88,7 +89,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind("Id", "Name", "Visible", "Timestamp")] LinkCategory linkCategory)
+        public async Task<IActionResult> Edit([Bind("Id", "Name", "Visible", "Timestamp")] LinkCategory linkCategory)
         {
             linkCategory.Timestamp = DateTime.Now;
 
@@ -103,7 +104,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/LinkCategoryManager/Delete/5
-        public ActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
@@ -123,7 +124,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // POST: Admin/LinkCategoryManager/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var linkCategory = _linkCategoryLogic.Get(id);
             _linkCategoryLogic.Delete(linkCategory);

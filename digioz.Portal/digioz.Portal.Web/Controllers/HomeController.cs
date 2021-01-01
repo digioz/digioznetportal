@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using digioz.Portal.Bll;
 using digioz.Portal.Bll.Interfaces;
 using digioz.Portal.Bo;
@@ -32,7 +33,7 @@ namespace digioz.Portal.Web.Controllers
             _announcementLogic = announcementLogic;
         }
 
-        public IActionResult Index() {
+        public async Task<IActionResult> Index() {
 
             var model = new HomeIndexViewModel {
                 Page = _pageLogic.GetAll().SingleOrDefault(x => x.Title == "Home" && x.Visible == true)
@@ -47,16 +48,16 @@ namespace digioz.Portal.Web.Controllers
             return View(model);
         }
 
-        public IActionResult Privacy() {
+        public async Task<IActionResult> Privacy() {
             return View();
         }
 
-        public ActionResult About() {
+        public async Task<IActionResult> About() {
             var page = _pageLogic.GetAll().SingleOrDefault(x => x.Title == "About" && x.Visible == true);
             return View(page);
         }
 
-        public ActionResult Contact() {
+        public async Task<IActionResult> Contact() {
             ViewBag.ShowContactForm = false;
 
             var configs = _configLogic.GetAll().Where(x => x.ConfigKey == "ShowContactForm");
@@ -77,13 +78,13 @@ namespace digioz.Portal.Web.Controllers
             return View(page);
         }
 
-        public ActionResult Announcements() {
+        public async Task<IActionResult> Announcements() {
             var announcements = _announcementLogic.GetAll().OrderByDescending(x => x.Id).Where(x => x.Visible == true).ToList();
             return View(announcements);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error() {
+        public async Task<IActionResult> Error() {
             return View(new ErrorViewModel {
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             });

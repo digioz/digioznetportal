@@ -44,7 +44,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return path;
         }
 
-        private static async Task CropImageAndSave(IFormFile file, string path, int width, int height)
+        private async Task CropImageAndSave(IFormFile file, string path, int width, int height)
         {
             using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
@@ -53,7 +53,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/SlideShowManager
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var slides = _slideShowLogic.GetAll();
             return View(slides);
@@ -79,7 +79,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/SlideShowManager/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             return View();
         }

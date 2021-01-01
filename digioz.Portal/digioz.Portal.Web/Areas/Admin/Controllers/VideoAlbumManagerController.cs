@@ -53,7 +53,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/VideoAlbumManager/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             return View();
         }

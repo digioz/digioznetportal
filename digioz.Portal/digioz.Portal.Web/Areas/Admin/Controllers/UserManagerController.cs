@@ -59,14 +59,14 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return path;
         }
 
-        private static async Task CropImageAndSave(UserManagerViewModel userVM, string path, int width, int height) {
+        private async Task CropImageAndSave(UserManagerViewModel userVM, string path, int width, int height) {
             using var memoryStream = new MemoryStream();
             await userVM.AvatarImage.CopyToAsync(memoryStream);
             using var img = Image.FromStream(memoryStream);
             Helpers.ImageHelper.SaveImageWithCrop(img, width, height, path);
         }
 
-        public ActionResult Index() {
+        public async Task<IActionResult> Index() {
             var users = _userLogic.GetAll();
 
             return View(users);
@@ -74,7 +74,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("/admin/usermanager/details/{id}")]
-        public ActionResult Details(string id) {
+        public async Task<IActionResult> Details(string id) {
             var user = _userLogic.Get(id);
             var profile = _profileLogic.GetAll().Where(x => x.UserId == user.Id).SingleOrDefault();
 
@@ -93,7 +93,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return View(vm);
         }
 
-        public IActionResult Create() {
+        public async Task<IActionResult> Create() {
             return View();
         }
 
@@ -152,7 +152,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("/admin/usermanager/edit/{id}")]
-        public IActionResult Edit(string id) {
+        public async Task<IActionResult> Edit(string id) {
             var user = _userLogic.Get(id);
             var profile = _profileLogic.GetAll().Where(x => x.UserId == user.Id).SingleOrDefault();
 
@@ -241,7 +241,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("/admin/usermanager/delete/{id}")]
-        public ActionResult Delete(string id) {
+        public async Task<IActionResult> Delete(string id) {
             var user = _userLogic.Get(id);
             var profile = _profileLogic.GetAll().Where(x => x.UserId == user.Id).SingleOrDefault();
 
@@ -286,7 +286,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-        public ActionResult Search(string searchString = "") {
+        public async Task<IActionResult> Search(string searchString = "") {
             var usersViewModel = new List<UserManagerViewModel>();
 
             if (searchString.IsNullEmpty()) {
@@ -301,7 +301,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("/admin/usermanager/roles/{id}")]
-        public async Task<ActionResult> RolesAsync(string id) {
+        public async Task<IActionResult> RolesAsync(string id) {
             var user = await _userManager.FindByIdAsync(id);
             var userRoles = await _userManager.GetRolesAsync(user);
             var roles = _roleLogic.GetAll();
@@ -324,7 +324,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("/admin/usermanager/roledelete/{id}/{userId}")]
-        public async Task<ActionResult> RoleDeleteAsync(string id, string userId) {
+        public async Task<IActionResult> RoleDeleteAsync(string id, string userId) {
             var user = await _userManager.FindByIdAsync(userId);
             var role = _roleLogic.Get(id);
             var userRole = _userRolesLogic.GetAll().Where(item => item.RoleId == id && item.UserId == userId).FirstOrDefault();
@@ -335,7 +335,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("/admin/usermanager/roleadd/{id}")]
-        public ActionResult RoleAdd(string id) {
+        public async Task<IActionResult> RoleAdd(string id) {
             var roles = _roleManager.Roles.ToList();
             ViewBag.Roles = new SelectList(roles, "Id", "Name");
             ViewBag.UserId = id;
@@ -345,7 +345,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpPost, ActionName("RoleAddPost")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> RoleAddPostAsync([Bind("Id", "Name")] IdentityRole model, IFormCollection form)
+        public async Task<IActionResult> RoleAddPostAsync([Bind("Id", "Name")] IdentityRole model, IFormCollection form)
         {
             string userId = form["UserId"];
             string roleId = form["Roles"];

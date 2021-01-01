@@ -51,7 +51,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return path;
         }
 
-        private static async Task CropImageAndSave(IFormFile file, string path, int width, int height)
+        private async Task CropImageAndSave(IFormFile file, string path, int width, int height)
         {
             using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
@@ -65,7 +65,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return View();
         }
 
-        public ActionResult VideoList(int albumId)
+        public async Task<IActionResult> VideoList(int albumId)
         {
             var videos = _videoLogic.GetAll(); // db.Videos.Include(p => p.AspNetUser).Include(p => p.VideoAlbum);
             
@@ -123,7 +123,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/VideoManager/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var users = _userManager.Users.ToList();
             ViewBag.UserId = new SelectList(users, "Id", "UserName");
@@ -321,7 +321,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         [Route("/admin/videomanager/approvevideos/{id}")]
-        public ActionResult ApproveVideos(int id)
+        public async Task<IActionResult> ApproveVideos(int id)
         {
             Video video = _videoLogic.Get(id);
 

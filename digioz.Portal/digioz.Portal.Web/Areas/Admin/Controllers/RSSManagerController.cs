@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 using digioz.Portal.Bll.Interfaces;
 using digioz.Portal.Bo;
@@ -31,7 +32,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/RSSManager
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var rssList = _rssLogic.GetAll();
 
@@ -39,7 +40,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/RSSManager/Details/5
-        public ActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -57,7 +58,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/RSSManager/Create
-        public ActionResult Create()
+        public async Task<IActionResult> Create()
         {
             return View();
         }
@@ -65,7 +66,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // POST: Admin/RSSManager/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind("Id,Name,Url,MaxCount,Timestamp")] Rss rss)
+        public async Task<IActionResult> Create([Bind("Id,Name,Url,MaxCount,Timestamp")] Rss rss)
         {
             rss.Timestamp = DateTime.Now;
 
@@ -79,7 +80,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/RSSManager/Edit/5
-        public ActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -101,7 +102,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind("Id,Name,Url,MaxCount,Timestamp")] Rss rss)
+        public async Task<IActionResult> Edit([Bind("Id,Name,Url,MaxCount,Timestamp")] Rss rss)
         {
             var rssDb = _rssLogic.Get(rss.Id);
             
@@ -121,7 +122,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/RSSManager/Delete/5
-        public ActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
@@ -141,7 +142,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // POST: Admin/RSSManager/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             Rss rss = _rssLogic.Get(Convert.ToInt32(id));
 

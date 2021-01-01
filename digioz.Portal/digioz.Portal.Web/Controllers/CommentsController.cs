@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace digioz.Portal.Web.Controllers
 {
@@ -31,24 +32,23 @@ namespace digioz.Portal.Web.Controllers
         }
 
         // GET: Comments
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }
 
-        public ActionResult List(int referenceId, string referenceType)
+        public async Task<IActionResult> List(int referenceId, string referenceType)
         {
             var comments = _commentLogic.GetCommentPostsByReference(referenceId, referenceType).OrderBy(x => x.ModifiedDate);
             ViewBag.ReferenceId = referenceId;
             ViewBag.ReferenceType = referenceType;
 
-            //return View(comments);
             return PartialView("List", comments);
         }
 
         [Authorize]
         [HttpPost]
-        public ActionResult Add(IFormCollection form)
+        public async Task<IActionResult> Add(IFormCollection form)
         {
             if (form != null && form["referenceId"].ToString() != string.Empty && form["referenceType"].ToString() != string.Empty && form["comment"].ToString() != string.Empty)
             {
@@ -75,7 +75,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         [Authorize]
-        public ActionResult Like(string id)
+        public async Task<IActionResult> Like(string id)
         {
             // Add the Like to the Comment
             var commentLike = new CommentLike() {

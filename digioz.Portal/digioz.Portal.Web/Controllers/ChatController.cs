@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web;
 using digioz.Portal.Bll;
 using digioz.Portal.Bll.Interfaces;
@@ -31,7 +32,7 @@ namespace digioz.Portal.Web.Controllers
 
         // GET: Chat
         [Authorize]
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var chats = _chatLogic.GetLatestChats();
 
@@ -40,7 +41,7 @@ namespace digioz.Portal.Web.Controllers
 
         [Authorize]
         [HttpPost]
-        public JsonResult Add(string message)
+        public async Task<JsonResult> Add(string message)
         {
             if (!string.IsNullOrEmpty(message) && message != "[object HTMLInputElement]")
             {
@@ -57,7 +58,7 @@ namespace digioz.Portal.Web.Controllers
             return null;
         }
 
-        public JsonResult Online()
+        public async Task<JsonResult> Online()
         {
             var dateTimeLastOnline = DateTime.Now.AddMinutes(-1);
             var online = new List<VisitorSession>(); // _visitorSessionLogic.GetChatVisitorSessions(dateTimeLastOnline);       

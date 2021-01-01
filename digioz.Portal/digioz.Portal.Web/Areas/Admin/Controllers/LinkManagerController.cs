@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 using digioz.Portal.Bll.Interfaces;
 using digioz.Portal.Bo;
@@ -32,12 +33,12 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: /Admin/LinkManager/
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }
 
-        public ActionResult List()
+        public async Task<IActionResult> List()
         {
             var models = _linkLogic.GetAll();
 
@@ -45,7 +46,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: /Admin/LinkManager/Details/5
-        public ActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -64,7 +65,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: /Admin/LinkManager/Create
-        public ActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var linkCategories = _linkCategoryLogic.GetAll(); 
             ViewBag.LinkCategory = new SelectList(linkCategories, "Id", "Name");
@@ -77,7 +78,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind("Id", "Name", "Url", "Description", "Category", "Visible", "Timestamp", "LinkCategory")] Link link)
+        public async Task<IActionResult> Create([Bind("Id", "Name", "Url", "Description", "Category", "Visible", "Timestamp", "LinkCategory")] Link link)
         {
             if (ModelState.IsValid)
             {
@@ -94,7 +95,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: /Admin/LinkManager/Edit/5
-        public ActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -119,7 +120,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind("Id", "Name", "Url", "Description", "Category", "Visible", "Timestamp", "LinkCategory")] Link link)
+        public async Task<IActionResult> Edit([Bind("Id", "Name", "Url", "Description", "Category", "Visible", "Timestamp", "LinkCategory")] Link link)
         {
             if (ModelState.IsValid)
             {
@@ -135,7 +136,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: /Admin/LinkManager/Delete/5
-        public ActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
@@ -156,7 +157,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // POST: /Admin/LinkManager/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var link = _linkLogic.Get(id);
             _linkLogic.Delete(link);

@@ -46,7 +46,7 @@ namespace digioz.Portal.Web.Controllers
             return path;
         }
 
-        private static async Task CropImageAndSave(UserManagerViewModel userVM, string path, int width, int height) {
+        private async Task CropImageAndSave(UserManagerViewModel userVM, string path, int width, int height) {
             using var memoryStream = new MemoryStream();
             await userVM.AvatarImage.CopyToAsync(memoryStream);
             using var img = Image.FromStream(memoryStream);
@@ -55,7 +55,7 @@ namespace digioz.Portal.Web.Controllers
 
         [Authorize]
         [Route("/profile/index")]
-        public ActionResult Edit()
+        public async Task<IActionResult> Edit()
         {
             var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var profile = _profileLogic.GetAll().Where(x => x.UserId == userID).SingleOrDefault();
@@ -80,7 +80,7 @@ namespace digioz.Portal.Web.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditPost(UserManagerViewModel userVM)
+        public async Task<IActionResult> EditPost(UserManagerViewModel userVM)
         {
             var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var profileAvatarNew = string.Empty;
@@ -148,7 +148,7 @@ namespace digioz.Portal.Web.Controllers
             return View("Edit");
         }
 
-        public ActionResult ShowDetails(string userId)
+        public async Task<IActionResult> ShowDetails(string userId)
         {
             var user = _userLogic.Get(userId);
             var profile = _profileLogic.GetAll().Where(x => x.UserId == user.Id).SingleOrDefault();
@@ -168,7 +168,7 @@ namespace digioz.Portal.Web.Controllers
             return View(vm);
         }
 
-        public FileResult ShowAvatar(string userId)
+        public async Task<FileResult> ShowAvatar(string userId)
         {
             var profile = _profileLogic.GetAll().Where(x => x.UserId == userId).SingleOrDefault();
 
@@ -195,7 +195,7 @@ namespace digioz.Portal.Web.Controllers
             return image;
         }
 
-		public ActionResult Pictures(string userId, string userName)
+        public async Task<IActionResult> Pictures(string userId, string userName)
 		{
             AspNetUser user = null;
             List<Picture> pictures = null;
@@ -219,7 +219,7 @@ namespace digioz.Portal.Web.Controllers
             return View(pictures);
 		}
 
-		public ActionResult PictureDelete(long id)
+        public async Task<IActionResult> PictureDelete(long id)
 		{
 			if (User.Identity.IsAuthenticated)
 			{

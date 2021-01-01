@@ -7,6 +7,7 @@ using digioz.Portal.Bll;
 using Microsoft.AspNetCore.Mvc;
 using digioz.Portal.Bll.Interfaces;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace digioz.Portal.Web.Controllers
 {
@@ -25,14 +26,14 @@ namespace digioz.Portal.Web.Controllers
 
         //
         // GET: /Links/
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var linkcategories = _linkCategoryLogic.GetAll(); 
 
             return View(linkcategories);
         }
 
-        public ActionResult LinkBox(int id)
+        public async Task<IActionResult> LinkBox(int id)
         {
             var links = _linkLogic.GetAll().Where(x => x.LinkCategory == id).ToList();
 

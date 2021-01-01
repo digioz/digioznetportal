@@ -51,7 +51,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return path;
         }
 
-        private static async Task CropImageAndSave(IFormFile file, string path, int width, int height)
+        private async Task CropImageAndSave(IFormFile file, string path, int width, int height)
         {
             using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
@@ -65,7 +65,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return View();
         }
 
-        public ActionResult PictureList(int albumId)
+        public async Task<IActionResult> PictureList(int albumId)
         {
             var pictures = _pictureLogic.GetAll(); // db.Pictures.Include(p => p.AspNetUser).Include(p => p.PictureAlbum);
             
@@ -122,7 +122,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/PictureManager/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var users = _userManager.Users.ToList();
             ViewBag.UserId = new SelectList(users, "Id", "UserName");
@@ -315,7 +315,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         [Route("/admin/picturemanager/approvepictures/{id}")]
-        public ActionResult ApprovePictures(int id)
+        public async Task<IActionResult> ApprovePictures(int id)
         {
             Picture picture = _pictureLogic.Get(id);
 

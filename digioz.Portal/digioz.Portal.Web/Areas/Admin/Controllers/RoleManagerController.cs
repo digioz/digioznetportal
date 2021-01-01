@@ -31,13 +31,13 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             _userManager = userManager;
         }
 
-        public IActionResult Index() {
+        public async Task<IActionResult> Index() {
             var models = _roleManager.Roles.ToList();
 
             return View(models);
         }
 
-        public IActionResult Create() {
+        public async Task<IActionResult> Create() {
             return View();
         }
 
