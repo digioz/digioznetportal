@@ -7,7 +7,7 @@ using digioz.Portal.Bll.Interfaces;
 using digioz.Portal.Dal;
 using digioz.Portal.Bll;
 
-namespace digioz.Portal.Web
+namespace digioz.Portal.Web.Models.AppStart
 {
     public static class DependencyConfig
     {

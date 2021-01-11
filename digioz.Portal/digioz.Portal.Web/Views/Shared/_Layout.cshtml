@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DigiOz .NET Portal</title>
+    <title>@ViewData["Title"] - @digioz.Portal.Web.Models.AppStart.SiteSettings.SiteName</title>
     @if (IsSectionDefined("keywords")) {@RenderSection("keywords")}
     @if (IsSectionDefined("description")) {@RenderSection("description")}
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -11,17 +11,15 @@
     @RenderSection("Head", required: false)
 </head>
 <body>
-    <!-- Powered by DigiOz .NET Portal -->
-    <!-- For more information visit http://www.digioz.com -->
     <div class="container">
         <div style="padding-left:20px;">
-            <a href="/"><img src="~/img/images/Logo_Small.png" alt="DigiOz Portal" /></a>
+            <a href="/"><img src="~/img/images/Logo_Small.png" alt="@digioz.Portal.Web.Models.AppStart.SiteSettings.SiteName" /></a>
             <h1 style="position:absolute; top:20px;">&nbsp;</h1><br /><br />
         </div>
     </div>
 
     <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-        <a class="navbar-brand" href="#">DigiOz .NET Portal</a>
+		<a class="navbar-brand" href="#">@digioz.Portal.Web.Models.AppStart.SiteSettings.SiteName</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -72,7 +70,7 @@
 
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - DigiOz .NET Portal</p>
+			<p>&copy; @DateTime.Now.Year - @digioz.Portal.Web.Models.AppStart.SiteSettings.SiteName</p>
         </footer>
     </div>
     <script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>

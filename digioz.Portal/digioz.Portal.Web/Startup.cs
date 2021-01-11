@@ -1,5 +1,6 @@
 using digioz.Portal.Dal;
 using digioz.Portal.Web.Data;
+using digioz.Portal.Web.Models.AppStart;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -86,6 +87,9 @@ namespace digioz.Portal.Web
 
             // Get connection string
             ConnectionString.Value = Configuration.GetConnectionString("DefaultConnection");
+
+            // Startup Configuration
+            services.AddHostedService<LifetimeEventsHostedService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
