@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using digioz.Portal.Web.Areas.Admin.Models.ViewModels;
 using System.Threading.Tasks;
+using X.PagedList;
 
 namespace digioz.Portal.Web.Controllers
 {
@@ -195,29 +196,43 @@ namespace digioz.Portal.Web.Controllers
             return image;
         }
 
-        public async Task<IActionResult> Pictures(string userId, string userName)
+        public async Task<IActionResult> Pictures(string userId, string userName, int? pageNumber)
 		{
             AspNetUser user = null;
             List<Picture> pictures = null;
 
             if (userId != null) {
                 user = _userLogic.Get(userId);
-
-            } else if (userName != null) {
+                pictures = _pictureLogic.GetAll().Where(x => x.UserId == user.Id && x.Approved == true && x.Visible == true).OrderByDescending(x => x.Id).ToList();
+                ViewBag.Username = user.UserName;
+                ViewBag.UserId = user.Id;
+            } 
+            else if (userName != null) 
+            {
                 user = _userLogic.GetAll().Where(x => x.UserName == userName).SingleOrDefault();
                 userId = user.Id;
-            } else {
-                var username = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                user = user = _userLogic.GetAll().Where(x => x.UserName == userName).SingleOrDefault();
-            }
-
-            if (user != null) {
-                pictures = _pictureLogic.GetAll().Where(x => x.UserId == user.Id).OrderByDescending(x => x.Id).ToList();
+                pictures = _pictureLogic.GetAll().Where(x => x.UserId == user.Id && x.Approved == true && x.Visible == true).OrderByDescending(x => x.Id).ToList();
                 ViewBag.Username = user.UserName;
+                ViewBag.UserId = user.Id;
+            } 
+            else 
+            {
+                if (User.Identity.IsAuthenticated)
+				{
+                    var username = User.Identity.Name; // User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    user = _userLogic.GetAll().Where(x => x.UserName == username).SingleOrDefault();
+                    pictures = _pictureLogic.GetAll().Where(x => x.UserId == user.Id).OrderByDescending(x => x.Id).ToList();
+                    ViewBag.Username = user.UserName;
+                    ViewBag.UserId = user.Id;
+                }
             }
 
-            return View(pictures);
-		}
+            int pageSize = 10;
+            int pageNumberNew = (pageNumber ?? 1);
+            ViewBag.PageNumber = pageNumber;
+
+            return View(pictures.ToPagedList(pageNumberNew, pageSize));
+        }
 
         public async Task<IActionResult> PictureDelete(long id)
 		{

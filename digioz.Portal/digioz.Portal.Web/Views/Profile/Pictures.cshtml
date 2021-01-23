@@ -1,66 +1,81 @@
 ﻿@model IEnumerable<digioz.Portal.Bo.Picture>
+@using X.PagedList.Mvc.Core; @*import this so we get our HTML Helper*@
+@using X.PagedList @*import this so we can cast our list to IPagedList (only necessary because ViewBag is dynamic)*@
+@using X.PagedList.Mvc.Core.Fluent
+@using X.PagedList.Web.Common
 
 @{
-	ViewBag.Title = "Pictures";
+	ViewBag.Title = "My Pictures";
 	Layout = "~/Views/Shared/_Layout.cshtml";
+	var pagedList = (IPagedList)Model;
+
+	if (ViewBag.PageNumber == null)
+	{
+		ViewBag.PageNumber = 1;
+	}
+
+	var pageNumber = (int)ViewBag.PageNumber;
+	pageNumber += 1;
+	var userId = ViewBag.UserId;
+	var userName = ViewBag.Username;
 }
 
-<h2>Pictures</h2>
-
-@if (Model != null)
+@if (Model != null && ViewBag.Username != null & ViewBag.Username == User.Identity.Name)
 {
-	if (ViewBag.Username != null & ViewBag.Username == User.Identity.Name)
-	{
-		<div class="btn btn-default col-md-2">@Html.ActionLink("Upload Picture", "Add", "Pictures")</div>
-		<p>&nbsp;</p>
+	<h2>My Pictures</h2>
 
-		@*@grid.GetHtml(
-		tableStyle: "table",
-		columns: new[] {
-		grid.Column("Id", "Id"),
-		grid.Column("",
-					header: "Image",
-					format: @<text>
-					<a href="/img/Pictures/Full/@item.Filename">
-						<img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="/img/Pictures/Thumb/@item.Filename" />
-					</a>
-					</text>
-		),
-		grid.Column("Description", "Description"),
-		grid.Column("Timestamp", "Timestamp"),
-		grid.Column("Approved", "Approved"),
-		grid.Column("Visible", "Visible"),
-		grid.Column("AspNetUser.UserName", "User"),
-		grid.Column("PictureAlbum.Name", "Album"),
-		grid.Column("",
-					header: "",
-					format: (item) => MvcHtmlString.Create(
-								Html.ActionImage("PictureDelete", new { Id = item.Id }, "~/img/images/icons/16x16/Cancel.png", imageAttributes: new { alt = "Delete", @class = "icon" },
-									linkAttributes: new { title = "Delete"}).ToString())
-					)
-		})
-	}
-	else
-	{
-		@grid.GetHtml(
-		tableStyle: "table",
-		columns: new[] {
-		grid.Column("Id", "Id"),
-		grid.Column("",
-					header: "Image",
-					format: @<text>
-					<a href="/img/Pictures/Full/@item.Filename">
-						<img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="/img/Pictures/Thumb/@item.Filename" />
-					</a>
-					</text>
-		),
-		grid.Column("Description", "Description"),
-		grid.Column("Timestamp", "Timestamp"),
-		grid.Column("AspNetUser.UserName", "User"),
-		grid.Column("PictureAlbum.Name", "Album"),
-		})*@
-	}
+	<p>&nbsp;</p>
+	<a class="btn btn-sm btn-primary" href="@Url.Action("Add", "Pictures")">Upload</a>
+	<br />
 
+	<table style="width:95%;">
+		<tr>
+			@{
+				int i = 0;
 
+				foreach (var item in Model)
+				{
+					<td>
+						<div style="text-align:center;padding-bottom:20px;">
+							<a href="~/img/Pictures/Full/@item.Filename">
+								<img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="~/img/Pictures/Thumb/@item.Filename" border="0" />
+								<br />
+								@item.Description
+							</a>
+						</div>
+					</td>
+
+					i++;
+
+					if (i == 2)
+					{
+					@:</tr><tr>
+						i = 0;
+					}
+
+				}
+			}
+		</tr>
+
+	</table>
+
+	<br />
+
+	<p style="width:100%; text-align:center;">
+		@Html.PagedListPager(pagedList, pageNumber => Url.Action("Pictures", new { userId = userId, userName = userName, pageNumber = pageNumber }))
+	</p>
+
+	<p>&nbsp;</p>
+
+	<div style="text-align:center;">
+		@Html.ActionLink("Return to Index", "Index", "Pictures")
+	</div>
+
+	<p>&nbsp;</p>
 }
+else
+{
+	<p>Sorry, no pictures available.</p>
+}
+
 

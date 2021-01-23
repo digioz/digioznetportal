@@ -1,0 +1,70 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Picture>
+@using X.PagedList.Mvc.Core; @*import this so we get our HTML Helper*@
+@using X.PagedList @*import this so we can cast our list to IPagedList (only necessary because ViewBag is dynamic)*@
+@using X.PagedList.Mvc.Core.Fluent
+@using X.PagedList.Web.Common
+
+@{
+	ViewBag.Title = "Picture List";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var pagedList = (IPagedList)Model;
+
+	if(ViewBag.PageNumber == null)
+	{
+		ViewBag.PageNumber = 1;
+	}
+
+	var pageNumber = (int)ViewBag.PageNumber;
+	pageNumber += 1;
+}
+
+<h2>Picture List</h2>
+
+<p>&nbsp;</p>
+<a class="btn btn-sm btn-primary" href="@Url.Action("Add", "Pictures")">Upload</a>
+<br />
+
+<table style="width:95%;">
+	<tr>
+		@{
+			int i = 0;
+
+			foreach (var item in Model)
+			{
+				<td>
+					<div style="text-align:center;padding-bottom:20px;">
+						<a href="~/img/Pictures/Full/@item.Filename">
+							<img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="~/img/Pictures/Thumb/@item.Filename" border="0" />
+							<br />
+							@item.Description
+						</a>
+					</div>
+				</td>
+
+				i++;
+
+				if (i == 2)
+				{
+				@:</tr><tr>
+					i = 0;
+				}
+
+			}
+		}
+	</tr>
+
+</table>
+
+<br />
+
+<p style="width:100%; text-align:center;">
+	@Html.PagedListPager(pagedList, pageNumber => Url.Action("List", new { pageNumber = pageNumber }))
+</p>
+
+<p>&nbsp;</p>
+
+<div style="text-align:center;">
+	@Html.ActionLink("Return to Index", "Index", "Pictures")
+</div>
+
+<p>&nbsp;</p>

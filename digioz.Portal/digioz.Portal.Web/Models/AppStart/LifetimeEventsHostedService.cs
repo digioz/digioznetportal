@@ -42,12 +42,12 @@ namespace digioz.Portal.Web.Models.AppStart
             return Task.CompletedTask;
         }
 
-        private void OnStarted()
+        private void OnStarted() 
         {
             _logger.LogInformation("OnStarted has been called.");
 
             // Set Site Settings Variables
-            var configs = _configLogic.GetAll();
+            var configs = _configLogic.GetAll(); 
             var siteName = configs.Where(x => x.ConfigKey == "SiteName").FirstOrDefault().ConfigValue;
             SiteSettings.SiteName = siteName;
         }

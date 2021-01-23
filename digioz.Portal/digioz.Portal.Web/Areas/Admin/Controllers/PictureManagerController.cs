@@ -145,6 +145,8 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             {
                 foreach (var file in files)
                 {
+                    var pictureNew = new Picture();
+
                     if (file != null && Utility.IsFileAnImage(file.FileName))
                     {
                         var imgFolder = GetImageFolderPath();
@@ -162,12 +164,16 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
                         // Save Thumbnail Image
                         await CropImageAndSave(file, pathThumb, 120, 120);
 
-                        picture.Filename = fileName;
-                        picture.Thumbnail = fileName;
+                        pictureNew.AlbumId = picture.AlbumId;
+                        pictureNew.UserId = picture.UserId;
+                        pictureNew.Description = picture.Description;
+                        pictureNew.Filename = fileName;
+                        pictureNew.Thumbnail = fileName;
+                        pictureNew.Approved = picture.Approved;
+                        pictureNew.Visible = pictureNew.Visible;
+                        pictureNew.Timestamp = DateTime.Now;
+                        _pictureLogic.Add(pictureNew);
                     }
-
-                    picture.Timestamp = DateTime.Now;
-                    _pictureLogic.Add(picture);
                 }
 
                 return RedirectToAction("PictureList");
