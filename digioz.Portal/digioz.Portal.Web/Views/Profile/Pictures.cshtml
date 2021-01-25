@@ -40,7 +40,11 @@
 							<a href="~/img/Pictures/Full/@item.Filename">
 								<img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="~/img/Pictures/Thumb/@item.Filename" border="0" />
 								<br />
-								@item.Description
+								@item.Description<br />
+								@if (item.Visible != true || item.Approved != true)
+								{
+									<p style="font-size:x-small;">(Pending Approval)</p>
+								}
 							</a>
 						</div>
 					</td>
@@ -62,7 +66,7 @@
 	<br />
 
 	<p style="width:100%; text-align:center;">
-		@Html.PagedListPager(pagedList, pageNumber => Url.Action("Pictures", new { userId = userId, userName = userName, pageNumber = pageNumber }))
+		@Html.PagedListPager(pagedList, pageNumber => Url.Action("Pictures", "Profile", new { pageNumber = pageNumber }))
 	</p>
 
 	<p>&nbsp;</p>
