@@ -26,7 +26,7 @@
                     <li class="nav-item">@Html.ActionLink("Admin Dashboard", "Index", "Home", new { area = "Admin" }, null)</li>
                 }
             </ul>
-            <p>Logged in as @Html.ActionLink(@User.Identity.Name, "Index", "Profile", new { area = "" }).</p>
+            <p style="font-size:x-small;width:100%;text-align:center;">Logged in as @Html.ActionLink(@User.Identity.Name, "Index", "Profile", new { area = "" }).</p>
         }
         else
         {

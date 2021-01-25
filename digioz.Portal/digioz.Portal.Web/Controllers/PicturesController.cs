@@ -101,7 +101,6 @@ namespace digioz.Portal.Web.Controllers
 		[Authorize]
 		public async Task<IActionResult> Add()
 		{
-			ViewBag.UserId = new SelectList(_userLogic.GetAll(), "Id", "UserName");
 			ViewBag.AlbumId = new SelectList(_pictureAlbumLogic.GetAll(), "Id", "Name");
 
 			return View();
@@ -112,10 +111,13 @@ namespace digioz.Portal.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> AddAsync(Picture model, IFormFile file)
 		{
-			if (file == null)
+            ViewBag.AlbumId = new SelectList(_pictureAlbumLogic.GetAll(), "Id", "Name", model.AlbumId);
+
+            if (file == null)
 			{
-				return RedirectToAction("Create", model);
-			}
+                ModelState.AddModelError(nameof(model.Filename), "You must select a file.");
+                return View("Add", model);
+            }
 
 			if (ModelState.IsValid)
 			{
@@ -149,12 +151,11 @@ namespace digioz.Portal.Web.Controllers
 
 				    _pictureLogic.Add(model); 
                 }
+
+			    return RedirectToAction("Pictures", "Profile");
 			}
 
-			ViewBag.UserId = new SelectList(_userLogic.GetAll(), "Id", "UserName", model.UserId);
-			ViewBag.AlbumId = new SelectList(_pictureAlbumLogic.GetAll(), "Id", "Name", model.AlbumId);
-
-			return RedirectToAction("Pictures", "Profile");
-		}
+            return View("Add", model);
+        }
     }
 }

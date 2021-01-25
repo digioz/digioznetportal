@@ -24,7 +24,8 @@
 		<div class="form-group">
 			<div class="control-label col-md-2" style="font-weight:bold;">Picture</div>
 			<div class="col-md-10">
-				<input type="file" name="file" id="file" />
+				<input type="file" name="file" id="file" /><br />
+				@Html.ValidationMessageFor(model => model.Filename)
 			</div>
 		</div>
 
