@@ -708,21 +708,19 @@ namespace digioz.Portal.Dal
             {
                 entity.ToTable("VisitorInfo");
 
-                entity.Property(e => e.BrowserName).HasMaxLength(100);
+                entity.Property(e => e.Browser).HasMaxLength(25);
 
-                entity.Property(e => e.BrowserType).HasMaxLength(100);
-
-                entity.Property(e => e.BrowserVersion).HasMaxLength(20);
-
-                entity.Property(e => e.Country).HasMaxLength(30);
+                entity.Property(e => e.BrowserEngineName).HasMaxLength(25);
 
                 entity.Property(e => e.IpAddress).HasMaxLength(25);
 
-                entity.Property(e => e.Language).HasMaxLength(100);
+                entity.Property(e => e.Platform).HasMaxLength(25);
 
-                entity.Property(e => e.OperatingSystem).HasMaxLength(20);
+                entity.Property(e => e.IpAddress).HasMaxLength(25);
 
-                entity.Property(e => e.SearchEngine).HasMaxLength(20);
+                entity.Property(e => e.UserLanguage).HasMaxLength(25);
+
+                entity.Property(e => e.SessionId).HasMaxLength(25);
             });
 
             modelBuilder.Entity<VisitorSession>(entity =>

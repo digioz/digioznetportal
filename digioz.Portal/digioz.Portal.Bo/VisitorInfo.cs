@@ -7,21 +7,24 @@ namespace digioz.Portal.Bo
 {
     public partial class VisitorInfo
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
+        public bool? JavaEnabled { get; set; }
+        public DateTime? Timestamp { get; set; }
+        public string Browser { get; set; }
+        public int? BrowserVersion { get; set; }
+        public int? BrowserVersionMajor { get; set; }
+        public int? BrowserVersionMinor { get; set; }
+        public int? ScreenHeight { get; set; }
+        public int? ScreenWidth { get; set; }
+        public string BrowserEngineName { get; set; }
+        public string Host { get; set; }
+        public string HostName { get; set; }
         public string IpAddress { get; set; }
-        public string PageUrl { get; set; }
-        public string ReferringUrl { get; set; }
-        public string BrowserName { get; set; }
-        public string BrowserType { get; set; }
-        public string BrowserUserAgent { get; set; }
-        public string BrowserVersion { get; set; }
-        public bool IsCrawler { get; set; }
-        public string JsVersion { get; set; }
-        public string OperatingSystem { get; set; }
-        public string Keywords { get; set; }
-        public string SearchEngine { get; set; }
-        public string Country { get; set; }
-        public string Language { get; set; }
-        public DateTime Timestamp { get; set; }
+        public string Platform { get; set; }
+        public string Referrer { get; set; }
+        public string Href { get; set; }
+        public string UserAgent { get; set; }
+        public string UserLanguage { get; set; }
+        public string SessionId { get; set; }
     }
 }

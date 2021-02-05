@@ -667,23 +667,26 @@ namespace digioz.Portal.Web.Data.Migrations
                 name: "VisitorInfo",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    JavaEnabled = table.Column<bool>(nullable: true),
+                    Timestamp = table.Column<DateTime>(nullable: false),
+                    Browser = table.Column<string>(maxLength: 25, nullable: true),
+                    BrowserVersion = table.Column<int>(nullable: true),
+                    BrowserVersionMajor = table.Column<int>(nullable: true),
+                    BrowserVersionMinor = table.Column<int>(nullable: true),
+                    ScreenHeight = table.Column<int>(nullable: true),
+                    ScreenWidth = table.Column<int>(nullable: true),
+                    BrowserEngineName = table.Column<string>(maxLength: 25, nullable: true),
+                    Host = table.Column<string>(nullable: true),
+                    HostName = table.Column<string>(nullable: true),
                     IpAddress = table.Column<string>(maxLength: 25, nullable: true),
-                    PageUrl = table.Column<string>(nullable: true),
-                    ReferringUrl = table.Column<string>(nullable: true),
-                    BrowserName = table.Column<string>(maxLength: 100, nullable: true),
-                    BrowserType = table.Column<string>(maxLength: 100, nullable: true),
-                    BrowserUserAgent = table.Column<string>(nullable: true),
-                    BrowserVersion = table.Column<string>(maxLength: 20, nullable: true),
-                    IsCrawler = table.Column<bool>(nullable: false),
-                    JsVersion = table.Column<string>(nullable: true),
-                    OperatingSystem = table.Column<string>(maxLength: 20, nullable: true),
-                    Keywords = table.Column<string>(nullable: true),
-                    SearchEngine = table.Column<string>(maxLength: 20, nullable: true),
-                    Country = table.Column<string>(maxLength: 30, nullable: true),
-                    Language = table.Column<string>(maxLength: 100, nullable: true),
-                    Timestamp = table.Column<DateTime>(nullable: false)
+                    Platform = table.Column<string>(maxLength: 25, nullable: true),
+                    Referrer = table.Column<string>(nullable: true),
+                    Href = table.Column<string>(nullable: true),
+                    UserAgent = table.Column<string>(nullable: true),
+                    UserLanguage = table.Column<string>(maxLength: 25, nullable: true),
+                    SessionId = table.Column<string>(maxLength: 128, nullable: true),
                 },
                 constraints: table =>
                 {
