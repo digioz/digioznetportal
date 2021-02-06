@@ -40,6 +40,7 @@ function screenWidth() {
     }
 }
 
+// Get Screen Height
 function screenHeight() {
 
     if (window.screen) {
@@ -101,11 +102,13 @@ function printResults() {
     console.log('Browser Engine Name: ' + engineName);
     console.log('Session Id: ' + sessionId);
     console.log('Session Create Date: ' + sessionCreateDate);
+    console.log('OS Name: ' + osName);
 }
 
+// Make Call to Controller to Write Visit
 function callAjax(url, callback) {
     var xmlhttp;
-    // compatible with IE7+, Firefox, Chrome, Opera, Safari
+    // compatible with IE7+, Firefox, Chrome, Opera, Safari and Edge
     xmlhttp = new XMLHttpRequest();
     //xmlhttp.onreadystatechange = function () {
     //    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -118,7 +121,6 @@ function callAjax(url, callback) {
 
 // Define all variables
 var language = getLanguage();
-var appPlatform = navigator.platform;
 var userAgent = navigator.userAgent;
 var javaEnabled = navigator.javaEnabled();
 
@@ -133,6 +135,10 @@ var browserName = browserObj["name"];
 var browser = browserName;
 var browserVersion = browserObj["version"];
 var browserType = browserObj["name"];
+
+var parsedResult = browserArray.parsedResult;
+var osName = parsedResult.os.name;
+var appPlatform = parsedResult.platform.type;
 
 var screenWidth = screenWidth();
 var screenHeight = screenHeight();
@@ -161,7 +167,7 @@ urlTracking += '?language=' + encodeURI(language) + '&appPlatform=' + encodeURI(
     + '&javaEnabled=' + encodeURI(javaEnabled) + '&browserVersion=' + encodeURI(browserVersion) + '&browserType=' + encodeURI(browserType)
     + '&screenWidth=' + encodeURI(screenWidth) + '&screenHeight=' + encodeURI(screenHeight) + '&host=' + encodeURI(host)
     + '&hostName=' + encodeURI(hostName) + '&referrer=' + encodeURI(referrer) + '&href=' + encodeURI(href) + '&engineName=' + encodeURI(engineName)
-    + '&sessionId=' + encodeURI(sessionId);
+    + '&sessionId=' + encodeURI(sessionId) + '&operatingSystem=' + encodeURI(osName);
 
 if (href.indexOf('localhost') != -1) {
     printResults();

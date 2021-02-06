@@ -28,7 +28,8 @@ namespace digioz.Portal.Web.Controllers
 
         [HttpGet]
         public void Process(string language, string appPlatform, string userAgent, string javaEnabled, string browserVersion, string browserType,
-                            string screenWidth, string screenHeight, string host, string hostName, string referrer, string href, string engineName, string sessionId)
+                            string screenWidth, string screenHeight, string host, string hostName, string referrer, string href, string engineName, 
+                            string sessionId, string operatingSystem)
         {
             var context = HttpContext;
             var ipAddress = IpAddressHelper.GetUserIPAddress(context);
@@ -79,7 +80,8 @@ namespace digioz.Portal.Web.Controllers
                     BrowserEngineName = engineName,
                     IpAddress = ipAddress,
                     Timestamp = DateTime.Now,
-                    SessionId = sessionId
+                    SessionId = sessionId,
+                    OperatingSystem = operatingSystem
                 };
 
                 

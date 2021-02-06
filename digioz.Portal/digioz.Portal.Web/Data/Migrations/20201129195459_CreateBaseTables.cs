@@ -685,6 +685,7 @@ namespace digioz.Portal.Web.Data.Migrations
                     UserAgent = table.Column<string>(nullable: true),
                     UserLanguage = table.Column<string>(maxLength: 25, nullable: true),
                     SessionId = table.Column<string>(maxLength: 128, nullable: true),
+                    OperatingSystem = table.Column<string>(maxLength: 25, nullable: true)
                 },
                 constraints: table =>
                 {

@@ -24,5 +24,6 @@ namespace digioz.Portal.Bo
         public string UserAgent { get; set; }
         public string UserLanguage { get; set; }
         public string SessionId { get; set; }
-    }
+		public string OperatingSystem { get; set; }
+	}
 }
