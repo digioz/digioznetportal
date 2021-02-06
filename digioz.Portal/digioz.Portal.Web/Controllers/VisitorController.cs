@@ -69,7 +69,7 @@ namespace digioz.Portal.Web.Controllers
                     UserAgent = userAgent,
                     JavaEnabled = Convert.ToBoolean(javaEnabled),
                     Browser = browserType,
-                    BrowserVersion = Convert.ToInt32(browserVersion),
+                    BrowserVersion = browserVersion,
                     ScreenWidth = Convert.ToInt32(screenWidth),
                     ScreenHeight = Convert.ToInt32(screenHeight),
                     Host = host,

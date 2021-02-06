@@ -11,9 +11,7 @@ namespace digioz.Portal.Bo
         public bool? JavaEnabled { get; set; }
         public DateTime? Timestamp { get; set; }
         public string Browser { get; set; }
-        public int? BrowserVersion { get; set; }
-        public int? BrowserVersionMajor { get; set; }
-        public int? BrowserVersionMinor { get; set; }
+        public string BrowserVersion { get; set; }
         public int? ScreenHeight { get; set; }
         public int? ScreenWidth { get; set; }
         public string BrowserEngineName { get; set; }

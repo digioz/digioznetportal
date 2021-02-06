@@ -1,6 +1,4 @@
-﻿// User Language
-var language = getLanguage();
-
+﻿// Get Language 
 function getLanguage() {
     var lang = '';
     if (navigator.userLanguage) {
@@ -11,15 +9,6 @@ function getLanguage() {
     }
     return lang;
 }
-
-// Platform
-var appPlatform = navigator.platform;
-
-// User Agent
-var userAgent = navigator.userAgent;
-
-// Java Enabled
-var javaEnabled = navigator.javaEnabled();
 
 // Browser Info
 function get_browser() {
@@ -41,13 +30,7 @@ function get_browser() {
     };
 }
 
-var browser = get_browser();
-var browserVersion = browser.version;
-var browserType = browser.name;
-
-// Screen Width
-var screenWidth = screenWidth();
-
+// Get Screen Width
 function screenWidth() {
 
     if (window.screen) {
@@ -57,9 +40,6 @@ function screenWidth() {
     }
 }
 
-// Screen Height
-var screenHeight = screenHeight();
-
 function screenHeight() {
 
     if (window.screen) {
@@ -68,19 +48,6 @@ function screenHeight() {
         return (0);
     }
 }
-
-// Host & Host Name
-var host = location.host;
-var hostName = location.hostname;
-
-// Referrer
-var referrer = document.referrer;
-
-// Get the full HREF
-var href = location.href;
-
-// Engine Name 
-var engineName = navigator.product;
 
 // Generate a Session ID
 function guid() {
@@ -109,6 +76,7 @@ function getCookie(cname) {
     return "";
 }
 
+// Set the cookie
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
@@ -116,19 +84,7 @@ function setCookie(cname, cvalue, exdays) {
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
-var sessionId = getCookie("sessionId");
-var sessionCreateDate = getCookie("sessionCreateDate");
-
-if (sessionId == "" || sessionId == null) {
-    sessionId = guid();
-    setCookie("sessionId", sessionId, 1);
-}
-
-if (sessionCreateDate == "" || sessionCreateDate == null) {
-    var currentdate = new Date();
-    setCookie("sessionCreateDate", currentdate, 1);
-}
-
+// Print Results to Console Log
 function printResults() {
     console.log('User Language: ' + language);
     console.log('Platform: ' + appPlatform);
@@ -147,6 +103,57 @@ function printResults() {
     console.log('Session Create Date: ' + sessionCreateDate);
 }
 
+function callAjax(url, callback) {
+    var xmlhttp;
+    // compatible with IE7+, Firefox, Chrome, Opera, Safari
+    xmlhttp = new XMLHttpRequest();
+    //xmlhttp.onreadystatechange = function () {
+    //    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+    //        callback(xmlhttp.responseText);
+    //    }
+    //}
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+}
+
+// Define all variables
+var language = getLanguage();
+var appPlatform = navigator.platform;
+var userAgent = navigator.userAgent;
+var javaEnabled = navigator.javaEnabled();
+
+// Get Browser Info
+//var browser = get_browser();
+//var browserVersion = browser.version;
+//var browserType = browser.name;
+
+const browserArray = bowser.getParser(window.navigator.userAgent);
+var browserObj = browserArray.getBrowser();
+var browserName = browserObj["name"];
+var browser = browserName;
+var browserVersion = browserObj["version"];
+var browserType = browserObj["name"];
+
+var screenWidth = screenWidth();
+var screenHeight = screenHeight();
+var host = location.host;
+var hostName = location.hostname;
+var referrer = document.referrer;
+var href = location.href;
+var engineName = navigator.product;
+var sessionId = getCookie("sessionId");
+var sessionCreateDate = getCookie("sessionCreateDate");
+
+if (sessionId == "" || sessionId == null) {
+    sessionId = guid();
+    setCookie("sessionId", sessionId, 1);
+}
+
+if (sessionCreateDate == "" || sessionCreateDate == null) {
+    var currentdate = new Date();
+    setCookie("sessionCreateDate", currentdate, 1);
+}
+
 var baseUrl = window.location.origin;
 var urlTracking = baseUrl + '/Visitor/Process';
 
@@ -162,17 +169,3 @@ if (href.indexOf('localhost') != -1) {
 }
 
 callAjax(urlTracking, null);
-
-function callAjax(url, callback) {
-    var xmlhttp;
-    // compatible with IE7+, Firefox, Chrome, Opera, Safari
-    xmlhttp = new XMLHttpRequest();
-    //xmlhttp.onreadystatechange = function () {
-    //    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-    //        callback(xmlhttp.responseText);
-    //    }
-    //}
-    xmlhttp.open("GET", url, true);
-    xmlhttp.send();
-}
-

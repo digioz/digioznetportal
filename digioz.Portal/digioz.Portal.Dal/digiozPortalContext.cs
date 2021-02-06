@@ -712,6 +712,8 @@ namespace digioz.Portal.Dal
 
                 entity.Property(e => e.BrowserEngineName).HasMaxLength(25);
 
+                entity.Property(e => e.BrowserVersion).HasMaxLength(25);
+
                 entity.Property(e => e.IpAddress).HasMaxLength(25);
 
                 entity.Property(e => e.Platform).HasMaxLength(25);
