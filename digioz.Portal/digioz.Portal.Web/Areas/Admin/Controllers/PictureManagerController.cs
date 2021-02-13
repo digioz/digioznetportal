@@ -170,7 +170,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
                         pictureNew.Filename = fileName;
                         pictureNew.Thumbnail = fileName;
                         pictureNew.Approved = picture.Approved;
-                        pictureNew.Visible = pictureNew.Visible;
+                        pictureNew.Visible = picture.Visible;
                         pictureNew.Timestamp = DateTime.Now;
                         _pictureLogic.Add(pictureNew);
                     }
