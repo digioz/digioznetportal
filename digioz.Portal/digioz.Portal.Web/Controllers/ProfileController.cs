@@ -27,17 +27,20 @@ namespace digioz.Portal.Web.Controllers
         private readonly ILogic<Profile> _profileLogic;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogic<Picture> _pictureLogic;
+        private readonly ILogic<Video> _videoLogic;
 
         public ProfileController(
             ILogic<AspNetUser> userLogic,
             ILogic<Profile> profileLogic,
             IWebHostEnvironment webHostEnvironment,
-            ILogic<Picture> pictureLogic
+            ILogic<Picture> pictureLogic,
+            ILogic<Video> videoLogic
         ) {
             _userLogic = userLogic;
             _profileLogic = profileLogic;
             _webHostEnvironment = webHostEnvironment;
             _pictureLogic = pictureLogic;
+            _videoLogic = videoLogic;
         }
 
         private string GetImageFolderPath() {
@@ -252,5 +255,64 @@ namespace digioz.Portal.Web.Controllers
 			// Redirect back to Pictures
 			return RedirectToAction("Pictures");
 		}
-	}
+
+        public async Task<IActionResult> Videos(string userId, string userName, int? pageNumber)
+        {
+            AspNetUser user = null;
+            List<Video> videos = null;
+
+            if (userId != null)
+            {
+                user = _userLogic.Get(userId);
+                videos = _videoLogic.GetAll().Where(x => x.UserId == user.Id && x.Approved == true && x.Visible == true).OrderByDescending(x => x.Id).ToList();
+                ViewBag.Username = user.UserName;
+                ViewBag.UserId = user.Id;
+            }
+            else if (userName != null)
+            {
+                user = _userLogic.GetAll().Where(x => x.UserName == userName).SingleOrDefault();
+                userId = user.Id;
+                videos = _videoLogic.GetAll().Where(x => x.UserId == user.Id && x.Approved == true && x.Visible == true).OrderByDescending(x => x.Id).ToList();
+                ViewBag.Username = user.UserName;
+                ViewBag.UserId = user.Id;
+            }
+            else
+            {
+                if (User.Identity.IsAuthenticated)
+                {
+                    var username = User.Identity.Name; // User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    user = _userLogic.GetAll().Where(x => x.UserName == username).SingleOrDefault();
+                    videos = _videoLogic.GetAll().Where(x => x.UserId == user.Id).OrderByDescending(x => x.Id).ToList();
+                    ViewBag.Username = user.UserName;
+                    ViewBag.UserId = user.Id;
+                }
+            }
+
+            int pageSize = 10;
+            int pageNumberNew = (pageNumber ?? 1);
+            ViewBag.PageNumber = pageNumber;
+
+            return View(videos.ToPagedList(pageNumberNew, pageSize));
+        }
+
+        public async Task<IActionResult> VideoDelete(long id)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Check to make sure user owns video
+                var video = _videoLogic.Get(id);
+                var username = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = _userLogic.GetAll().Where(x => x.UserName == username).SingleOrDefault();
+
+                if (user != null && video != null && user.Id == video.UserId)
+                {
+                    // Delete Video
+                    _videoLogic.Delete(video);
+                }
+            }
+
+            // Redirect back to Videos
+            return RedirectToAction("Videos");
+        }
+    }
 }
