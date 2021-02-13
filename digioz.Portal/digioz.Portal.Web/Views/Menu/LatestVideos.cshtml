@@ -1,0 +1,48 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Video>
+
+@if (Model.Any())
+{
+	if (ViewBag.ShowLatestVideos == true)
+	{
+		<div class="card bg-light mb-3">
+			<div class="card-header">Latest Videos</div>
+			<div class="card-body">
+				<table style="width:95%;">
+					<tr>
+						@{
+							int i = 0;
+
+							foreach (var item in Model)
+							{
+								<td style="padding:5px;vertical-align:top;">
+									<div style="text-align:left;padding:10px;background-color:#f3f6fa">
+										<center>
+											<a href="~/img/Videos/Full/@item.Filename">
+												<img class="img-thumbnail" alt="240x120" style="width: 240px; height: 120px;" src="~/img/Videos/Thumb/@item.Thumbnail" border="0" />
+											</a>
+										</center>
+									</div>
+								</td>
+
+								i++;
+
+								if (i == 3)
+								{
+								@:</tr><tr>
+									i = 0;
+								}
+							}
+						}
+					</tr>
+				</table>
+				<br />
+				<div class="text-center"><a class="btn btn-xs btn-primary" href="@Url.Action("Index", "Videos")">View More</a></div>
+			</div>
+		</div>
+
+		<p>&nbsp;</p>
+	}
+}
+
+
+

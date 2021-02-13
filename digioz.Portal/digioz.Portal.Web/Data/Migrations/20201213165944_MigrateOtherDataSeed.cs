@@ -150,7 +150,8 @@ namespace digioz.Portal.Web.Data.Migrations
             plugins.Add(new Plugin() { Name = "SlideShow", Dll = null, IsEnabled = false });
             plugins.Add(new Plugin() { Name = "Comments", Dll = null, IsEnabled = false });
             plugins.Add(new Plugin() { Name = "RSSFeed", Dll = null, IsEnabled = false });
-            plugins.Add(new Plugin() { Name = "LatestPictures", Dll = null, IsEnabled = true });
+            plugins.Add(new Plugin() { Name = "LatestPictures", Dll = null, IsEnabled = false });
+            plugins.Add(new Plugin() { Name = "LatestVideos", Dll = null, IsEnabled = false });
 
             context.Plugins.AddRange(plugins);
             context.SaveChanges();

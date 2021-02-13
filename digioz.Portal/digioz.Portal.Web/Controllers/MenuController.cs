@@ -23,6 +23,7 @@ namespace digioz.Portal.Web.Controllers
         private readonly ILogic<SlideShow> _slideShowLogic;
         private readonly ILogic<CommentConfig> _commentConfigLogic;
         private readonly ILogic<Picture> _pictureLogic;
+        private readonly ILogic<Video> _videoLogic;
         private readonly ILogic<ProductCategory> _productCategoryLogic;
         private readonly ILogic<Rss> _rssLogic;
 
@@ -36,6 +37,7 @@ namespace digioz.Portal.Web.Controllers
             ILogic<SlideShow> slideShowLogic,
             ILogic<CommentConfig> commentConfigLogic,
             ILogic<Picture> pictureLogic,
+            ILogic<Video> videoLogic,
             ILogic<ProductCategory> productCategoryLogic,
             ILogic<Rss> rssLogic
         ) 
@@ -49,6 +51,7 @@ namespace digioz.Portal.Web.Controllers
             _slideShowLogic = slideShowLogic;
             _commentConfigLogic = commentConfigLogic;
             _pictureLogic = pictureLogic;
+            _videoLogic = videoLogic;
             _productCategoryLogic = productCategoryLogic;
             _rssLogic = rssLogic;
         }
@@ -248,6 +251,22 @@ namespace digioz.Portal.Web.Controllers
             }
 
             return PartialView("LatestPictures", latestPictures);
+        }
+
+        [ResponseCache(VaryByHeader = "User-Agent", Duration = 20)]
+        public async Task<IActionResult> LatestVideos()
+        {
+            var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true && x.Name == "LatestVideos");
+            var latestVideos = new List<Video>();
+            ViewBag.ShowLatestVideos = false;
+
+            if (plugins.Any())
+            {
+                latestVideos = _videoLogic.GetAll().Take(9).ToList();
+                ViewBag.ShowLatestVideos = true;
+            }
+
+            return PartialView("LatestVideos", latestVideos);
         }
     }
 }
