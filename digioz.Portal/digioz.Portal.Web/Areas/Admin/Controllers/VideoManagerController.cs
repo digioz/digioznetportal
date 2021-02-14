@@ -67,7 +67,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         public async Task<IActionResult> VideoList(int albumId)
         {
-            var videos = _videoLogic.GetAll(); // db.Videos.Include(p => p.AspNetUser).Include(p => p.VideoAlbum);
+            var videos = _videoLogic.GetAll();
             
             if (albumId > 0)
             {
@@ -315,7 +315,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         [Route("/admin/videomanager/approve")]
         public ActionResult Approve()
         {
-            var videos = _videoLogic.GetAll().Where(x => x.Approved == false || x.Visible == false).ToList();
+            var videos = _videoLogic.GetGeneric(x => x.Approved == false || x.Visible == false).ToList();
 
             return View(videos.ToList());
         }

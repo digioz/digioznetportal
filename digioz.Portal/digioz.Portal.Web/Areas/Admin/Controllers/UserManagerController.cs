@@ -294,7 +294,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             }
 
             // Search Records
-            var users = _userLogic.GetAll().Where(x => x.UserName.Contains(searchString.Trim())).ToList();
+            var users = _userLogic.GetGeneric(x => x.UserName.Contains(searchString.Trim())).ToList();
 
             return View(users);
         }
@@ -327,7 +327,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         public async Task<IActionResult> RoleDeleteAsync(string id, string userId) {
             var user = await _userManager.FindByIdAsync(userId);
             var role = _roleLogic.Get(id);
-            var userRole = _userRolesLogic.GetAll().Where(item => item.RoleId == id && item.UserId == userId).FirstOrDefault();
+            var userRole = _userRolesLogic.GetGeneric(item => item.RoleId == id && item.UserId == userId).FirstOrDefault();
             _userRolesLogic.Delete(userRole);
 
             return RedirectToAction("Roles", "UserManager", new { id = userId });

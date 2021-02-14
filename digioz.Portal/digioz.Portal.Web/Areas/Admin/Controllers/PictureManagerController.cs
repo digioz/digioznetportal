@@ -67,7 +67,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         public async Task<IActionResult> PictureList(int albumId)
         {
-            var pictures = _pictureLogic.GetAll(); // db.Pictures.Include(p => p.AspNetUser).Include(p => p.PictureAlbum);
+            var pictures = _pictureLogic.GetAll();
             
             if (albumId > 0)
             {

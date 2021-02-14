@@ -91,13 +91,13 @@ namespace digioz.Portal.Web.Controllers
             if (ModelState.IsValid)
             {
                 // find subscription first if any
-                var subscribers = _mailingListSubscriberLogic.GetAll().Where(x => x.Email == model.Email);
+                var subscribers = _mailingListSubscriberLogic.GetGeneric(x => x.Email == model.Email);
 
                 if (subscribers != null && model.Unsubscribe == true)
                 {
                     foreach (var subscriber in subscribers) {
                         // remove all subscriptions 
-                        var subscriberRelations = _mailingListSubscriberRelationLogic.GetAll().Where(x => x.MailingListSubscriberId == subscriber.Id).ToList();
+                        var subscriberRelations = _mailingListSubscriberRelationLogic.GetGeneric(x => x.MailingListSubscriberId == subscriber.Id).ToList();
 
                         foreach (var relation in subscriberRelations) {
                             _mailingListSubscriberRelationLogic.Delete(relation);

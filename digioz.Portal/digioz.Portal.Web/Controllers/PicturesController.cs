@@ -64,7 +64,7 @@ namespace digioz.Portal.Web.Controllers
             List<PicturesViewModel> pictureAlbumList = new List<PicturesViewModel>();
             PicturesViewModel pictureAlbum;
 
-            var pictureAlbums = _pictureAlbumLogic.GetAll().Where(x => x.Visible == true).ToList();
+            var pictureAlbums = _pictureAlbumLogic.GetGeneric(x => x.Visible == true).ToList();
 
             foreach (var item in pictureAlbums)
             {
@@ -74,7 +74,7 @@ namespace digioz.Portal.Web.Controllers
                 pictureAlbum.Description = item.Description;
                 pictureAlbum.Timestamp = item.Timestamp;
                 pictureAlbum.Visible = item.Visible;
-                pictureAlbum.Thumbnail = _pictureLogic.GetAll().OrderByDescending(x => x.Id).Where(x => x.AlbumId == item.Id && x.Visible == true && x.Approved == true).Select(x => x.Filename).FirstOrDefault();
+                pictureAlbum.Thumbnail = _pictureLogic.GetGeneric(x => x.AlbumId == item.Id && x.Visible == true && x.Approved == true).OrderByDescending(x => x.Id).Select(x => x.Filename).FirstOrDefault();
 
                 if (pictureAlbum.Thumbnail == null || pictureAlbum.Thumbnail == string.Empty)
                 {
@@ -89,7 +89,7 @@ namespace digioz.Portal.Web.Controllers
 
         public async Task<IActionResult> List(int id, int? pageNumber)
         {
-            var pictures = _pictureLogic.GetAll().Where(x => x.AlbumId == id && x.Visible == true && x.Approved == true).OrderByDescending(x => x.Id).ToList();
+            var pictures = _pictureLogic.GetGeneric(x => x.AlbumId == id && x.Visible == true && x.Approved == true).OrderByDescending(x => x.Id).ToList();
 
             int pageSize = 10;
             int pageNumberNew = (pageNumber ?? 1);
@@ -143,7 +143,7 @@ namespace digioz.Portal.Web.Controllers
 				    model.Timestamp = DateTime.Now;
 
 				    var username = User.Identity.Name;
-                    var user = _userLogic.GetAll().SingleOrDefault(x => x.UserName == username);
+                    var user = _userLogic.GetGeneric(x => x.UserName == username).SingleOrDefault();
 
 				    model.UserId = user.Id;
 				    model.Approved = false;

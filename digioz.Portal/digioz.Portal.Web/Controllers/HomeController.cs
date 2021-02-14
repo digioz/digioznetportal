@@ -36,15 +36,15 @@ namespace digioz.Portal.Web.Controllers
         public async Task<IActionResult> Index() {
 
             var model = new HomeIndexViewModel {
-                Page = _pageLogic.GetAll().SingleOrDefault(x => x.Title == "Home" && x.Visible == true)
+                Page = _pageLogic.GetGeneric(x => x.Title == "Home" && x.Visible == true).SingleOrDefault()
             };
             var numberOfAnnouncements = 1;
-            var configs = _configLogic.GetAll().Where(x => x.ConfigKey == "NumberOfAnnouncements");
+            var configs = _configLogic.GetGeneric(x => x.ConfigKey == "NumberOfAnnouncements");
             if (configs != null) {
                 numberOfAnnouncements = int.Parse(configs.Take(1).SingleOrDefault().ConfigValue);
             }
 
-            model.Announcements = _announcementLogic.GetAll().OrderByDescending(x => x.Id).Where(x => x.Visible == true).Take(numberOfAnnouncements).ToList();
+            model.Announcements = _announcementLogic.GetGeneric(x => x.Visible == true).Take(numberOfAnnouncements).OrderByDescending(x => x.Id).ToList();
             return View(model);
         }
 
@@ -53,14 +53,14 @@ namespace digioz.Portal.Web.Controllers
         }
 
         public async Task<IActionResult> About() {
-            var page = _pageLogic.GetAll().SingleOrDefault(x => x.Title == "About" && x.Visible == true);
+            var page = _pageLogic.GetGeneric(x => x.Title == "About" && x.Visible == true).SingleOrDefault();
             return View(page);
         }
 
         public async Task<IActionResult> Contact() {
             ViewBag.ShowContactForm = false;
 
-            var configs = _configLogic.GetAll().Where(x => x.ConfigKey == "ShowContactForm");
+            var configs = _configLogic.GetGeneric(x => x.ConfigKey == "ShowContactForm");
 
             if (configs.Any()) {
                 var singleOrDefault = configs.Take(1).SingleOrDefault();
@@ -74,12 +74,12 @@ namespace digioz.Portal.Web.Controllers
                 }
             }
 
-            var page = _pageLogic.GetAll().SingleOrDefault(x => x.Title == "Contact" && x.Visible == true);
+            var page = _pageLogic.GetGeneric(x => x.Title == "Contact" && x.Visible == true).SingleOrDefault();
             return View(page);
         }
 
         public async Task<IActionResult> Announcements() {
-            var announcements = _announcementLogic.GetAll().OrderByDescending(x => x.Id).Where(x => x.Visible == true).ToList();
+            var announcements = _announcementLogic.GetGeneric(x => x.Visible == true).OrderByDescending(x => x.Id).ToList();
             return View(announcements);
         }
 

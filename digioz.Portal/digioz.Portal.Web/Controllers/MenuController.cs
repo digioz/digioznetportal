@@ -66,7 +66,7 @@ namespace digioz.Portal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
         public async Task<IActionResult> TopMenu()
         {
-            var topMenus = _menuLogic.GetAll().Where(x => x.Location == "TopMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
+            var topMenus = _menuLogic.GetGeneric(x => x.Location == "TopMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
 
             return PartialView("TopMenu", topMenus);
         }
@@ -79,7 +79,7 @@ namespace digioz.Portal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
         public async Task<IActionResult> PluginMenu()
         {
-            var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true);
+            var plugins = _pluginLogic.GetGeneric(x => x.IsEnabled == true);
 
             return PartialView("PluginMenu", plugins);
         }
@@ -88,7 +88,7 @@ namespace digioz.Portal.Web.Controllers
         public async Task<IActionResult> LeftMenu()
         {
             //var logic = new MenuLogic();
-            var leftMenus = _menuLogic.GetAll().Where(x => x.Location == "LeftMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
+            var leftMenus = _menuLogic.GetGeneric(x => x.Location == "LeftMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
 
             return PartialView("LeftMenu", leftMenus);
         }
@@ -96,7 +96,7 @@ namespace digioz.Portal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
         public async Task<IActionResult> StoreMenu()
         {
-            var plugins = _pluginLogic.GetAll().Where(x => x.Name == "Store" && x.IsEnabled == true).ToList();
+            var plugins = _pluginLogic.GetGeneric(x => x.Name == "Store" && x.IsEnabled == true).ToList();
             ViewBag.ShowStore = false;
 
             if (plugins.Count > 0)
@@ -112,7 +112,7 @@ namespace digioz.Portal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
         public async Task<IActionResult> PollMenu()
         {
-            var polls = _pollLogic.GetAll().Where(x => x.Featured == true);
+            var polls = _pollLogic.GetGeneric(x => x.Featured == true);
             polls = polls.OrderByDescending(x => x.DateCreated).ToList();
             var poll = polls.Take(1).SingleOrDefault();
 
@@ -124,14 +124,14 @@ namespace digioz.Portal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
         public async Task<IActionResult> TwitterMenu()
         {
-            var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true && x.Name == "Twitter");
+            var plugins = _pluginLogic.GetGeneric(x => x.IsEnabled == true && x.Name == "Twitter");
 
             if (plugins.Any())
             {
                 //Check config table for twitter handle
-                var configs = _configLogic.GetAll().Where(x => x.ConfigKey == "TwitterHandle");
+                var configs = _configLogic.GetGeneric(x => x.ConfigKey == "TwitterHandle");
                 var twitterHandleConfig = configs.Take(1).SingleOrDefault();
-                configs = _configLogic.GetAll().Where(x => x.ConfigKey == "TwitterWidgetID");
+                configs = _configLogic.GetGeneric(x => x.ConfigKey == "TwitterWidgetID");
 
                 if (twitterHandleConfig != null)
                 {
@@ -147,9 +147,9 @@ namespace digioz.Portal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
         public async Task<IActionResult> WhoIsOnlineMenu()
         {
-            var configWhoIsOnline = _pluginLogic.GetAll().SingleOrDefault(x => x.Name == "WhoIsOnline");
+            var configWhoIsOnline = _pluginLogic.GetGeneric(x => x.Name == "WhoIsOnline").SingleOrDefault();
 
-            var latestVisitors = _visitorSessionLogic.GetAll().Where(x => x.DateModified >= DateTime.Now.AddMinutes(-10)).ToList();
+            var latestVisitors = _visitorSessionLogic.GetGeneric(x => x.DateModified >= DateTime.Now.AddMinutes(-10)).ToList();
             var visitorRegistered = latestVisitors.Where(x => x.Username != null).DistinctBy(x => x.Username).ToList();
 
             ViewBag.VisitorCount = latestVisitors.Count;
@@ -170,7 +170,7 @@ namespace digioz.Portal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
         public async Task<IActionResult> ZoneMenu(string zoneType)
         {
-            var modules = _moduleLogic.GetAll().Where(x => x.Location == zoneType).ToList();
+            var modules = _moduleLogic.GetGeneric(x => x.Location == zoneType).ToList();
             ViewBag.SelectedZone = zoneType;
 
             return PartialView("ZoneMenu", modules);
@@ -180,7 +180,7 @@ namespace digioz.Portal.Web.Controllers
         public async Task<IActionResult> SlideShow()
         {
             var slides = new List<SlideShow>();
-            var plugins = _pluginLogic.GetAll().SingleOrDefault(x => x.IsEnabled == true &&  x.Name == "SlideShow");
+            var plugins = _pluginLogic.GetGeneric(x => x.IsEnabled == true &&  x.Name == "SlideShow").SingleOrDefault();
 
             if (plugins != null)
             {
@@ -200,8 +200,8 @@ namespace digioz.Portal.Web.Controllers
                 CommentsEnabled = false
             };
 
-            var plugins = _pluginLogic.GetAll().SingleOrDefault(x => x.IsEnabled == true && x.Name == "Comments");
-            var configs = _configLogic.GetAll().Where(x => x.ConfigKey == "EnableCommentsOnAllPages");
+            var plugins = _pluginLogic.GetGeneric(x => x.IsEnabled == true && x.Name == "Comments").SingleOrDefault();
+            var configs = _configLogic.GetGeneric(x => x.ConfigKey == "EnableCommentsOnAllPages");
             var enableCommentsOnAllPages = configs.Take(1).SingleOrDefault();
 
             if (enableCommentsOnAllPages != null && enableCommentsOnAllPages.ConfigValue == "true")
@@ -210,7 +210,7 @@ namespace digioz.Portal.Web.Controllers
             }
             else
             {
-                var commentConfigs = _commentConfigLogic.GetAll().Where(x => x.ReferenceId == referenceId && x.ReferenceType == referenceType).ToList();
+                var commentConfigs = _commentConfigLogic.GetGeneric(x => x.ReferenceId == referenceId && x.ReferenceType == referenceType).ToList();
 
                 if (commentConfigs.Count > 0)
                 {
@@ -224,7 +224,7 @@ namespace digioz.Portal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
         public async Task<IActionResult> RSSFeed()
         {
-            var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true && x.Name == "RSSFeed");
+            var plugins = _pluginLogic.GetGeneric(x => x.IsEnabled == true && x.Name == "RSSFeed");
             var feedContent = new List<RSSViewModel>();
 
             var rssList = _rssLogic.GetAll();
@@ -240,13 +240,13 @@ namespace digioz.Portal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 20)]
         public async Task<IActionResult> LatestPictures()
         {
-            var plugins = _pluginLogic.GetAll().Where(x => x.IsEnabled == true && x.Name == "LatestPictures");
+            var plugins = _pluginLogic.GetGeneric(x => x.IsEnabled == true && x.Name == "LatestPictures");
             var latestPictures = new List<Picture>();
             ViewBag.ShowLatestPictures = false;
 
             if (plugins.Any())
             {
-                latestPictures = _pictureLogic.GetAll().Take(9).ToList();
+                latestPictures = _pictureLogic.GetAll().Take(9).ToList(); // To Do - Make it more performant
                 ViewBag.ShowLatestPictures = true;
             }
 
@@ -262,7 +262,7 @@ namespace digioz.Portal.Web.Controllers
 
             if (plugins.Any())
             {
-                latestVideos = _videoLogic.GetAll().Take(9).ToList();
+                latestVideos = _videoLogic.GetAll().Take(9).ToList(); // ToDo - Make it more performant
                 ViewBag.ShowLatestVideos = true;
             }
 

@@ -35,7 +35,7 @@ namespace digioz.Portal.Web.Controllers
 
         public async Task<IActionResult> LinkBox(int id)
         {
-            var links = _linkLogic.GetAll().Where(x => x.LinkCategory == id).ToList();
+            var links = _linkLogic.GetGeneric(x => x.LinkCategory == id).ToList();
 
             return PartialView("LinkBox", links);
         }

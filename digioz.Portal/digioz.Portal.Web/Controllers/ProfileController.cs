@@ -62,7 +62,7 @@ namespace digioz.Portal.Web.Controllers
         public async Task<IActionResult> Edit()
         {
             var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var profile = _profileLogic.GetAll().Where(x => x.UserId == userID).SingleOrDefault();
+            var profile = _profileLogic.GetGeneric(x => x.UserId == userID).SingleOrDefault();
 
             var user = _userLogic.Get(userID);
 
@@ -126,7 +126,7 @@ namespace digioz.Portal.Web.Controllers
                     }
                 }
 
-                var profile = _profileLogic.GetAll().Where(x => x.UserId == userVM.Id).SingleOrDefault();
+                var profile = _profileLogic.GetGeneric(x => x.UserId == userVM.Id).SingleOrDefault();
 
                 if (profile == null) {
                     var profileNew = new Profile();
@@ -155,7 +155,7 @@ namespace digioz.Portal.Web.Controllers
         public async Task<IActionResult> ShowDetails(string userId)
         {
             var user = _userLogic.Get(userId);
-            var profile = _profileLogic.GetAll().Where(x => x.UserId == user.Id).SingleOrDefault();
+            var profile = _profileLogic.GetGeneric(x => x.UserId == user.Id).SingleOrDefault();
 
             var vm = new UserManagerViewModel() {
                 Id = user.Id,
@@ -174,7 +174,7 @@ namespace digioz.Portal.Web.Controllers
 
         public async Task<FileResult> ShowAvatar(string userId)
         {
-            var profile = _profileLogic.GetAll().Where(x => x.UserId == userId).SingleOrDefault();
+            var profile = _profileLogic.GetGeneric(x => x.UserId == userId).SingleOrDefault();
 
             var imgFolder = GetImageFolderPath();
             var path = Path.Combine(imgFolder, "Avatar", "Full");
@@ -206,15 +206,15 @@ namespace digioz.Portal.Web.Controllers
 
             if (userId != null) {
                 user = _userLogic.Get(userId);
-                pictures = _pictureLogic.GetAll().Where(x => x.UserId == user.Id && x.Approved == true && x.Visible == true).OrderByDescending(x => x.Id).ToList();
+                pictures = _pictureLogic.GetGeneric(x => x.UserId == user.Id && x.Approved == true && x.Visible == true).OrderByDescending(x => x.Id).ToList();
                 ViewBag.Username = user.UserName;
                 ViewBag.UserId = user.Id;
             } 
             else if (userName != null) 
             {
-                user = _userLogic.GetAll().Where(x => x.UserName == userName).SingleOrDefault();
+                user = _userLogic.GetGeneric(x => x.UserName == userName).SingleOrDefault();
                 userId = user.Id;
-                pictures = _pictureLogic.GetAll().Where(x => x.UserId == user.Id && x.Approved == true && x.Visible == true).OrderByDescending(x => x.Id).ToList();
+                pictures = _pictureLogic.GetGeneric(x => x.UserId == user.Id && x.Approved == true && x.Visible == true).OrderByDescending(x => x.Id).ToList();
                 ViewBag.Username = user.UserName;
                 ViewBag.UserId = user.Id;
             } 
@@ -223,8 +223,8 @@ namespace digioz.Portal.Web.Controllers
                 if (User.Identity.IsAuthenticated)
 				{
                     var username = User.Identity.Name; // User.FindFirstValue(ClaimTypes.NameIdentifier);
-                    user = _userLogic.GetAll().Where(x => x.UserName == username).SingleOrDefault();
-                    pictures = _pictureLogic.GetAll().Where(x => x.UserId == user.Id).OrderByDescending(x => x.Id).ToList();
+                    user = _userLogic.GetGeneric(x => x.UserName == username).SingleOrDefault();
+                    pictures = _pictureLogic.GetGeneric(x => x.UserId == user.Id).OrderByDescending(x => x.Id).ToList();
                     ViewBag.Username = user.UserName;
                     ViewBag.UserId = user.Id;
                 }
@@ -244,7 +244,7 @@ namespace digioz.Portal.Web.Controllers
                // Check to make sure user owns picture
                var picture = _pictureLogic.Get(id);
                 var username = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var user = _userLogic.GetAll().Where(x => x.UserName == username).SingleOrDefault();
+                var user = _userLogic.GetGeneric(x => x.UserName == username).SingleOrDefault();
 
                 if (user != null && picture != null && user.Id == picture.UserId) {
                     // Delete Picture
@@ -264,15 +264,15 @@ namespace digioz.Portal.Web.Controllers
             if (userId != null)
             {
                 user = _userLogic.Get(userId);
-                videos = _videoLogic.GetAll().Where(x => x.UserId == user.Id && x.Approved == true && x.Visible == true).OrderByDescending(x => x.Id).ToList();
+                videos = _videoLogic.GetGeneric(x => x.UserId == user.Id && x.Approved == true && x.Visible == true).OrderByDescending(x => x.Id).ToList();
                 ViewBag.Username = user.UserName;
                 ViewBag.UserId = user.Id;
             }
             else if (userName != null)
             {
-                user = _userLogic.GetAll().Where(x => x.UserName == userName).SingleOrDefault();
+                user = _userLogic.GetGeneric(x => x.UserName == userName).SingleOrDefault();
                 userId = user.Id;
-                videos = _videoLogic.GetAll().Where(x => x.UserId == user.Id && x.Approved == true && x.Visible == true).OrderByDescending(x => x.Id).ToList();
+                videos = _videoLogic.GetGeneric(x => x.UserId == user.Id && x.Approved == true && x.Visible == true).OrderByDescending(x => x.Id).ToList();
                 ViewBag.Username = user.UserName;
                 ViewBag.UserId = user.Id;
             }
@@ -281,8 +281,8 @@ namespace digioz.Portal.Web.Controllers
                 if (User.Identity.IsAuthenticated)
                 {
                     var username = User.Identity.Name; // User.FindFirstValue(ClaimTypes.NameIdentifier);
-                    user = _userLogic.GetAll().Where(x => x.UserName == username).SingleOrDefault();
-                    videos = _videoLogic.GetAll().Where(x => x.UserId == user.Id).OrderByDescending(x => x.Id).ToList();
+                    user = _userLogic.GetGeneric(x => x.UserName == username).SingleOrDefault();
+                    videos = _videoLogic.GetGeneric(x => x.UserId == user.Id).OrderByDescending(x => x.Id).ToList();
                     ViewBag.Username = user.UserName;
                     ViewBag.UserId = user.Id;
                 }
@@ -302,7 +302,7 @@ namespace digioz.Portal.Web.Controllers
                 // Check to make sure user owns video
                 var video = _videoLogic.Get(id);
                 var username = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var user = _userLogic.GetAll().Where(x => x.UserName == username).SingleOrDefault();
+                var user = _userLogic.GetGeneric(x => x.UserName == username).SingleOrDefault();
 
                 if (user != null && video != null && user.Id == video.UserId)
                 {

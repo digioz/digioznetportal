@@ -64,7 +64,7 @@ namespace digioz.Portal.Web.Controllers
             List<VideosViewModel> videoAlbumList = new List<VideosViewModel>();
             VideosViewModel videoAlbum;
 
-            var videoAlbums = _videoAlbumLogic.GetAll().Where(x => x.Visible == true).ToList();
+            var videoAlbums = _videoAlbumLogic.GetGeneric(x => x.Visible == true).ToList();
 
             foreach (var item in videoAlbums)
             {
@@ -74,7 +74,7 @@ namespace digioz.Portal.Web.Controllers
                 videoAlbum.Description = item.Description;
                 videoAlbum.Timestamp = item.Timestamp;
                 videoAlbum.Visible = item.Visible;
-                videoAlbum.Thumbnail = _videoLogic.GetAll().OrderByDescending(x => x.Id).Where(x => x.AlbumId == item.Id && x.Visible == true && x.Approved == true).Select(x => x.Thumbnail).FirstOrDefault();
+                videoAlbum.Thumbnail = _videoLogic.GetGeneric(x => x.AlbumId == item.Id && x.Visible == true && x.Approved == true).OrderByDescending(x => x.Id).Select(x => x.Thumbnail).FirstOrDefault();
 
                 if (videoAlbum.Thumbnail == null || videoAlbum.Thumbnail == string.Empty)
                 {
@@ -89,7 +89,7 @@ namespace digioz.Portal.Web.Controllers
 
         public async Task<IActionResult> List(int id, int? pageNumber)
         {
-            var videos = _videoLogic.GetAll().Where(x => x.AlbumId == id && x.Visible == true && x.Approved == true).OrderByDescending(x => x.Id).ToList();
+            var videos = _videoLogic.GetGeneric(x => x.AlbumId == id && x.Visible == true && x.Approved == true).OrderByDescending(x => x.Id).ToList();
 
             int pageSize = 10;
             int pageNumberNew = (pageNumber ?? 1);
@@ -147,7 +147,7 @@ namespace digioz.Portal.Web.Controllers
 				    model.Timestamp = DateTime.Now;
 
 				    var username = User.Identity.Name;
-                    var user = _userLogic.GetAll().SingleOrDefault(x => x.UserName == username);
+                    var user = _userLogic.GetGeneric(x => x.UserName == username).SingleOrDefault();
 
 				    model.UserId = user.Id;
 				    model.Approved = false;
