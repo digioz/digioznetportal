@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 using digioz.Portal.Bo;
 using digioz.Portal.Bo.ViewModels;
 using digioz.Portal.Dal;
@@ -50,18 +52,19 @@ namespace digioz.Portal.Dal.Interfaces
             db.SaveChanges();
         }
 
-        public IEnumerable<T> Get(Query query) 
+        public List<T> GetQuery(Query query) 
         {
-            var queryString = GetQuery(query);
+            var queryString = GetQueryParse(query);
             using var db = new digiozPortalContext();
             return db.Set<T>().FromSqlRaw(queryString).ToList();
         }
 
-        public IEnumerable<T> Get(string query) {
+        public List<T> GetQueryString(string query) {
             using var db = new digiozPortalContext();
             return db.Set<T>().FromSqlRaw(query).ToList();
         }
-        private string GetQuery(Query query) 
+
+        private string GetQueryParse(Query query) 
         {
             var queryString = $"SELECT {(query.Top > 0 ? $"TOP {query.Top}" : "")} " +
                 (string.IsNullOrWhiteSpace(query.Select) ? " * " : query.Select)  + " FROM " + typeof(T).Name +
@@ -70,5 +73,11 @@ namespace digioz.Portal.Dal.Interfaces
 
             return queryString;
         }
-    }
+
+		List<T> IRepo<T>.GetGeneric(Expression<Func<T, bool>> where)
+		{
+            using var db = new digiozPortalContext();
+            return db.Set<T>().Where(where).ToList();
+        }
+	}
 }

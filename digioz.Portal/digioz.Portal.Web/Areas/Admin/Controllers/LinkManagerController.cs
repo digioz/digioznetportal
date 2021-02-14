@@ -54,7 +54,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             }
 
             var link = _linkLogic.Get(id);
-            ViewBag.LinkCategory = _linkCategoryLogic.GetAll().Where(x => x.Id == link.LinkCategory).SingleOrDefault();
+            ViewBag.LinkCategory = _linkCategoryLogic.GetGeneric(x => x.Id == link.LinkCategory).SingleOrDefault();
 
             if (link == null)
             {
@@ -74,8 +74,6 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // POST: /Admin/LinkManager/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id", "Name", "Url", "Description", "Category", "Visible", "Timestamp", "LinkCategory")] Link link)
@@ -116,8 +114,6 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // POST: /Admin/LinkManager/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([Bind("Id", "Name", "Url", "Description", "Category", "Visible", "Timestamp", "LinkCategory")] Link link)
@@ -144,7 +140,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             }
 
             var link = _linkLogic.Get(id);
-            ViewBag.LinkCategory = _linkCategoryLogic.GetAll().Where(x => x.Id == link.LinkCategory).SingleOrDefault();
+            ViewBag.LinkCategory = _linkCategoryLogic.GetGeneric(x => x.Id == link.LinkCategory).SingleOrDefault();
 
             if (link == null)
             {
