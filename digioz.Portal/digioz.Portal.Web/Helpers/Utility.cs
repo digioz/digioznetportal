@@ -22,26 +22,12 @@ using digioz.Portal.Bll;
 using Microsoft.AspNetCore.Http;
 using digioz.Portal.Web.Models;
 using digioz.Portal.Payment;
+using digioz.Portal.Bll.Interfaces;
 
 namespace digioz.Portal.Web.Helpers
 {
     public static class Utility
     {
-        //public static bool CreateUserProfileCustomRecord(string userID, string email)
-        //{
-        //    Profile profile = new Profile
-        //    {
-        //        UserID = userID,
-        //        Email = email
-        //    };
-
-        //    // Create Profile
-        //    var logic = new ProfileLogic();
-        //    logic.Add(profile);
-
-        //    return true;
-        //}
-
         public static bool IsImage(IFormFile postedFile)
         {
             //-------------------------------------------
@@ -71,124 +57,6 @@ namespace digioz.Portal.Web.Helpers
             return true;
         }
 
-        //public static bool SubmitMail(EmailModel email)
-        //{
-
-        //    bool result = false;
-
-        //    try
-        //    {
-        //        SmtpClient smtpClient = null;
-        //        MailMessage message = null;
-        //        System.Net.Mail.Attachment attachment = null;
-        //        smtpClient = new SmtpClient(email.SMTPServer);
-        //        smtpClient.Credentials = new NetworkCredential(email.SMTPUsername, email.SMTPPassword);
-
-        //        if (email.SMTPPort > 0)
-        //        {
-        //            smtpClient.Port = Convert.ToInt32(email.SMTPPort);
-        //        }
-
-        //        message = new MailMessage(email.FromEmail, email.ToEmail, email.Subject, email.Message);
-
-        //        message.BodyEncoding = Encoding.UTF8;
-        //        message.IsBodyHtml = true;
-        //        message.Priority = MailPriority.Normal;
-
-        //        if (!string.IsNullOrEmpty(email.Attachment))
-        //        {
-        //            attachment = new System.Net.Mail.Attachment(email.Attachment);
-        //            message.Attachments.Add(attachment);
-        //        }
-
-        //        smtpClient.Send(message);
-
-        //        result = true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        AddLogEntry(ex.Message + email.ToEmail + "|" + email.Message);
-        //        string lsException = ex.Message;
-        //        result = false;
-        //    }
-
-        //    return result;
-        //}
-
-        //public static bool AddLogEntry(string message)
-        //{
-        //    try
-        //    {
-        //        Log log = new Log();
-        //        log.Message = message;
-        //        log.Timestamp = DateTime.Now;
-
-        //        var logic = new LogLogic();
-        //        logic.Add(log);
-        //    }
-        //    catch
-        //    {
-        //        // Do nothing
-        //    }
-
-        //    return true;
-        //}
-
-        //public static bool ForgotPasswordEmail(ForgotPasswordModel forgotPassword)
-        //{
-        //    bool result = false;
-        //    var logic = new ProfileLogic();
-        //    Profile profile = logic.GetProfileByEmail(forgotPassword.Email);
-        //    EmailModel loEmail = new EmailModel();
-
-        //    var logicConfig = new ConfigLogic();
-        //    var config = logicConfig.GetConfig();
-
-        //    if (profile != null)
-        //    {
-        //        try
-        //        {
-        //            loEmail.SMTPServer = config["SMTPServer"];
-        //            loEmail.SMTPUsername = config["SMTPUsername"];
-        //            loEmail.SMTPPassword = config["SMTPPassword"];
-        //            loEmail.FromEmail = config["WebmasterEmail"];
-
-        //            loEmail.ToEmail = profile.Email;
-        //            loEmail.Subject = config["SiteName"] + " Account Password Reset Request";
-        //            loEmail.Message = "Dear User,<br /><br />"
-        //                                + "We have received a password reset request from someone specifying your email account.<br />"
-        //                                + "If you requested this password reset, you can now reset your password by clicking on the following link: <br /><br />"
-        //                                + config["SiteURL"] + "/Account/ResetPassword/" + profile.UserID + "<br /><br />"
-        //                                + "Thanks,<br />"
-        //                                + "The " + config["SiteName"] + " Management Team";
-
-        //            bool resultEmailSubmit = SubmitMail(loEmail);
-
-        //            if (resultEmailSubmit)
-        //            {
-        //                result = true;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            string msg = "Send Email Error: " + ex.Message + " Stack Trace: " + ex.StackTrace.ToString();
-        //            AddLogEntry(msg);
-        //            result = false;
-        //        }
-        //    }
-
-        //    return result;
-        //}
-
-        //public static bool DoesUserExist(string userID)
-        //{
-        //    var logic = new ProfileLogic();
-        //    var profile = logic.GetProfileByUserId(userID);
-        //    bool result = profile != null && profile.UserID == userID;
-
-        //    return result;
-        //}
-
         public static string GetCurrentTimestamp()
         {
             string result = string.Empty;
@@ -196,58 +64,6 @@ namespace digioz.Portal.Web.Helpers
             
             return result;
         }
-
-        //public static List<string> GetDatabases()
-        //{
-        //    string sql = "EXEC sp_databases;";
-        //    MSSQL db = new MSSQL();
-        //    List<string> databases = new List<string>();
-
-        //    db.openConnection();
-
-        //    try
-        //    {
-        //        DataTable loDT = db.QueryDBDataset(sql);
-
-        //        if (loDT != null && loDT.Rows.Count > 0)
-        //        {
-        //            foreach (DataRow loDr in loDT.Rows)
-        //            {
-        //                databases.Add(Convert.ToString(loDr["DATABASE_NAME"]));
-        //            }
-        //        }
-        //    }
-        //    catch 
-        //    { }
-            
-        //    db.closeConnection();
-
-        //    return databases;
-        //}
-
-        //public static bool ExecuteDBCommand(string command)
-        //{
-        //    string sql = command;
-        //    MSSQL db = new MSSQL();
-        //    bool result = false;
-
-        //    db.openConnection();
-
-        //    try
-        //    {
-        //        db.ExecDB(sql);
-
-        //        result = true;
-        //    }
-        //    catch
-        //    {
-        //        result = false;
-        //    }
-
-        //    db.closeConnection();
-
-        //    return result;
-        //}
 
         public static bool IsFileAnImage(string psFilename)
         {
@@ -1126,53 +942,6 @@ namespace digioz.Portal.Web.Helpers
         //    return result;
         //}
 
-        //public static bool GetVisitorInfo(string ip, HttpBrowserCapabilities browser, string browserUserAgent, string referringURL, string language, string[] languages, string pageUrl)
-        //{
-        //    // System.Threading.Thread.Sleep(10000);
-
-        //    // Get Visitor Statistics 
-        //    try
-        //    {
-        //        digioz.PortalEntities db = new digioz.PortalEntities();
-        //        VisitorInfo visitorInfo = new VisitorInfo();
-        //        string country = string.Empty;
-
-        //        // Get Country
-        //        try
-        //        {
-        //            country = GetCountryFromAPI(ip, languages);
-        //        }
-        //        catch
-        //        {
-        //            country = string.Empty;
-        //        }
-
-        //        visitorInfo.PageURL = pageUrl;
-        //        visitorInfo.OperatingSystem = browser.Platform;
-        //        visitorInfo.IPAddress = ip;
-        //        visitorInfo.BrowserName = browser.Browser;
-        //        visitorInfo.BrowserType = browser.Type;
-        //        visitorInfo.BrowserUserAgent = browserUserAgent;
-        //        visitorInfo.BrowserVersion = browser.Version;
-        //        visitorInfo.IsCrawler = browser.Crawler;
-        //        visitorInfo.JSVersion = browser.EcmaScriptVersion.ToString();
-        //        visitorInfo.ReferringURL = referringURL;
-        //        visitorInfo.Language = language;
-        //        visitorInfo.Country = country;
-        //        visitorInfo.SearchEngine = Utility.GetSearchEngineName(visitorInfo.ReferringURL);
-        //        visitorInfo.Timestamp = DateTime.Now;
-
-        //        db.VisitorInfos.Add(visitorInfo);
-        //        db.SaveChanges();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Utility.AddLogEntry(ex.Message);
-        //    }
-
-        //    return true;
-        //}
-
         // Hashes an email with MD5.  Suitable for use with Gravatar profile
         public static string HashEmailForGravatar(string email)
         {
@@ -1269,54 +1038,53 @@ namespace digioz.Portal.Web.Helpers
             return ext;
         }
 
-        //public static void WriteVisitorSession(string sessionId, string pageUrl, string userName, string ipAddress)
-        //{
-        //    try
-        //    {
-        //        var logic = new VisitorSessionLogic();
-        //        var prevSession = logic.GetAll().SingleOrDefault(x => x.SessionId == sessionId);
+		public static void WriteVisitorSession(ILogic<VisitorSession> visitorSessionLogic, string sessionId, string pageUrl, string userName, string ipAddress)
+		{
+			try
+			{
+				var prevSession = visitorSessionLogic.GetAll().SingleOrDefault(x => x.SessionId == sessionId);
 
-        //        if (prevSession != null)
-        //        {
-        //            prevSession.PageUrl = pageUrl;
+				if (prevSession != null)
+				{
+					prevSession.PageUrl = pageUrl;
 
-        //            if (!string.IsNullOrEmpty(userName))
-        //            {
-        //                prevSession.UserName = userName;
-        //            }
+					if (!string.IsNullOrEmpty(userName))
+					{
+						prevSession.Username = userName;
+					}
 
-        //            prevSession.DateModified = DateTime.Now;
-        //            logic.Edit(prevSession);
-        //        }
-        //        else
-        //        {
-        //            VisitorSession session = new VisitorSession();
+					prevSession.DateModified = DateTime.Now;
+                    visitorSessionLogic.Edit(prevSession);
+				}
+				else
+				{
+					VisitorSession session = new VisitorSession();
 
-        //            if (ipAddress != null)
-        //            {
-        //                session.IpAddress = ipAddress;
-        //                session.PageUrl = pageUrl;
-        //                session.SessionId = sessionId;
+					if (ipAddress != null)
+					{
+						session.IpAddress = ipAddress;
+						session.PageUrl = pageUrl;
+						session.SessionId = sessionId;
 
-        //                if (!string.IsNullOrEmpty(userName))
-        //                {
-        //                    session.UserName = userName;
-        //                }
+						if (!string.IsNullOrEmpty(userName))
+						{
+							session.Username = userName;
+						}
 
-        //                session.DateCreated = DateTime.Now;
-        //                session.DateModified = session.DateCreated;
-        //            }
+						session.DateCreated = DateTime.Now;
+						session.DateModified = session.DateCreated;
+					}
 
-        //            logic.Add(session);
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        // Ignore for now
-        //    }
-        //}
+                    visitorSessionLogic.Add(session);
+				}
+			}
+			catch
+			{
+				// Ignore for now
+			}
+		}
 
-        public static string ReadTextFile(string path)
+		public static string ReadTextFile(string path)
         {
             string content = File.ReadAllText(path);
 

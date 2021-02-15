@@ -154,7 +154,23 @@ namespace digioz.Portal.Web.Controllers
 
         public async Task<IActionResult> ShowDetails(string userId)
         {
-            var user = _userLogic.Get(userId);
+            if (userId == null) {
+                return RedirectToAction("Index", "Home");
+            }
+
+            var user = new AspNetUser();
+
+            if (userId.Contains("@")) {
+                user = _userLogic.GetGeneric(x => x.UserName == userId).SingleOrDefault();
+			}
+            else {
+                user = _userLogic.Get(userId);
+            }
+
+            if (user == null) {
+                return RedirectToAction("Index", "Home");
+			}
+
             var profile = _profileLogic.GetGeneric(x => x.UserId == user.Id).SingleOrDefault();
 
             var vm = new UserManagerViewModel() {
@@ -182,7 +198,7 @@ namespace digioz.Portal.Web.Controllers
             var avatarUrl = Path.Combine(path, "Default.png");
             var mimeType = "image/png";
 
-            if (profile != null && profile.Avatar != null)
+            if (profile != null && !profile.Avatar.IsNullEmpty())
             {
                 mimeType = Helpers.Utility.GetMimeType(profile.Avatar);
                 avatarUrl = Path.Combine(path, profile.Avatar);

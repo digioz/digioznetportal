@@ -12,12 +12,15 @@ namespace digioz.Portal.Web.Controllers
 	public class VisitorController : Controller
 	{
         private readonly ILogic<VisitorInfo> _visitorInfoLogic;
+        private readonly ILogic<VisitorSession> _visitorSessionLogic;
 
         public VisitorController(
-            ILogic<VisitorInfo> visitorInfoLogic
+            ILogic<VisitorInfo> visitorInfoLogic,
+            ILogic<VisitorSession> visitorSessionLogic
         )
         {
             _visitorInfoLogic = visitorInfoLogic;
+            _visitorSessionLogic = visitorSessionLogic;
         }
 
         // GET: Visitor
@@ -63,6 +66,7 @@ namespace digioz.Portal.Web.Controllers
 
             try
             {
+                // Log Visitor Info
                 VisitorInfo visitorInfo = new VisitorInfo
                 {
                     UserLanguage = language,
@@ -86,6 +90,10 @@ namespace digioz.Portal.Web.Controllers
 
                 
                 _visitorInfoLogic.Add(visitorInfo);
+
+                // Log Visitor Session
+                var userName = User.Identity.Name;
+                Helpers.Utility.WriteVisitorSession(_visitorSessionLogic, sessionId, href, userName, ipAddress);
             }
             catch (Exception ex)
             {
