@@ -1,0 +1,68 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Config>
+
+@{
+    ViewBag.Title = "Configuration Manager";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<main>
+	<div class="container-fluid">
+		<div class="card mb-4">
+			<div class="card-header">
+				<h2>Configuration Manager</h2>
+			</div>
+			<div class="card-body">
+				<p>
+					<a class="btn btn-sm btn-primary" href="@Url.Action("Create", "ConfigurationManager", new { area = "Admin" })">Create New</a>
+				</p>
+
+				@if (TempData["Results"] != null)
+				{
+					<div class="alert alert-success">@TempData["Results"]</div>
+				}
+
+				<h5>Please use the Grid below to add, edit or delete Configuration Keys:</h5>
+
+				<p>&nbsp;</p>
+
+				<table class="table">
+					<tr>
+						<th>
+							@Html.DisplayNameFor(model => model.ConfigKey)
+						</th>
+						<th>
+							@Html.DisplayNameFor(model => model.ConfigValue)
+						</th>
+						<th></th>
+					</tr>
+
+					@foreach (var item in Model)
+					{
+						<tr>
+							<td>
+								@Html.DisplayFor(modelItem => item.ConfigKey)
+							</td>
+							<td style="max-width:200px;word-wrap: break-word;">
+								@if (item.IsEncrypted)
+								{
+									<span>[XXX]</span>
+								}
+								else
+								{
+									@Html.DisplayFor(modelItem => item.ConfigValue)
+								}
+							</td>
+							<td style="width:100px;">
+								<a href="@Url.Action("Details", new { id = item.Id })"><img class="sb-nav-link-icon" src="~/img/images/icons/16x16/Search.png" alt="Details" /></a>
+								<a href="@Url.Action("Edit", new { id = item.Id })"><img class="sb-nav-link-icon" src="~/img/images/icons/16x16/Edit.png" alt="Edit" /></a>
+								<a href="@Url.Action("Delete", new { id = item.Id })"><img class="sb-nav-link-icon" src="~/img/images/icons/16x16/Cancel.png" alt="Delete" /></a>
+							</td>
+						</tr>
+					}
+				</table>
+			</div>
+		</div>
+	</div>
+</main>
+
+
