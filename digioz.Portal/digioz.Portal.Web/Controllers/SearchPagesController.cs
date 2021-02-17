@@ -21,7 +21,7 @@ namespace digioz.Portal.Web.Controllers
             _pageLogic = pageLogic;
         }
 
-        public ActionResult Index(string searchString = "")
+        public async Task<IActionResult> Index(string searchString = "")
         {
             if (searchString == "")
             {
