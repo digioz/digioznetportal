@@ -79,7 +79,7 @@ namespace digioz.Portal.Bll
 			{
                 var encryptionKey = GetEncryptionKey();
                 var encryptString = new EncryptString();
-
+                 
                 try
                 {
                     config.ConfigValue = encryptString.Encrypt(encryptionKey, config.ConfigValue);

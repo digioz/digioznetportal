@@ -4,6 +4,7 @@ using digioz.Portal.Bo;
 using digioz.Portal.Dal;
 using System.Collections.Generic;
 using System;
+using digioz.Portal.Utilities;
 
 namespace digioz.Portal.Web.Data.Migrations
 {
@@ -16,13 +17,17 @@ namespace digioz.Portal.Web.Data.Migrations
             // Insert Config Seed 
             var configs = new List<Config>();
 
+            var siteEncryptionKey = StringUtils.GetUniqueKey(32);
+            var encryptString = new EncryptString();
+            var smtpPassword = encryptString.Encrypt(siteEncryptionKey, "Pass@word1");
+
             configs.Add(new Config() { Id = "139b2ea9-9f7c-46a4-ae2b-5093980c8d55", ConfigKey = "SMTPServer", ConfigValue = "mail.domain.com", IsEncrypted = false });
             configs.Add(new Config() { Id = "05f2eb10-9b9b-44ed-984d-be0172027931", ConfigKey = "SMTPPort", ConfigValue = "587", IsEncrypted = false });
             configs.Add(new Config() { Id = "010cc9e4-f97c-4eda-8967-0dc236aa05c4", ConfigKey = "SMTPUsername", ConfigValue = "webmaster@domain.com", IsEncrypted = false });
-            configs.Add(new Config() { Id = "7b35120d-0fb6-4829-9614-2855e48d532d", ConfigKey = "SMTPPassword", ConfigValue = "8CfX+Yn6Qqa3K2LQRdkdaw==", IsEncrypted = true });
-            configs.Add(new Config() { Id = "29d234af-a801-44ec-b9e7-f9406bd886bd", ConfigKey = "SiteURL", ConfigValue = "http://localhost:57443", IsEncrypted = false });
+            configs.Add(new Config() { Id = "7b35120d-0fb6-4829-9614-2855e48d532d", ConfigKey = "SMTPPassword", ConfigValue = smtpPassword, IsEncrypted = true });
+            configs.Add(new Config() { Id = "29d234af-a801-44ec-b9e7-f9406bd886bd", ConfigKey = "SiteURL", ConfigValue = "https://localhost:44394/", IsEncrypted = false });
             configs.Add(new Config() { Id = "d532c723-70b9-4320-9f94-c173159772e5", ConfigKey = "SiteName", ConfigValue = "DigiOz .NET Portal", IsEncrypted = false });
-            configs.Add(new Config() { Id = "a32696b0-d05a-4cdc-b00d-c3415920de26", ConfigKey = "SiteEncryptionKey", ConfigValue = "BlAMwXxp7oMxGtWzIZYeYDFiidifydsf", IsEncrypted = false });
+            configs.Add(new Config() { Id = "a32696b0-d05a-4cdc-b00d-c3415920de26", ConfigKey = "SiteEncryptionKey", ConfigValue = siteEncryptionKey, IsEncrypted = false });
             configs.Add(new Config() { Id = "eed98de0-341a-4aa3-bf45-6e35a8e353bb", ConfigKey = "WebmasterEmail", ConfigValue = "webmaster@domain.com", IsEncrypted = false });
             configs.Add(new Config() { Id = "98dc1312-a620-4048-ad0b-f3ae47668c6e", ConfigKey = "PaymentLoginID", ConfigValue = "6b74ZBkn5u3", IsEncrypted = false });
             configs.Add(new Config() { Id = "d73f0d79-89d9-435e-a772-3d6ab73b40cf", ConfigKey = "PaymentTransactionKey", ConfigValue = "9M4Tc3s89w3C39cq", IsEncrypted = false });
