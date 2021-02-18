@@ -1,0 +1,76 @@
+﻿@model digioz.Portal.Bo.Module
+
+@{
+    ViewBag.Title = "Module Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Module Details</h2>
+
+			<div>
+				<hr />
+				<dl class="dl-horizontal">
+					<dt>
+						@Html.DisplayNameFor(model => model.Title)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.Title)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.Body)
+					</dt>
+
+					<dd>
+						@Html.Raw(Model.Body)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.DisplayInBox)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.DisplayInBox)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.Visible)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.Visible)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.Timestamp)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.Timestamp)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.UserId)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.UserId)
+					</dd>
+
+				</dl>
+			</div>
+			<p>
+				@Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+				@Html.ActionLink("Back to List", "Index")
+			</p>
+		</div>
+	</div>
+</div>
+
+
+
+

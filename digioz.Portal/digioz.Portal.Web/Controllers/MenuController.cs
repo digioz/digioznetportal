@@ -170,7 +170,7 @@ namespace digioz.Portal.Web.Controllers
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
         public async Task<IActionResult> ZoneMenu(string zoneType)
         {
-            var modules = _moduleLogic.GetGeneric(x => x.Location == zoneType).ToList();
+            var modules = _moduleLogic.GetGeneric(x => x.Location == zoneType && x.Visible == true).ToList();
             ViewBag.SelectedZone = zoneType;
 
             return PartialView("ZoneMenu", modules);

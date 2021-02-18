@@ -282,7 +282,7 @@ namespace digioz.Portal.Web.Data.Migrations
                     UserId = table.Column<string>(maxLength: 128, nullable: true),
                     Location = table.Column<string>(maxLength: 255, nullable: true),
                     Title = table.Column<string>(maxLength: 50, nullable: true),
-                    Body = table.Column<string>(maxLength: 50, nullable: true),
+                    Body = table.Column<string>(nullable: true),
                     Visible = table.Column<bool>(nullable: false),
                     Timestamp = table.Column<DateTime>(nullable: true),
                     DisplayInBox = table.Column<bool>(nullable: false)
