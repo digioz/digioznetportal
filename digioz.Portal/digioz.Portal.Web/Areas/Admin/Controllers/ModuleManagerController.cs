@@ -33,7 +33,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: /Admin/ModuleManager/
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var modules = _moduleLogic.GetAll(); 
 
@@ -41,7 +41,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: /Admin/ModuleManager/Details/5
-        public ActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -59,7 +59,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: /Admin/ModuleManager/Create
-        public ActionResult Create()
+        public async Task<IActionResult> Create()
         {
             // Get user list
             ViewBag.UserId = new SelectList(_userLogic.GetAll(), "Id", "UserName");
@@ -73,7 +73,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // POST: /Admin/ModuleManager/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind("Id,UserId,Title,Body,Visible,Timestamp,Location,DisplayInBox")] Module module)
+        public async Task<IActionResult> Create([Bind("Id,UserId,Title,Body,Visible,Timestamp,Location,DisplayInBox")] Module module)
         {
             if (ModelState.IsValid)
             {
@@ -95,7 +95,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: /Admin/ModuleManager/Edit/5
-        public ActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -121,7 +121,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // POST: /Admin/ModuleManager/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind("Id,UserId,Title,Body,Visible,Timestamp,Location,DisplayInBox")] Module module)
+        public async Task<IActionResult> Edit([Bind("Id,UserId,Title,Body,Visible,Timestamp,Location,DisplayInBox")] Module module)
         {
             if (ModelState.IsValid)
             {
@@ -143,7 +143,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: /Admin/ModuleManager/Delete/5
-        public ActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
@@ -163,7 +163,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // POST: /Admin/ModuleManager/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var module = _moduleLogic.Get(id);
             _moduleLogic.Delete(module);

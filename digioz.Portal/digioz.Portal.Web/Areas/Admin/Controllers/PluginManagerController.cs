@@ -27,13 +27,13 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/PluginManager
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View(_pluginLogic.GetAll());
         }
 
         // GET: Admin/PluginManager/Details/5
-        public ActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -51,7 +51,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/PluginManager/Create
-        public ActionResult Create()
+        public async Task<IActionResult> Create()
         {
             return View();
         }
@@ -59,7 +59,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // POST: Admin/PluginManager/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind("Id,Name,Dll,IsEnabled")] Plugin plugin)
+        public async Task<IActionResult> Create([Bind("Id,Name,Dll,IsEnabled")] Plugin plugin)
         {
             if (ModelState.IsValid)
             {
@@ -72,7 +72,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/PluginManager/Edit/5
-        public ActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -92,7 +92,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // POST: Admin/PluginManager/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind("Id,Name,Dll,IsEnabled")] Plugin plugin)
+        public async Task<IActionResult> Edit([Bind("Id,Name,Dll,IsEnabled")] Plugin plugin)
         {
             if (ModelState.IsValid)
             {
@@ -105,7 +105,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/PluginManager/Delete/5
-        public ActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
@@ -125,7 +125,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // POST: Admin/PluginManager/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var plugin = _pluginLogic.Get(id);
             _pluginLogic.Delete(plugin);
