@@ -11,42 +11,46 @@
     @RenderSection("Head", required: false)
 </head>
 <body>
-    <div class="container">
-        <div style="padding-left:20px;">
-            <a href="/"><img src="~/img/images/Logo_Small.png" alt="@digioz.Portal.Web.Models.AppStart.SiteSettings.SiteName" /></a>
-            <h1 style="position:absolute; top:20px;">&nbsp;</h1><br /><br />
-        </div>
-    </div>
+	<div class="container">
+		<div style="padding-left:20px;">
+			<a href="/"><img src="~/img/images/Logo_Small.png" alt="@digioz.Portal.Web.Models.AppStart.SiteSettings.SiteName" /></a>
+			<h1 style="position:absolute; top:20px;">&nbsp;</h1><br /><br />
+		</div>
+	</div>
 
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
 		<a class="navbar-brand" href="#">@digioz.Portal.Web.Models.AppStart.SiteSettings.SiteName</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-            
-                @Html.RenderAction("TopMenu", "Menu", new { area = "" })
-            
-            <form class="form-inline mt-2 mt-md-0" action="/SearchPages">
-                <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" name="searchString">
-                <button class="btn btn-primary my-2 my-sm-0" type="submit">Search</button>
-            </form>
-        </div>
-    </nav>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarCollapse">
 
-    <div class="container body-content">
-        <div class="row">
-            <div class="col-md-3">
+			@Html.RenderAction("TopMenu", "Menu", new { area = "" })
 
-                @Html.RenderAction("LeftMenu", "Menu", new { area = "" })
+			<form class="form-inline mt-2 mt-md-0" action="/SearchPages">
+				<input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" name="searchString">
+				<button class="btn btn-primary my-2 my-sm-0" type="submit">Search</button>
+			</form>
+		</div>
+	</nav>
 
-                @Html.RenderAction("UserMenu", "Menu", new { area = "" })
+	@{ Html.RenderAction("ZoneMenu", "Menu", new { zoneType = "Top" });}
 
-                @Html.RenderAction("WhoIsOnlineMenu", "Menu", new { area = "" })
+	<div class="container body-content">
+		<div class="row">
+			<div class="col-md-3">
 
-                @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "Left" })
+				@Html.RenderAction("LeftMenu", "Menu", new { area = "" })
 
-            </div>
+				@Html.RenderAction("UserMenu", "Menu", new { area = "" })
+
+				@Html.RenderAction("WhoIsOnlineMenu", "Menu", new { area = "" })
+
+				@Html.RenderAction("TwitterMenu", "Menu", new { area = "" })
+
+				@Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "Left" })
+
+			</div>
 			<div class="col-md-9">
 
 				@Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "BodyTop" })
@@ -68,18 +72,20 @@
 
 				@Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "BodyBottom" })
 			</div>
-        </div>
+		</div>
 
-        <hr />
-        <footer>
+		@Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "Bottom" })
+
+		<hr />
+		<footer>
 			<p>&copy; @DateTime.Now.Year - @digioz.Portal.Web.Models.AppStart.SiteSettings.SiteName</p>
-        </footer>
-    </div>
-    <script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @RenderSection("Scripts", required: false)
-    <script src="~/lib/bowser/bowser.js"></script>
-    <script src="~/js/visitor.js"></script>
+		</footer>
+	</div>
+	<script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@RenderSection("Scripts", required: false)
+	<script src="~/lib/bowser/bowser.js"></script>
+	<script src="~/js/visitor.js"></script>
 </body>
 </html>

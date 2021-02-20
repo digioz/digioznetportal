@@ -1,25 +1,23 @@
 ﻿@model IEnumerable<digioz.Portal.Bo.Module>
 
-@if (Model != null)
+@if (Model != null && Model.Count() > 0)
 {
     if ((ViewBag.SelectedZone == "Top" || ViewBag.SelectedZone == "Bottom") && Model.Any())
     {
-        @:<div class="container" style="padding: 15px;">
+        @:<div class="container body-content">
     }
 
-    foreach (var item in Model)
+    foreach (var item in Model) 
     {
         if (item.Visible)
         {
             if (item.DisplayInBox)
             {
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">@item.Title</h3>
-                    </div>
-                    <div class="panel-body">
-                        @Html.Raw(item.Body)
-                    </div>
+                <div class="card bg-light mb-5">
+					<div class="card-header" style="background-color:#428BCA;color:#ffffff;">@item.Title</div>
+					<div class="card-body">
+						@Html.Raw(item.Body)
+					</div>
                 </div>
             }
             else

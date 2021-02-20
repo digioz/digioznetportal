@@ -1,0 +1,59 @@
+﻿@model digioz.Portal.Bo.Plugin
+
+@{
+    ViewBag.Title = "Delete Plugin";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Delete Plugin</h2>
+
+			<h3>Are you sure you want to delete this?</h3>
+			<div>
+				<hr />
+				<dl class="dl-horizontal">
+					<dt>
+						@Html.DisplayNameFor(model => model.Name)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.Name)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.Dll)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.Dll)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.IsEnabled)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.IsEnabled)
+					</dd>
+
+				</dl>
+
+				@using (Html.BeginForm())
+				{
+					@Html.AntiForgeryToken()
+
+					<div class="form-actions no-color">
+						<input type="submit" value="Delete" class="btn btn-primary" /> |
+						@Html.ActionLink("Back to List", "Index")
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
