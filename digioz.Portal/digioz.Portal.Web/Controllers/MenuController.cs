@@ -129,19 +129,20 @@ namespace digioz.Portal.Web.Controllers
             if (plugins.Any())
             {
                 //Check config table for twitter handle
-                var configs = _configLogic.GetGeneric(x => x.ConfigKey == "TwitterHandle");
-                var twitterHandleConfig = configs.Take(1).SingleOrDefault();
-                configs = _configLogic.GetGeneric(x => x.ConfigKey == "TwitterWidgetID");
+                var configs = _configLogic.GetConfig();
+                var twitterHandle = configs["TwitterHandle"];
 
-                if (twitterHandleConfig != null)
+                if (twitterHandle != null)
                 {
-                    var twitterFeed = new Twitter(twitterHandleConfig.ConfigValue, true);
+                    var twitterFeed = new Twitter(twitterHandle, true);
                     ViewBag.TwitterHandle = twitterFeed.TwitterHandle;
                     ViewBag.TwitterUser = twitterFeed.TwitterUser;
+
                     return PartialView("TwitterMenu", twitterFeed);
                 }
             }
-            return null;
+
+            return PartialView("TwitterMenu", null);
         }
 
         [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
