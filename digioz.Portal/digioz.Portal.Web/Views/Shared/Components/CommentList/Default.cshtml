@@ -25,7 +25,10 @@
                                 <span style="padding:0px;font-size:x-small">Likes (<b>@comment.Likes</b>)</span>
                                 @if (User.Identity.IsAuthenticated)
                                 {
-                                    <a href="@Url.Action("Like","Comments", new { id = comment.Id })"><img src="~/img/images/icons/20x20/Like.png" /></a>
+                                    @using (Html.BeginForm("Like", "Comments",  new { id = comment.Id }, FormMethod.Post, true,new {@style = "display: inline-block;" }))
+                                    {
+                                        <button type="submit" class="btn btn-sm"><img src="~/img/images/icons/20x20/Like.png" /></button>
+                                    }
                                 }
                             </td>
                         </tr>

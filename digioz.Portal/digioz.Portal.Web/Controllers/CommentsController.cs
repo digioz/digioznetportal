@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Web;
-using digioz.Portal.Bll;
 using digioz.Portal.Bll.Interfaces;
 using digioz.Portal.Bo;
-using digioz.Portal.Web.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -75,6 +71,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         [Authorize]
+        [HttpPost]
         public async Task<IActionResult> Like(string id)
         {
             // Add the Like to the Comment
