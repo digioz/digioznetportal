@@ -27,7 +27,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         // GET: Twitter
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }
