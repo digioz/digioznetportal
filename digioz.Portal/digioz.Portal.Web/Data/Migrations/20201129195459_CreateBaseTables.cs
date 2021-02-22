@@ -143,7 +143,10 @@ namespace digioz.Portal.Web.Data.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Message = table.Column<string>(nullable: true),
-                    Timestamp = table.Column<DateTime>(nullable: true)
+                    Level = table.Column<string>(nullable: true),
+                    Timestamp = table.Column<DateTime>(nullable: true),
+                    Exception = table.Column<string>(nullable: true),
+                    LogEvent = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
