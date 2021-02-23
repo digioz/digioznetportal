@@ -35,6 +35,7 @@ namespace digioz.Portal.Web.Controllers
 
         public async Task<IActionResult> Index() {
 
+            _logger.LogError("this is test error");
             var model = new HomeIndexViewModel {
                 Page = _pageLogic.GetGeneric(x => x.Title == "Home" && x.Visible == true).SingleOrDefault()
             };
