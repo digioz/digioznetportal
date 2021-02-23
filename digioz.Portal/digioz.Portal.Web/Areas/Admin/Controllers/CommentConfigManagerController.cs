@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using digioz.Portal.Bll.Interfaces;
 using System.Security.Claims;
 using digioz.Portal.Web.Areas.Admin.Models.ViewModels;
+using Newtonsoft.Json;
 
 namespace digioz.Portal.Web.Areas.Admin.Controllers
 {
@@ -158,34 +159,27 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> GetEnableReferences(string referenceType)
+        public async Task<JsonResult> GetEnableReferences(string referenceType)
         {
-            List<SelectListItem> referenceTypeListItems = new List<SelectListItem>();
-
             if (referenceType == "Page")
             {
-                var pages = _pageLogic.GetAll();
+                var list = new SelectList(_pageLogic.GetAll(), "Id", "Title");
 
-                foreach (var item in pages)
-                {
-                    referenceTypeListItems.Add(new SelectListItem() { Text = item.Title, Value = item.Id.ToString() });
-                }
+                ViewBag.EnableReference = list;
 
-                ViewBag.EnableReference = referenceTypeListItems;
+                return Json(list);
             }
             else if (referenceType == "Announcement")
             {
-                var announcements = _announcementLogic.GetAll();
+                var list = new SelectList(_announcementLogic.GetAll(), "Id", "Title");
+                ViewBag.EnableReference = list;
 
-                foreach (var item in announcements)
-                {
-                    referenceTypeListItems.Add(new SelectListItem() { Text = item.Title, Value = item.Id.ToString() });
-                }
-
-                ViewBag.EnableReference = referenceTypeListItems;
+                return Json(list);
             }
-
-            return Json(referenceTypeListItems);
+            else
+			{
+                return null;
+			}
         }
 
         public async Task<IActionResult> Details(string id)
@@ -239,7 +233,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         }
 
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken] 
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var model = _commentConfigLogic.Get(id);

@@ -19,18 +19,18 @@
                     input: selectedGrade
                 },
                 error: function (response) {
-                    alert(response.responseText);
+                    //alert(response.responseText);
                 },
                 success: function (response) {
                     var items = "<option></option>";
-                    alert(response);
+                    //alert(response);
 
                     $.each(response, function (i, referenceTypes) {
-                        items += "<option value='" + referenceTypes.Value + "'>" + referenceTypes.Text + "</option>";
+                        items += "<option value='" + referenceTypes.value + "'>" + referenceTypes.text + "</option>";
                     });
 
                     $('#EnableReference').html(items);
-                    alert(response);
+                    ///alert(response);
                 }
             });
         });
