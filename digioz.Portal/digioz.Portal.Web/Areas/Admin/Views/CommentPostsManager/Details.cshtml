@@ -1,0 +1,71 @@
+﻿@model digioz.Portal.Bo.Comment
+
+@{
+    ViewBag.Title = "Comment Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Comment Details</h2>
+
+			<div>
+				<dl class="dl-horizontal">
+					<dt>
+						@Html.DisplayNameFor(model => model.ParentId)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.ParentId)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.UserId)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.UserId)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.Body)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.Body)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.CreatedDate)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.CreatedDate)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.ModifiedDate)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.ModifiedDate)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.Likes)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.Likes)
+					</dd>
+
+				</dl>
+			</div>
+			<p>
+				@Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+				@Html.ActionLink("Back to List", "Index")
+			</p>
+		</div>
+	</div>
+</div>

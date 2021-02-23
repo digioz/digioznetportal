@@ -68,6 +68,7 @@ namespace digioz.Portal.Web.Data.Migrations
                     Id = table.Column<string>(maxLength: 128, nullable: false),
                     ReferenceId = table.Column<string>(nullable: true),
                     ReferenceType = table.Column<string>(nullable: true),
+                    ReferenceTitle = table.Column<string>(nullable: true),
                     Visible = table.Column<bool>(nullable: false),
                     Timestamp = table.Column<DateTime>(nullable: true)
                 },
