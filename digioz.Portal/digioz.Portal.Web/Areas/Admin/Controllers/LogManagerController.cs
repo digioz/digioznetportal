@@ -15,10 +15,9 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 	{
         private readonly ILogic<Log> _logLogic;
 
-        public LogManagerController(
-            ILogic<Log> logLogic,
+        public LogManagerController( 
             IConfigLogic configLogic,
-            ILogic<AspNetUser> userLogic
+            ILogic<Log> logLogic
         )
         {
             _logLogic = logLogic;

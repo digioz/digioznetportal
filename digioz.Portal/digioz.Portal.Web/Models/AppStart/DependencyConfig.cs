@@ -28,7 +28,6 @@ namespace digioz.Portal.Web.Models.AppStart
             services.AddSingleton<IRepo<LinkCategory>, BaseRepo<LinkCategory>>();
             services.AddSingleton<IRepo<Link>, BaseRepo<Link>>();
             services.AddSingleton<IRepo<Log>, BaseRepo<Log>>();
-            services.AddSingleton<IRepo<LogVisitor>, BaseRepo<LogVisitor>>();
             services.AddSingleton<IRepo<MailingListCampaign>, BaseRepo<MailingListCampaign>>();
             services.AddSingleton<IRepo<MailingListCampaignRelation>, BaseRepo<MailingListCampaignRelation>>();
             services.AddSingleton<IRepo<MailingList>, BaseRepo<MailingList>>();
@@ -74,7 +73,6 @@ namespace digioz.Portal.Web.Models.AppStart
             services.AddSingleton<ILogic<LinkCategory>, BaseLogic<LinkCategory>>();
             services.AddSingleton<ILogic<Link>, BaseLogic<Link>>();
             services.AddSingleton<ILogic<Log>, BaseLogic<Log>>();
-            services.AddSingleton<ILogic<LogVisitor>, BaseLogic<LogVisitor>>();
             services.AddSingleton<ILogic<MailingListCampaign>, BaseLogic<MailingListCampaign>>();
             services.AddSingleton<ILogic<MailingListCampaignRelation>, BaseLogic<MailingListCampaignRelation>>();
             services.AddSingleton<ILogic<MailingList>, BaseLogic<MailingList>>();

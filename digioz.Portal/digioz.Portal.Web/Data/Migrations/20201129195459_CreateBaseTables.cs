@@ -154,28 +154,6 @@ namespace digioz.Portal.Web.Data.Migrations
                     table.PrimaryKey("PK_Log", x => x.Id);
                 });
 
-
-            migrationBuilder.CreateTable(
-                name: "LogVisitor",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    IPAddress = table.Column<string>(nullable: true),
-                    BrowserType = table.Column<string>(nullable: true),
-                    Language = table.Column<string>(nullable: true),
-                    IsBot = table.Column<bool>(nullable: false),
-                    Country = table.Column<string>(nullable: true),
-                    ReferringUrl = table.Column<string>(nullable: true),
-                    SearchString = table.Column<string>(nullable: true),
-                    Timestamp = table.Column<DateTime>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LogVisitor", x => x.Id);
-                });
-
-
             migrationBuilder.CreateTable(
                 name: "MailingList",
                 columns: table => new

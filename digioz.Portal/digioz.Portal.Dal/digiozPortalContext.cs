@@ -40,7 +40,6 @@ namespace digioz.Portal.Dal
         public virtual DbSet<Link> Links { get; set; }
         public virtual DbSet<LinkCategory> LinkCategories { get; set; }
         public virtual DbSet<Log> Logs { get; set; }
-        public virtual DbSet<LogVisitor> LogVisitors { get; set; }
         public virtual DbSet<MailingList> MailingLists { get; set; }
         public virtual DbSet<MailingListCampaign> MailingListCampaigns { get; set; }
         public virtual DbSet<MailingListCampaignRelation> MailingListCampaignRelations { get; set; }
@@ -239,13 +238,6 @@ namespace digioz.Portal.Dal
             modelBuilder.Entity<Log>(entity =>
             {
                 entity.ToTable("Log");
-            });
-
-            modelBuilder.Entity<LogVisitor>(entity =>
-            {
-                entity.ToTable("LogVisitor");
-
-                entity.Property(e => e.Ipaddress).HasColumnName("IPAddress");
             });
 
             modelBuilder.Entity<MailingList>(entity =>
