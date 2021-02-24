@@ -72,16 +72,17 @@
                     </nav>
                 </div>
 
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="false" aria-controls="collapseUtilities">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOther" aria-expanded="false" aria-controls="collapseOther">
                     <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                    Utilities
+                    Other
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse" id="collapseUtilities" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="">Database</a>
-                        <a class="nav-link" href="">File Manager</a>
-                    </nav>
+                <div class="collapse" id="collapseOther" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
+					<nav class="sb-sidenav-menu-nested nav">
+						<a class="nav-link" href="@Url.Action("Index", "LogManager", new { area = "Admin" })">Logs</a>
+						<a class="nav-link" href="">Database</a>
+						<a class="nav-link" href="">File Manager</a>
+					</nav>
                 </div>
             </div>
         </div>
