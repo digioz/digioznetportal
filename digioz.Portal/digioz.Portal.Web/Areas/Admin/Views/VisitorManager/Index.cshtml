@@ -1,0 +1,60 @@
+﻿@model IEnumerable<digioz.Portal.Bo.VisitorInfo>
+@using NonFactors.Mvc.Grid
+
+@{
+	ViewBag.Title = "Visitor Manager";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@section HeaderScripts {
+	<link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet">
+}
+
+@section FooterScripts {
+	<script src="~/js/mvc-grid/mvc-grid.js"></script>
+	<script>
+        document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+	</script>
+}
+
+<main>
+	<div class="container-fluid">
+		<div class="card mb-4">
+			<div class="card-header">
+				<h2>Visitor Manager</h2>
+			</div>
+			@*https://mvc6-grid.azurewebsites.net/formatting*@
+			@(Html
+				.Grid(Model)
+				.Build(columns =>
+				{
+					columns.Add(model => model.Id).Titled("Id").Filterable(false);
+					columns.Add(model => model.IpAddress).Titled("IP Address").Filterable(true);
+
+					columns.Add(model => model.OperatingSystem).Titled("OS").UsingDefaultFilterMethod("equals");
+					columns.Add(model => model.Browser).Titled("Browser").UsingDefaultFilterMethod("equals");
+					columns.Add(model => model.BrowserVersion).Titled("Browser Version").UsingDefaultFilterMethod("equals");
+					columns.Add(model => model.Href).Titled("Page Visited").UsingDefaultFilterMethod("equals");
+					columns.Add(model => model.Timestamp).Titled("Date").UsingDefaultFilterMethod("equals");
+
+					columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='VisitorManager/Details?id={model.Id}' id=\"details\"  asp-action=\"Details\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"../img/images/icons/16x16/Search.png\" alt=\"Details\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;").Encoded(false);
+
+				})
+					.Empty("No users found.")
+					.Filterable()
+					.Sortable()
+					.Pageable()
+                )
+			<div id='myModal' class='modal fade in'>
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div id='myModalContent'></div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	</div>
+</main>
+
