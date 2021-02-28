@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "Link Manager";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var categories = (Dictionary<int, string>)ViewBag.LinkCategory;
 }
 
 <main>
@@ -43,8 +44,7 @@
                     @Html.DisplayFor(modelItem => item.Url)
                 </td>
                 <td>
-                    To Do
-                    @*@Html.DisplayFor(modelItem => item.LinkCategory.Name)*@
+                    @categories[item.LinkCategory].ToString()
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Visible)

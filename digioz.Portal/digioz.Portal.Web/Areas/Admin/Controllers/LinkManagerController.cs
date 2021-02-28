@@ -40,7 +40,10 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         public async Task<IActionResult> List()
         {
+            var linkCategory = _linkCategoryLogic.GetAll().ToDictionary(x => x.Id, x => x.Name);
             var models = _linkLogic.GetAll();
+
+            ViewBag.LinkCategory = linkCategory;
 
             return View(models);
         }
