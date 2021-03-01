@@ -53,6 +53,8 @@ namespace digioz.Portal.Bll
 						models.Add("Dec", Convert.ToInt32(result["Dec"]));
 					}
 				}
+
+				context.Database.CloseConnection();
 			}
 
 			return models;
