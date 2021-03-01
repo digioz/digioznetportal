@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using digioz.Portal.Bll;
 using digioz.Portal.Bll.Interfaces;
 using digioz.Portal.Bo;
 using digioz.Portal.Web.Areas.Admin.Models.ViewModels;
@@ -30,6 +31,10 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 						'' AS [HostName], '' AS [Platform], '' AS [Referrer], '' AS [UserAgent], '' AS [UserLanguage], '' AS [SessionId]
 						FROM [VisitorInfo] ORDER BY Id DESC;";
             model.Visitors = (List<VisitorInfo>)_visitorInfoLogic.GetQueryString(query);
+
+            // Get Visitor Yearly Chart
+            var chartLogic = new ChartLogic();
+            model.VisitorYearlyHits = chartLogic.GetVisitorYearlyHits();
 
             return View(model);
         }

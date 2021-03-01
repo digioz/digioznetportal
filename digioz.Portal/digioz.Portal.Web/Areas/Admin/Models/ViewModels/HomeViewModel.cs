@@ -10,5 +10,8 @@ namespace digioz.Portal.Web.Areas.Admin.Models.ViewModels
 	{
 		public List<VisitorInfo> Visitors { get; set; }
 
+		public Dictionary<string, int> VisitorYearlyHits { get; set; }
+
+		public Dictionary<string, int> VisitorMonthlyHits { get; set; }
 	}
 }

@@ -3,7 +3,8 @@
 
 @{ 
 	ViewBag.Title = "Index";
-	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml"; 
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+	var vyh = Model.VisitorYearlyHits;
 }
 
 @section HeaderScripts {
@@ -14,13 +15,59 @@
 @section FooterScripts {
 	<script src="~/admin/js/Chart.min.js"></script>
 	<script src="~/admin/assets/demo/chart-area-demo.js"></script>
-	<script src="~/admin/assets/demo/chart-bar-demo.js"></script>
-	<script src="~/admin/js/jquery.dataTables.min.js"></script>
+	@*<script src="~/admin/assets/demo/chart-bar-demo.js"></script>*@
 	<script src="~/admin/js/dataTables.bootstrap4.min.js"></script>
-	<script src="~/admin/assets/demo/datatables-demo.js"></script>
 	<script src="~/js/mvc-grid/mvc-grid.js"></script>
 	<script>
 		document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+	</script>
+	<script>
+		// Set new default font family and font color to mimic Bootstrap's default styling
+		Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+		Chart.defaults.global.defaultFontColor = '#292b2c';
+
+		// Bar Chart Example
+		var ctx = document.getElementById("visitorHitsChart");
+		var myLineChart = new Chart(ctx, {
+			type: 'bar',
+			data: {
+				labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+				datasets: [{
+					label: "Hits",
+					backgroundColor: "rgba(2,117,216,1)",
+					borderColor: "rgba(2,117,216,1)",
+					data: [ @vyh["Jan"], @vyh["Feb"], @vyh["Mar"], @vyh["Apr"], @vyh["May"], @vyh["Jun"], @vyh["Jul"], @vyh["Aug"], @vyh["Sep"], @vyh["Oct"], @vyh["Nov"], @vyh["Dec"] ],
+				}],
+			},
+			options: {
+				scales: {
+					xAxes: [{
+						time: {
+							unit: 'month'
+						},
+						gridLines: {
+							display: false
+						},
+						ticks: {
+							maxTicksLimit: 6
+						}
+					}],
+					yAxes: [{
+						ticks: {
+							min: 0,
+							max: 1000,
+							maxTicksLimit: 5
+						},
+						gridLines: {
+							display: true
+						}
+					}],
+				},
+				legend: {
+					display: false
+				}
+			}
+		});
 	</script>
 }
 
@@ -28,7 +75,8 @@
 	<div class="container-fluid">
 		<h1 class="mt-4">Dashboard</h1>
 		<ol class="breadcrumb mb-4">
-			<li class="breadcrumb-item active">Admin Dashboard</li>
+			<li class="breadcrumb-item active">Home</li>
+			<li class="breadcrumb-item">Index</li>
 		</ol>
 		<div class="row">
 			<div class="col-xl-3 col-md-6">
@@ -73,7 +121,7 @@
 				<div class="card mb-4">
 					<div class="card-header">
 						<i class="fas fa-chart-area mr-1"></i>
-						Area Chart Example
+						Daily Visits for this Month
 					</div>
 					<div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
 				</div>
@@ -82,9 +130,9 @@
 				<div class="card mb-4">
 					<div class="card-header">
 						<i class="fas fa-chart-bar mr-1"></i>
-						Bar Chart Example
+						Visitor Hits by Month
 					</div>
-					<div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>
+					<div class="card-body"><canvas id="visitorHitsChart" width="100%" height="40"></canvas></div>
 				</div>
 			</div>
 		</div>
