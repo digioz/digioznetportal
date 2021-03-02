@@ -4,7 +4,9 @@
 @{ 
 	ViewBag.Title = "Index";
 	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
-	var vyh = Model.VisitorYearlyHits;
+	// var vyh = Model.VisitorYearlyHits;
+	var vyhKeys = Model.VisitorYearlyHits.Keys.ToArray();
+	var vyhValues = Model.VisitorYearlyHits.Values.ToArray();
 }
 
 @section HeaderScripts {
@@ -31,12 +33,12 @@
 		var myLineChart = new Chart(ctx, {
 			type: 'bar',
 			data: {
-				labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+				labels: @Html.Raw(Json.Serialize(vyhKeys)),
 				datasets: [{
 					label: "Hits",
 					backgroundColor: "rgba(2,117,216,1)",
 					borderColor: "rgba(2,117,216,1)",
-					data: [ @vyh["Jan"], @vyh["Feb"], @vyh["Mar"], @vyh["Apr"], @vyh["May"], @vyh["Jun"], @vyh["Jul"], @vyh["Aug"], @vyh["Sep"], @vyh["Oct"], @vyh["Nov"], @vyh["Dec"] ],
+					data: @Html.Raw(Json.Serialize(vyhValues)),
 				}],
 			},
 			options: {
