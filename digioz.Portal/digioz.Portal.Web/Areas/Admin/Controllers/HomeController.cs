@@ -36,6 +36,9 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             var chartLogic = new ChartLogic();
             model.VisitorYearlyHits = chartLogic.GetVisitorYearlyHits();
 
+            // Get Visitor Monthly Chart
+            model.VisitorMonthlyHits = chartLogic.GetVisitorMonthlyHits();
+
             return View(model);
         }
     }

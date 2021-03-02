@@ -4,21 +4,20 @@
 @{ 
 	ViewBag.Title = "Index";
 	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
-	// var vyh = Model.VisitorYearlyHits;
+
 	var vyhKeys = Model.VisitorYearlyHits.Keys.ToArray();
 	var vyhValues = Model.VisitorYearlyHits.Values.ToArray();
+
+	var vmhKeys = Model.VisitorMonthlyHits.Keys.ToArray();
+	var vmhValues = Model.VisitorMonthlyHits.Values.ToArray();
 }
 
 @section HeaderScripts {
-	<link href="~/admin/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
 	<link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet">
 }
 
 @section FooterScripts {
 	<script src="~/admin/js/Chart.min.js"></script>
-	<script src="~/admin/assets/demo/chart-area-demo.js"></script>
-	@*<script src="~/admin/assets/demo/chart-bar-demo.js"></script>*@
-	<script src="~/admin/js/dataTables.bootstrap4.min.js"></script>
 	<script src="~/js/mvc-grid/mvc-grid.js"></script>
 	<script>
 		document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
@@ -62,6 +61,62 @@
 						},
 						gridLines: {
 							display: true
+						}
+					}],
+				},
+				legend: {
+					display: false
+				}
+			}
+		});
+	</script>
+	<script>
+		// Set new default font family and font color to mimic Bootstrap's default styling
+		Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+		Chart.defaults.global.defaultFontColor = '#292b2c';
+
+		// Area Chart Example
+		var ctx = document.getElementById("myAreaChart");
+		var myLineChart = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: @Html.Raw(Json.Serialize(vmhKeys)),
+				datasets: [{
+					label: "Hits",
+					lineTension: 0.3,
+					backgroundColor: "rgba(2,117,216,0.2)",
+					borderColor: "rgba(2,117,216,1)",
+					pointRadius: 5,
+					pointBackgroundColor: "rgba(2,117,216,1)",
+					pointBorderColor: "rgba(255,255,255,0.8)",
+					pointHoverRadius: 5,
+					pointHoverBackgroundColor: "rgba(2,117,216,1)",
+					pointHitRadius: 50,
+					pointBorderWidth: 2,
+					data: @Html.Raw(Json.Serialize(vmhValues)),
+				}],
+			},
+			options: {
+				scales: {
+					xAxes: [{
+						time: {
+							unit: 'date'
+						},
+						gridLines: {
+							display: false
+						},
+						ticks: {
+							maxTicksLimit: 7
+						}
+					}],
+					yAxes: [{
+						ticks: {
+							min: 0,
+							max: 1000,
+							maxTicksLimit: 5
+						},
+						gridLines: {
+							color: "rgba(0, 0, 0, .125)",
 						}
 					}],
 				},

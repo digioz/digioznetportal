@@ -45,5 +45,40 @@ namespace digioz.Portal.Bll
 
 			return models;
 		}
+
+		public Dictionary<string, int> GetVisitorMonthlyHits()
+		{
+			var models = new Dictionary<string, int>();
+
+			using (var context = new digiozPortalContext())
+			using (var command = context.Database.GetDbConnection().CreateCommand())
+			{
+				var query = @"SELECT DAY(Timestamp) AS [Day], COUNT(*) AS [Count] FROM VisitorInfo
+							WHERE YEAR(Timestamp) = YEAR(dateadd(dd, -1, GetDate()))
+							AND MONTH(Timestamp) = MONTH(GetDate())
+							GROUP BY DAY(Timestamp)
+							ORDER BY DAY(Timestamp)";
+
+				command.CommandText = query;
+				context.Database.OpenConnection();
+
+				using (var result = command.ExecuteReader())
+				{
+					int count = result.FieldCount;
+
+					var dt = new DataTable();
+					dt.Load(result);
+
+					foreach (DataRow dr in dt.Rows)
+					{
+						models.Add(dr["Day"].ToString(), Convert.ToInt32(dr["Count"]));
+					}
+				}
+
+				context.Database.CloseConnection();
+			}
+
+			return models;
+		}
 	}
 }
