@@ -16,12 +16,15 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
     public class HomeController : Controller
     {
         private readonly ILogic<VisitorInfo> _visitorInfoLogic;
+        private readonly ILogic<Log> _logLogic;
 
         public HomeController(
-            ILogic<VisitorInfo> visitorInfoLogic
+            ILogic<VisitorInfo> visitorInfoLogic,
+            ILogic<Log> logLogic
         )
         {
             _visitorInfoLogic = visitorInfoLogic;
+            _logLogic = logLogic;
         }
 
         public async Task<IActionResult> Index() {
@@ -39,7 +42,23 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             // Get Visitor Monthly Chart
             model.VisitorMonthlyHits = chartLogic.GetVisitorMonthlyHits();
 
+            // Get Log Counts
+            model.GetLogCounts = chartLogic.GetLogCounts();
+
             return View(model);
         }
+
+        public async Task<IActionResult> Details(string id)
+		{
+            var query = "SELECT TOP (1000) [Id],LEFT([Message],150) AS [Message], [Level], [Timestamp], '' AS [Exception], '' AS [LogEvent] FROM Log ORDER BY Id DESC;";
+            var logs = (List<Log>)_logLogic.GetQueryString(query);
+
+            if (id != "All")
+			{
+                logs = logs.Where(x => x.Level == id).ToList();
+			}
+
+            return View(logs);
+		}
     }
 }

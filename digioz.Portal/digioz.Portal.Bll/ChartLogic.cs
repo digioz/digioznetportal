@@ -80,5 +80,55 @@ namespace digioz.Portal.Bll
 
 			return models;
 		}
+
+		public Dictionary<string, int> GetLogCounts()
+		{
+			var models = new Dictionary<string, int>();
+
+			using (var context = new digiozPortalContext())
+			using (var command = context.Database.GetDbConnection().CreateCommand())
+			{
+				var query = @"SELECT [Level], COUNT(*) As [Count] FROM [Log] GROUP BY [Level];";
+
+				command.CommandText = query;
+				context.Database.OpenConnection();
+
+				using (var result = command.ExecuteReader())
+				{
+					int count = result.FieldCount;
+					int total = 0;
+
+					var dt = new DataTable();
+					dt.Load(result);
+
+					foreach (DataRow dr in dt.Rows)
+					{
+						models.Add(dr["Level"].ToString(), Convert.ToInt32(dr["Count"]));
+						total += Convert.ToInt32(dr["Count"]);
+					}
+
+					models.Add("All", total);
+				}
+
+				if (!models.ContainsKey("Error"))
+				{
+					models.Add("Error", 0);
+				}
+
+				if (!models.ContainsKey("Warning"))
+				{
+					models.Add("Warning", 0);
+				}
+
+				if (!models.ContainsKey("Information"))
+				{
+					models.Add("Information", 0);
+				}
+
+				context.Database.CloseConnection();
+			}
+
+			return models;
+		}
 	}
 }

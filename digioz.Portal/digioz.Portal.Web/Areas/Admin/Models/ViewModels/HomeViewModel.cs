@@ -13,5 +13,7 @@ namespace digioz.Portal.Web.Areas.Admin.Models.ViewModels
 		public Dictionary<string, int> VisitorYearlyHits { get; set; }
 
 		public Dictionary<string, int> VisitorMonthlyHits { get; set; }
+
+		public Dictionary<string, int> GetLogCounts { get; set; }
 	}
 }
