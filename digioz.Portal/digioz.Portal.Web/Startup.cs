@@ -1,5 +1,6 @@
 using digioz.Portal.Dal;
 using digioz.Portal.Web.Data;
+using digioz.Portal.Web.Hubs;
 using digioz.Portal.Web.Models.AppStart;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -90,6 +91,9 @@ namespace digioz.Portal.Web
 
             // Startup Configuration
             services.AddHostedService<LifetimeEventsHostedService>();
+
+            // Add SignalR Chat
+            services.AddSignalR();
         }
          
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -123,6 +127,7 @@ namespace digioz.Portal.Web
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
                 endpoints.MapRazorPages();
+                endpoints.MapHub<ChatHub>("/chathub");
             });
         }
     }
