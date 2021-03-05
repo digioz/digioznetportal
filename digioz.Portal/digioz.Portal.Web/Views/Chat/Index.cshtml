@@ -4,13 +4,26 @@
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			$("#chat-message-container").animate({ scrollTop: $(document).height() }, "slow");
+
+			$('#sendButton').click(function () {
+				$("#chat-message-container").animate({ scrollTop: $(document).height() }, "slow");
+				return false;
+			});
+		});
+	</script>
+}
+
 <div class="container">
 	<div class="row">&nbsp;</div>
 	<input type="text" id="userInput" value="@ViewBag.Username" hidden />
 	<input type="text" id="userId" value="@ViewBag.UserId" hidden />
 
 	<div class="row">
-		<div class="col-8"><input class="form-control" type="text" id="messageInput" /></div>
+		<div class="col-8"><input class="form-control" type="text" name="messageInput" id="messageInput" /></div>
 		<input type="button" id="sendButton" value="Send Message" class="btn btn-primary" />
 	</div>
 </div>
@@ -20,8 +33,16 @@
 	</div>
 </div>
 <div class="row">
-	<div class="chat-list">
-		<ul id="messagesList"></ul>
+	<div id="chat-message-container" name="chat-message-container" class="chat-list">
+		<div id="chatlistbox">
+			<ul id="messagesList">
+				@foreach (var chat in Model)
+				{
+					<li>@chat.UserId says @chat.Message </li>
+				}
+
+			</ul>
+		</div>
 	</div>
 </div>
 

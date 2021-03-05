@@ -34,7 +34,10 @@ namespace digioz.Portal.Web.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var chats = _chatLogic.GetLatestChats();
+            var query = @"SELECT TOP (50) * FROM [Chat] ORDER BY [Id] DESC;";
+            var chats = (List<Chat>)_chatLogic.GetQueryString(query);
+            chats.Reverse();
+
             ViewBag.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             ViewBag.Username = User.Identity.Name;
 
