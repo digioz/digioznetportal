@@ -329,3 +329,14 @@ body {
 .field-validation-error {
     color: #f60f0f;
 }
+
+
+.chat-list {
+    position: relative;
+    height: 600px;
+    width: 100%;
+    overflow-y: auto;
+    background-color: #e5e5e5;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+}
