@@ -35,27 +35,10 @@ namespace digioz.Portal.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var chats = _chatLogic.GetLatestChats();
+            ViewBag.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ViewBag.Username = User.Identity.Name;
 
             return View(chats);
-        }
-
-        [Authorize]
-        [HttpPost]
-        public async Task<JsonResult> Add(string message)
-        {
-            if (!string.IsNullOrEmpty(message) && message != "[object HTMLInputElement]")
-            {
-                var chat = new Chat
-                {
-                    Timestamp = DateTime.Now,
-                    Message = HttpUtility.HtmlEncode(message),
-                    UserId = User.FindFirstValue(ClaimTypes.NameIdentifier) 
-                };
-
-                _chatLogic.Add(chat);
-            }
-
-            return null;
         }
 
         public async Task<JsonResult> Online()
