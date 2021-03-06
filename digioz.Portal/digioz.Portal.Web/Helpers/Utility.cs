@@ -1042,7 +1042,7 @@ namespace digioz.Portal.Web.Helpers
 		{
 			try
 			{
-				var prevSession = visitorSessionLogic.GetAll().SingleOrDefault(x => x.SessionId == sessionId);
+				var prevSession = visitorSessionLogic.GetGeneric(x => x.SessionId == sessionId).SingleOrDefault();
 
 				if (prevSession != null)
 				{

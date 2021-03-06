@@ -44,10 +44,10 @@ namespace digioz.Portal.Web.Controllers
             return View(chats);
         }
 
-        public async Task<JsonResult> Online()
+        public async Task<JsonResult> Online(DateTime lastOnline)
         {
             var dateTimeLastOnline = DateTime.Now.AddMinutes(-1);
-            var online = new List<VisitorSession>(); // _visitorSessionLogic.GetChatVisitorSessions(dateTimeLastOnline);       
+            var online = _visitorSessionLogic.GetGeneric(x => x.PageUrl.Contains("/Chat") && x.DateModified > lastOnline).Select(x => x.Username).Distinct().ToList();       
 
             return Json(online);
         }
