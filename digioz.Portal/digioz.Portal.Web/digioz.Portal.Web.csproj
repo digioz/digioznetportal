@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="21.1.0" />
+    <PackageReference Include="ClosedXML" Version="0.95.4" />
     <PackageReference Include="MaxMind.Db" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
@@ -43,6 +43,10 @@
     <ProjectReference Include="..\digioz.Portal.Dal\digioz.Portal.Dal.csproj" />
     <ProjectReference Include="..\digioz.Portal.Payment\digioz.Portal.Payment.csproj" />
     <ProjectReference Include="..\digioz.Portal.Utilities\digioz.Portal.Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\data\" />
   </ItemGroup>
 
 </Project>
