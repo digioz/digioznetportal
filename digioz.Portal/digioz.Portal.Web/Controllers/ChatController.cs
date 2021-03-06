@@ -44,8 +44,9 @@ namespace digioz.Portal.Web.Controllers
             return View(chats);
         }
 
-        public async Task<JsonResult> Online(DateTime lastOnline)
+        public async Task<JsonResult> Online()
         {
+            var lastOnline = DateTime.Now.AddMinutes(-2);
             var dateTimeLastOnline = DateTime.Now.AddMinutes(-1);
             var online = _visitorSessionLogic.GetGeneric(x => x.PageUrl.Contains("/Chat") && x.DateModified > lastOnline).Select(x => x.Username).Distinct().ToList();       
 
