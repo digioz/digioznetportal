@@ -1,4 +1,4 @@
-﻿@model IEnumerable<digioz.Portal.Bo.Chat>
+﻿@model IEnumerable<digioz.Portal.Bo.ViewModels.ChatViewModel>
 @{
 	ViewBag.Title = "Chat";
 	Layout = "~/Views/Shared/_Layout.cshtml";
@@ -16,7 +16,7 @@
 		});
 	</script>
 }
-
+ 
 <div class="container">
 	<div class="row">&nbsp;</div>
 	<input type="text" id="userInput" value="@ViewBag.Username" hidden />
@@ -38,7 +38,7 @@
 			<ul id="messagesList">
 				@foreach (var chat in Model)
 				{
-					<li>@chat.UserId says @chat.Message </li>
+					<li>@chat.UserName: @chat.Message </li>
 				}
 
 			</ul>

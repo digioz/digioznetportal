@@ -8,6 +8,7 @@ using digioz.Portal.Bll;
 using digioz.Portal.Bll.Interfaces;
 using digioz.Portal.Bo;
 using digioz.Portal.Web.Controllers;
+using digioz.Portal.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -34,8 +35,7 @@ namespace digioz.Portal.Web.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var query = @"SELECT TOP (50) * FROM [Chat] ORDER BY [Id] DESC;";
-            var chats = (List<Chat>)_chatLogic.GetQueryString(query);
+            var chats = _chatLogic.GetLatestChats();
             chats.Reverse();
 
             ViewBag.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
