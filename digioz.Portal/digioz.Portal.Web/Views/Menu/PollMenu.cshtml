@@ -14,10 +14,14 @@
             <center>
                 @if (!Model.IsClosed)
                 {
-                    <div class="btn btn-primary btn-xs" style="text-align: center;">@Html.ActionLink("Add Vote", "Add", "Polls", new { Area = "", id = Model.Id.ToString() }, new { @style = "color:#ffffff;" })</div>
-
+                    <div class="btn btn-primary btn-xs" style="text-align: center;">
+                        @Html.ActionLink("Add Vote", "Add", "Polls", new { Area = "", id = Model.Id.ToString() }, new { @style = "color:#ffffff;" })
+                    </div>
                 }
-                <div class="btn btn-primary btn-xs" style="text-align: center;">@Html.ActionLink("Other Polls", "Index", "Polls", null, new { @style = "color:#ffffff;" })</div>
+
+                <div class="btn btn-primary btn-xs" style="text-align: center;">
+                    @Html.ActionLink("Other Polls", "Index", "Polls", null, new { @style = "color:#ffffff;" })
+                </div>
             </center>
         </div>
     </div>

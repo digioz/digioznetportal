@@ -1,4 +1,5 @@
-﻿using digioz.Portal.Dal;
+﻿using digioz.Portal.Bo.ViewModels;
+using digioz.Portal.Dal;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -123,6 +124,44 @@ namespace digioz.Portal.Bll
 				if (!models.ContainsKey("Information"))
 				{
 					models.Add("Information", 0);
+				}
+
+				context.Database.CloseConnection();
+			}
+
+			return models;
+		}
+
+		public List<PollDisplayChartViewModel> GetPollResults(string id)
+		{
+			var models = new List<PollDisplayChartViewModel>();
+
+			using (var context = new digiozPortalContext())
+			using (var command = context.Database.GetDbConnection().CreateCommand())
+			{
+				var query = @"select pa.Answer, count(pv.Id) CountOf from PollVote pv, PollAnswer pa 
+                             where pa.Id = pv.PollAnswerId and pa.PollId = '" + id + "' group by pa.Answer;";
+
+				command.CommandText = query;
+				context.Database.OpenConnection();
+
+				using (var result = command.ExecuteReader())
+				{
+					int count = result.FieldCount;
+
+					var dt = new DataTable();
+					dt.Load(result);
+
+					foreach (DataRow dr in dt.Rows)
+					{
+						var pollDisplayChart = new PollDisplayChartViewModel()
+						{
+							Answer = dr["Answer"].ToString(),
+							CountOf = Convert.ToInt32(dr["CountOf"])
+						};
+
+						models.Add(pollDisplayChart);
+					}
 				}
 
 				context.Database.CloseConnection();

@@ -1,0 +1,88 @@
+﻿@model digioz.Portal.Bo.Poll
+
+@{
+    ViewBag.Title = "Edit Poll";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Edit Poll</h2>
+
+			<p>
+				<a class="btn btn-sm btn-primary" href="@Url.Action("CreateAnswer", "PollManager", new { id = Model.Id, area = "Admin" })">Create New Answer</a>
+			</p>
+
+			@using (Html.BeginForm())
+			{
+				@Html.AntiForgeryToken()
+
+				<div class="form-horizontal">
+					<hr />
+					@Html.ValidationSummary(true)
+					@Html.HiddenFor(model => model.Id)
+
+					<div class="form-group">
+						<label class="control-label col-md-2">Poll Name</label>
+						<div class="col-md-10">
+							@Html.TextBoxFor(model => model.Slug, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Slug, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-2">Is Closed?</label>
+						<div class="col-md-10">
+							@Html.EditorFor(model => model.IsClosed)
+							@Html.ValidationMessageFor(model => model.IsClosed, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-2">Featured?</label>
+						<div class="col-md-10">
+							@Html.EditorFor(model => model.Featured)
+							@Html.ValidationMessageFor(model => model.Featured, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-2">@Html.DisplayNameFor(model => model.AllowMultipleOptionsVote)</label>
+						<div class="col-md-10">
+							@Html.EditorFor(model => model.AllowMultipleOptionsVote)
+							@Html.ValidationMessageFor(model => model.AllowMultipleOptionsVote, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-md-offset-2 col-md-10">
+							<input type="submit" value="Save" class="btn btn-primary" />
+						</div>
+					</div>
+				</div>
+			}
+
+			<table class="table">
+				<tr>
+					<th>Option</th>
+					<th>Action</th>
+				</tr>
+				@foreach (var item in ViewBag.PollAnswers)
+				{
+					<tr>
+						<td>@item.Answer</td>
+						<td>
+							<a href="@Url.Action("EditAnswer", new { id = item.Id })"><img class="sb-nav-link-icon" src="~/img/images/icons/16x16/Edit.png" alt="Edit" /></a>
+							<a href="@Url.Action("DeleteAnswer", new { id = item.Id })"><img class="sb-nav-link-icon" src="~/img/images/icons/16x16/Cancel.png" alt="Delete" /></a>
+						</td>
+					</tr>
+				}
+			</table>
+
+			<div>
+				@Html.ActionLink("Back to List", "Index")
+			</div>
+		</div>
+	</div>
+</div>
