@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace digioz.Portal.Web.Controllers
 {
-    public class PollChartsController : Controller
+    public class PollChartsController : Controller 
     {
         private readonly ILogic<Poll> _pollLogic;
         private readonly ILogic<PollAnswer> _pollAnswerLogic;
@@ -60,28 +60,15 @@ namespace digioz.Portal.Web.Controllers
                 var chartLogic = new ChartLogic();
                 var pollResults = chartLogic.GetPollResults(id);
 
-                if (poll == null || pollResults != null)
-                {
-                    return RedirectToAction("ChartNotAvailable");
-                }
-
                 ViewBag.PollTitle = poll.Slug;
                 ViewBag.PollColumn = "Answer";
 
                 return View(pollResults);
             }
-            catch (Exception)
+            catch 
             {
-               return RedirectToAction("ChartNotAvailable");
+                return RedirectToAction("Index", "Home");
             }
         }
-
-        public FileResult ChartNotAvailable()
-        {
-            var path = GetImagePath() + "\\images\\Chart_Results_Not_Availabe.jpg";
-
-            return File(path, "image/jpg", "Chart_Results_Not_Availabe.jpg");
-        }
-
     }
 }

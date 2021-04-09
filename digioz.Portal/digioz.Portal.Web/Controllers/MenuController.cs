@@ -9,6 +9,7 @@ using digioz.Portal.Web.Models.ViewModels;
 using digioz.Portal.Web.Helpers;
 using digioz.Portal.Bll.Interfaces;
 using System.Threading.Tasks;
+using digioz.Portal.Bll;
 
 namespace digioz.Portal.Web.Controllers
 {
@@ -72,7 +73,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         public async Task<IActionResult> UserMenu() 
-        {
+        { 
             return PartialView("UserMenu");
         }
 
@@ -109,14 +110,16 @@ namespace digioz.Portal.Web.Controllers
             return PartialView("StoreMenu", productCategories);
         }
 
-        [ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
-        public async Task<IActionResult> PollMenu()
+		[ResponseCache(VaryByHeader = "User-Agent", Duration = 300)]
+		public async Task<IActionResult> PollMenu()
         {
             var polls = _pollLogic.GetGeneric(x => x.Featured == true);
             polls = polls.OrderByDescending(x => x.DateCreated).ToList();
             var poll = polls.Take(1).SingleOrDefault();
 
-            Response.ContentType = "text/html";
+            var chartLogic = new ChartLogic();
+            var pollResults = chartLogic.GetPollResults(poll.Id);
+            ViewBag.PollResults = pollResults;
 
             return PartialView("PollMenu", poll);
         }
