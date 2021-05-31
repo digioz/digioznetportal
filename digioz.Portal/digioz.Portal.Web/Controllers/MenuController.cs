@@ -115,11 +115,15 @@ namespace digioz.Portal.Web.Controllers
         {
             var polls = _pollLogic.GetGeneric(x => x.Featured == true);
             polls = polls.OrderByDescending(x => x.DateCreated).ToList();
-            var poll = polls.Take(1).SingleOrDefault();
+            var poll = new Poll();
 
-            var chartLogic = new ChartLogic();
-            var pollResults = chartLogic.GetPollResults(poll.Id);
-            ViewBag.PollResults = pollResults;
+            if (polls.Any())
+			{
+                poll = polls.Take(1).SingleOrDefault();
+                var chartLogic = new ChartLogic();
+                var pollResults = chartLogic.GetPollResults(poll.Id);
+                ViewBag.PollResults = pollResults;
+			}
 
             return PartialView("PollMenu", poll);
         }

@@ -55,8 +55,7 @@ namespace digioz.Portal.Web.Controllers
 
             try
             {
-
-                var poll = _pollLogic.Get(id);
+                var poll = _pollLogic.Get(id); 
                 var chartLogic = new ChartLogic();
                 var pollResults = chartLogic.GetPollResults(id);
 
