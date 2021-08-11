@@ -1,0 +1,308 @@
+﻿@model digioz.Portal.Web.Areas.Admin.Models.ViewModels.OrderManagerViewModel
+@using System.Globalization
+@using digioz.Portal.Utilities
+@{
+    ViewBag.Title = "Order Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2>Order Details</h2>
+            <div>
+                <hr />
+                <dl class="dl-horizontal">
+
+                    <dt>
+                        Invoice Number
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.InvoiceNumber)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.FirstName)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.FirstName)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.LastName)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.LastName)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.OrderDate)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.OrderDate)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.ShippingAddress)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.ShippingAddress)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.ShippingAddress2)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.ShippingAddress2)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.ShippingCity)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.ShippingCity)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.ShippingState)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.ShippingState)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.ShippingZip)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.ShippingZip)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.ShippingCountry)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.ShippingCountry)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.BillingAddress)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.BillingAddress)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.BillingAddress2)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.BillingAddress2)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.BillingCity)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.BillingCity)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.BillingState)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.BillingState)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.BillingZip)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.BillingZip)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.BillingCountry)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.BillingCountry)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.Phone)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.Phone)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.Email)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.Email)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.Total)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.Total)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.Ccnumber)
+                    </dt>
+
+                    <dd>
+                        @StringUtils.CreditCardNumberShowLast4Chars(Model.Order.Ccnumber)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.Ccexp)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.Ccexp)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.CccardCode)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.CccardCode)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.Ccamount)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.Ccamount)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.TrxDescription)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.TrxDescription)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.TrxApproved)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.TrxApproved)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.TrxAuthorizationCode)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.TrxAuthorizationCode)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.TrxMessage)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.TrxMessage)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.TrxResponseCode)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.TrxResponseCode)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Order.TrxId)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Order.TrxId)
+                    </dd>
+
+                </dl>
+            </div>
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Product Name</th>
+                        <th>Description</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Size</th>
+                        <th>Color</th>
+                        <th>MaterialType</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+
+                        foreach (var item in Model.OrderDetails)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@Html.ActionLink(item.ProductId, "Details", "ProductManager", new { id = item.ProductId }, null)</td>
+
+                                <td>@item.Quantity</td>
+                                <td>
+                                    @{
+                                        string price = Convert.ToString(item.UnitPrice * item.Quantity, CultureInfo.CurrentCulture);
+                                        <span>@price</span>
+                                    }
+                                </td>
+                                <td>@item.Size</td>
+                                <td>@item.Color</td>
+                                <td>@item.MaterialType</td>
+                            </tr>
+                            if (!string.IsNullOrEmpty(item.Notes))
+                            {
+                                <tr>
+                                    <td colspan="7">
+                                        @item.Notes
+                                    </td>
+                                </tr>
+                            }
+
+                            i++;
+                        }
+                    }
+
+                </tbody>
+            </table>
+
+            <div>
+                @Html.ActionLink("Edit", "Edit", new { id = Model.Order.Id }) |
+                @Html.ActionLink("Back to List", "Index")
+            </div>
+        </div>
+    </div>
+</div>
