@@ -16,6 +16,12 @@ namespace digioz.Portal.Payment
     public class MakePayment : IMakePayment
     {
         IMakePayment _makePayment;
+
+        public MakePayment()
+		{
+
+		}
+
         public MakePayment(IMakePayment makePayment) 
         {
             _makePayment = makePayment;
@@ -25,6 +31,7 @@ namespace digioz.Portal.Payment
         {
             throw new NotImplementedException();
         }
+
         public PayResponse ProcessPayment(Pay pay, PaymentType payType, PaymentTypeKey key, List<PayLineItem> payLineItems )
         {
             IMakePayment makePayment;

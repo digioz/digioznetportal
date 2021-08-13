@@ -1,0 +1,243 @@
+﻿@model IEnumerable<digioz.Portal.Web.Areas.Admin.Models.ViewModels.OrderManagerViewModel>
+@using System.Globalization
+@using digioz.Portal.Bo
+@using digioz.Portal.Bll.Interfaces 
+
+@{
+	ViewBag.Title = "Order History";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	ILogic<Product> productLogic = ViewBag.ProductLogic;
+}
+
+<h2>Order History</h2>
+
+@foreach (var item in Model)
+{
+	<div>
+		<hr />
+		<dl class="dl-horizontal">
+
+			<dt>
+				Invoice Number:
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.InvoiceNumber)
+			</dd>
+
+			<dt>
+				Order Date
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.OrderDate)
+			</dd>
+
+			<dt>
+				Shipping Address
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.ShippingAddress)
+			</dd>
+
+			<dt>
+				Shipping Address 2
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.ShippingAddress2)
+			</dd>
+
+			<dt>
+				Shipping City
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.ShippingCity)
+			</dd>
+
+			<dt>
+				Shipping State
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.ShippingState)
+			</dd>
+
+			<dt>
+				Shipping Zip
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.ShippingZip)
+			</dd>
+
+			<dt>
+				Shipping Country
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.ShippingCountry)
+			</dd>
+
+			<dt>
+				Billing Address
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.BillingAddress)
+			</dd>
+
+			<dt>
+				Billing Address 2
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.BillingAddress2)
+			</dd>
+
+			<dt>
+				Billing City
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.BillingCity)
+			</dd>
+
+			<dt>
+				Billing State
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.BillingState)
+			</dd>
+
+			<dt>
+				Billing Zip
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.BillingZip)
+			</dd>
+
+			<dt>
+				Billing Country
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.BillingCountry)
+			</dd>
+
+			<dt>
+				Phone
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.Phone)
+			</dd>
+
+			<dt>
+				Email
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.Email)
+			</dd>
+
+			<dt>
+				Order Total
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.Total)
+			</dd>
+
+			<dt>
+				Credit Card Number
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.Ccnumber)
+			</dd>
+
+			<dt>
+				Credit Card Expiration Date
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.Ccexp)
+			</dd>
+
+			<dt>
+				Transaction Status
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.TrxApproved)
+			</dd>
+
+			<dt>
+				Transaction ID
+			</dt>
+
+			<dd>
+				@Html.DisplayFor(model => item.Order.TrxId)
+			</dd>
+
+		</dl>
+	</div>
+
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Product Name</th>
+				<th>Description</th>
+				<th>Quantity</th>
+				<th>Price</th>
+			</tr>
+		</thead>
+		<tbody>
+			@{
+				int i = 1;
+
+				foreach (var lineItem in item.OrderDetails)
+				{
+					var product = productLogic.Get(lineItem.ProductId);
+
+					<tr>
+						<td>@i</td>
+						@if (product.Name == "Transaction Fee")
+						{
+							<td>@product.Name</td>
+						}
+						else
+						{
+							<td>@Html.ActionLink(product.Name, "Details", "Store", new { id = lineItem.ProductId }, null)</td>
+						}
+						<td>@Html.Raw(product.ShortDescription)</td>
+						<td>@lineItem.Quantity</td>
+						<td>
+							@{
+								string price = (lineItem.Quantity * product.Price).ToString("N", new CultureInfo("en-US"));
+							}
+							@price
+						</td>
+					</tr>
+
+					if (!string.IsNullOrEmpty(lineItem.Notes))
+					{
+						<tr>
+							<td colspan="7">
+								@lineItem.Notes
+							</td>
+						</tr>
+					}
+					i++;
+				}
+			}
+		</tbody>
+	</table>
+}
+

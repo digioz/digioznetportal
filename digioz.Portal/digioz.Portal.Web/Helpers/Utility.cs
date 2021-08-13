@@ -1375,5 +1375,67 @@ namespace digioz.Portal.Web.Helpers
 
             return result;
         }
+
+        public static bool AddLogEntry(string message, ILogic<Log> logLogic)
+        {
+            try
+            {
+                Log log = new Log();
+                log.Message = message;
+                log.Timestamp = DateTime.Now;
+
+                logLogic.Add(log);
+            }
+            catch
+            {
+                // Do nothing
+            }
+
+            return true;
+        }
+
+        public static bool SubmitMail(EmailModel email, ILogic<Log> logLogic)
+        {
+
+            bool result = false;
+
+            try
+            {
+                SmtpClient smtpClient = null;
+                MailMessage message = null;
+                System.Net.Mail.Attachment attachment = null;
+                smtpClient = new SmtpClient(email.SMTPServer);
+                smtpClient.Credentials = new NetworkCredential(email.SMTPUsername, email.SMTPPassword);
+
+                if (email.SMTPPort > 0)
+                {
+                    smtpClient.Port = Convert.ToInt32(email.SMTPPort);
+                }
+
+                message = new MailMessage(email.FromEmail, email.ToEmail, email.Subject, email.Message);
+
+                message.BodyEncoding = Encoding.UTF8;
+                message.IsBodyHtml = true;
+                message.Priority = MailPriority.Normal;
+
+                if (!string.IsNullOrEmpty(email.Attachment))
+                {
+                    attachment = new System.Net.Mail.Attachment(email.Attachment);
+                    message.Attachments.Add(attachment);
+                }
+
+                smtpClient.Send(message);
+
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                AddLogEntry(ex.Message + email.ToEmail + "|" + email.Message, logLogic);
+                string lsException = ex.Message;
+                result = false;
+            }
+
+            return result;
+        }
     }
 }

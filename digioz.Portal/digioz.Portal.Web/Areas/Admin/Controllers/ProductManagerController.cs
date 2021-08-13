@@ -81,6 +81,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             }
 
             var product = _productLogic.Get(id);
+            ViewBag.ProductCategory = _productCategoryLogic.Get(product.ProductCategoryId);
 
             if (product == null)
             {
@@ -393,7 +394,8 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
                 return BadRequest();
             }
 
-            Product product = _productLogic.Get(id); 
+            Product product = _productLogic.Get(id);
+            ViewBag.ProductCategory = _productCategoryLogic.Get(product.ProductCategoryId);
 
             if (product == null)
             {

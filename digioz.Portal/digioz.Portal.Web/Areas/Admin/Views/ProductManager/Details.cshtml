@@ -1,226 +1,228 @@
 ﻿@model digioz.Portal.Bo.Product
-
+@using digioz.Portal.Bo 
 @{
-    ViewBag.Title = "Product Details";
-    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+	ViewBag.Title = "Product Details";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+	var productCategory = (ProductCategory)ViewBag.ProductCategory;
 }
 
 <div class="container">
-    <div class="row">
-        <div class="col-12">
-            <h2>Product Details</h2>
+	<div class="row">
+		<div class="col-12">
+			<h2>Product Details</h2>
 
-            <div>
-                <hr />
-                <dl class="dl-horizontal">
-                    <dt>
-                        @Html.DisplayNameFor(model => model.ProductCategoryId)
-                    </dt>
+			<div>
+				<hr />
+				<dl class="dl-horizontal">
+					<dt>
+						Category
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.ProductCategoryId)
-                    </dd>
+					<dd>
+						@productCategory.Name
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Name)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.Name)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.Name)
-                    </dd>
+					<dd>
+						@Html.DisplayFor(model => model.Name)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Make)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.Make)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.Make)
-                    </dd>
+					<dd>
+						@Html.DisplayFor(model => model.Make)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Model)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.Model)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.Model)
-                    </dd>
+					<dd>
+						@Html.DisplayFor(model => model.Model)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Sku)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.Sku)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.Sku)
-                    </dd>
+					<dd>
+						@Html.DisplayFor(model => model.Sku)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Image)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.Image)
+					</dt>
 
-                    <dd>
-                        @if (string.IsNullOrEmpty(Model.Image))
-                        {
-                            <img src="~/img/Products/Thumb/PictureAlbumIcon.png" />
-                        }
-                        else
-                        {
-                            <a href="~/img/Products/Full/@Model.Image">
-                                <img src="~/img/Products/Thumb/@Model.Image" />
-                            </a>
-                        }
-                    </dd>
+					<dd>
+						@if (string.IsNullOrEmpty(Model.Image))
+						{
+							<img src="~/img/Products/Thumb/PictureAlbumIcon.png" />
+						}
+						else
+						{
+							<a href="~/img/Products/Full/@Model.Image">
+								<img src="~/img/Products/Thumb/@Model.Image" />
+							</a>
+						}
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Price)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.Price)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.Price)
-                    </dd>
+					<dd>
+						@Html.DisplayFor(model => model.Price)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Cost)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.Cost)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.Cost)
-                    </dd>
+					<dd>
+						@Html.DisplayFor(model => model.Cost)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.QuantityPerUnit)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.QuantityPerUnit)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.QuantityPerUnit)
-                    </dd>
+					<dd>
+						@Html.DisplayFor(model => model.QuantityPerUnit)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Weight)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.Weight)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.Weight)
-                    </dd>
+					<dd>
+						@Html.DisplayFor(model => model.Weight)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Dimensions)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.Dimensions)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.Dimensions)
-                    </dd>
+					<dd>
+						@Html.DisplayFor(model => model.Dimensions)
+					</dd>
 
-                    <dt>
-                        Sizes
-                    </dt>
+					<dt>
+						Sizes
+					</dt>
 
-                    <dd>
-                        <ul>
-                            @foreach (var item in ViewBag.Sizes)
-                            {
-                                <li>@item.OptionValue</li>
-                            }
-                        </ul>
-                    </dd>
+					<dd>
+						<ul>
+							@foreach (var item in ViewBag.Sizes)
+							{
+								<li>@item.OptionValue</li>
+							}
+						</ul>
+					</dd>
 
-                    <dt>
-                        Colors
-                    </dt>
+					<dt>
+						Colors
+					</dt>
 
-                    <dd>
-                        <ul>
-                            @foreach (var item in ViewBag.Colors)
-                            {
-                                <li>@item.OptionValue</li>
-                            }
-                        </ul>
-                    </dd>
+					<dd>
+						<ul>
+							@foreach (var item in ViewBag.Colors)
+							{
+								<li>@item.OptionValue</li>
+							}
+						</ul>
+					</dd>
 
-                    <dt>
-                        Material Type
-                    </dt>
+					<dt>
+						Material Type
+					</dt>
 
-                    <dd>
-                        <ul>
-                            @foreach (var item in ViewBag.MaterialTypes)
-                            {
-                                <li>@item.OptionValue</li>
-                            }
-                        </ul>
-                    </dd>
+					<dd>
+						<ul>
+							@foreach (var item in ViewBag.MaterialTypes)
+							{
+								<li>@item.OptionValue</li>
+							}
+						</ul>
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.PartNumber)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.PartNumber)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.PartNumber)
-                    </dd>
+					<dd>
+						@Html.DisplayFor(model => model.PartNumber)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.ShortDescription)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.ShortDescription)
+					</dt>
 
-                    <dd>
-                        @Html.Raw(Model.ShortDescription)
-                    </dd>
+					<dd>
+						@Html.Raw(Model.ShortDescription)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Description)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.Description)
+					</dt>
 
-                    <dd>
-                        @Html.Raw(Model.Description)
-                    </dd>
+					<dd>
+						@Html.Raw(Model.Description)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.ManufacturerUrl)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.ManufacturerUrl)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.ManufacturerUrl)
-                    </dd>
+					<dd>
+						@Html.DisplayFor(model => model.ManufacturerUrl)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.UnitsInStock)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.UnitsInStock)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.UnitsInStock)
-                    </dd>
+					<dd>
+						@Html.DisplayFor(model => model.UnitsInStock)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.OutOfStock)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.OutOfStock)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.OutOfStock)
-                    </dd>
+					<dd>
+						@Html.DisplayFor(model => model.OutOfStock)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Notes)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.Notes)
+					</dt>
 
-                    <dd>
-                        @Html.Raw(Model.Notes)
-                    </dd>
+					<dd>
+						@Html.Raw(Model.Notes)
+					</dd>
 
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Visible)
-                    </dt>
+					<dt>
+						@Html.DisplayNameFor(model => model.Visible)
+					</dt>
 
-                    <dd>
-                        @Html.DisplayFor(model => model.Visible)
-                    </dd>
-                </dl>
+					<dd>
+						@Html.DisplayFor(model => model.Visible)
+					</dd>
+				</dl>
 
-            </div>
-            <p>
-                @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-                @Html.ActionLink("Back to List", "Index")
-            </p>
-        </div>
-    </div>
+			</div>
+			<p>
+				@Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+				@Html.ActionLink("Back to List", "Index")
+			</p>
+		</div>
+	</div>
 </div>
 
 

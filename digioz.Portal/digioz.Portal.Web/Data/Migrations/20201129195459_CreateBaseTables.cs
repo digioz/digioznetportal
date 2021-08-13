@@ -583,7 +583,7 @@ namespace digioz.Portal.Web.Data.Migrations
                     ProductId = table.Column<string>(maxLength: 128, nullable: true),
                     Quantity = table.Column<int>(nullable: false),
                     DateCreated = table.Column<DateTime>(nullable: false),
-                    Size = table.Column<bool>(maxLength: 50, nullable: true),
+                    Size = table.Column<string>(maxLength: 50, nullable: true),
                     Color = table.Column<string>(maxLength: 50, nullable: true),
                     MaterialType = table.Column<string>(maxLength: 50, nullable: true),
                     Notes = table.Column<string>(nullable: true)

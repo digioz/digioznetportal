@@ -26,13 +26,15 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         private readonly ILogic<Order> _orderLogic;
         private readonly ILogic<OrderDetail> _orderDetailLogic;
         private readonly ILogic<AspNetUser> _userLogic;
+        private readonly ILogic<Product> _productLogic;
 
         public OrderManagerController(
             ILogger<OrderManagerController> logger,
             IConfigLogic configLogic,
             ILogic<Order> orderLogic,
             ILogic<OrderDetail> orderDetailLogic,
-            ILogic<AspNetUser> userLogic
+            ILogic<AspNetUser> userLogic,
+            ILogic<Product> productLogic
         )
         {
             _logger = logger;
@@ -40,6 +42,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             _orderLogic = orderLogic;
             _orderDetailLogic = orderDetailLogic;
             _userLogic = userLogic;
+            _productLogic = productLogic;
         }
 
         // GET: OrderManager
@@ -85,6 +88,8 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.ProductLogic = _productLogic;
 
             return View(OMVM);
         }
@@ -213,6 +218,8 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.ProductLogic = _productLogic;
 
             return View(OMVM);
         }

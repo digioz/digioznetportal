@@ -1,0 +1,244 @@
+﻿@model digioz.Portal.Web.Models.ViewModels.CheckOutViewModel
+@{
+    ViewBag.Title = "Checkout";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('#BillingSameAsShipping').click(function () {
+                var billingAddress1 = $("#ShippingAddress").val();
+                var billingAddress2 = $("#ShippingAddress2").val();
+                var billingCity = $("#ShippingCity").val();
+                var billingState = $("#ShippingState").val();
+                var billingZip = $("#ShippingZip").val();
+                var billingCountry = $("#ShippingCountry > option:selected").attr("value");
+
+                $('#BillingAddress').val(billingAddress1);
+                $('#BillingAddress2').val(billingAddress2);
+                $('#BillingCity').val(billingCity);
+                $('#BillingState').val(billingState);
+                $('#BillingZip').val(billingZip);
+                $('#BillingCountry').val(billingCountry);
+            });
+        });
+    
+    </script>
+}
+
+<h2>Checkout &amp; Pay</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="well">
+            <div class="form-group">
+                @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.LastName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <p>&nbsp;</p>
+
+        <div class="well">
+            <div class="form-group">
+                @Html.LabelFor(model => model.ShippingAddress, htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.ShippingAddress, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.ShippingAddress, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ShippingAddress2, htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.ShippingAddress2, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.ShippingAddress2, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ShippingCity, htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.ShippingCity, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.ShippingCity, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ShippingState, htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.ShippingState, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.ShippingState, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ShippingZip, htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.ShippingZip, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.ShippingZip, "", new {@class = "text-danger"})
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ShippingCountry, htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-12">
+                    @Html.DropDownListFor(model => model.ShippingCountry, Model.ShippingCountries, string.Empty, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.ShippingCountries, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <p>&nbsp;</p>
+
+        <div class="well">
+
+            <div class="form-group">
+                <label class="control-label col-md-3">&nbsp;</label>
+                <input type="checkbox" id="BillingSameAsShipping" name="BillingSameAsShipping" /> Same as Shipping
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BillingAddress, htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.BillingAddress, new {@class = "form-control"})
+                    @Html.ValidationMessageFor(model => model.BillingAddress, "", new {@class = "text-danger"})
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BillingAddress2, htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.BillingAddress2, new {@class = "form-control"})
+                    @Html.ValidationMessageFor(model => model.BillingAddress2, "", new {@class = "text-danger"})
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BillingCity, htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.BillingCity, new {@class = "form-control"})
+                    @Html.ValidationMessageFor(model => model.BillingCity, "", new {@class = "text-danger"})
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BillingState, htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.BillingState, new {@class = "form-control"})
+                    @Html.ValidationMessageFor(model => model.BillingState, "", new {@class = "text-danger"})
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BillingZip, htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.BillingZip, new {@class = "form-control"})
+                    @Html.ValidationMessageFor(model => model.BillingZip, "", new {@class = "text-danger"})
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BillingCountry, htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-12">
+                    @Html.DropDownListFor(model => model.BillingCountry, Model.BillingCountries, string.Empty, new {@class = "form-control"})
+                    @Html.ValidationMessageFor(model => model.BillingCountries, "", new {@class = "text-danger"})
+                </div>
+            </div>
+        </div>
+
+        <p>&nbsp;</p>
+
+        <div class="well">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.Phone, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <p>&nbsp;</p>
+
+        <div class="well">
+            <div class="form-group">
+                @Html.LabelFor(model => model.CCNumber, htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.CCNumber, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.CCNumber, "", new {@class = "text-danger"})
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.CCExpMonth, htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-12">
+                    @Html.DropDownListFor(model => model.CCExpMonth, Model.MonthList, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.CCExpMonth, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.CCExpYear, htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-12">
+                    @Html.DropDownListFor(model => model.CCExpYear, Model.YearsList, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.CCExpYear, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.CCCardCode, htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-12">
+                    @Html.TextBoxFor(model => model.CCCardCode, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.CCCardCode, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            @*<div class="form-group">
+                @Html.LabelFor(model => model.PaymentGateway, htmlAttributes: new { @class = "control-label col-md-3" })
+                <div class="col-md-12">
+                    @Html.DropDownListFor(model=>model.PaymentGateway,Model.PaymentGatewayList, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.PaymentGateway, "", new { @class = "text-danger" })
+                </div>
+            </div>*@
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-12">
+                <input type="submit" value="Place Order and Pay" class="btn btn-lg btn-success" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+
