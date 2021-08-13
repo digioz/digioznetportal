@@ -1363,5 +1363,17 @@ namespace digioz.Portal.Web.Helpers
 
             return rssContentList;
         }
+
+        public static string DefaultOrValue(string value, string defaultValue)
+        {
+            string result = defaultValue;
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                result = value;
+            }
+
+            return result;
+        }
     }
 }
