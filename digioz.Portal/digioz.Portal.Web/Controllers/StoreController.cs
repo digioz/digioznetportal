@@ -152,7 +152,7 @@ namespace digioz.Portal.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Update(string id, FormCollection form)
+        public ActionResult Update(string id, IFormCollection form)
         {
             var cartItem = _shoppingCartLogic.Get(id); 
             var quantity = form["Quantity"].ToString();
