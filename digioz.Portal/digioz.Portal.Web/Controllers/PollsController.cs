@@ -130,6 +130,7 @@ namespace digioz.Portal.Web.Controllers
 
                 PollVote pollVote = new PollVote
                 {
+                    Id = Guid.NewGuid().ToString(),
                     PollAnswerId = _pollAnswerLogic.Get(keyId).Id,
                     UserId = user.Id
                 };
