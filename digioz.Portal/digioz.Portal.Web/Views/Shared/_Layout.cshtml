@@ -34,9 +34,10 @@
 		</div>
 	</nav>
 
-	@{ Html.RenderAction("ZoneMenu", "Menu", new { zoneType = "Top" });}
-
 	<div class="container body-content">
+
+		@Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "Top" })
+
 		<div class="row">
 			<div class="col-md-3">
 
@@ -55,29 +56,29 @@
 				@Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "Left" })
 
 			</div>
-            <div class="col-md-9">
+			<div class="col-md-9">
 
-                @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "BodyTop" })
+				@Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "BodyTop" })
 
-                @RenderSection("SlideShow", required: false)
+				@RenderSection("SlideShow", required: false)
 
-                @RenderSection("featured", required: false)
+				@RenderSection("featured", required: false)
 
-                @RenderSection("LatestPictures", required: false)
+				@RenderSection("LatestPictures", required: false)
 
-                @RenderSection("LatestVideos", required: false)
+				@RenderSection("LatestVideos", required: false)
 
-                @RenderSection("RSSFeed", required: false)
+				@RenderSection("RSSFeed", required: false)
 
-                <div class="card bg-light mb-5">
-                    <div class="card-header" style="background-color:#428BCA;color:#ffffff;">@ViewBag.Title</div>
-                    <div class="card-body">
-                        @RenderBody()
-                    </div>
-                </div>
+				<div class="card bg-light mb-5">
+					<div class="card-header" style="background-color:#428BCA;color:#ffffff;">@ViewBag.Title</div>
+					<div class="card-body">
+						@RenderBody()
+					</div>
+				</div>
 
-                @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "BodyBottom" })
-            </div>
+				@Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "BodyBottom" })
+			</div>
 		</div>
 
 		@Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "Bottom" })
