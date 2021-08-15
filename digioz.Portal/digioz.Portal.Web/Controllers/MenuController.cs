@@ -72,6 +72,7 @@ namespace digioz.Portal.Web.Controllers
             return PartialView("TopMenu", topMenus);
         }
 
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> UserMenu() 
         { 
             return PartialView("UserMenu");
@@ -198,6 +199,7 @@ namespace digioz.Portal.Web.Controllers
             return PartialView("SlideShow", slides);
         }
 
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> CommentsMenu(string referenceType, string referenceId)
         {
             var commentVM = new CommentsMenuViewModel {
