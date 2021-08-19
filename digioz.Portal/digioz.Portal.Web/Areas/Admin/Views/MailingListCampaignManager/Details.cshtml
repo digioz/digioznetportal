@@ -1,0 +1,91 @@
+﻿@model digioz.Portal.Bo.MailingListCampaign
+
+@{
+    ViewBag.Title = "Campaign Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2>Campaign Details</h2>
+
+            <div>
+                <hr />
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Name)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Subject)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Subject)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.FromName)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.FromName)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.FromEmail)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.FromEmail)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Summary)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Summary)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Banner)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Banner)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Body)
+                    </dt>
+
+                    <dd>
+                        @Html.Raw(Model.Body)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.VisitorCount)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.VisitorCount)
+                    </dd>
+
+                </dl>
+            </div>
+            <p>
+                @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+                @Html.ActionLink("Email View", "EmailDisplay", "MailingList", new { area = "", id = Model.Id }, new { @target = "_blank" }) |
+                @Html.ActionLink("Back to List", "Index")
+            </p>
+        </div>
+    </div>
+</div>
+
+

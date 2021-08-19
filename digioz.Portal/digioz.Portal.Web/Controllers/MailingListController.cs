@@ -41,7 +41,7 @@ namespace digioz.Portal.Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> EmailDisplay(Guid id)
+        public async Task<IActionResult> EmailDisplay(string id)
         {
             var model = _mailingListCampaignsLogic.Get(id); 
 
