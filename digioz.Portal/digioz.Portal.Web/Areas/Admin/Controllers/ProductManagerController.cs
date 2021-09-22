@@ -31,13 +31,15 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         private readonly ILogic<ProductCategory> _productCategoryLogic;
         private readonly ILogic<ProductOption> _productOptionLogic;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IConfigLogic _configLogic;
 
         public ProductManagerController(
             ILogger<ProductManagerController> logger,
             ILogic<Product> productLogic,
             ILogic<ProductCategory> productCategoryLogic,
             ILogic<ProductOption> productOptionLogic,
-            IWebHostEnvironment webHostEnvironment
+            IWebHostEnvironment webHostEnvironment,
+            IConfigLogic configLogic
         )
         {
             _logger = logger;
@@ -45,6 +47,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             _productCategoryLogic = productCategoryLogic;
             _productOptionLogic = productOptionLogic;
             _webHostEnvironment = webHostEnvironment;
+            _configLogic = configLogic;
         }
 
         private string GetImageFolderPath()
@@ -99,6 +102,8 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // GET: ProductManager/Create
         public async Task<IActionResult> Create()
         {
+            var configKeys = _configLogic.GetConfig();
+            ViewBag.TinyMCEApiKey = configKeys["TinyMCEApiKey"];
             ViewBag.ProductCategoryID = new SelectList(_productCategoryLogic.GetAll(), "Id", "Name");
 
             return View();
@@ -109,7 +114,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateAsync([Bind("ProductCategoryId,Name,Make,Model,Sku,Image,Price,Cost,QuantityPerUnit,Weight,Dimensions,Sizes,Colors,MaterialType,PartNumber,ShortDescription,Description,ManufacturerURL,UnitsInStock,OutOfStock,Notes,SizeList,ColorList,MaterialTypeList,Visible")] Product product, IFormFile file, IFormCollection form)
+        public async Task<ActionResult> CreateAsync([Bind("ProductCategoryId,Name,Make,Model,Sku,Image,Price,Cost,QuantityPerUnit,Weight,Dimensions,Sizes,Colors,MaterialType,PartNumber,ShortDescription,Description,ManufacturerUrl,UnitsInStock,OutOfStock,Notes,SizeList,ColorList,MaterialTypeList,Visible")] Product product, IFormFile file, IFormCollection form)
         {
             if (file != null && Utility.IsFileAnImage(file.FileName))
             {
@@ -209,6 +214,9 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         [Route("/admin/productmanager/edit/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
+            var configKeys = _configLogic.GetConfig();
+            ViewBag.TinyMCEApiKey = configKeys["TinyMCEApiKey"];
+
             if (id == null)
             {
                 return BadRequest();
@@ -236,7 +244,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost, ActionName("EditAsync")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind("Id,ProductCategoryId,Name,Make,Model,Sku,Image,Price,Cost,QuantityPerUnit,Weight,Dimensions,Sizes,Colors,MaterialType,PartNumber,ShortDescription,Description,ManufacturerURL,UnitsInStock,OutOfStock,Notes,SizeList,ColorList,MaterialTypeList,Visible")] Product product, IFormFile file, IFormCollection form)
+        public async Task<ActionResult> EditAsync([Bind("Id,ProductCategoryId,Name,Make,Model,Sku,Image,Price,Cost,QuantityPerUnit,Weight,Dimensions,Sizes,Colors,MaterialType,PartNumber,ShortDescription,Description,ManufacturerUrl,UnitsInStock,OutOfStock,Notes,SizeList,ColorList,MaterialTypeList,Visible")] Product product, IFormFile file, IFormCollection form)
         {
             if (file != null && Utility.IsFileAnImage(file.FileName))
             {
