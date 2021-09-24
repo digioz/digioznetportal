@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AuthorizeNet" Version="2.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\digioz.Portal.Bll\digioz.Portal.Bll.csproj" />
   </ItemGroup>
 

@@ -41,7 +41,7 @@
 						{
 							<table class="borderless">
 								<tr>
-									<td><input class="form-control input-sm" type="number" id="Quantity" name="Quantity" size="10" value="@item.Quantity" /></td>
+									<td><input class="form-control input-sm" type="number" id="Quantity" name="Quantity" size="5" value="@item.Quantity" /></td>
 									<td><input type="submit" value="Submit" class="btn btn-sm btn-info" /></td>
 								</tr>
 							</table>
@@ -68,8 +68,9 @@
 			}
 
 			<tr>
-				<td colspan="3" style="text-align: right;">Total: </td>
-				<td style="text-align: right; font-weight: bold;">$ @total.ToString("N", new CultureInfo("en-US"))</td>
+				<td colspan="4" style="text-align: right;">Total: </td>
+				<td style="text-align: right; font-weight: bold; width:90px;">$ @total.ToString("N", new CultureInfo("en-US"))</td>
+				<td>&nbsp;</td>
 			</tr>
 		}
 
