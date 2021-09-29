@@ -278,7 +278,7 @@
 							<tr>
 								<td>@i</td>
 								<td>@Html.ActionLink(product.Name, "Details", "ProductManager", new { id = item.ProductId }, null)</td>
-								<td>@product.ShortDescription</td>
+								<td>@Html.Raw(product.ShortDescription)</td>
 								<td>@item.Quantity</td>
 								<td>
 									@{
