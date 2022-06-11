@@ -24,7 +24,7 @@ namespace digioz.Portal.Web.Data.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "b4280b6a-0613-4cbd-a9e6-f1701e926e73", 0, "4d3acfa8-989c-4daa-af5e-444d8997edf9", "admin@domain.com", true, false, null, "ADMIN@DOMAIN.COM", "ADMIN@DOMAIN.COM", "AQAAAAEAACcQAAAAEJISeglNmBnfpwu6BJXd7jSh9jxeNdX2CXKzSZGUoOIJvRBG4nH5O2NnsGHFbMYcIA==", null, false, "3RCCOF64EJGX4UZTBISAL4PKITHDTWQG", false, "admin@domain.com" });
+                values: new object[] { "b4280b6a-0613-4cbd-a9e6-f1701e926e73", 0, "4d3acfa8-989c-4daa-af5e-444d8997edf9", "admin@domain.com", true, false, null, "ADMIN@DOMAIN.COM", "ADMIN", "AQAAAAEAACcQAAAAEJISeglNmBnfpwu6BJXd7jSh9jxeNdX2CXKzSZGUoOIJvRBG4nH5O2NnsGHFbMYcIA==", null, false, "3RCCOF64EJGX4UZTBISAL4PKITHDTWQG", false, "admin" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
