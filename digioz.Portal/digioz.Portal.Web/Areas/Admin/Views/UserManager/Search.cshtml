@@ -45,7 +45,7 @@
                 .Build(columns =>
                 {
                     columns.Add(model => model.UserName).Titled("UserName");
-
+                    columns.Add(model => model.Email).Titled("Email");
                     columns.Add(model => model.EmailConfirmed).Titled("Email Confirmed");
                     columns.Add(model => model.PhoneNumber).Titled("Phone");
 

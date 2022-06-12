@@ -100,14 +100,15 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UserManagerViewModel userVM) {
-            userVM.UserName = userVM.Email;
+            userVM.UserName = userVM.UserName;
 
-            if (!string.IsNullOrEmpty(userVM.Email)) {
+            if (!string.IsNullOrEmpty(userVM.UserName) && !string.IsNullOrEmpty(userVM.UserName))
+            {
                 if (userVM.Password != userVM.PasswordConfirm) {
                     ModelState.AddModelError("", "Password confirmation does not match.");
                 } else {
                     var user = new IdentityUser {
-                        UserName = userVM.Email,
+                        UserName = userVM.UserName,
                         Email = userVM.Email
                     };
 
@@ -172,16 +173,17 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPost([Bind("Id", "UserId", "Email", "Birthday", "BirthdayVisible", "Address", "Address2", "City",
+        public async Task<IActionResult> EditPost([Bind("Id", "UserId", "UserName", "Email", "Birthday", "BirthdayVisible", "Address", "Address2", "City",
                                                     "State", "Zip", "Country", "Signature", "Avatar", "FirstName", "LastName", "AvatarImage")] UserManagerViewModel userVM) {
             var user = await _userManager.FindByIdAsync(userVM.Id);
 
             if (user != null) {
-                if (!string.IsNullOrEmpty(userVM.Email)) {
+                if (!string.IsNullOrEmpty(userVM.UserName) && !string.IsNullOrEmpty(userVM.UserName))
+                {
                     user.Email = userVM.Email;
-                    user.UserName = userVM.Email;
+                    user.UserName = userVM.UserName;
                 } else {
-                    ModelState.AddModelError("", "Email cannot be empty.");
+                    ModelState.AddModelError("", "Email and UserName cannot be empty.");
                 }
 
                 if (!string.IsNullOrEmpty(userVM.Password)) {

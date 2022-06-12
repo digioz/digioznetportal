@@ -45,7 +45,7 @@
                 .Build(columns =>
                 {
                     columns.Add(model => model.UserName).Titled("UserName").Filterable(true);
-
+                    columns.Add(model => model.Email).Titled("Email").Filterable(true);
                     columns.Add(model => model.EmailConfirmed).Titled("Email Confirmed").UsingDefaultFilterMethod("equals"); ;
                     columns.Add(model => model.PhoneNumber).Titled("Phone").UsingDefaultFilterMethod("equals"); ;
 
