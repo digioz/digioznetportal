@@ -18,7 +18,6 @@ namespace digioz.Portal.Web.Areas.Admin.Models.ViewModels
         public string Id { get; set; }
         public int ProfileID { get; set; }
         [Required]
-        [Display(Name = "User name")]
         public string UserName { get; set; }
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
@@ -42,10 +41,12 @@ namespace digioz.Portal.Web.Areas.Admin.Models.ViewModels
         public string Country { get; set; }
         public string Signature { get; set; }
         public string Avatar { get; set; }
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
         public IFormFile AvatarImage { get; set; }
-
+        [Display(Name = "Use Gravatar")]
         public bool UseGravatar { get; set; }
         public List<SelectListItem> Countries { get; set; }
     }

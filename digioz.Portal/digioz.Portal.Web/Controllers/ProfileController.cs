@@ -25,6 +25,7 @@ namespace digioz.Portal.Web.Controllers
     {
         private readonly ILogic<AspNetUser> _userLogic;
         private readonly ILogic<Profile> _profileLogic;
+        private readonly UserManager<IdentityUser> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogic<Picture> _pictureLogic;
         private readonly ILogic<Video> _videoLogic;
@@ -32,12 +33,14 @@ namespace digioz.Portal.Web.Controllers
         public ProfileController(
             ILogic<AspNetUser> userLogic,
             ILogic<Profile> profileLogic,
+            UserManager<IdentityUser> usrManager,
             IWebHostEnvironment webHostEnvironment,
             ILogic<Picture> pictureLogic,
             ILogic<Video> videoLogic
         ) {
             _userLogic = userLogic;
             _profileLogic = profileLogic;
+            _userManager = usrManager;
             _webHostEnvironment = webHostEnvironment;
             _pictureLogic = pictureLogic;
             _videoLogic = videoLogic;
@@ -144,7 +147,17 @@ namespace digioz.Portal.Web.Controllers
 
                     _profileLogic.Edit(profile);
                 }
-                    
+
+                // Update Email address
+                var user = await _userManager.FindByIdAsync(userVM.Id);
+
+                if (user != null)
+                {
+                    user.Email = userVM.Email;
+                    await _userManager.UpdateAsync(user);   
+                }
+
+
                 TempData["Saved"] = true;
                 return RedirectToAction("Edit");
             }

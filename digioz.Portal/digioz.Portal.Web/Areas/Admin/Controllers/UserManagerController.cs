@@ -102,7 +102,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
         public async Task<IActionResult> Create(UserManagerViewModel userVM) {
             userVM.UserName = userVM.UserName;
 
-            if (!string.IsNullOrEmpty(userVM.UserName) && !string.IsNullOrEmpty(userVM.UserName))
+            if (!string.IsNullOrEmpty(userVM.Email) && !string.IsNullOrEmpty(userVM.UserName))
             {
                 if (userVM.Password != userVM.PasswordConfirm) {
                     ModelState.AddModelError("", "Password confirmation does not match.");
@@ -178,7 +178,7 @@ namespace digioz.Portal.Web.Areas.Admin.Controllers
             var user = await _userManager.FindByIdAsync(userVM.Id);
 
             if (user != null) {
-                if (!string.IsNullOrEmpty(userVM.UserName) && !string.IsNullOrEmpty(userVM.UserName))
+                if (!string.IsNullOrEmpty(userVM.Email) && !string.IsNullOrEmpty(userVM.UserName))
                 {
                     user.Email = userVM.Email;
                     user.UserName = userVM.UserName;
