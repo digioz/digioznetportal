@@ -4,7 +4,6 @@ using digioz.Portal.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System;
-using digioz.Portal.Utilities;
 using digioz.Portal.Web.Models.ViewModels;
 using digioz.Portal.Web.Helpers;
 using digioz.Portal.Bll.Interfaces;
@@ -159,7 +158,8 @@ namespace digioz.Portal.Web.Controllers
             var configWhoIsOnline = _pluginLogic.GetGeneric(x => x.Name == "WhoIsOnline").SingleOrDefault();
 
             var latestVisitors = _visitorSessionLogic.GetGeneric(x => x.DateModified >= DateTime.Now.AddMinutes(-10)).ToList();
-            var visitorRegistered = latestVisitors.Where(x => x.Username != null).DistinctBy(x => x.Username).ToList();
+            var visitorRegistered = latestVisitors.Where(x => x.Username != null).ToList();
+            visitorRegistered = visitorRegistered.DistinctBy(x => x.Username).ToList();
 
             ViewBag.VisitorCount = latestVisitors.Count;
             ViewBag.RegisteredVisitors = visitorRegistered;
