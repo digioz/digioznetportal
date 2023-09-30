@@ -1,5 +1,5 @@
 # DigiOz .NET Portal
-ASP.NET MVC Core Portal written with .NET 5.0.
+ASP.NET MVC Core Portal written with .NET 6.0.
 
 # Default Accounts
 By default the system will create two accounts for you if you run the tables and inserts scripts for version 1.0.0.0.
