@@ -1,0 +1,67 @@
+﻿@model IEnumerable<digioz.Portal.Bo.MailingList>
+
+@{
+    ViewBag.Title = "Mailing List Menu";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<main>
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Mailing List Menu</h2>
+            </div>
+            <div class="card-body">
+                <table style="width:95%;">
+                    <tr>
+                        <td>
+                            <div style="text-align:center;padding-bottom:20px;">
+                                <a href="/Admin/MailingListManager/List">
+                                    <img class="img-thumbnail" alt="64x64" style="width: 64px; height: 64px;" src="~/img/images/icons/64x64/MailingList.png" border="0" /><br />
+                                    Mailing List
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="text-align: center; padding-bottom: 20px;">
+                                <a href="/Admin/MailingListSubscriberManager">
+                                    <img class="img-thumbnail" alt="64x64" style="width: 64px; height: 64px;" src="~/img/images/icons/64x64/MailingListSubscribers.png" border="0" /><br />
+                                    Subscribers
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="text-align: center; padding-bottom: 20px;">
+                                <a href="/Admin/MailingListCampaignManager">
+                                    <img class="img-thumbnail" alt="64x64" style="width: 64px; height: 64px;" src="~/img/images/icons/64x64/MailingListCampaign.png" border="0" /><br />
+                                    Campaign
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="text-align: center; padding-bottom: 20px;">
+                                <a href="/Admin/MailingListImageManager">
+                                    <img class="img-thumbnail" alt="64x64" style="width: 64px; height: 64px;" src="~/img/images/icons/64x64/image-icon.png" border="0" /><br />
+                                    Images
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                </table>
+
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+            </div>
+        </div>
+    </div>
+</main>
+

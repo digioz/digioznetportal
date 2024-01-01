@@ -1,0 +1,174 @@
+﻿@using System.Globalization
+@model digioz.Portal.Bo.Product
+@{
+    ViewBag.Title = "Product Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Head {
+    <script type="text/javascript">
+        $(document)
+            .ready(function() {
+                $('#Quantity').change(function (e) {
+                    var selectedQuantity = $("#Quantity").val();
+
+                    //alert(selectedQuantity);
+                    alert(selectedQuantity.length);
+
+                    if (selectedQuantity.length === 0) {
+                        $('#Quantity').val('1');
+                    }
+                });
+            });
+</script>
+}
+
+<h2>Product Details</h2>
+
+@using (Html.BeginForm("Add","Store"))
+{
+    @Html.HiddenFor(model => model.Id)
+
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                @if (Model.Image == null)
+                {
+                    Model.Image = "/img/images/icons/128x128/product_placeholder.jpg";
+                }
+                else
+                {
+                    Model.Image = "/img/Products/Full/" + Model.Image;
+                }
+
+				<td>
+					<a href="@Model.Image"><img src="@Model.Image" style="width: 200px;" /></a><br /><br />
+					<input type="submit" value="Add to Cart" class="btn btn-sm btn-danger" />
+					<a class="btn btn-sm btn-success" href="@Url.Action("List", "Store", new { area = "" })">View Cart</a>
+				</td>
+                <td>
+                    <table>
+                        <tr>
+                            <td>Name: </td>
+                            <td>@Model.Name</td>
+                        </tr>
+                        <tr>
+                            <td>Make: </td>
+                            <td>@Model.Make</td>
+                        </tr>
+                        <tr>
+                            <td>Model: </td>
+                            <td>@Model.Model</td>
+                        </tr>
+                        <tr>
+                            <td>SKU: </td>
+                            <td>@Model.Sku</td>
+                        </tr>
+                        <tr>
+                            <td>Price: </td>
+                            <td>$ @Model.Price.ToString("N", new CultureInfo("en-US"))</td>
+                        </tr>
+                        <tr>
+                            <td>Quantity: </td>
+                            <td><input type="number" id="Quantity" name="Quantity" value="1" /></td>
+                        </tr>
+                        <tr>
+                            <td>Quantity Per Unit:</td>
+                            <td>@Model.QuantityPerUnit</td>
+                        </tr>
+                        <tr>
+                            <td>Weight: </td>
+                            <td>@Model.Weight</td>
+                        </tr>
+                        <tr>
+                            <td>Dimensions:</td>
+                            <td>@Model.Dimensions</td>
+                        </tr>
+                        <tr>
+                            <td>Sizes:</td>
+                            <td>
+                                @if (ViewBag.Sizes.Count > 0)
+                                {
+                                    <select id="Size" name="Size">
+                                        <option></option>
+                                        @foreach (var item in ViewBag.Sizes)
+                                        {
+                                            <option>@item.OptionValue</option>
+                                        }
+                                    </select>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Colors:</td>
+                            <td>
+                                @if (ViewBag.Colors.Count > 0)
+                                {
+                                    <select id="Color" name="Color">
+                                        <option></option>
+                                        @foreach (var item in ViewBag.Colors)
+                                        {
+                                            <option>@item.OptionValue</option>
+                                        }
+                                    </select>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Material Type:</td>
+                            <td>
+                                @if (ViewBag.MaterialTypes.Count > 0)
+                                {
+                                    <select id="MaterialType" name="MaterialType">
+                                        <option></option>
+                                        @foreach (var item in ViewBag.MaterialTypes)
+                                        {
+                                            <option>@item.OptionValue</option>
+                                        }
+                                    </select>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Part Number: </td>
+                            <td>@Model.PartNumber</td>
+                        </tr>
+                        <tr>
+                            <td>Description: </td>
+                            <td>@Html.Raw(Model.Description)</td>
+                        </tr>
+                        <tr>
+                            <td>Manufacturer URL:</td>
+                            <td>@Model.ManufacturerUrl</td>
+                        </tr>
+                        <tr>
+                            <td>Status:</td>
+                            <td>
+                                @if (@Model.OutOfStock)
+                                {
+                                    <span>Out of Stock</span>
+                                }
+                                else
+                                {
+                                    <span>Available</span>
+                                }
+                            <td>
+                        </tr>
+                        <tr>
+                            <td>Notes:</td>
+                            <td>@Html.Raw(Model.Notes)</td>
+                        </tr>
+                        <tr>
+                            <td>Your Comments (if any):</td>
+                            <td>
+                                <textarea class="form-control" cols="20" id="UserNotes" name="UserNotes" rows="2" style="height:150px;"></textarea> 
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+

@@ -1,0 +1,240 @@
+﻿@model digioz.Portal.Web.Areas.Admin.Models.ViewModels.HomeViewModel
+@using NonFactors.Mvc.Grid
+
+@{ 
+	ViewBag.Title = "Index";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+	var vyhKeys = Model.VisitorYearlyHits.Keys.ToArray();
+	var vyhValues = Model.VisitorYearlyHits.Values.ToArray();
+
+	var vmhKeys = Model.VisitorMonthlyHits.Keys.ToArray();
+	var vmhValues = Model.VisitorMonthlyHits.Values.ToArray();
+}
+
+@section HeaderScripts {
+	<link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet">
+}
+
+@section FooterScripts {
+	<script src="~/admin/js/Chart.min.js"></script>
+	<script src="~/js/mvc-grid/mvc-grid.js"></script>
+	<script>
+		document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+	</script>
+	<script>
+		// Set new default font family and font color to mimic Bootstrap's default styling
+		Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+		Chart.defaults.global.defaultFontColor = '#292b2c';
+
+		// Bar Chart Example
+		var ctx = document.getElementById("visitorHitsChart");
+		var myLineChart = new Chart(ctx, {
+			type: 'bar',
+			data: {
+				labels: @Html.Raw(Json.Serialize(vyhKeys)),
+				datasets: [{
+					label: "Hits",
+					backgroundColor: "rgba(2,117,216,1)",
+					borderColor: "rgba(2,117,216,1)",
+					data: @Html.Raw(Json.Serialize(vyhValues)),
+				}],
+			},
+			options: {
+				scales: {
+					xAxes: [{
+						time: {
+							unit: 'month'
+						},
+						gridLines: {
+							display: false
+						},
+						ticks: {
+							maxTicksLimit: 6
+						}
+					}],
+					yAxes: [{
+						ticks: {
+							min: 0,
+							max: 1000,
+							maxTicksLimit: 5
+						},
+						gridLines: {
+							display: true
+						}
+					}],
+				},
+				legend: {
+					display: false
+				}
+			}
+		});
+	</script>
+	<script>
+		// Set new default font family and font color to mimic Bootstrap's default styling
+		Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+		Chart.defaults.global.defaultFontColor = '#292b2c';
+
+		// Area Chart Example
+		var ctx = document.getElementById("myAreaChart");
+		var myLineChart = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: @Html.Raw(Json.Serialize(vmhKeys)),
+				datasets: [{
+					label: "Hits",
+					lineTension: 0.3,
+					backgroundColor: "rgba(2,117,216,0.2)",
+					borderColor: "rgba(2,117,216,1)",
+					pointRadius: 5,
+					pointBackgroundColor: "rgba(2,117,216,1)",
+					pointBorderColor: "rgba(255,255,255,0.8)",
+					pointHoverRadius: 5,
+					pointHoverBackgroundColor: "rgba(2,117,216,1)",
+					pointHitRadius: 50,
+					pointBorderWidth: 2,
+					data: @Html.Raw(Json.Serialize(vmhValues)),
+				}],
+			},
+			options: {
+				scales: {
+					xAxes: [{
+						time: {
+							unit: 'date'
+						},
+						gridLines: {
+							display: false
+						},
+						ticks: {
+							maxTicksLimit: 7
+						}
+					}],
+					yAxes: [{
+						ticks: {
+							min: 0,
+							max: 1000,
+							maxTicksLimit: 5
+						},
+						gridLines: {
+							color: "rgba(0, 0, 0, .125)",
+						}
+					}],
+				},
+				legend: {
+					display: false
+				}
+			}
+		});
+	</script>
+}
+
+<main>
+	<div class="container-fluid">
+		<h1 class="mt-4">Dashboard</h1>
+		<ol class="breadcrumb mb-4">
+			<li class="breadcrumb-item active">Home</li>
+			<li class="breadcrumb-item">Index</li>
+		</ol>
+		<div class="row">
+			<div class="col-xl-3 col-md-6">
+				<div class="card bg-primary text-white mb-4">
+					<div class="card-body">All Logs</div>
+					<div class="card-footer d-flex align-items-center justify-content-between">
+						<a class="small text-white stretched-link" href="@Url.ActionLink("Details", "Home", new { id = "All" })">
+							View Details (@Model.GetLogCounts["All"])
+						</a>
+						<div class="small text-white"><i class="fas fa-angle-right"></i></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-3 col-md-6">
+				<div class="card bg-warning text-white mb-4">
+					<div class="card-body">Warning Logs</div>
+					<div class="card-footer d-flex align-items-center justify-content-between">
+						<a class="small text-white stretched-link" href="@Url.ActionLink("Details", "Home", new { id = "Warning" })">
+							View Details (@Model.GetLogCounts["Warning"])
+						</a>
+						<div class="small text-white"><i class="fas fa-angle-right"></i></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-3 col-md-6">
+				<div class="card bg-success text-white mb-4">
+					<div class="card-body">Information Logs</div>
+					<div class="card-footer d-flex align-items-center justify-content-between">
+						<a class="small text-white stretched-link" href="@Url.ActionLink("Details", "Home", new { id = "Information" })">
+							View Details (@Model.GetLogCounts["Information"])
+						</a>
+						<div class="small text-white"><i class="fas fa-angle-right"></i></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-3 col-md-6">
+				<div class="card bg-danger text-white mb-4">
+					<div class="card-body">Error Logs</div>
+					<div class="card-footer d-flex align-items-center justify-content-between">
+						<a class="small text-white stretched-link" href="@Url.ActionLink("Details", "Home", new { id = "Error" })">
+							View Details (@Model.GetLogCounts["Error"])
+						</a>
+						<div class="small text-white"><i class="fas fa-angle-right"></i></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xl-6">
+				<div class="card mb-4">
+					<div class="card-header">
+						<i class="fas fa-chart-area mr-1"></i>
+						Daily Visits for this Month
+					</div>
+					<div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
+				</div>
+			</div>
+			<div class="col-xl-6">
+				<div class="card mb-4">
+					<div class="card-header">
+						<i class="fas fa-chart-bar mr-1"></i>
+						Visitor Hits by Month
+					</div>
+					<div class="card-body"><canvas id="visitorHitsChart" width="100%" height="40"></canvas></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Visitor Table -->
+		@(Html
+			.Grid(Model.Visitors)
+			.Build(columns =>
+			{
+				columns.Add(model => model.Id).Titled("Id").Filterable(false);
+				columns.Add(model => model.IpAddress).Titled("IP Address").Filterable(true);
+
+				columns.Add(model => model.OperatingSystem).Titled("OS").UsingDefaultFilterMethod("equals");
+				columns.Add(model => model.Browser).Titled("Browser").UsingDefaultFilterMethod("equals");
+				columns.Add(model => model.BrowserVersion).Titled("Browser Version").UsingDefaultFilterMethod("equals");
+				columns.Add(model => model.Href).Titled("Page Visited").UsingDefaultFilterMethod("equals");
+				columns.Add(model => model.Timestamp).Titled("Date").UsingDefaultFilterMethod("equals");
+
+				columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='Admin/VisitorManager/Details?id={model.Id}' id=\"details\"  asp-action=\"Details\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"../img/images/icons/16x16/Search.png\" alt=\"Details\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;").Encoded(false);
+
+			})
+				.Empty("No users found.")
+				.Filterable()
+				.Sortable()
+				.Pageable()
+            )
+	</div>
+</main>
+<footer class="py-4 bg-light mt-auto">
+	<div class="container-fluid">
+		<div class="d-flex align-items-center justify-content-between small">
+			<div class="text-muted">&copy; @DateTime.Now.Year - @digioz.Portal.Web.Models.AppStart.SiteSettings.SiteName</div>
+			<div>
+				<a href="#">Privacy Policy</a>
+				&middot;
+				<a href="#">Terms &amp; Conditions</a>
+			</div>
+		</div>
+	</div>
+</footer>

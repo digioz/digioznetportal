@@ -1,0 +1,41 @@
+﻿@model Microsoft.AspNetCore.Identity.IdentityRole
+
+@{
+    ViewData["Title"] = "Add Role To User";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Add Roll To User</h2>
+
+            @using (Html.BeginForm("RoleAddPost", "UserManager"))
+            {
+                @Html.AntiForgeryToken()
+                <input id="UserId" name="UserId" type="hidden" value="@ViewBag.UserId" />
+
+                <div class="form-horizontal">
+                    @Html.ValidationSummary(true)
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="Roles">Roles</label>
+                        <div class="col-md-10">
+                            @Html.DropDownList("Roles", String.Empty)
+                            @Html.ValidationMessageFor(model => model.Id)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Add Role To User" class="btn btn-sm btn-primary" />
+                        </div>
+                    </div>
+                </div>}
+            <br /><br />
+            <div>
+                @Html.ActionLink("Back to List", "Roles", "UserManager", new { id = ViewBag.UserId } )
+            </div>
+        </div>
+    </div>
+</div>

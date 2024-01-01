@@ -1,0 +1,85 @@
+﻿@model digioz.Portal.Web.Areas.Admin.Models.ViewModels.PollViewModel
+
+@{
+    ViewBag.Title = "Poll Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Poll Details</h2>
+
+			<p>
+				<a class="btn btn-sm btn-primary" href="@Url.Action("CreateAnswer", "PollManager", new { id = Model.Poll.Id, area = "Admin" })">Create New Answer</a>
+			</p>
+
+			<div>
+				<dl class="dl-horizontal">
+					<dt>
+						Name
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.Poll.Slug)
+					</dd>
+
+					<dt>
+						Date Created
+					</dt>
+
+					<dd>
+						@Model.Poll.DateCreated
+					</dd>
+
+					<dt>
+						Is Closed?
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.Poll.IsClosed)
+					</dd>
+
+					<dt>
+						Featured?
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.Poll.Featured)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.Poll.AllowMultipleOptionsVote)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.Poll.AllowMultipleOptionsVote)
+					</dd>
+
+				</dl>
+			</div>
+
+			<table class="table">
+				<tr>
+					<th>Option</th>
+					<th>Action</th>
+				</tr>
+				@foreach (var item in Model.PollAnswers)
+				{
+					<tr>
+						<td>@item.Answer</td>
+						<td>
+							<a href="@Url.Action("EditAnswer", new { id = item.Id })"><img class="sb-nav-link-icon" src="~/img/images/icons/16x16/Edit.png" alt="Edit" /></a>
+							<a href="@Url.Action("DeleteAnswer", new { id = item.Id })"><img class="sb-nav-link-icon" src="~/img/images/icons/16x16/Cancel.png" alt="Delete" /></a>
+						</td>
+					</tr>
+				}
+			</table>
+
+			<p>
+				@Html.ActionLink("Edit", "Edit", new { id = Model.Poll.Id }) |
+				@Html.ActionLink("Back to List", "Index")
+			</p>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "digioz.Portal.Web", "digioz.Portal.Web\digioz.Portal.Web.csproj", "{C74FD9E4-4F39-4AD4-AF83-4AAD5B7358A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "digioz.Portal.Bo", "digioz.Portal.Bo\digioz.Portal.Bo.csproj", "{523CECB8-4E3A-4A21-B279-3A8D1D5FADC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "digioz.Portal.Bll", "digioz.Portal.Bll\digioz.Portal.Bll.csproj", "{53905FF5-690C-46E3-9627-A4B3D4A96898}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "digioz.Portal.Dal", "digioz.Portal.Dal\digioz.Portal.Dal.csproj", "{34429748-7D9E-41DC-BCE5-57EA86D179A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "digioz.Portal.Utilities", "digioz.Portal.Utilities\digioz.Portal.Utilities.csproj", "{FD21B1C9-3E18-40ED-B1B7-8466934CF09F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "digioz.Portal.Payment", "digioz.Portal.Payment\digioz.Portal.Payment.csproj", "{849B0618-C351-48C5-928E-1E5CA5BC7895}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C74FD9E4-4F39-4AD4-AF83-4AAD5B7358A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C74FD9E4-4F39-4AD4-AF83-4AAD5B7358A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C74FD9E4-4F39-4AD4-AF83-4AAD5B7358A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C74FD9E4-4F39-4AD4-AF83-4AAD5B7358A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{523CECB8-4E3A-4A21-B279-3A8D1D5FADC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{523CECB8-4E3A-4A21-B279-3A8D1D5FADC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{523CECB8-4E3A-4A21-B279-3A8D1D5FADC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{523CECB8-4E3A-4A21-B279-3A8D1D5FADC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53905FF5-690C-46E3-9627-A4B3D4A96898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53905FF5-690C-46E3-9627-A4B3D4A96898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53905FF5-690C-46E3-9627-A4B3D4A96898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53905FF5-690C-46E3-9627-A4B3D4A96898}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34429748-7D9E-41DC-BCE5-57EA86D179A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34429748-7D9E-41DC-BCE5-57EA86D179A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34429748-7D9E-41DC-BCE5-57EA86D179A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34429748-7D9E-41DC-BCE5-57EA86D179A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD21B1C9-3E18-40ED-B1B7-8466934CF09F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD21B1C9-3E18-40ED-B1B7-8466934CF09F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD21B1C9-3E18-40ED-B1B7-8466934CF09F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD21B1C9-3E18-40ED-B1B7-8466934CF09F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{849B0618-C351-48C5-928E-1E5CA5BC7895}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{849B0618-C351-48C5-928E-1E5CA5BC7895}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{849B0618-C351-48C5-928E-1E5CA5BC7895}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{849B0618-C351-48C5-928E-1E5CA5BC7895}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {900066D3-6365-4F91-8BF8-1BFFE81FB462}
+	EndGlobalSection
+EndGlobal

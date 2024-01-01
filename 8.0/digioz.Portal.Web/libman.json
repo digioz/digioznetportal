@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "signalr.js@2.4.1",
+      "destination": "wwwroot/lib/signalr.js/",
+      "files": [
+        "jquery.signalR.min.js",
+        "jquery.signalR.js"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "@microsoft/signalr@latest",
+      "destination": "wwwroot/lib/signalr/",
+      "files": [
+        "dist/browser/signalr.js.map",
+        "dist/browser/signalr.min.js.map"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "jqueryui@1.11.1",
+      "destination": "wwwroot/lib/jqueryui/"
+    }
+  ]
+}

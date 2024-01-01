@@ -1,0 +1,58 @@
+﻿@model digioz.Portal.Bo.Log
+
+@{
+	ViewData["Title"] = "Log Details";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Log Details</h2>
+
+			<div>
+				<dl class="row">
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.Id)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.Id)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.Message)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.Message)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.Level)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.Level)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.Timestamp)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.Timestamp)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.Exception)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.Exception)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.LogEvent)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.LogEvent)
+					</dd>
+				</dl>
+			</div>
+			<p>
+				@Html.ActionLink("Back to List", "Index")
+			</p>
+		</div>
+	</div>
+</div>

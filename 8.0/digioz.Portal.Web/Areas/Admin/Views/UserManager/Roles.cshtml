@@ -1,0 +1,52 @@
+﻿@model IEnumerable<digioz.Portal.Web.Models.ViewModels.UserRoleViewModel>
+
+@{
+    ViewBag.Title = "User Roles";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<main>
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>User Roles for @ViewBag.Email</h2>
+            </div>
+            <div class="card-body">
+                <p>
+                    <a class="btn btn-sm btn-primary" href="@Url.Action("RoleAdd", "UserManager", new { id = ViewBag.UserId, area = "Admin" })">Add Role</a>
+                </p>
+                <table class="table-bordered" style="width:95%;">
+                    <tr>
+                        <th>
+                            Role Id
+                        </th>
+                        <th>
+                            Role Name
+                        </th>
+                        <th></th>
+                    </tr>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.RoleId)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.RoleName)
+                            </td>
+                            <td style="width:100px;">
+                                <a href="@Url.Action("RoleDelete", new { id = item.RoleId, userId = item.UserId })"><img class="sb-nav-link-icon" src="~/img/images/icons/16x16/Cancel.png" alt="Delete" /></a>
+                            </td>
+                        </tr>
+                    }
+                </table>
+                <br /><br />
+                <div>
+                    @Html.ActionLink("Back to Index", "Index")
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+

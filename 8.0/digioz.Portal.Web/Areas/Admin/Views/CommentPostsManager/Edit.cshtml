@@ -1,0 +1,44 @@
+﻿@model digioz.Portal.Bo.Comment
+
+@{
+    ViewBag.Title = "Edit Comment";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Edit Comment</h2>
+
+			@using (Html.BeginForm())
+			{
+				@Html.AntiForgeryToken()
+
+				<div class="form-horizontal">
+					<h4>Comment</h4>
+					<hr />
+					@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+					@Html.HiddenFor(model => model.Id)
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Body, htmlAttributes: new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							@Html.TextAreaFor(model => model.Body, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Body, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-md-offset-2 col-md-10">
+							<input type="submit" value="Save" class="btn btn-primary" />
+						</div>
+					</div>
+				</div>
+			}
+
+			<div>
+				@Html.ActionLink("Back to List", "Index")
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Microsoft.AspNetCore.Identity.IdentityRole>
+
+@{ 
+    ViewBag.Title = "Link Manager";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml"; 
+}
+
+<main>
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header">
+                Role Manager
+            </div>
+            <div class="card-body">
+                <p>
+                    <a class="btn btn-sm btn-primary" href="@Url.Action("Create", "RoleManager", new { area = "Admin" })">Create New</a>
+                </p>
+                <table class="table-bordered" style="width:95%;">
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Id)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Name)
+                        </th>
+                        <th></th>
+                    </tr>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Id)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td style="width:100px;">
+                                <a href="@Url.Action("Delete", new { id = item.Id })"><img class="sb-nav-link-icon" src="~/img/images/icons/16x16/Cancel.png" alt="Delete" /></a>
+                            </td>
+                        </tr>}
+
+                </table>
+            </div>
+        </div>
+    </div>
+</main>

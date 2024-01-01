@@ -1,0 +1,56 @@
+﻿@model digioz.Portal.Bo.Config
+
+@{
+    ViewBag.Title = "Create Configuration Key";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Create Configuration</h2>
+
+			@using (Html.BeginForm())
+			{
+				@Html.AntiForgeryToken()
+
+				<div class="form-horizontal">
+					@Html.ValidationSummary(true)
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.ConfigKey, new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							@Html.TextBoxFor(model => model.ConfigKey, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.ConfigKey)
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.ConfigValue, new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							@Html.TextBoxFor(model => model.ConfigValue, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.ConfigValue)
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.IsEncrypted, new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							@Html.EditorFor(model => model.IsEncrypted)
+							@Html.ValidationMessageFor(model => model.IsEncrypted)
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-md-offset-2 col-md-10">
+							<input type="submit" value="Create" class="btn btn-primary" />
+						</div>
+					</div>
+				</div>
+			}
+			<div>
+				@Html.ActionLink("Back to List", "Index")
+			</div>
+		</div>
+	</div>
+</div>

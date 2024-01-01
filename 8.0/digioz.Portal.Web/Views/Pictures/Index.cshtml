@@ -1,0 +1,53 @@
+﻿@model IEnumerable<digioz.Portal.Web.Models.ViewModels.PicturesViewModel>
+@{
+	ViewBag.Title = "Pictures";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Pictures</h2>
+
+<p>&nbsp;</p>
+<a class="btn btn-sm btn-primary" href="@Url.Action("Add", "Pictures")">Upload</a>
+<br />
+
+<table style="width:95%;">
+	<tr>
+		@{
+			int i = 0;
+
+			foreach (var item in Model)
+			{
+				<td style="padding:5px;vertical-align:top;">
+					<div style="text-align:left;padding:10px;background-color:#f3f6fa">
+						<br />
+						<center><span style="text-align:center;font-size:18px;font-weight:bold;">@item.Name</span></center>
+						<br />
+						<center>
+							<a href="/Pictures/List/@item.ID">
+								<img class="img-thumbnail" alt="120x120" style="width: 120px; height: 120px;" src="~/img/Pictures/Thumb/@item.Thumbnail" border="0" />
+							</a>
+						</center>
+						<br />
+						<p style="width:100%;text-align: center;">@Html.Raw(item.Description)</p>
+					</div>
+				</td>
+
+				i++;
+
+				if (i == 2)
+				{
+				@:</tr><tr>
+					i = 0;
+				}
+
+			}
+		}
+	</tr>
+
+</table>
+
+<p>&nbsp;</p>
+
+
+
+

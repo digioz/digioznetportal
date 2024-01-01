@@ -1,0 +1,330 @@
+﻿@model digioz.Portal.Bo.Product
+
+@{
+	ViewBag.Title = "Create Product";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@section HeaderScripts {
+	<style>
+		.tox-notifications-container {
+			display: none !important;
+		}
+	</style>
+	<script src='https://cdn.tiny.cloud/1/@ViewBag.TinyMCEApiKey/tinymce/5/tinymce.min.js' referrerpolicy="origin"></script>
+	@*<script src="~/admin/js/tinymce.min.js"></script>*@
+	<script>
+		tinymce.init({
+			selector: '#Description',
+			plugins: 'print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons',
+			imagetools_cors_hosts: ['picsum.photos'],
+			menubar: 'file edit view insert format tools table help',
+			toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
+			toolbar_sticky: true,
+			autosave_ask_before_unload: true,
+			autosave_interval: '30s',
+			autosave_prefix: '{path}{query}-{id}-',
+			autosave_restore_when_empty: false,
+			autosave_retention: '2m',
+			image_advtab: true,
+		});
+		tinymce.init({
+			selector: '#ShortDescription',
+			plugins: 'print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons',
+			imagetools_cors_hosts: ['picsum.photos'],
+			menubar: 'file edit view insert format tools table help',
+			toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
+			toolbar_sticky: true,
+			autosave_ask_before_unload: true,
+			autosave_interval: '30s',
+			autosave_prefix: '{path}{query}-{id}-',
+			autosave_restore_when_empty: false,
+			autosave_retention: '2m',
+			image_advtab: true,
+		});
+	</script>
+}
+
+@section FooterScripts {
+	<script src="~/admin/js/ProductOptionsCrud.js"></script>
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Create Product</h2>
+
+			@using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+			{
+				@Html.AntiForgeryToken()
+
+				<div class="form-horizontal">
+					<hr />
+					@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.ProductCategoryId, "Category", htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.DropDownList("ProductCategoryId", null, htmlAttributes: new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.ProductCategoryId, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Make, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.TextBoxFor(model => model.Make, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Make, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Model, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.TextBoxFor(model => model.Model, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Model, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Sku, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.TextBoxFor(model => model.Sku, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Sku, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="control-label col-md-3" style="font-weight:bold;">Picture</div>
+						<div class="col-md-12">
+							<input class="form-control" type="file" name="file" id="file" />
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.TextBoxFor(model => model.Price, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Cost, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.TextBoxFor(model => model.Cost, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Cost, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.QuantityPerUnit, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.TextBoxFor(model => model.QuantityPerUnit, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.QuantityPerUnit, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Weight, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.TextBoxFor(model => model.Weight, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Weight, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Dimensions, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.TextBoxFor(model => model.Dimensions, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Dimensions, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-3">Sizes</label>
+						<div class="col-md-12">
+							<table>
+								<tr>
+									<td>
+										<input name="SizeNew" class="form-control" id="SizeNew" type="text" style="width:200px;" />
+									</td>
+									<td>
+										<input id="AddSize" name="AddSize" type="button" class="btn btn-sm btn-success" style="width:70px;" value="Add" /><br />
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-3">&nbsp;</label>
+						<div class="col-md-12">
+							<table>
+								<tr>
+									<td>
+										<select size="5" class="form-control" id="SizeList" name="SizeList" style="width:200px;" multiple></select>
+									</td>
+									<td style="vertical-align:top;">
+										<button id="RemoveSize" name="RemoveSize" type="button" class="btn btn-sm btn-danger">Remove</button>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-3">Colors</label>
+						<div class="col-md-12">
+							<table>
+								<tr>
+									<td>
+										<input name="ColorNew" class="form-control" id="ColorNew" type="text" style="width:200px;" />
+									</td>
+									<td>
+										<input id="AddColor" name="AddColor" type="button" class="btn btn-sm btn-success" style="width:70px;" value="Add" /><br />
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-3">&nbsp;</label>
+						<div class="col-md-12">
+							<table>
+								<tr>
+									<td>
+										<select size="5" class="form-control" id="ColorList" name="ColorList" style="width:200px;" multiple></select>
+									</td>
+									<td style="vertical-align:top;">
+										<button id="RemoveColor" name="RemoveColor" type="button" class="btn btn-sm btn-danger">Remove</button>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-3">Material Types</label>
+						<div class="col-md-12">
+							<table>
+								<tr>
+									<td>
+										<input name="MaterialTypeNew" class="form-control" id="MaterialTypeNew" type="text" style="width:200px;" />
+									</td>
+									<td>
+										<input id="AddMaterialType" name="AddMaterialType" type="button" class="btn btn-sm btn-success" style="width:70px;" value="Add" /><br />
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-3">&nbsp;</label>
+						<div class="col-md-12">
+							<table>
+								<tr>
+									<td>
+										<select id="MaterialTypeList" name="MaterialTypeList" size="5" class="form-control" style="width:200px;" multiple></select>
+									</td>
+									<td style="vertical-align:top;">
+										<button id="RemoveMaterialType" name="RemoveMaterialType" type="button" class="btn btn-sm btn-danger">Remove</button>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.PartNumber, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.TextBoxFor(model => model.PartNumber, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.PartNumber, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.ShortDescription, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.EditorFor(model => model.ShortDescription, new { htmlAttributes = new { @class = "form-control" } })
+							@Html.ValidationMessageFor(model => model.ShortDescription, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+							@Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.ManufacturerUrl, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.TextBoxFor(model => model.ManufacturerUrl, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.ManufacturerUrl, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.UnitsInStock, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.TextBoxFor(model => model.UnitsInStock, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.UnitsInStock, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.OutOfStock, htmlAttributes: new { @class = "control-label col-md-4", @style = "padding-right: 65px;" })
+						<div class="col-md-12">
+							<div class="checkbox">
+								@Html.EditorFor(model => model.OutOfStock)
+								@Html.ValidationMessageFor(model => model.OutOfStock, "", new { @class = "text-danger" })
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Notes, htmlAttributes: new { @class = "control-label col-md-3" })
+						<div class="col-md-12">
+							@Html.EditorFor(model => model.Notes, new { htmlAttributes = new { @class = "form-control" } })
+							@Html.ValidationMessageFor(model => model.Notes, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Visible, htmlAttributes: new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							@Html.CheckBoxFor(model => model.Visible)
+							@Html.ValidationMessageFor(model => model.Visible, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-md-offset-2 col-md-12">
+							<input id="submit" name="submit" type="submit" value="Create" class="btn btn-primary" />
+						</div>
+					</div>
+				</div>
+			}
+
+			<div>
+				@Html.ActionLink("Back to List", "Index")
+			</div>
+		</div>
+	</div>
+</div>
+
+
+

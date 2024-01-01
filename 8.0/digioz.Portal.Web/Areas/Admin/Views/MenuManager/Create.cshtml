@@ -1,0 +1,92 @@
+﻿@model digioz.Portal.Bo.Menu
+
+@{
+    ViewBag.Title = "Create Menu Entry";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Create Menu Entry</h2>
+
+			@using (Html.BeginForm())
+			{
+				@Html.AntiForgeryToken()
+
+				<div class="form-horizontal">
+					<hr />
+					@Html.ValidationSummary(true)
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							@Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Name)
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-2">Location</label>
+						<div class="col-md-10">
+							@Html.DropDownList("Location")
+							@Html.ValidationMessageFor(model => model.Location)
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Controller, new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							@Html.TextBoxFor(model => model.Controller, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Controller)
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Action, new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							@Html.TextBoxFor(model => model.Action, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Action)
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Url, new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							@Html.TextBoxFor(model => model.Url, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Url)
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Target, new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							@Html.TextBoxFor(model => model.Target, new { @class = "form-control" })
+							@Html.ValidationMessageFor(model => model.Target)
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Visible, new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							@Html.EditorFor(model => model.Visible)
+							@Html.ValidationMessageFor(model => model.Visible)
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-md-offset-2 col-md-10">
+							<input type="submit" value="Create" class="btn btn-primary" />
+						</div>
+					</div>
+				</div>
+			}
+
+			<div>
+				@Html.ActionLink("Back to List", "Index")
+			</div>
+		</div>
+	</div>
+</div>
+
+

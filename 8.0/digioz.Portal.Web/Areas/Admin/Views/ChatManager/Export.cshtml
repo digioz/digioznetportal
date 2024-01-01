@@ -1,0 +1,125 @@
+﻿@model digioz.Portal.Web.Areas.Admin.Models.ViewModels.ChatExportPurgeViewModel
+@{
+	ViewBag.Title = "Export Chat Messages";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@section HeaderScripts {
+	<link href="~/lib/jqueryui/jquery-ui.css" rel="stylesheet" />
+}
+
+@section FooterScripts {
+	<script src="~/lib/jqueryui/jquery-ui.js"></script>
+	<script>
+		$(function () {
+			$("#StartDate").datepicker({
+				showOtherMonths: true,
+				selectOtherMonths: true,
+				dateFormat: "mm/dd/yy"
+			});
+			$("#EndDate").datepicker({
+				showOtherMonths: true,
+				selectOtherMonths: true,
+				dateFormat: "mm/dd/yy"
+			});
+
+			$("#StartDateButton").click(function () {
+				$("#StartDate").datepicker("show");
+			});
+			$("#EndDateButton").click(function () {
+				$("#EndDate").datepicker("show");
+			});
+		});
+
+	</script>
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Export Chat Messages</h2>
+
+			@if (ViewBag.Status != null)
+			{
+				if (ViewBag.Status == "Success")
+				{
+					<div class="alert alert-dismissible alert-success">
+						<button type="button" class="close" data-dismiss="alert">×</button>
+						@Html.Raw(ViewBag.Message)
+					</div>
+				}
+				else
+				{
+					<div class="alert alert-dismissible alert-danger">
+						<button type="button" class="close" data-dismiss="alert">×</button>
+						@Html.Raw(ViewBag.Message)
+					</div>
+				}
+			}
+
+			@using (Html.BeginForm())
+			{
+				@Html.AntiForgeryToken()
+
+				<div class="form-horizontal">
+					<hr />
+					@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							<table style="border:0px;">
+								<tr>
+									<td>
+										@Html.TextBoxFor(model => model.StartDate, new { @readonly = "readonly", @class = "form-control" })
+									</td>
+									<td>
+										<img id="StartDateButton" name="StartDateButton" src="~/img/images/icons/32x32/Calendar.png" />
+									</td>
+								</tr>
+							</table>
+							@Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.EndDate, htmlAttributes: new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							<table style="border:0px;">
+								<tr>
+									<td>
+										@Html.TextBoxFor(model => model.EndDate, new { @readonly = "readonly", @class = "form-control" })
+									</td>
+									<td>
+										<img id="EndDateButton" name="EndDateButton" src="~/img/images/icons/32x32/Calendar.png" />
+									</td>
+								</tr>
+							</table>
+							@Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.ProcessAll, htmlAttributes: new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							@Html.CheckBoxFor(model => model.ProcessAll, new { htmlAttributes = new { @class = "form-check-input" } })
+							@Html.ValidationMessageFor(model => model.ProcessAll, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-md-offset-2 col-md-10">
+							<input type="submit" value="Export" class="btn btn-primary" />
+						</div>
+					</div>
+				</div>
+			}
+
+			<div>
+				@Html.ActionLink("Back to List", "Index")
+			</div>
+
+		</div>
+	</div>
+</div>
+

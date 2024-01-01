@@ -1,0 +1,126 @@
+﻿@model digioz.Portal.Web.Areas.Admin.Models.ViewModels.EnableCommentsViewModel
+
+@{
+    ViewBag.Title = "Edit Enabled Comments";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@section FooterScripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var selectedRefType = $("#ReferenceTypes option:selected").text();
+
+            $.ajax({
+                url: "/Admin/CommentConfigManager/GetEnableReferences?referenceType=" + selectedRefType,
+                type: "GET",
+                dataType: "json",
+                //async: false,
+                data: {
+                    input: selectedRefType
+                },
+                error: function (response) {
+                    //alert(response.responseText);
+                },
+                success: function (response) {
+                    var items = "<option></option>";
+                    //alert(response);
+
+                    $.each(response, function (i, referenceTypes) {
+                        items += "<option value='" + referenceTypes.value + "'>" + referenceTypes.text + "</option>";
+                    });
+
+                    $('#EnableReference').html(items);
+                    //alert(response);
+
+                    // Set model value
+                    $("#EnableReference").val('@Model.EnableReference');
+                    $("#ReferenceTypes").val('@Model.ReferenceTypes');
+                }
+        });
+        });
+
+        $("#ReferenceTypes").change(function () {
+            var selectedRefType = $("#ReferenceTypes > option:selected").attr("value");
+
+            $.ajax({
+                url: "/Admin/CommentConfigManager/GetEnableReferences?referenceType=" + selectedRefType,
+                type: "GET",
+                dataType: "json",
+                //async: false,
+                data: {
+                    input: selectedRefType
+                },
+                error: function (response) {
+                    //alert(response.responseText);
+                },
+                success: function (response) {
+                    var items = "<option></option>";
+                    //alert(response);
+
+                    $.each(response, function (i, referenceTypes) {
+                        items += "<option value='" + referenceTypes.value + "'>" + referenceTypes.text + "</option>";
+                    });
+
+                    $('#EnableReference').html(items);
+                    //alert(response);
+                }
+            });
+        });
+
+    </script>
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Edit Enabled Comments</h2>
+
+			@using (Html.BeginForm())
+			{
+				@Html.AntiForgeryToken()
+
+				<div class="form-horizontal">
+					<hr />
+					@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+					@Html.HiddenFor(model => model.Id)
+
+					<div class="form-group">
+						<label class="control-label col-md-2">Reference Type</label>
+						<div class="col-md-10">
+							@Html.DropDownList("ReferenceTypes", Model.ReferenceTypes)
+							@Html.ValidationMessageFor(model => model.ReferenceTypes, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-2">Reference Value</label>
+						<div class="col-md-10">
+							<select id="EnableReference" name="EnableReference"></select>
+							@Html.ValidationMessageFor(model => model.EnableReference, "", new { @class = "text-danger" })
+						</div>
+					</div>
+
+					<div class="form-group">
+						@Html.LabelFor(model => model.Visible, htmlAttributes: new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							<div class="checkbox">
+								@Html.EditorFor(model => model.Visible)
+								@Html.ValidationMessageFor(model => model.Visible, "", new { @class = "text-danger" })
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-md-offset-2 col-md-10">
+							<input type="submit" value="Save" class="btn btn-primary" />
+						</div>
+					</div>
+				</div>
+			}
+
+			<div>
+				@Html.ActionLink("Back to List", "Index")
+			</div>
+		</div>
+	</div>
+</div>

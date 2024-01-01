@@ -1,0 +1,26 @@
+﻿@model IEnumerable<digioz.Portal.Bo.ProductCategory>
+
+@if (Model.Any() && ViewBag.ShowStore == true)
+{
+	<div class="card bg-light mb-3">
+		<div class="card-header">Store</div>
+		<div class="card-body">
+			<div>
+				<ul>
+					<li>@Html.ActionLink("Order History", "History", "Store", new { area = "" }, null)</li>
+					@foreach (var item in Model)
+					{
+						if (item.Visible)
+						{
+							<li>@Html.ActionLink(item.Name, "ByCategory", "Store", new { id = item.Id }, null)</li>
+						}
+					}
+				</ul>
+
+				<div style="text-align: center;">
+					<a href="/Store/List"><img src="~/img/images/icons/64x64/shopping_cart.png" /></a>
+				</div>
+			</div>
+		</div>
+	</div>
+}

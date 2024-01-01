@@ -1,0 +1,173 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Product>
+@using digioz.Portal.Web.Helpers 
+@using NonFactors.Mvc.Grid
+
+@{
+    ViewBag.Title = "Products";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@section HeaderScripts {
+    <link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet">
+}
+
+@section FooterScripts {
+    <script src="~/js/mvc-grid/mvc-grid.js"></script>
+    <script>
+        document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+    </script>
+}
+
+<main>
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Products</h2>
+            </div>
+            <div class="card-body">
+                <div>
+                    <form class="navbar-form" role="search" action="@Url.Action("Search")">
+                        <div class="form-group">
+                            <table>
+                                <tr>
+                                    <td><input type="text" class="form-control" placeholder="Search" name="searchString" style="width:300px;"></td>
+                                    <td><button type="submit" class="btn btn-info btn-primary">Search</button></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </form>
+                </div>
+                <p>
+                    <a class="btn btn-sm btn-primary" href="@Url.Action("Create", "ProductManager", new { area = "Admin" })">Create New</a>
+                </p>
+                @*https://mvc6-grid.azurewebsites.net/formatting*@
+                @(Html
+                .Grid(Model)
+                .Build(columns =>
+                {
+                    columns.Add(model => $"<a href='../../img/Products/Full/" + Utility.DefaultOrValue(model.Image, "PictureAlbumIcon.png") + "'>"
+                        + "<img class='img-thumbnail' alt='120x120' style='width: 120px; height: 120px;' src='../../img/Products/Thumb/" + Utility.DefaultOrValue(model.Image, "PictureAlbumIcon.png") + "' /></a>"
+                    ).Encoded(false);
+                    columns.Add(model => model.Name).Titled("Name").Filterable(true);
+                    columns.Add(model => model.Make).Titled("Make").Filterable(true);
+                    columns.Add(model => model.Model).Titled("Model").UsingDefaultFilterMethod("equals");
+                    columns.Add(model => model.Sku).Titled("SKU").UsingDefaultFilterMethod("equals");
+                    columns.Add(model => model.Price).Titled("Price").UsingDefaultFilterMethod("equals");
+                    columns.Add(model => model.Visible).Titled("Visible").UsingDefaultFilterMethod("equals");
+
+                    columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='ProductManager/Details/{model.Id}' id=\"details\"  asp-action=\"Details\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"../img/images/icons/16x16/Search.png\" alt=\"Details\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+                                       + $"<a data-modal='' data-id=\"{model.Id}\" href='ProductManager/Edit/{model.Id}' id=\"edit\"  asp-action=\"Edit\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"../img/images/icons/16x16/Edit.png\" alt=\"Edit\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+                                       + $"<a data-modal='' data-id=\"{model.Id}\" href='ProductManager/Delete/{model.Id}' id=\"delete\"  asp-action=\"Delete\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"../img/images/icons/16x16/Cancel.png\" alt=\"Delete\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;").Encoded(false);
+
+                })
+                    .Empty("No users found.")
+                    .Filterable()
+                    .Sortable()
+                    .Pageable()
+                )
+                <div id='myModal' class='modal fade in'>
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div id='myModalContent'></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+@*<main>
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header">
+
+            </div>
+            <div class="card-body">
+                <p>
+                    <div class="btn btn-default">@Html.ActionLink("Create New", "Create")</div>
+                </p>
+                <table class="table">
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Image)
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Category
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Make)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Model)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Sku)
+                        </th>
+
+                        <th>
+                            @Html.DisplayNameFor(model => model.Price)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Visible)
+                        </th>
+                        <th></th>
+                    </tr>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (string.IsNullOrEmpty(item.Image))
+                                {
+                                    <img src="~/Content/images/icons/128x128/product_placeholder.jpg" />
+                                }
+                                else
+                                {
+                                    <a href="~/Content/Products/Full/@item.Image">
+                                        <img src="~/Content/Products/Thumb/@item.Image" />
+                                    </a>
+                                }
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ProductCategoryId)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Make)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Model)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Sku)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Price)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Visible)
+                            </td>
+                            <td>
+                                @Html.Raw(
+                                    Html.ActionImage("Details", new { id = item.ID }, "~/Content/images/icons/16x16/Search.png", imageAttributes: new { alt = "Details", @class = "icon" },
+                                        linkAttributes: new { title = "Details" }).ToString() + " " +
+                                    Html.ActionImage("Edit", new { id = item.ID }, "~/Content/images/icons/16x16/Edit.png", imageAttributes: new { alt = "Edit", @class = "icon" },
+                                        linkAttributes: new { title = "Edit" }).ToString() + " " +
+                                    Html.ActionImage("Delete", new { id = item.ID }, "~/Content/images/icons/16x16/Cancel.png", imageAttributes: new { alt = "Delete", @class = "icon" },
+                                        linkAttributes: new { title = "Delete" }).ToString()
+                                    )
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</main>*@

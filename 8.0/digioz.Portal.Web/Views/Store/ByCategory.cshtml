@@ -1,0 +1,88 @@
+﻿@using System.Globalization
+@model IEnumerable<digioz.Portal.Bo.Product>
+
+@using X.PagedList.Mvc.Core; @*import this so we get our HTML Helper*@
+@using X.PagedList @*import this so we can cast our list to IPagedList (only necessary because ViewBag is dynamic)*@
+@using X.PagedList.Mvc.Core.Fluent
+@using X.PagedList.Web.Common
+
+@{
+	ViewBag.Title = "Latest Products";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+
+	var pagedList = (IPagedList)Model;
+	var categoryId = ViewBag.CategoryId;
+
+	if (ViewBag.PageNumber == null)
+	{
+		ViewBag.PageNumber = 1;
+	}
+
+	var pageNumber = (int)ViewBag.PageNumber;
+	pageNumber += 1;
+}
+
+<h2>Store</h2>
+
+<p>&nbsp;</p>
+
+<center>
+	@if (Model.Any())
+	{
+		<a class="btn btn-md btn-success" href="@Url.Action("List", "Store", new { area = "" })">View Cart</a>
+	}
+</center>
+
+<table style="width: 95%; padding-bottom: 30px; text-align: center;">
+	<tr>
+		@{
+			int i = 0;
+
+			foreach (var item in Model)
+			{
+				if (item.Image == null)
+				{
+					item.Image = "/img/images/icons/128x128/product_placeholder.jpg";
+				}
+				else
+				{
+					item.Image = "/img/Products/Thumb/" + item.Image;
+				}
+
+				<td style="height: 300px;">
+					<div class="img-thumbnail" style="text-align: center; padding-bottom: 20px; width: 180px; height: 250px;">
+						<br />
+						<a href="/Store/Details/@item.Id">
+							<img alt="120x120" style="width: 120px; height: 120px;" src="@item.Image" border="0" />
+						</a>
+						<br />
+						<b>Price:</b> $ @item.Price.ToString("N", new CultureInfo("en-US"))
+						<br />
+						@Html.Raw(item.ShortDescription)
+						<br />
+						@Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-sm btn-primary", @style = "color:#ffffff;" })
+					</div>
+				</td>
+
+				i++;
+
+				if (i == 3)
+				{
+				@:</tr><tr>
+					i = 0;
+				}
+
+			}
+		}
+	</tr>
+
+</table>
+
+
+<br />
+
+<p style="width:100%; text-align:center;">
+	@Html.PagedListPager(pagedList, pageNumber => Url.Action("ByCategory", new { id = categoryId, page = pageNumber }))
+</p>
+
+<p>&nbsp;</p>
