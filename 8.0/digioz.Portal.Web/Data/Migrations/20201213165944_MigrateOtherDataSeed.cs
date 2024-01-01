@@ -74,7 +74,7 @@ namespace digioz.Portal.Web.Data.Migrations
                 Title = "Home",
                 Url = "/Home/Index",
                 Body = @"<p><span style=''font-size: medium;''><strong>Welcome to DigiOz .NET Portal!</strong></span></p>
-                        <p>DigiOz .NET Portal is a web based portal system written in ASP.NET MVC Core 5.0 and&nbsp;C#&nbsp;which uses a 
+                        <p>DigiOz .NET Portal is a web based portal system written in ASP.NET MVC written with .NET 8.0 and &nbsp; C# &nbsp; which uses a 
                         Microsoft SQL Database to allows webmasters to setup and customize an instant website for either business 
                         or personal use.</p>
                         <p>Some Features included in this Portal System include:</p>
