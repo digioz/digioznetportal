@@ -1,0 +1,63 @@
+﻿@model IEnumerable<digioz.Portal.Web.Areas.Admin.Models.ViewModels.CommentPostViewModel>
+@using NonFactors.Mvc.Grid
+
+@{
+	ViewBag.Title = "Comment Posts List";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@section HeaderScripts {
+	<link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet">
+}
+
+@section FooterScripts {
+	<script src="~/js/mvc-grid/mvc-grid.js"></script>
+	<script>
+		document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+	</script>
+}
+
+<main>
+	<div class="container-fluid">
+		<div class="card mb-4">
+			<div class="card-header">
+				<h2>Comment Post List</h2>
+			</div>
+			<div class="card-body">
+				@*https://mvc6-grid.azurewebsites.net/formatting*@
+				@(Html
+				.Grid(Model)
+				.Build(columns =>
+				{
+					columns.Add(model => model.Username).Titled("Username").Filterable(true);
+
+					columns.Add(model => model.ReferenceType).Titled("Type").UsingDefaultFilterMethod("equals");
+					columns.Add(model => model.ModifiedDate).Titled("Date").UsingDefaultFilterMethod("equals");
+					columns.Add(model => model.Likes).Titled("Likes").UsingDefaultFilterMethod("equals");
+
+					columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='CommentPostsManager/Details?id={model.Id}' id=\"details\"  asp-action=\"Details\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"../img/images/icons/16x16/Search.png\" alt=\"Details\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+									   + $"<a data-modal='' data-id=\"{model.Id}\" href='CommentPostsManager/Edit?id={model.Id}' id=\"edit\"  asp-action=\"Edit\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"../img/images/icons/16x16/Edit.png\" alt=\"Edit\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;"
+									   + $"<a data-modal='' data-id=\"{model.Id}\" href='CommentPostsManager/Delete?id={model.Id}' id=\"delete\"  asp-action=\"Delete\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"../img/images/icons/16x16/Cancel.png\" alt=\"Delete\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;").Encoded(false);
+				})
+					.Empty("No comments found.")
+					.Filterable()
+					.Sortable()
+					.Pageable()
+                )
+				<div id='myModal' class='modal fade in'>
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div id='myModalContent'></div>
+						</div>
+					</div>
+				</div>
+
+				<div>
+					@Html.ActionLink("Back to Comment Menu", "Index", "CommentManager")
+				</div>
+			</div>
+		</div>
+	</div>
+</main>
+
+

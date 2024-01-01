@@ -1,0 +1,13 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Plugin>
+
+@{
+    var controller = ViewContext.RouteData.Values["Controller"].ToString();
+    var action = ViewContext.RouteData.Values["Action"].ToString();
+}
+
+    @foreach (var item in Model)
+    {
+        <li @if (controller == item.Name && action == "Index") { <text> class="active" </text> }>
+            @Html.ActionLink(@item.Name, "Index", @item.Name, new { area = "" }, null)
+        </li>
+    }

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\digioz.Portal.Dal\digioz.Portal.Dal.csproj" />
+    <ProjectReference Include="..\digioz.Portal.Utilities\digioz.Portal.Utilities.csproj" />
+  </ItemGroup>
+
+</Project>

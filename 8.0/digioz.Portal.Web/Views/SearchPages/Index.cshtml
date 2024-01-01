@@ -1,0 +1,35 @@
+﻿@model System.Collections.Generic.List<digioz.Portal.Web.Models.ViewModels.SearchPagesViewModel>
+
+@{
+	ViewBag.Title = "Search Results";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<article class="col2 marg_right1">
+	<div class="pad">
+		<div class="box2">
+			<div class="pad">
+				<h3>Search Results</h3>
+
+				@if (Model.Any())
+				{
+					int i = 1;
+
+					foreach (var result in Model)
+					{
+						<div class="panel panel-default" style="padding: 20px;">
+							@i . <a href="@result.Url">@result.Title</a><br />
+							<p>@result.Body</p>
+							@{ i++; }
+						</div>
+					}
+				}
+				else
+				{
+					<p>Your search did not return any results!</p>
+				}
+
+			</div>
+		</div>
+	</div>
+</article>

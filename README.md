@@ -1,13 +1,12 @@
 # DigiOz .NET Portal
-ASP.NET MVC Core Portal written with .NET 5.0.
+ASP.NET MVC Portal written with .NET 8.0.
 
 # Default Accounts
-By default the system will create two accounts for you if you run the tables and inserts scripts for version 1.0.0.0.
+By default the system will create two accounts for you if you run the tables and inserts scripts.
 
 - **Admin**
 
 o Username: admin@domain.com
-
 o Password: Pass@word1
 
 # Setup Database

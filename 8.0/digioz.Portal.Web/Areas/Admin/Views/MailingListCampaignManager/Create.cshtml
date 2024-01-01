@@ -1,0 +1,138 @@
+﻿@model digioz.Portal.Bo.MailingListCampaign
+
+@{
+    ViewBag.Title = "Submit Email Campaign";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@section FooterScripts {
+    <script type="text/javascript">
+        $(document)
+            .ready(function() {
+                $('#Banner').change(function (e) {
+                    var selectedBanner = $("#Banner option:selected").text();
+
+                    //alert(selectedBanner);
+                    var selectedBannerUrl = '/img/Emails/uploads/Full/' + selectedBanner;
+
+                    $('#bannerImage').attr('src', selectedBannerUrl);
+                });
+            });
+    </script>
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2>Submit Email Campaign</h2>
+
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-horizontal">
+                    <hr />
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Subject, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.Subject, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Subject, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FromName, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.FromName, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.FromName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FromEmail, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.FromEmail, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.FromEmail, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Summary, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.Summary, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Summary, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="Banner">Banner</label>
+                        <div class="col-md-10">
+                            <select id="Banner" name="Banner">
+                                <option value=""></option>
+                                @if (ViewBag.Banner != null)
+                                {
+                                    foreach (var item in ViewBag.Banner)
+                                    {
+                                        string bannerSelected = string.Empty;
+
+                                        if (item.Name == "blank_email_banner.png")
+                                        {
+                                            bannerSelected = "selected";
+                                        }
+                                        <option value="@item.Name" @bannerSelected>@item.Name</option>
+                                    }
+                                }
+                            </select>
+                            <br /><br />
+                            <img src="/img/Emails/uploads/Full/blank_email_banner.png" id="bannerImage" name="bannerImage" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Body, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(model => model.Body, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Body, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Mailing List</label>
+                        @{
+                            <table style="background-color:#DCDCF4; width:280px; padding-left:50px;">
+                                @foreach (var item in ViewBag.MailingLists)
+                                {
+                                    <tr>
+                                        <td style="padding-left:15px;"><input class="checkbox" type="checkbox" name="mailinglist" value="@item.Id" /></td>
+                                        <td style="padding-left:15px;">@item.Name</td>
+                                    </tr>
+                                }
+                            </table>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Submit" class="btn btn-primary" />
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div>
+                @Html.ActionLink("Back to List", "Index")
+            </div>
+        </div>
+    </div>
+</div>
+
+

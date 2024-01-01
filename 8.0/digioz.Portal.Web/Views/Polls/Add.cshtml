@@ -1,0 +1,54 @@
+﻿@model digioz.Portal.Bo.Poll
+@{
+	ViewBag.Title = "Add Poll Vote";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var pollAnswers = (List<digioz.Portal.Bo.PollAnswer>)ViewBag.PollAnswers;
+}
+
+<h2>Add Poll Vote</h2>
+
+<h4>Poll: @Model.Slug</h4>
+
+@if (ViewBag.HasUserVoted == true)
+{
+    <div class="alert alert-danger" role="alert">
+        Sorry, you have already voted for this poll!
+    </div>
+}
+else
+{
+    using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.Id)
+
+        <table class="table">
+            <tr>
+                <th>Answer</th>
+                <th>Vote</th>
+            </tr>
+            @foreach (var answer in pollAnswers)
+            {
+                <tr>
+                    <td>
+                        @if (Model.AllowMultipleOptionsVote)
+                        {
+                            <input type="checkbox" id="answerid_@answer.Id" name="answerid_@answer.Id" />
+                        }
+                        else
+                        {
+                            <input type="radio" id="answer" name="answer" value="@answer.Id" />
+                        }
+                    </td>
+                    <td>@answer.Answer</td>
+                </tr>
+            }
+        </table>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Vote" class="btn btn-primary" />
+            </div>
+        </div>
+    }
+}

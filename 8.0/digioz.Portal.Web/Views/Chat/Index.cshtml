@@ -1,0 +1,85 @@
+﻿@model IEnumerable<digioz.Portal.Bo.ViewModels.ChatViewModel>
+@{
+	ViewBag.Title = "Chat";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Head {
+	<meta http-equiv="refresh" content="60">
+}
+
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			chatUsersOnline();
+			var resInterval = window.setInterval('chatUsersOnline()', 10000);
+
+			$("#chat-message-container").animate({ scrollTop: $(document).height() }, "slow");
+
+			$('#sendButton').click(function () {
+				$("#chat-message-container").animate({ scrollTop: $(document).height() }, "slow");
+				return false;
+			});
+		});
+
+		function chatUsersOnline() {
+			$.ajax({
+				type: "GET",
+				url: "/Chat/Online",
+				dataType: "json",
+				success: function (response) {
+					//alert("data fetched");
+
+					var items = "<ul>";
+
+					$.each(response, function (i, users) {
+						items += "<li>" + users + "</li>";
+						//alert(users);
+					});
+
+					items += "</ul>";
+
+					$('#onlineUsersList').html(items);
+				}
+			});
+		}
+	</script>
+}
+ 
+<div class="row">
+	<div class="col-12">
+		<hr />
+		<h4 style="padding-left: 25px;">Online Users</h4>
+		<div id="onlineUsersList" name="onlineUsersList" style="width: 100%; background-color:#cbecfa;">
+			<!-- List of Users -->
+		</div>
+		<hr />
+	</div>
+</div>
+<div class="row">
+	<div id="chat-message-container" name="chat-message-container" class="chat-list">
+		<div id="chatlistbox">
+			<ul id="messagesList">
+				@foreach (var chat in Model)
+				{
+					<li>@chat.UserName: @chat.Message </li>
+				}
+
+			</ul>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<div class="row">&nbsp;</div>
+	<input type="text" id="userInput" value="@ViewBag.Username" hidden />
+	<input type="text" id="userId" value="@ViewBag.UserId" hidden />
+
+	<div class="row">
+		<div class="col-10"><input class="form-control" type="text" name="messageInput" id="messageInput" /></div>
+		<input type="button" id="sendButton" value="Send Message" class="btn btn-primary" />
+	</div>
+</div>
+
+<script src="~/lib/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js"></script>

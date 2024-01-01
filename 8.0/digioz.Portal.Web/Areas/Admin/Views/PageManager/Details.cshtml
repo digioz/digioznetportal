@@ -1,0 +1,97 @@
+﻿@model digioz.Portal.Bo.Page
+
+@{
+    ViewBag.Title = "Page Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2>Page Details</h2>
+
+            <div>
+                <table class="table border-bottom">
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Title)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Title)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Url)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Url)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Body)
+                        </td>
+
+                        <td>
+                            @Html.Raw(Model.Body)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Keywords)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Keywords)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Description)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Description)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Visible)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Visible)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Timestamp)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Timestamp)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            Username
+                        </td>
+
+                        <td>
+                            @ViewBag.UserName
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <p>
+                @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+                @Html.ActionLink("Back to List", "Index")
+            </p>
+        </div>
+    </div>
+</div>
+
+

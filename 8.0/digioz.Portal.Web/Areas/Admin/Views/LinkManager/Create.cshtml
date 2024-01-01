@@ -1,0 +1,72 @@
+﻿@model digioz.Portal.Bo.Link
+
+@{
+    ViewBag.Title = "Create Link1";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Create Link</h2>
+
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-horizontal">
+                    @Html.ValidationSummary(true)
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Name)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Url, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(model => model.Url, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Url)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Description, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Description)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="LinkCategory">Category</label>
+                        <div class="col-md-10">
+                            @Html.DropDownList("LinkCategory", String.Empty)
+                            @Html.ValidationMessageFor(model => model.LinkCategory)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Visible, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.Visible)
+                            @Html.ValidationMessageFor(model => model.Visible)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Create" class="btn btn-sm btn-primary" />
+                        </div>
+                    </div>
+                </div>}
+
+            <div>
+                @Html.ActionLink("Back to List", "List")
+            </div>
+        </div>
+    </div>
+</div>

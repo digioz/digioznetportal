@@ -1,0 +1,48 @@
+﻿@model digioz.Portal.Bo.Config
+
+@{
+    ViewBag.Title = "Configuration Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Configuration Details</h2>
+
+			<div>
+				<dl class="dl-horizontal">
+					<dt>
+						@Html.DisplayNameFor(model => model.ConfigKey)
+					</dt>
+
+					<dd>
+						@Html.DisplayFor(model => model.ConfigKey)
+					</dd>
+
+					<dt>
+						@Html.DisplayNameFor(model => model.ConfigValue)
+					</dt>
+
+					<dd>
+						@if (Model.IsEncrypted)
+						{
+							<span>[XXX]</span>
+						}
+						else
+						{
+							@Html.DisplayFor(model => model.ConfigValue)
+						}
+					</dd>
+
+				</dl>
+			</div>
+			<p>
+				@Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+				@Html.ActionLink("Back to List", "Index")
+			</p>
+		</div>
+	</div>
+</div>
+
+

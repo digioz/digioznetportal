@@ -1,0 +1,160 @@
+﻿@model digioz.Portal.Web.Areas.Admin.Models.ViewModels.UserManagerViewModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div>
+                <h2>User Details</h2>
+
+                <table class="table border-bottom">
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.UserName)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.UserName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.FirstName)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.FirstName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.LastName)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.LastName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Email)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Email)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Birthday)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Birthday)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.BirthdayVisible)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.BirthdayVisible)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Address)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Address)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Address2)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Address2)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.City)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.City)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.State)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.State)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Zip)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Zip)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Country)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Country)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Signature)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(model => model.Signature)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">
+                            @Html.DisplayNameFor(model => model.Avatar)
+                        </td>
+
+                        <td>
+                            @if (Model.Avatar != null && Model.Avatar.Length > 0)
+                            {
+                                <a href="~/img/Avatar/Full/@Model.Avatar">
+                                    <img class="img-thumbnail" src="~/img/Avatar/Thumb/@Model.Avatar" />
+                                </a><br /> 
+                            }
+                            else
+                            {
+                                <a href="~/img/Avatar/Full/Default.png">
+                                    <img class="img-thumbnail" src="~/img/Avatar/Thumb/Default.png" />
+                                </a><br />
+                            }
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <p>
+                @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+                @Html.ActionLink("Back to List", "Index")
+            </p>
+        </div>
+    </div>
+</div>

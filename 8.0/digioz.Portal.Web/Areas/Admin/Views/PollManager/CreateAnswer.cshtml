@@ -1,0 +1,41 @@
+﻿@model digioz.Portal.Bo.PollAnswer
+
+@{
+    ViewBag.Title = "Create Poll Answer";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Create Poll Answer</h2>
+
+			@using (Html.BeginForm())
+			{
+				@Html.AntiForgeryToken()
+				@Html.HiddenFor(model => model.PollId)
+
+				<div class="form-horizontal">
+					@Html.ValidationSummary(true)
+					<div class="form-group">
+						@Html.LabelFor(model => model.Answer, htmlAttributes: new { @class = "control-label col-md-2" })
+						<div class="col-md-10">
+							@Html.EditorFor(model => model.Answer)
+							@Html.ValidationMessageFor(model => model.Answer)
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-md-offset-2 col-md-10">
+							<input type="submit" value="Create" class="btn btn-primary" />
+						</div>
+					</div>
+				</div>
+			}
+
+			<div>
+				@Html.ActionLink("Back to List", "Index")
+			</div>
+		</div>
+	</div>
+</div>

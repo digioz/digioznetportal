@@ -1,0 +1,17 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Poll>
+@{
+    ViewBag.Title = "Add Poll Vote";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>List of Polls</h2>
+
+<div class="list-group">
+    @if (Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            <a href="@Url.Action("Details", "Polls", new { id = item.Id })" class="list-group-item">@item.Slug</a>
+        }
+    }
+</div>

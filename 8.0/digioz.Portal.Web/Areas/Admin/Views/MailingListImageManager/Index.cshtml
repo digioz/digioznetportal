@@ -1,0 +1,61 @@
+﻿@model List<digioz.Portal.Web.Areas.Admin.Models.ViewModels.MailingListImageViewModel>
+@using NonFactors.Mvc.Grid
+@using digioz.Portal.Web.Helpers 
+@{
+    ViewBag.Title = "Mailing List Images";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@section HeaderScripts {
+    <link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet">
+}
+
+@section FooterScripts {
+    <script src="~/js/mvc-grid/mvc-grid.js"></script>
+    <script>
+        document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+    </script>
+}
+
+<main>
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Mailing List Image Manager</h2>
+            </div>
+            <div class="card-body">
+                <p>
+                    <a class="btn btn-sm btn-primary" href="@Url.Action("Create", "MailingListImageManager", new { area = "Admin" })">Create New</a>
+                </p>
+                @*https://mvc6-grid.azurewebsites.net/formatting*@
+                @(Html
+                .Grid(Model)
+                .Build(columns =>
+                {
+                    columns.Add(model => $"<a href='../../img/Emails/uploads/Full/" + Utility.DefaultOrValue(model.Name, "PictureAlbumIcon.png") + "'>"
+                        + "<img class='img-thumbnail' alt='120x120' style='width: 120px; height: 120px;' src='../../img/Emails/uploads/Thumb/" + Utility.DefaultOrValue(model.Name, "PictureAlbumIcon.png") + "' /></a>"
+                    ).Encoded(false);
+                    columns.Add(model => model.Name).Titled("Filename").Filterable(true);
+                    columns.Add(model => $"<a data-modal='' data-id=\"{model.Name}\" href='MailingListImageManager/Delete/{model.Name}' id=\"delete\"  asp-action=\"Delete\" asp-route-id=\"@item.Name\"'><img class=\"sb-nav-link-icon\" src=\"../img/images/icons/16x16/Cancel.png\" alt=\"Delete\"><span class='glyphicon glyphicon-user'></span></a>").Encoded(false);
+                })
+                    .Empty("No users found.")
+                    .Filterable()
+                    .Sortable()
+                    .Pageable()
+                )
+                <div id='myModal' class='modal fade in'>
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div id='myModalContent'></div>
+                        </div>
+                    </div>
+                </div>
+                <p>&nbsp;</p>
+
+                <div>
+                    @Html.ActionLink("Back to Mailing List Menu", "Index", "MailingListManager")
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

@@ -1,0 +1,133 @@
+﻿@model digioz.Portal.Bo.VisitorInfo
+
+@{
+    ViewData["Title"] = "Visitor Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<h2>Visitor Details</h2>
+
+			<div>
+				<h4>VisitorInfo</h4>
+				<hr />
+				<dl class="row">
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.Id)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.Id)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.JavaEnabled)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.JavaEnabled)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.Timestamp)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.Timestamp)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.Browser)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.Browser)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.BrowserVersion)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.BrowserVersion)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.ScreenHeight)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.ScreenHeight)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.ScreenWidth)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.ScreenWidth)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.BrowserEngineName)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.BrowserEngineName)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.Host)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.Host)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.HostName)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.HostName)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.IpAddress)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.IpAddress)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.Platform)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.Platform)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.Referrer)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.Referrer)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.Href)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.Href)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.UserAgent)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.UserAgent)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.UserLanguage)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.UserLanguage)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.SessionId)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.SessionId)
+					</dd>
+					<dt class="col-sm-2">
+						@Html.DisplayNameFor(model => model.OperatingSystem)
+					</dt>
+					<dd class="col-sm-10">
+						@Html.DisplayFor(model => model.OperatingSystem)
+					</dd>
+				</dl>
+			</div>
+			<div>
+				@Html.ActionLink("Back to List", "Index")
+			</div>
+		</div>
+	</div>
+</div>
+

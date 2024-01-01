@@ -1,0 +1,22 @@
+﻿@model List<digioz.Portal.Bo.Link>
+
+<tr>
+@{
+	int i = 0;
+
+	foreach (var link in Model)
+	{
+		<td>
+			<a href="@link.Url" target="_blank" title="@link.Description">@link.Name</a>
+		</td>
+
+		i++;
+
+		if (i == 2)
+		{
+		@:</tr><tr>
+			i = 0;
+		}
+	}
+}
+</tr>

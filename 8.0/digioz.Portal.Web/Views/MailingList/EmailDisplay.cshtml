@@ -1,0 +1,41 @@
+﻿@model digioz.Portal.Bo.MailingListCampaign
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>@Model.Subject</title>
+</head>
+<body>
+
+<table style="background-color: #F4F4F4; padding: 20px; margin: auto; max-width: 650px; border: solid; border-width:1px; border-color:#000000;">
+    <tr>
+        <td style="width: 530px;font-size:8pt;">@Model.Subject</td>
+        <td style="width: 120px;font-size:8pt;text-align:right;"><a href="@ViewBag.EmailDisplayUrl" target="_blank">View in Browser</a></td>
+    </tr>
+    @if (!string.IsNullOrEmpty(ViewBag.BannerUrl))
+    {
+        <tr>
+            <td colspan="2"><img src="@ViewBag.BannerUrl" /></td>
+        </tr>
+    }
+    <tr style="min-height: 800px;">
+        <td colspan="2" style="vertical-align:top;">@Html.Raw(Model.Body)</td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <div style="width: 100%; text-align: center;">
+                <span style="font-size:8pt;">Getting too many emails? Click Here to <a href="@ViewBag.UnsubscribeUrl">UNSUBSCRIBE</a></span>
+            </div>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
+
+

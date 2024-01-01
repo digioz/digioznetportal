@@ -1,0 +1,27 @@
+﻿@model digioz.Portal.Bo.Page
+@{ 
+    ViewBag.Title = Model.Title;  
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+
+@section keywords {
+    <meta name="keywords" content="@Model.Keywords" />
+}
+
+@section description {
+    <meta name="description" content="@Model.Description" />
+}
+
+@{ 
+    if (Model != null)
+    {
+        @Html.Raw(@Model.Body) 
+    }
+    else
+    {
+        <h2>Page was not found</h2>
+        <div>The page you are looking for either does not exist or is not available for viewing at the moment.</div> 
+    }
+}
+
+@Html.RenderAction("CommentsMenu", "Menu", new { referenceId = Model.Id, referenceType = "Page" })

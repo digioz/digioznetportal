@@ -1,0 +1,53 @@
+﻿@model IEnumerable<digioz.Portal.Bo.Chat>
+@using NonFactors.Mvc.Grid
+@{
+	ViewBag.Title = "Chat Manager";
+	Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@section HeaderScripts {
+	<link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet">
+}
+
+@section FooterScripts {
+	<script src="~/js/mvc-grid/mvc-grid.js"></script>
+	<script>
+        document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+	</script>
+}
+
+<main>
+	<div class="container-fluid">
+		<div class="card mb-4">
+			<div class="card-header">
+				<h2>Chat Manager</h2>
+			</div>
+			<div class="card-body">
+				<p>
+					<a class="btn btn-sm btn-primary" href="@Url.Action("Purge", "ChatManager", new { area = "Admin" })">Purge</a>
+					<a class="btn btn-sm btn-primary" href="@Url.Action("Export", "ChatManager", new { area = "Admin" })">Export</a>
+				</p>
+
+				@(Html
+					.Grid(Model)
+					.Build(columns =>
+					{
+						columns.Add(model => model.Id).Titled("Id").Filterable(false);
+						columns.Add(model => model.UserId).Titled("IP Address").Filterable(true);
+
+						columns.Add(model => model.Message).Titled("OS").UsingDefaultFilterMethod("equals");
+						columns.Add(model => model.Timestamp).Titled("Date").UsingDefaultFilterMethod("equals");
+
+						columns.Add(model => $"<a data-modal='' data-id=\"{model.Id}\" href='Admin/ChatManager/Delete?id={model.Id}' id=\"delete\"  asp-action=\"Delete\" asp-route-id=\"@item.Id\"'><img class=\"sb-nav-link-icon\" src=\"../img/images/icons/16x16/cancel.png\" alt=\"Details\"><span class='glyphicon glyphicon-user'></span></a> &nbsp;&nbsp;").Encoded(false);
+
+					})
+						.Empty("No users found.")
+						.Filterable()
+						.Sortable()
+						.Pageable()
+				)
+			</div>
+		</div>
+	</div>
+</main>
+
