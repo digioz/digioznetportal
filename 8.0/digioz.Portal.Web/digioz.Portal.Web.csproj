@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <UserSecretsId>aspnet-digioz.Portal.Web-6E4D210B-5040-4AFC-8696-B19F182D0B00</UserSecretsId>
+    <AssemblyVersion>8.0.0.0</AssemblyVersion>
+    <FileVersion>8.0.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
