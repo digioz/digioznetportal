@@ -20,7 +20,7 @@ namespace digioz.Portal.Utilities
                         var p = destProps.First(x => x.Name == sourceProp.Name);
 
                         // check if the property can be set or no.
-                        if (p.CanWrite && !excludes.Contains(p.Name)) { 
+                        if (p.CanWrite && (excludes == null || !excludes.Contains(p.Name))) { 
                             p.SetValue(dest, sourceProp.GetValue(source, null), null);
                         }
                     }
