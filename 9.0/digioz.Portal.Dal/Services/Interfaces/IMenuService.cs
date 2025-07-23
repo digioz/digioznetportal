@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using digioz.Portal.Bo;
-using digioz.Portal.Dal.Services;
 
 namespace digioz.Portal.Dal.Services.Interfaces
 {
