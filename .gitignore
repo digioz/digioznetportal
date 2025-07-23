@@ -3,3 +3,13 @@
 ################################################################################
 
 /.vs
+/9.0/.vs
+/9.0/digioz.Portal.Bo/bin/Debug
+/9.0/digioz.Portal.Bo/obj
+/9.0/digioz.Portal.Dal/bin/Debug
+/9.0/digioz.Portal.Dal/obj
+/9.0/digioz.Portal.Utilities/bin/Debug
+/9.0/digioz.Portal.Utilities/obj
+/9.0/digioz.Portal.Web/.vs
+/9.0/digioz.Portal.Web/bin/Debug/net9.0
+/9.0/digioz.Portal.Web/obj
