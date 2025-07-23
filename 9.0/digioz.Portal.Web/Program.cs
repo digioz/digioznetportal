@@ -27,7 +27,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(
 // Add Custom Services
 builder.Services.AddDbContext<digiozPortalContext>(
     options => options.UseSqlServer(connectionString),
-    optionsLifetime: ServiceLifetime.Singleton);
+    optionsLifetime: ServiceLifetime.Scoped);
 builder.Services.AddDbContextFactory<digiozPortalContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddRazorPages();
