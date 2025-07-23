@@ -8,8 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.Http;
-//using Microsoft.Security.Application;
+
 
 namespace digioz.Portal.Utilities
 {
