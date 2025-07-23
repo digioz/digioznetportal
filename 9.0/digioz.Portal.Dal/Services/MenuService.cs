@@ -2,7 +2,6 @@
 using digioz.Portal.Dal.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace digioz.Portal.Dal.Services
