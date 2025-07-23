@@ -1,3 +1,4 @@
+using digioz.Portal.Dal;
 using digioz.Portal.Web.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +11,25 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddRoles<IdentityRole>() // Add role management
+builder.Services.AddDefaultIdentity<IdentityUser>(
+                        options =>
+                        {
+                            options.SignIn.RequireConfirmedAccount = false;
+                            options.SignIn.RequireConfirmedEmail = false;
+                            options.User.RequireUniqueEmail = true;
+                            options.Lockout.AllowedForNewUsers = true;
+                            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(120);
+                            options.Lockout.MaxFailedAccessAttempts = 5;
+                        })
+    .AddRoles<IdentityRole>()   // Add this line to enable roles
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+// Add Custom Services
+builder.Services.AddDbContext<digiozPortalContext>(
+    options => options.UseSqlServer(connectionString),
+    optionsLifetime: ServiceLifetime.Singleton);
+builder.Services.AddDbContextFactory<digiozPortalContext>(options => options.UseSqlServer(connectionString));
+
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
