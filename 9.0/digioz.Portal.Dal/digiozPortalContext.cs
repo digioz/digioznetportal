@@ -710,11 +710,9 @@ namespace digioz.Portal.Dal
 
                 entity.Property(e => e.Platform).HasMaxLength(25);
 
-                entity.Property(e => e.IpAddress).HasMaxLength(25);
-
                 entity.Property(e => e.UserLanguage).HasMaxLength(25);
 
-                entity.Property(e => e.SessionId).HasMaxLength(25);
+                entity.Property(e => e.SessionId).HasMaxLength(128);
 
                 entity.Property(e => e.OperatingSystem).HasMaxLength(25);
             });

@@ -539,7 +539,7 @@ namespace digioz.Portal.Utilities
         /// <param name="input"></param>
         /// <returns></returns>
         public static string UrlEncode(string input) {
-            return UrlEncode(input);
+            return HttpUtility.UrlEncode(input);
         }
 
         /// <summary>
