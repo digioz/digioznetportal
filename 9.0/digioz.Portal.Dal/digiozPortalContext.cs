@@ -712,7 +712,7 @@ namespace digioz.Portal.Dal
 
                 entity.Property(e => e.UserLanguage).HasMaxLength(25);
 
-                entity.Property(e => e.SessionId).HasMaxLength(25);
+                entity.Property(e => e.SessionId).HasMaxLength(128);
 
                 entity.Property(e => e.OperatingSystem).HasMaxLength(25);
             });
