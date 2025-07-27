@@ -3,25 +3,25 @@
 <ul class="navbar-nav mr-auto">
     @if (Model != null)
     {
-        var controllerSelected = ViewContext.RouteData.Values["Controller"].ToString();
-        var actionSelected = ViewContext.RouteData.Values["Action"].ToString();
+@*         var controllerSelected = ViewContext.RouteData.Values["Controller"].ToString();
+        var actionSelected = ViewContext.RouteData.Values["Action"].ToString(); *@
 
         foreach (var item in Model)
         {
             if (!string.IsNullOrEmpty(item.Controller))
             {
-                if (controllerSelected == item.Controller && actionSelected == item.Action)
+                @* if (controllerSelected == item.Controller && actionSelected == item.Action)
                 {
                     <li class="nav-item active">
                         @Html.ActionLink(@item.Name, @item.Action, @item.Controller, new { area = "" }, new { @class = "nav-link" })
                     </li>
                 }
                 else
-                {
+                { *@
                     <li class="nav-item">
                         @Html.ActionLink(@item.Name, @item.Action, @item.Controller, new { area = "" }, new { @class = "nav-link" })
                     </li>
-                }
+                //}
             }
             else
             {

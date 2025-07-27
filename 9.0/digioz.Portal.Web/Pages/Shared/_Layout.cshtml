@@ -1,10 +1,166 @@
-﻿@using digioz.Portal.Bo
-@using digioz.Portal.Dal.Services
+﻿@using Microsoft.Extensions.Caching.Memory
+@using digioz.Portal.Bo
 @using digioz.Portal.Dal.Services.Interfaces
 @inject IMenuService MenuService
+@inject IConfigService ConfigService
+@inject Microsoft.Extensions.Caching.Memory.IMemoryCache MemoryCache
 
 @{
-	var leftMenu = MenuService.GetAll().Where(x => x.Location == "LeftMenu" && x.Visible == true).OrderBy(x => x.SortOrder).ToList();
+    // Cache keys
+    var cacheKeyConfig = "Config";
+    var cacheKeyTopMenu = "TopMenu";
+    var cacheKeyLeftMenu = "LeftMenu";
+    var cacheKeyUserMenu = "UserMenu";
+    var cacheKeyWhoIsOnlineMenu = "WhoIsOnlineMenu";
+    var cacheKeyStoreMenu = "StoreMenu";
+    var cacheKeyPollMenu = "PollMenu";
+    var cacheKeyTwitterMenu = "TwitterMenu";
+    var cacheKeyZoneMenuLeft = "ZoneMenuLeft";
+    var cacheKeyZoneMenuBodyTop = "ZoneMenuBodyTop";
+    var cacheKeyZoneMenuBodyBottom = "ZoneMenuBodyBottom";
+    var cacheKeyZoneMenuBottom = "ZoneMenuBottom";
+    var cacheKeySlideShow = "SlideShow";
+    var cacheKeyFeatured = "Featured";
+    var cacheKeyLatestPictures = "LatestPictures";
+    var cacheKeyLatestVideos = "LatestVideos";
+    var cacheKeyRSSFeed = "RSSFeed";
+
+    // Menu variables
+    List<Config> config;
+    List<Menu> topMenu;
+    List<Menu> leftMenu;
+    List<Menu> whoIsOnlineMenu;
+    List<Menu> storeMenu;
+    List<Menu> pollMenu;
+    List<Menu> twitterMenu;
+    List<Menu> zoneMenuLeft;
+    List<Menu> zoneMenuBodyTop;
+    List<Menu> zoneMenuBodyBottom;
+    List<Menu> zoneMenuBottom;
+    // Other variables (types may need to be adjusted based on your actual data)
+    // object slideShow;
+    // object featured;
+    // object latestPictures;
+    // object latestVideos;
+    // object rssFeed;
+
+    var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
+
+    // Retrieve configuration from cache or database
+    if (!MemoryCache.TryGetValue(cacheKeyConfig, out config))
+    {
+        config = ConfigService.GetAll();
+        MemoryCache.Set(cacheKeyConfig, config, cacheEntryOptions);
+    }
+    if (!MemoryCache.TryGetValue(cacheKeyTopMenu, out topMenu))
+    {
+        topMenu = MenuService.GetAll()
+            .Where(x => x.Location == "TopMenu" && x.Visible == true)
+            .OrderBy(x => x.SortOrder)
+            .ToList();
+        MemoryCache.Set(cacheKeyTopMenu, topMenu, cacheEntryOptions);
+    }
+    if (!MemoryCache.TryGetValue(cacheKeyLeftMenu, out leftMenu))
+    {
+        leftMenu = MenuService.GetAll()
+            .Where(x => x.Location == "LeftMenu" && x.Visible == true)
+            .OrderBy(x => x.SortOrder)
+            .ToList();
+        MemoryCache.Set(cacheKeyLeftMenu, leftMenu, cacheEntryOptions);
+    }
+    if (!MemoryCache.TryGetValue(cacheKeyWhoIsOnlineMenu, out whoIsOnlineMenu))
+    {
+        whoIsOnlineMenu = MenuService.GetAll()
+            .Where(x => x.Location == "WhoIsOnlineMenu" && x.Visible == true)
+            .OrderBy(x => x.SortOrder)
+            .ToList();
+        MemoryCache.Set(cacheKeyWhoIsOnlineMenu, whoIsOnlineMenu, cacheEntryOptions);
+    }
+    if (!MemoryCache.TryGetValue(cacheKeyStoreMenu, out storeMenu))
+    {
+        storeMenu = MenuService.GetAll()
+            .Where(x => x.Location == "StoreMenu" && x.Visible == true)
+            .OrderBy(x => x.SortOrder)
+            .ToList();
+        MemoryCache.Set(cacheKeyStoreMenu, storeMenu, cacheEntryOptions);
+    }
+    if (!MemoryCache.TryGetValue(cacheKeyPollMenu, out pollMenu))
+    {
+        pollMenu = MenuService.GetAll()
+            .Where(x => x.Location == "PollMenu" && x.Visible == true)
+            .OrderBy(x => x.SortOrder)
+            .ToList();
+        MemoryCache.Set(cacheKeyPollMenu, pollMenu, cacheEntryOptions);
+    }
+    if (!MemoryCache.TryGetValue(cacheKeyTwitterMenu, out twitterMenu))
+    {
+        twitterMenu = MenuService.GetAll()
+            .Where(x => x.Location == "TwitterMenu" && x.Visible == true)
+            .OrderBy(x => x.SortOrder)
+            .ToList();
+        MemoryCache.Set(cacheKeyTwitterMenu, twitterMenu, cacheEntryOptions);
+    }
+    if (!MemoryCache.TryGetValue(cacheKeyZoneMenuLeft, out zoneMenuLeft))
+    {
+        zoneMenuLeft = MenuService.GetAll()
+            .Where(x => x.Location == "ZoneMenuLeft" && x.Visible == true)
+            .OrderBy(x => x.SortOrder)
+            .ToList();
+        MemoryCache.Set(cacheKeyZoneMenuLeft, zoneMenuLeft, cacheEntryOptions);
+    }
+    if (!MemoryCache.TryGetValue(cacheKeyZoneMenuBodyTop, out zoneMenuBodyTop))
+    {
+        zoneMenuBodyTop = MenuService.GetAll()
+            .Where(x => x.Location == "ZoneMenuBodyTop" && x.Visible == true)
+            .OrderBy(x => x.SortOrder)
+            .ToList();
+        MemoryCache.Set(cacheKeyZoneMenuBodyTop, zoneMenuBodyTop, cacheEntryOptions);
+    }
+    if (!MemoryCache.TryGetValue(cacheKeyZoneMenuBodyBottom, out zoneMenuBodyBottom))
+    {
+        zoneMenuBodyBottom = MenuService.GetAll()
+            .Where(x => x.Location == "ZoneMenuBodyBottom" && x.Visible == true)
+            .OrderBy(x => x.SortOrder)
+            .ToList();
+        MemoryCache.Set(cacheKeyZoneMenuBodyBottom, zoneMenuBodyBottom, cacheEntryOptions);
+    }
+    if (!MemoryCache.TryGetValue(cacheKeyZoneMenuBottom, out zoneMenuBottom))
+    {
+        zoneMenuBottom = MenuService.GetAll()
+            .Where(x => x.Location == "ZoneMenuBottom" && x.Visible == true)
+            .OrderBy(x => x.SortOrder)
+            .ToList();
+        MemoryCache.Set(cacheKeyZoneMenuBottom, zoneMenuBottom, cacheEntryOptions);
+    }
+    // For the following, replace the assignment with the actual data retrieval logic as needed
+    // if (!MemoryCache.TryGetValue(cacheKeySlideShow, out slideShow))
+    // {
+    //     slideShow = null; // TODO: Replace with actual SlideShow data retrieval
+    //     MemoryCache.Set(cacheKeySlideShow, slideShow, cacheEntryOptions);
+    // }
+    // if (!MemoryCache.TryGetValue(cacheKeyFeatured, out featured))
+    // {
+    //     featured = null; // TODO: Replace with actual Featured data retrieval
+    //     MemoryCache.Set(cacheKeyFeatured, featured, cacheEntryOptions);
+    // }
+    // if (!MemoryCache.TryGetValue(cacheKeyLatestPictures, out latestPictures))
+    // {
+    //     latestPictures = null; // TODO: Replace with actual LatestPictures data retrieval
+    //     MemoryCache.Set(cacheKeyLatestPictures, latestPictures, cacheEntryOptions);
+    // }
+    // if (!MemoryCache.TryGetValue(cacheKeyLatestVideos, out latestVideos))
+    // {
+    //     latestVideos = null; // TODO: Replace with actual LatestVideos data retrieval
+    //     MemoryCache.Set(cacheKeyLatestVideos, latestVideos, cacheEntryOptions);
+    // }
+    // if (!MemoryCache.TryGetValue(cacheKeyRSSFeed, out rssFeed))
+    // {
+    //     rssFeed = null; // TODO: Replace with actual RSSFeed data retrieval
+    //     MemoryCache.Set(cacheKeyRSSFeed, rssFeed, cacheEntryOptions);
+    // }
+
+    // Convert config to a dictionary for easy access
+    var configDictionary = config.ToDictionary(c => c.ConfigKey, c => c.ConfigValue);
 }
 
 <!DOCTYPE html>
@@ -12,7 +168,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>@ViewData["Title"] - digioz.Portal.Web.Models.AppStart.SiteSettings.SiteName</title>
+	<title>@ViewData["Title"] - @configDictionary["SiteName"]</title>
 	@if (IsSectionDefined("keywords"))
 	{
 		@RenderSection("keywords")
@@ -28,19 +184,19 @@
 <body>
 	<div class="container">
 		<div style="padding-left:20px;">
-			<a href="/"><img src="~/img/images/Logo_Small.png" alt="digioz.Portal.Web.Models.AppStart.SiteSettings.SiteName" /></a>
+            <a href="/"><img src="~/img/images/Logo_Small.png" alt="@configDictionary["SiteName"]" /></a>
 			<h1 style="position:absolute; top:20px;">&nbsp;</h1><br /><br />
 		</div>
 	</div>
 
 	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-		<a class="navbar-brand" href="#">digioz.Portal.Web.Models.AppStart.SiteSettings.SiteName</a>
+        <a class="navbar-brand" href="#">@configDictionary["SiteName"]</a>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<div class="collapse navbar-collapse" id="navbarCollapse">
 
-@* 			@Html.RenderAction("TopMenu", "Menu", new { area = "" }) *@
+            @await Html.PartialAsync("Menu/_TopMenu", topMenu)
 
 			<form class="d-flex mt-2 mt-md-0" action="/SearchPages">
 				<input class="form-control me-2" type="text" placeholder="Search" aria-label="Search" name="searchString">
@@ -57,10 +213,9 @@
             <div class="col-md-3">
 
             @await Html.PartialAsync("Menu/_LeftMenu", leftMenu)
+            @await Html.PartialAsync("Menu/_UserMenu")
 
             @*
-
-            @Html.RenderAction("UserMenu", "Menu", new { area = "" })
 
             @Html.RenderAction("WhoIsOnlineMenu", "Menu", new { area = "" })
 
@@ -102,7 +257,7 @@
 
 		<hr />
 		<footer>
-			<p>&copy; @DateTime.Now.Year - digioz.Portal.Web.Models.AppStart.SiteSettings.SiteName</p>
+            <p>&copy; @DateTime.Now.Year - @configDictionary["SiteName"]</p>
 		</footer>
 	</div>
 	<script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
