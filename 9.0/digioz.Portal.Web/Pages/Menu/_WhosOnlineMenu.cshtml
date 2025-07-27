@@ -1,0 +1,28 @@
+@{
+    if (ViewBag.WhoIsOnlineEnabled == true)
+    {
+        <div class="card bg-light mb-3">
+            <div class="card-header">Online</div>
+            <div class="card-body">
+                <div>
+                    <span>Visitors: </span>@ViewBag.VisitorCount<br />
+                    @{
+                        var visitors = ViewBag.RegisteredVisitors;
+
+                        if (visitors.Count > 0)
+                        {
+                            <span>Logged In: </span>
+
+                            foreach (var visitor in visitors)
+                            {
+                                <a href="@Url.Action("ShowDetails", "Profile", new { userId = visitor.Username })">@visitor.Username</a>
+            
+                                <span>, </span>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
