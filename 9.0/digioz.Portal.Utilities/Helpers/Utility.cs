@@ -44,9 +44,7 @@ namespace digioz.Portal.Utilities.Helpers
                 return false;
             }
 
-            //-------------------------------------------
-            //  Check the image extension
-            //-------------------------------------------
+            // Check if the file extension of the uploaded file is a valid image extension.
             if (Path.GetExtension(postedFile.FileName).ToLower() != ".jpg"
                 && Path.GetExtension(postedFile.FileName).ToLower() != ".png"
                 && Path.GetExtension(postedFile.FileName).ToLower() != ".gif"
