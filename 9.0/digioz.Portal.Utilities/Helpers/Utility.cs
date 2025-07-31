@@ -1140,7 +1140,7 @@ namespace digioz.Portal.Utilities.Helpers
             cardNumber = cardNumber.Replace("-", "");
             Regex reNum = new Regex(@"^\d+$");
             bool isNumeric = reNum.Match(cardNumber).Success;
-            if (cardNumber.Length < 14 || isNumeric)
+            if (cardNumber.Length < 14 || !isNumeric)
             {
                 switch (int.Parse(cardNumber.Substring(0, 2)))
                 {
