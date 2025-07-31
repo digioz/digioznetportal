@@ -36,7 +36,7 @@
                 <li class="nav-item">
                     <a class="nav-link p-0 text-start" asp-area="Identity" asp-page="/Account/Login">Login</a>
                 </li>
-                <li class="nav-item">@Html.ActionLink("Forgot Password", "ForgotPassword", "Account", new { area = "Identity" }, new { @class = "nav-link p-0 text-start" })</li>
+                <li class="nav-item"><a class="nav-link p-0 text-start" asp-area="Identity" asp-controller="Account" asp-action="ForgotPassword">Forgot Password</a></li>
             </ul>
         }
     </div>
