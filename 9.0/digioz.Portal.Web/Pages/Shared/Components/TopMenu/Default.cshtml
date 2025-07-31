@@ -8,7 +8,7 @@
             if (!string.IsNullOrEmpty(item.Controller))
             {
                 <li class="nav-item">
-                    @Html.ActionLink(@item.Name, @item.Action, @item.Controller, new { area = "" }, new { @class = "nav-link" })
+                    <a asp-action="@item.Action" asp-controller="@item.Controller" asp-area="" class="nav-link">@item.Name</a>
                 </li>
             }
             else

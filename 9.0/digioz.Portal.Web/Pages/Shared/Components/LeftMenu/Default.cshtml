@@ -10,7 +10,7 @@
                 {
                     if (!string.IsNullOrEmpty(item.Controller))
                     {
-                        <li>@Html.ActionLink(item.Name, item.Action, item.Controller, new { area = "" }, null)</li>
+                        <li><a asp-action="@item.Action" asp-controller="@item.Controller" asp-area="">@item.Name</a></li>
                     }
                     else
                     {
