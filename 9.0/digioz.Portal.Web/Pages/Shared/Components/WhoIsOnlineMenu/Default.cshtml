@@ -15,11 +15,9 @@
                         {
                             <span>Logged In: </span>
 
-                            foreach (var visitor in visitors)
+                            @foreach (var visitor in visitors)
                             {
-                                <a href="@Url.Action("ShowDetails", "Profile", new { userId = visitor.Username })">@visitor.Username</a>
-            
-                                <span>, </span>
+                                <a href="@Url.Action("ShowDetails", "Profile", new { userId = visitor.Username })">@visitor.Username</a>@(visitor != visitors.Last() ? ", " : "")
                             }
                         }
                     }
