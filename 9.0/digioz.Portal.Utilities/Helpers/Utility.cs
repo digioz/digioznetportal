@@ -639,6 +639,7 @@ namespace digioz.Portal.Utilities.Helpers
             return searchEngineName;
         }
 
+        private static readonly HttpClient HttpClientInstance = new HttpClient();
         public static async Task<string> GetWebContent(string url)
         {
             var text = await HttpClientInstance.GetStringAsync(url);
