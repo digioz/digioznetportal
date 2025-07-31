@@ -37,6 +37,10 @@ namespace digioz.Portal.Bo.ViewModels
         public IFormFile AvatarImage { get; set; }
         public List<string> Countries { get; set; }
 
+        public ProfileViewModel()
+        {
+            Countries = new List<string>();
+        }
         public ProfileViewModel(List<string> countries)
         {
             Countries = countries;
