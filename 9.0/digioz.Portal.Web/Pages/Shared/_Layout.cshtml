@@ -6,15 +6,15 @@
 
 @{
     // Cache keys
-    var cacheKeyConfig = "Config";
-    List<Config> config;
+    var cacheKeyConfigDictionary = "ConfigDictionary";
+    Dictionary<string, string> configDictionary;
     var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
-    if (!MemoryCache.TryGetValue(cacheKeyConfig, out config))
+    if (!MemoryCache.TryGetValue(cacheKeyConfigDictionary, out configDictionary))
     {
-        config = ConfigService.GetAll();
-        MemoryCache.Set(cacheKeyConfig, config, cacheEntryOptions);
+        var config = ConfigService.GetAll();
+        configDictionary = config.ToDictionary(c => c.ConfigKey, c => c.ConfigValue);
+        MemoryCache.Set(cacheKeyConfigDictionary, configDictionary, cacheEntryOptions);
     }
-    var configDictionary = config.ToDictionary(c => c.ConfigKey, c => c.ConfigValue);
 }
 
 <!DOCTYPE html>
