@@ -641,12 +641,13 @@ namespace digioz.Portal.Utilities.Helpers
             return searchEngineName;
         }
 
-        public static string GetWebContent(string url)
+        public static async Task<string> GetWebContent(string url)
         {
-            var client = new WebClient();
-            var text = client.DownloadString(url);
-
-            return text.ToString();
+            using (var client = new HttpClient())
+            {
+                var text = await client.GetStringAsync(url);
+                return text;
+            }
         }
         public static string GetCountryCode(string country)
         {
