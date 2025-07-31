@@ -643,11 +643,8 @@ namespace digioz.Portal.Utilities.Helpers
 
         public static async Task<string> GetWebContent(string url)
         {
-            using (var client = new HttpClient())
-            {
-                var text = await client.GetStringAsync(url);
-                return text;
-            }
+            var text = await HttpClientInstance.GetStringAsync(url);
+            return text;
         }
         public static string GetCountryCode(string country)
         {
