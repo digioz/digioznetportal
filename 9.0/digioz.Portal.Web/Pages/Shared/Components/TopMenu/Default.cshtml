@@ -22,16 +22,7 @@
     else
     {
         <li class="nav-item active">
-            @Html.ActionLink(
-                "Home",
-                "Index",
-                "Home",
-                new { area = "" },
-                new Dictionary<string, object> { 
-                    { "class", "nav-link active" }, 
-                    { "aria-current", "page" } 
-                }
-            )
+            <a asp-action="Index" asp-controller="Home" asp-area="" class="nav-link active" aria-current="page">Home</a>
         </li>
     }
 </ul>
