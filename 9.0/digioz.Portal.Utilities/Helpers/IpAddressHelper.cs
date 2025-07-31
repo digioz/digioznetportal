@@ -14,7 +14,7 @@ namespace digioz.Portal.Utilities.Helpers
 
 			try
 			{
-				ip = context.Connection. RemoteIpAddress.ToString();
+				ip = context.Connection.RemoteIpAddress.ToString();
 
 				if (ip == "::1")
 				{
