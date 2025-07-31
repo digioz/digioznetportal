@@ -1,53 +1,121 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.Extensions.Caching.Memory
+@using digioz.Portal.Bo
+@using digioz.Portal.Dal.Services.Interfaces
+@inject IConfigService ConfigService
+@inject Microsoft.Extensions.Caching.Memory.IMemoryCache MemoryCache
+
+@{
+    // Cache keys
+    var cacheKeyConfigDictionary = "ConfigDictionary";
+    Dictionary<string, string> configDictionary;
+    var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
+    if (!MemoryCache.TryGetValue(cacheKeyConfigDictionary, out configDictionary))
+    {
+        var config = ConfigService.GetAll();
+        configDictionary = config.ToDictionary(c => c.ConfigKey, c => c.ConfigValue);
+        MemoryCache.Set(cacheKeyConfigDictionary, configDictionary, cacheEntryOptions);
+    }
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - digioz.Portal</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/digioz.Portal.styles.css" asp-append-version="true" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - @configDictionary["SiteName"]</title>
+	@if (IsSectionDefined("keywords"))
+	{
+		@RenderSection("keywords")
+	}
+	@if (IsSectionDefined("description"))
+	{
+		@RenderSection("description")
+	}
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/css/site.css" />
+	@RenderSection("Head", required: false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">digioz.Portal</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
-                </div>
+	<div class="container">
+		<div style="padding-left:20px;">
+            <a href="/"><img src="~/img/images/Logo_Small.png" alt="@configDictionary["SiteName"]" /></a>
+			<h1 style="position:absolute; top:20px;">&nbsp;</h1><br /><br />
+		</div>
+	</div>
+
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+        <a class="navbar-brand" href="#">@configDictionary["SiteName"]</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarCollapse">
+
+            @await Component.InvokeAsync("TopMenu")
+
+			<form class="d-flex mt-2 mt-md-0" action="/SearchPages">
+				<input class="form-control me-2" type="text" placeholder="Search" aria-label="Search" name="searchString">
+				<button class="btn btn-primary my-2 my-md-0" type="submit">Search</button>
+			</form>
+		</div>
+	</nav>
+
+	<div class="container body-content">
+
+		<div class="row">
+            <div class="col-md-3">
+
+            @await Component.InvokeAsync("LeftMenu")
+            @await Component.InvokeAsync("UserMenu")
+			@await Component.InvokeAsync("WhoIsOnlineMenu")
+
+            @*
+
+            @Html.RenderAction("StoreMenu", "Menu", new { area = "" })
+
+            @Html.RenderAction("PollMenu", "Menu", new { area = "" })
+
+            @Html.RenderAction("TwitterMenu", "Menu", new { area = "" })
+
+            @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "Left" }) *@
+
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+			<div class="col-md-9">
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - digioz.Portal - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
-    </footer>
+				@* @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "BodyTop" })
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+				@RenderSection("SlideShow", required: false)
 
-    @await RenderSectionAsync("Scripts", required: false)
+				@RenderSection("featured", required: false)
+
+				@RenderSection("LatestPictures", required: false)
+
+				@RenderSection("LatestVideos", required: false)
+
+				@RenderSection("RSSFeed", required: false) *@
+
+				<div class="card bg-light mb-5">
+					<div class="card-header" style="background-color:#428BCA;color:#ffffff;">@ViewBag.Title</div>
+					<div class="card-body">
+						@RenderBody()
+					</div>
+				</div>
+
+				@* @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "BodyBottom" }) *@
+			</div>
+		</div>
+
+		@* @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "Bottom" }) *@
+
+		<hr />
+		<footer>
+            <p>&copy; @DateTime.Now.Year - @configDictionary["SiteName"]</p>
+		</footer>
+	</div>
+	<script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@RenderSection("Scripts", required: false)
+	<script src="~/lib/bowser/bowser.js"></script>
+	<script src="~/js/visitor.js"></script>
 </body>
 </html>

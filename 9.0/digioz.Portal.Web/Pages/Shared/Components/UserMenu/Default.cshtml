@@ -1,0 +1,43 @@
+@using Microsoft.AspNetCore.Identity
+@{
+    var SignInManager = (SignInManager<IdentityUser>)ViewBag.SignInManager;
+    var UserManager = (UserManager<IdentityUser>)ViewBag.UserManager;
+}
+
+<div class="card bg-light mb-3">
+    <div class="card-header">User</div>
+    <div class="card-body">
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <form class="row g-1" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <button type="submit" class="nav-link btn btn-link p-0 text-start">Logout</button>
+                    </form>
+                </li>
+                <li class="nav-item"><a class="nav-link" asp-area="Identity" asp-page="/Account/Manage">My Account</a></li>
+                <li class="nav-item"><a class="nav-link" asp-page="/Profile/Edit">My Profile</a></li>
+                <li class="nav-item"><a class="nav-link" asp-page="/Profile/Pictures">My Pictures</a></li>
+                <li class="nav-item"><a class="nav-link" asp-page="/Profile/Videos">My Videos</a></li>
+                <li class="nav-item"><a class="nav-link" asp-page="/PrivateMessages/Index">Private Messages</a></li>
+                @if (User.IsInRole("Administrator"))
+                {
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-page="/Home/Index">Admin Dashboard</a></li>
+                }
+            </ul>
+            <p style="font-size:x-small;width:100%;text-align:center;">Logged in as <a asp-page="/Profile/Index">@User.Identity.Name</a>.</p>
+        }
+        else
+        {
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link p-0 text-start" asp-area="Identity" asp-page="/Account/Register">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link p-0 text-start" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                </li>
+                <li class="nav-item"><a class="nav-link p-0 text-start" asp-area="Identity" asp-page="/Account/ForgotPassword">Forgot Password</a></li>
+            </ul>
+        }
+    </div>
+</div>

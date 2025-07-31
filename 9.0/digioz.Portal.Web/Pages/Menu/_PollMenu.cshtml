@@ -1,0 +1,33 @@
+@model digioz.Portal.Bo.Poll
+
+@if (Model.Id != null)
+{
+	<div class="card bg-light mb-3">
+		<div class="card-header">Polls</div>
+		<div class="card-body">
+			<span style="font-weight: bold;">@Model.Slug</span>
+
+			@if (ViewBag.PollResults == null || ViewBag.PollResults.Count == 0)
+			{
+				<img src="~/img/images/Chart_Results_Not_Availabe.jpg" style="width: 100%" />
+			}
+			else
+			{
+				<img src="~/PollCharts/Index/@Model.Id.ToString()" style="width: 100%" />
+			}
+
+			<center>
+				@if (!Model.IsClosed)
+				{
+					<div class="btn btn-primary btn-xs" style="text-align: center;">
+						@Html.ActionLink("Add Vote", "Add", "Polls", new { Area = "", id = Model.Id.ToString() }, new { @style = "color:#ffffff;" })
+					</div>
+				}
+
+				<div class="btn btn-primary btn-xs" style="text-align: center;">
+					@Html.ActionLink("Other Polls", "Index", "Polls", null, new { @style = "color:#ffffff;" })
+				</div>
+			</center>
+		</div>
+	</div>
+}

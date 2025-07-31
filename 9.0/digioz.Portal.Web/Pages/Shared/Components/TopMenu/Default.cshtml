@@ -1,0 +1,28 @@
+@model List<digioz.Portal.Bo.Menu>
+
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    @if (Model != null)
+    {
+        foreach (var item in Model)
+        {
+            if (!string.IsNullOrEmpty(item.Controller))
+            {
+                <li class="nav-item">
+                    <a asp-action="@item.Action" asp-controller="@item.Controller" asp-area="" class="nav-link">@item.Name</a>
+                </li>
+            }
+            else
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="@item.Url" target="@item.Target">@item.Name</a>
+                </li>
+            }
+        }
+    }
+    else
+    {
+        <li class="nav-item active">
+            <a asp-action="Index" asp-controller="Home" asp-area="" class="nav-link active" aria-current="page">Home</a>
+        </li>
+    }
+</ul>

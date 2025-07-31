@@ -8,6 +8,16 @@
 
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\digioz.Portal.Bo\digioz.Portal.Bo.csproj" />
   </ItemGroup>
 
 </Project>
