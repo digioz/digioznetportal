@@ -897,7 +897,10 @@ namespace digioz.Portal.Utilities.Helpers
             countryCodes.Add("Zambia", "ZM");
             countryCodes.Add("Zimbabwe", "ZW");
             countryCodes.Add("Aland Islands", "AX");
-            return countryCodes[country];
+            if (countryCodes.TryGetValue(country, out var countryCode)) {
+                return countryCode;
+            }
+            return string.Empty; // Return a default value if the key is not found
         }
         //public static string GetCountryFromAPI(string ip, string[] languages)
         //{
