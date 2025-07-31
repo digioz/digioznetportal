@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using digioz.Portal.Bo;
@@ -22,6 +23,13 @@ namespace digioz.Portal.Dal.Services
         public List<VisitorSession> GetAll()
         {
             return _context.VisitorSessions.ToList();
+        }
+
+        public List<VisitorSession> GetAllGreaterThan(DateTime dateTime)
+        {
+            return _context.VisitorSessions
+                .Where(x => x.DateModified >= dateTime)
+                .ToList();
         }
 
         public void Add(VisitorSession session)

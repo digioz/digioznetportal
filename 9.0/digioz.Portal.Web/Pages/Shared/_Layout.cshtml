@@ -68,10 +68,9 @@
 
             @await Component.InvokeAsync("LeftMenu")
             @await Component.InvokeAsync("UserMenu")
+			@await Component.InvokeAsync("WhoIsOnlineMenu")
 
             @*
-
-            @Html.RenderAction("WhoIsOnlineMenu", "Menu", new { area = "" })
 
             @Html.RenderAction("StoreMenu", "Menu", new { area = "" })
 

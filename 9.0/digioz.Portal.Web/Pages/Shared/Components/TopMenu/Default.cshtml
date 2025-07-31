@@ -1,6 +1,6 @@
 @model List<digioz.Portal.Bo.Menu>
 
-<ul class="navbar-nav mr-auto">
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
     @if (Model != null)
     {
         foreach (var item in Model)
@@ -13,12 +13,25 @@
             }
             else
             {
-                <li class="nav-item"><a class="nav-link" href="@item.Url" target="@item.Target">@item.Name</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@item.Url" target="@item.Target">@item.Name</a>
+                </li>
             }
         }
     }
     else
     {
-        <li class="nav-item active">@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+        <li class="nav-item active">
+            @Html.ActionLink(
+                "Home",
+                "Index",
+                "Home",
+                new { area = "" },
+                new Dictionary<string, object> { 
+                    { "class", "nav-link active" }, 
+                    { "aria-current", "page" } 
+                }
+            )
+        </li>
     }
 </ul>

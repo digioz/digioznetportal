@@ -9,34 +9,34 @@
     <div class="card-body">
         @if (SignInManager.IsSignedIn(User))
         {
-            <ul>
+            <ul class="nav flex-column">
                 <li class="nav-item">
-                    <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                        <button type="submit" class="nav-link btn btn-link" style="padding: 0px;text-align:left;">Logout</button>
+                    <form class="row g-1" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <button type="submit" class="nav-link btn btn-link p-0 text-start">Logout</button>
                     </form>
                 </li>
-                <li class="nav-item">@Html.ActionLink("My Account", "Manage", "Account", new { area = "Identity" }, null)</li>
-                <li class="nav-item">@Html.ActionLink("My Profile", "Edit", "Profile", new { area = "" }, null)</li>
-                <li class="nav-item">@Html.ActionLink("My Pictures", "Pictures", "Profile", new { area = "" }, null)</li>
-                <li class="nav-item">@Html.ActionLink("My Videos", "Videos", "Profile", new { area = "" }, null)</li>
-                <li class="nav-item">@Html.ActionLink("Private Messages", "Index", "PrivateMessages", new { area = "" }, null)</li>
+                <li class="nav-item">@Html.ActionLink("My Account", "Manage", "Account", new { area = "Identity" }, new { @class = "nav-link p-0 text-start" })</li>
+                <li class="nav-item">@Html.ActionLink("My Profile", "Edit", "Profile", new { area = "" }, new { @class = "nav-link p-0 text-start" })</li>
+                <li class="nav-item">@Html.ActionLink("My Pictures", "Pictures", "Profile", new { area = "" }, new { @class = "nav-link p-0 text-start" })</li>
+                <li class="nav-item">@Html.ActionLink("My Videos", "Videos", "Profile", new { area = "" }, new { @class = "nav-link p-0 text-start" })</li>
+                <li class="nav-item">@Html.ActionLink("Private Messages", "Index", "PrivateMessages", new { area = "" }, new { @class = "nav-link p-0 text-start" })</li>
                 @if (User.IsInRole("Administrator"))
                 {
-                    <li class="nav-item">@Html.ActionLink("Admin Dashboard", "Index", "Home", new { area = "Admin" }, null)</li>
+                    <li class="nav-item">@Html.ActionLink("Admin Dashboard", "Index", "Home", new { area = "Admin" }, new { @class = "nav-link p-0 text-start" })</li>
                 }
             </ul>
-            <p style="font-size:x-small;width:100%;text-align:center;">Logged in as @Html.ActionLink(@User.Identity.Name, "Index", "Profile", new { area = "" }).</p>
+            <p class="small w-100 text-center">Logged in as @Html.ActionLink(@User.Identity.Name, "Index", "Profile", new { area = "" }, new { @class = "link-secondary" }).</p>
         }
         else
         {
-            <ul>
+            <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" asp-area="Identity" asp-page="/Account/Register" style="padding: 0px;text-align:left;">Register</a>
+                    <a class="nav-link p-0 text-start" asp-area="Identity" asp-page="/Account/Register">Register</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" asp-area="Identity" asp-page="/Account/Login" style="padding: 0px;text-align:left;">Login</a>
+                    <a class="nav-link p-0 text-start" asp-area="Identity" asp-page="/Account/Login">Login</a>
                 </li>
-                <li class="nav-item">@Html.ActionLink("Forgot Password", "ForgotPassword", "Account", new { area = "Identity" }, null)</li>
+                <li class="nav-item">@Html.ActionLink("Forgot Password", "ForgotPassword", "Account", new { area = "Identity" }, new { @class = "nav-link p-0 text-start" })</li>
             </ul>
         }
     </div>
