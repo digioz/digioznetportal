@@ -961,34 +961,30 @@ namespace digioz.Portal.Utilities.Helpers
             return sBuilder.ToString();  // Return the hexadecimal string. 
         }
 
-        public static bool SaveFileFromUrl(string fileName, string url)
+        public static async Task<bool> SaveFileFromUrl(string fileName, string url)
         {
-            byte[] content;
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            WebResponse response = request.GetResponse();
-
-            Stream stream = response.GetResponseStream();
-
-            using (BinaryReader br = new BinaryReader(stream))
+            using (HttpClient client = new HttpClient())
             {
-                content = br.ReadBytes(500000);
-                br.Close();
-            }
-            response.Close();
+                try
+                {
+                    // Send a GET request to the URL
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode();
 
-            FileStream fs = new FileStream(fileName, FileMode.Create);
-            BinaryWriter bw = new BinaryWriter(fs);
-            try
-            {
-                bw.Write(content);
-            }
-            finally
-            {
-                fs.Close();
-                bw.Close();
-            }
+                    // Read the content as a byte array
+                    byte[] content = await response.Content.ReadAsByteArrayAsync();
 
-            return true;
+                    // Write the content to a file
+                    await File.WriteAllBytesAsync(fileName, content);
+
+                    return true;
+                }
+                catch
+                {
+                    // Handle exceptions (e.g., log the error)
+                    return false;
+                }
+            }
         }
 
         public static string GetRemoteImageExtension(string url)
