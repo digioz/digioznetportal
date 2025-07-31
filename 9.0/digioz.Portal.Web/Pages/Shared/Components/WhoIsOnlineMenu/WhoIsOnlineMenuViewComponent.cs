@@ -25,10 +25,10 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var whoisOnline = new WhoIsOnlineViewModel();
-
-            if (!_cache.TryGetValue(CacheKey, out var whoIsOnlineMenu))
+            if (!_cache.TryGetValue(CacheKey, out WhoIsOnlineViewModel whoisOnline))
             {
+                whoisOnline = new WhoIsOnlineViewModel();
+
                 var configWhoIsOnline = _pluginService.GetAll().Where(x => x.Name == "WhoIsOnline").SingleOrDefault();
                 var latestVisitors = _visitorSessionService.GetAllGreaterThan(DateTime.Now.AddMinutes(-10)).ToList();
                 var visitorRegistered = latestVisitors.Where(x => x.Username != null).ToList();
@@ -37,14 +37,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
                 whoisOnline.VisitorCount = latestVisitors.Count;
                 whoisOnline.RegisteredVisitors = visitorRegistered;
 
-                if (configWhoIsOnline == null || configWhoIsOnline.IsEnabled == false)
-                {
-                    whoisOnline.WhoIsOnlineEnabled = false;
-                }
-                else
-                {
-                    whoisOnline.WhoIsOnlineEnabled = true;
-                }
+                whoisOnline.WhoIsOnlineEnabled = configWhoIsOnline != null && configWhoIsOnline.IsEnabled;
 
                 _cache.Set(CacheKey, whoisOnline, new MemoryCacheEntryOptions().SetSlidingExpiration(System.TimeSpan.FromMinutes(15)));
             }
