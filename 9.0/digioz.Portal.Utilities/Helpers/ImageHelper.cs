@@ -18,7 +18,7 @@ namespace digioz.Portal.Utilities.Helpers
         public int TinyMaxHeight { get; set; }
         public string FileName { get; set; }
         public string FullImageFolder { get; set; }
-        public string SmallImageFolder { get; set; } // Fixed typo
+        public string SmallImageFolder { get; set; }
         public string TinyImageFolder { get; set; }
     }
 
