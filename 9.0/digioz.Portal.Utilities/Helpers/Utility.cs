@@ -13,17 +13,12 @@ using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-//using digioz.Portal.Bo.ViewModels;
 using System.ServiceModel.Syndication;
 using System.Xml;
 using digioz.Portal.Bo.ViewModels;
-//using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Http;
-//using digioz.Portal.Bo;
-//using digioz.Portal.Bll;
-//using Microsoft.AspNetCore.Http;
-//using digioz.Portal.Payment;
-//using digioz.Portal.Bll.Interfaces;
+using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace digioz.Portal.Utilities.Helpers
 {
