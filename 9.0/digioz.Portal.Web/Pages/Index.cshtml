@@ -33,8 +33,6 @@
     // Render comments section if enabled
     if (Model.AllowComments)
     {
-        <hr />
-        <h4>Comments</h4>
         @await Component.InvokeAsync("CommentsMenu", new { referenceType = "PageContent", referenceId = Model.PageContent?.Id.ToString() })
 	}
 }
