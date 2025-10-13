@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.AspNetCore.Identity;
 using System;
+using Microsoft.AspNetCore.Identity;
 
 #nullable disable
 
