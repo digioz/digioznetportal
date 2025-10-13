@@ -6,7 +6,7 @@
 }
 
 @section keywords {
-    @if (Model != null && Model.PageContent.Keywords != null)
+    @if (Model != null && Model.PageContent != null && Model.PageContent.Keywords != null)
     {
         <meta name="keywords" content="@Model.PageContent.Keywords" />
     }
