@@ -3,14 +3,21 @@
 <div class="card bg-light mb-3">
     <div class="card-header">Menu</div>
     <div class="card-body">
-        <ul class="list-unstyled">
+        <ul>
             @if (Model != null)
             {
                 foreach (var item in Model)
                 {
                     if (!string.IsNullOrEmpty(item.Controller))
                     {
-                        <li><a asp-action="@item.Action" asp-controller="@item.Controller" asp-area="">@item.Name</a></li>
+                        if (item.Controller == "Home")
+                        {
+                            <li><a href="/Index">@item.Name</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/@item.Controller/@item.Action">@item.Name</a></li>
+                        }
                     }
                     else
                     {
@@ -20,7 +27,7 @@
             }
             else
             {
-                <li class="active"><a asp-action="Index" asp-controller="Home">Home</a></li>
+                <li><a href="/Index">Home</a></li>
             }
         </ul>
     </div>
