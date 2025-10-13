@@ -87,7 +87,7 @@ INSERT INTO Page (UserId, Title, Url, Body, Keywords, Description, Visible, Time
                         page Views, etc.</li>
                         <li>Menu Manager lets you add new Menu links both to internal pages and external sites.</li>
                         <li>User Manager lets you manage the registered users of the site.</li>
-                        <li>Announcements section let's you add, edit or remove site wide announcements to the users, which 
+                        <li>Announcements section let''s you add, edit or remove site wide announcements to the users, which 
                         show up on the Home Index Page.</li>
                         <li>Picture Manager lets you create Picture Galleries, and add or remove pictures from the site.</li>
                         <li>Video Manager allows you to upload and display Videos to your site and manage them.</li>

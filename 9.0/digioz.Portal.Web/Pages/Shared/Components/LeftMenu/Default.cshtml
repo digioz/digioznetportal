@@ -10,7 +10,14 @@
                 {
                     if (!string.IsNullOrEmpty(item.Controller))
                     {
-                        <li><a href="/@item.Controller/@item.Action">@item.Name</a></li>
+                        if (item.Controller == "Home")
+                        {
+                            <li><a href="/Index">@item.Name</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/@item.Controller/@item.Action">@item.Name</a></li>
+                        }
                     }
                     else
                     {
@@ -20,7 +27,7 @@
             }
             else
             {
-                <li><a href="/Home/Index">Home</a></li>
+                <li><a href="/Index">Home</a></li>
             }
         </ul>
     </div>
