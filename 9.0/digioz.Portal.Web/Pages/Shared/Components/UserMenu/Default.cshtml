@@ -9,20 +9,20 @@
     <div class="card-body">
         @if (SignInManager.IsSignedIn(User))
         {
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <form class="m-0" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <ul>
+                <li>
+                    <form class="row g-1" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                         <button type="submit" class="nav-link btn btn-link p-0 text-start">Logout</button>
                     </form>
                 </li>
-                <li class="nav-item"><a class="nav-link p-0 text-start" asp-area="Identity" asp-page="/Account/Manage">My Account</a></li>
-                <li class="nav-item"><a class="nav-link p-0 text-start" asp-page="/Profile/Edit">My Profile</a></li>
-                <li class="nav-item"><a class="nav-link p-0 text-start" asp-page="/Profile/Pictures">My Pictures</a></li>
-                <li class="nav-item"><a class="nav-link p-0 text-start" asp-page="/Profile/Videos">My Videos</a></li>
-                <li class="nav-item"><a class="nav-link p-0 text-start" asp-page="/PrivateMessages/Index">Private Messages</a></li>
+                <li><a asp-area="Identity" asp-page="/Account/Manage">My Account</a></li>
+                <li><a asp-page="/Profile/Edit">My Profile</a></li>
+                <li><a asp-page="/Profile/Pictures">My Pictures</a></li>
+                <li><a asp-page="/Profile/Videos">My Videos</a></li>
+                <li><a asp-page="/PrivateMessages/Index">Private Messages</a></li>
                 @if (User.IsInRole("Administrator"))
                 {
-                    <li class="nav-item"><a class="nav-link p-0 text-start" asp-area="Admin" asp-page="/Home/Index">Admin Dashboard</a></li>
+                    <li><a asp-area="Admin" asp-page="/Home/Index">Admin Dashboard</a></li>
                 }
             </ul>
             <br />
@@ -30,14 +30,14 @@
         }
         else
         {
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link p-0 text-start" asp-area="Identity" asp-page="/Account/Register">Register</a>
+            <ul>
+                <li>
+                    <a asp-area="Identity" asp-page="/Account/Register">Register</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link p-0 text-start" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                <li>
+                    <a asp-area="Identity" asp-page="/Account/Login">Login</a>
                 </li>
-                <li class="nav-item"><a class="nav-link p-0 text-start" asp-area="Identity" asp-page="/Account/ForgotPassword">Forgot Password</a></li>
+                <li><a asp-area="Identity" asp-page="/Account/ForgotPassword">Forgot Password</a></li>
             </ul>
         }
     </div>

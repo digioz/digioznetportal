@@ -3,7 +3,7 @@
 <div class="card bg-light mb-3">
     <div class="card-header">Menu</div>
     <div class="card-body">
-        <ul class="list-unstyled">
+        <ul>
             @if (Model != null)
             {
                 foreach (var item in Model)
@@ -20,7 +20,7 @@
             }
             else
             {
-                <li class="active"><a asp-action="Index" asp-controller="Home">Home</a></li>
+                <li><a asp-action="Index" asp-controller="Home">Home</a></li>
             }
         </ul>
     </div>
