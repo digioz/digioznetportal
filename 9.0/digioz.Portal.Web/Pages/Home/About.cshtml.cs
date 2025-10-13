@@ -18,6 +18,7 @@ namespace digioz.Portal.Pages.Home
         private readonly IConfigService _configService;
         private readonly ICommentConfigService _commentConfigService;
         private readonly ILogger<IndexModel> _logger;
+
         public AboutModel(
             ILogger<IndexModel> logger,
             IPageService pageService,

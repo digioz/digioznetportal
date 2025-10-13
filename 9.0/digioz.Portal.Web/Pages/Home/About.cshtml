@@ -25,7 +25,7 @@
         @Html.Raw(Model.PageContent.Body)
     }
 
-    // Render comments section if enabled
+    // Display comments if enabled for this page
     if (Model.AllowComments)
     {
         @await Component.InvokeAsync("CommentsMenu", new { referenceType = "PageContent", referenceId = Model.PageContent?.Id.ToString() })

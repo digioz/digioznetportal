@@ -11,6 +11,12 @@
         {
             <div class="card-body">
                 <p class="text-muted small mb-0">No comments yet.</p>
+                @if (!User.Identity.IsAuthenticated)
+                {
+                    <div class="mt-2">
+                        <small class="text-muted fst-italic">Please log in to post comments.</small>
+                    </div>
+                }
             </div>
         }
         else
@@ -74,7 +80,7 @@
                 </form>
             </div>
         }
-        else
+        else if (Model.Any())
         {
             <div class="card-body">
                 <small class="text-muted fst-italic">Please log in to post comments.</small>

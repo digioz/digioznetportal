@@ -37,7 +37,7 @@ namespace digioz.Portal.Pages
         {
             PageContent = _pageService.GetByTitle("Home");
 
-            // Supply delegates so Utilities stays DAL-agnostic
+            // Display comments if enabled for this page
             AllowComments = _commentsHelper.IsCommentsEnabledForPageTitle(
                 PageContent?.Title
             );
