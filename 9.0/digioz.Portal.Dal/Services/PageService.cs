@@ -45,5 +45,10 @@ namespace digioz.Portal.Dal.Services
                 _context.SaveChanges();
             }
         }
+
+        public Page GetByTitle(string title)
+        {
+            return _context.Pages.FirstOrDefault(p => p.Title == title);
+        }
     }
 }

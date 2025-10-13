@@ -69,7 +69,7 @@ INSERT INTO Menu (UserId, Name, Location, Controller, Action, Url, Target, Visib
 DECLARE @adminUserId2 nvarchar(128) = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'admin@domain.com');
 
 INSERT INTO Page (UserId, Title, Url, Body, Keywords, Description, Visible, Timestamp) VALUES
-(@adminUserId2, 'Home', '/Home/Index', N'<p><span style=""font-size: medium;""><strong>Welcome to DigiOz .NET Portal!</strong></span></p>
+(@adminUserId2, 'Home', '/Index', N'<p><span style=""font-size: medium;""><strong>Welcome to DigiOz .NET Portal!</strong></span></p>
                         <p>DigiOz .NET Portal is a web based portal system written in ASP.NET Razor Pages written with .NET 9.0 and &nbsp; C# &nbsp; which uses a 
                         Microsoft SQL Database to allows webmasters to setup and customize an instant website for either business 
                         or personal use.</p>
@@ -170,7 +170,7 @@ DELETE FROM Menu WHERE UserId = @adminUserId AND (Location = 'LeftMenu' AND Name
             // Remove Page Seed (resolve admin user and delete seeded pages)
             migrationBuilder.Sql(@"
 DECLARE @adminUserId2 nvarchar(128) = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'admin@domain.com');
-DELETE FROM Page WHERE UserId = @adminUserId2 AND Url IN ('/Home/Index','/Home/Contact','/Home/About');
+DELETE FROM Page WHERE UserId = @adminUserId2 AND Url IN ('/Index','/Home/Contact','/Home/About');
 ");
 
             // Remove Plugin Seed

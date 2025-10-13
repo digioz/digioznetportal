@@ -10,5 +10,6 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void Add(Page page);
         void Update(Page page);
         void Delete(int id);
+        Page GetByTitle(string title);
     }
 }
