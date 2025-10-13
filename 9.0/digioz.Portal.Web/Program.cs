@@ -1,6 +1,7 @@
 using digioz.Portal.Dal;
 using digioz.Portal.Dal.Services;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using digioz.Portal.Web.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -76,6 +77,16 @@ builder.Services.AddScoped<IVisitorInfoService, VisitorInfoService>();
 builder.Services.AddScoped<IVisitorSessionService, VisitorSessionService>();
 builder.Services.AddScoped<IZoneService, ZoneService>();
 builder.Services.AddMemoryCache();
+
+// Helpers: wire CommentsHelper with delegates to avoid Utilities->Dal reference
+builder.Services.AddScoped<ICommentsHelper>(sp =>
+{
+    var configSvc = sp.GetRequiredService<IConfigService>();
+    var commentConfigSvc = sp.GetRequiredService<ICommentConfigService>();
+    return new CommentsHelper(
+        () => configSvc.GetAll(),
+        () => commentConfigSvc.GetAll());
+});
 
 builder.Services.AddRazorPages();
 
