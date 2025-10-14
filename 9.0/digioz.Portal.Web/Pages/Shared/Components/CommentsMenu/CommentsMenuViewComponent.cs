@@ -44,12 +44,8 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
             ViewBag.RecaptchaEnabled = recaptchaCfg.enabled;
             ViewBag.RecaptchaPublicKey = recaptchaCfg.publicKey;
 
-            // Always fetch fresh comments (removed caching to ensure immediate refresh after add/like)
-            List<Comment> comments = _commentService
-                .GetAll()
-                .Where(c => c.ReferenceType == pagePath)
-                .OrderByDescending(c => c.ModifiedDate ?? c.CreatedDate)
-                .ToList();
+            // Use repository-level filtering instead of loading all comments into memory
+            List<Comment> comments = _commentService.GetByReferenceType(pagePath);
 
             return View(comments);
         }
