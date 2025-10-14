@@ -96,37 +96,35 @@
 }
 <script>
 (function(){
-    // After successful add / like we will do a full page reload for guaranteed refresh.
-    // This avoids the need for a separate handler or partial fetch complexities.
+    const recaptchaEnabled = '@( (ViewBag.RecaptchaEnabled ?? false).ToString().ToLower() )' === 'true';
 
     function handleAjaxForm(form, beforeSend){
         form.addEventListener('submit', function(e){
             if (beforeSend) {
                 const proceed = beforeSend(e);
-                if (proceed === false) return; // recaptcha will manually continue
+                if (proceed === false) return;
             } else {
                 e.preventDefault();
             }
             const data = new FormData(form);
             fetch(form.action, { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(r=>{ window.location.reload(); })
-                .catch(()=>{ window.location.reload(); });
+                .then(()=> { window.location.reload(); })
+                .catch(()=> { window.location.reload(); });
         });
     }
 
     const commentForm = document.getElementById('commentForm');
     if(commentForm){
-        if(window.grecaptcha && '@ViewBag.RecaptchaEnabled' === 'True'){
+        if(recaptchaEnabled && window.grecaptcha){
             handleAjaxForm(commentForm, function(e){
                 e.preventDefault();
                 grecaptcha.ready(function(){
                     grecaptcha.execute('@ViewBag.RecaptchaPublicKey', {action: 'comment'}).then(function(token){
                         document.getElementById('recaptchaToken').value = token;
-                        // submit again without preventing
                         const data = new FormData(commentForm);
                         fetch(commentForm.action, { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                            .then(r=>{ window.location.reload(); })
-                            .catch(()=>{ window.location.reload(); });
+                            .then(()=> window.location.reload())
+                            .catch(()=> window.location.reload());
                     });
                 });
                 return false;
