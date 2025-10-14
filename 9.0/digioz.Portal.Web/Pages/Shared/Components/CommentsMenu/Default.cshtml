@@ -6,7 +6,7 @@
         <button type="button" class="btn btn-info btn-sm" data-bs-toggle="collapse" data-bs-target="#@ViewBag.ReferenceType@ViewBag.ReferenceId" aria-expanded="false" aria-controls="@ViewBag.ReferenceType@ViewBag.ReferenceId">View</button>
     </div>
 
-    <div id="@ViewBag.ReferenceType@ViewBag.ReferenceId" class="collapse show">
+    <div id="@ViewBag.ReferenceType@ViewBag.ReferenceId" class="collapse hide">
         @if (!Model.Any())
         {
             <div class="card-body">
@@ -52,8 +52,8 @@
                                 {
                                     <form action="/Comments/Like?id=@comment.Id" method="post" class="d-inline comment-like-form" data-comment-id="@comment.Id">
                                         @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-outline-secondary">
-                                            <img src="~/img/images/icons/20x20/Like.png" alt="Like" />
+                                        <button type="submit" class="btn btn-outline-secondary p-0 like-btn" style="width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;line-height:1;" aria-label="Like">
+                                            <img src="~/img/images/icons/20x20/Like.png" alt="Like" width="14" height="14" />
                                         </button>
                                     </form>
                                 }
