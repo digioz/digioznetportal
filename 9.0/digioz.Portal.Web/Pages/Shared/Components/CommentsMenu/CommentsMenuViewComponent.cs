@@ -13,8 +13,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
     {
         private readonly ICommentService _commentService;
         private readonly IConfigService _configService;
-        private readonly IMemoryCache _cache;
-        private const string CacheKeyPrefix = "CommentsMenu_";
+        private readonly IMemoryCache _cache; // still used for Recaptcha only
 
         public CommentsMenuViewComponent(ICommentService commentService, IConfigService configService, IMemoryCache cache)
         {
@@ -26,12 +25,12 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
         public async Task<IViewComponentResult> InvokeAsync(string referenceId = null)
         {
             var pagePath = HttpContext?.Request?.Path.Value ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(pagePath)) pagePath = "/";
+            if (string.IsNullOrWhiteSpace(pagePath) || pagePath == "/") pagePath = "/Index";
 
-            ViewBag.ReferenceId = referenceId; // optional external id (e.g. page db id)
-            ViewBag.ReferenceType = pagePath;   // the logical grouping key
+            ViewBag.ReferenceId = referenceId;
+            ViewBag.ReferenceType = pagePath;
 
-            // Recaptcha config (cached)
+            // Recaptcha config (cache OK, low churn)
             const string cfgCacheKey = "RecaptchaCfg";
             if (!_cache.TryGetValue(cfgCacheKey, out (bool enabled, string publicKey) recaptchaCfg))
             {
@@ -45,16 +44,12 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
             ViewBag.RecaptchaEnabled = recaptchaCfg.enabled;
             ViewBag.RecaptchaPublicKey = recaptchaCfg.publicKey;
 
-            var cacheKey = CacheKeyPrefix + pagePath;
-            if (!_cache.TryGetValue(cacheKey, out List<Comment> comments))
-            {
-                comments = _commentService
-                    .GetAll()
-                    .Where(c => c.ReferenceType == pagePath)
-                    .OrderByDescending(c => c.ModifiedDate ?? c.CreatedDate)
-                    .ToList();
-                _cache.Set(cacheKey, comments, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
-            }
+            // Always fetch fresh comments (removed caching to ensure immediate refresh after add/like)
+            List<Comment> comments = _commentService
+                .GetAll()
+                .Where(c => c.ReferenceType == pagePath)
+                .OrderByDescending(c => c.ModifiedDate ?? c.CreatedDate)
+                .ToList();
 
             return View(comments);
         }

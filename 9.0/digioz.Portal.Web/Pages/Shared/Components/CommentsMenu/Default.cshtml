@@ -67,7 +67,7 @@
         @if (User.Identity.IsAuthenticated)
         {
             <div class="card-body border-top">
-                <form action="/Comments/Add" method="post" class="mt-3" id="commentForm" data-refresh-target="#comments-container">
+                <form action="/Comments/Add" method="post" class="mt-3" id="commentForm">
                     @Html.AntiForgeryToken()
                     <input type="hidden" id="referenceId" name="referenceId" value="@ViewBag.ReferenceId" />
                     <input type="hidden" id="referenceType" name="referenceType" value="@ViewBag.ReferenceType" />
@@ -96,52 +96,53 @@
 }
 <script>
 (function(){
-    const containerId = 'comments-container';
-    function reloadComments(){
-        fetch(window.location.pathname + '?handler=CommentsPartial', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-            .then(r=> r.text())
-            .then(html=>{
-                const wrapper = document.getElementById(containerId);
-                if(wrapper){ wrapper.innerHTML = html; }
-            })
-            .catch(()=>{});
+    // After successful add / like we will do a full page reload for guaranteed refresh.
+    // This avoids the need for a separate handler or partial fetch complexities.
+
+    function handleAjaxForm(form, beforeSend){
+        form.addEventListener('submit', function(e){
+            if (beforeSend) {
+                const proceed = beforeSend(e);
+                if (proceed === false) return; // recaptcha will manually continue
+            } else {
+                e.preventDefault();
+            }
+            const data = new FormData(form);
+            fetch(form.action, { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r=>{ window.location.reload(); })
+                .catch(()=>{ window.location.reload(); });
+        });
     }
 
-    // Intercept comment form submit for AJAX post (after recaptcha if enabled)
     const commentForm = document.getElementById('commentForm');
     if(commentForm){
-        commentForm.addEventListener('submit', function(e){
-            if(window.grecaptcha && '@ViewBag.RecaptchaEnabled' === 'True'){
+        if(window.grecaptcha && '@ViewBag.RecaptchaEnabled' === 'True'){
+            handleAjaxForm(commentForm, function(e){
                 e.preventDefault();
                 grecaptcha.ready(function(){
                     grecaptcha.execute('@ViewBag.RecaptchaPublicKey', {action: 'comment'}).then(function(token){
                         document.getElementById('recaptchaToken').value = token;
-                        submitCommentAjax();
+                        // submit again without preventing
+                        const data = new FormData(commentForm);
+                        fetch(commentForm.action, { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                            .then(r=>{ window.location.reload(); })
+                            .catch(()=>{ window.location.reload(); });
                     });
                 });
-            } else {
-                e.preventDefault();
-                submitCommentAjax();
-            }
-        });
+                return false;
+            });
+        } else {
+            handleAjaxForm(commentForm);
+        }
     }
 
-    function submitCommentAjax(){
-        const form = commentForm;
-        const formData = new FormData(form);
-        fetch(form.action, { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-            .then(r=>{ if(r.ok) reloadComments(); })
-            .catch(()=>{});
-    }
-
-    // Intercept like forms
     document.querySelectorAll('.comment-like-form').forEach(f=>{
         f.addEventListener('submit', function(e){
             e.preventDefault();
-            const formData = new FormData(f);
-            fetch(f.action, { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(r=> { if(r.ok) reloadComments(); })
-                .catch(()=>{});
+            const data = new FormData(f);
+            fetch(f.action, { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(()=> window.location.reload())
+                .catch(()=> window.location.reload());
         });
     });
 })();

@@ -21,23 +21,18 @@ namespace digioz.Portal.Web.Pages.Comments
 
         public IActionResult OnPost(string id)
         {
-            if (string.IsNullOrWhiteSpace(id))
-                return Redirect(Request.Headers["Referer"].ToString() ?? "/");
+            var referer = Request.Headers["Referer"].ToString();
+            if (string.IsNullOrWhiteSpace(id)) return Redirect(referer ?? "/");
 
             var comment = _commentService.GetAll().FirstOrDefault(c => c.Id == id);
             if (comment != null)
             {
                 comment.Likes += 1;
                 _commentService.Update(comment);
-
-                // Invalidate cache for its page (ReferenceType holds page path)
-                if (!string.IsNullOrWhiteSpace(comment.ReferenceType))
-                {
-                    _cache.Remove("CommentsMenu_" + comment.ReferenceType);
-                }
+                _cache.Remove("CommentsMenu_" + comment.ReferenceType); // defensive
             }
 
-            return Redirect(Request.Headers["Referer"].ToString() ?? "/");
+            return Redirect(referer ?? "/");
         }
     }
 }

@@ -40,11 +40,12 @@ namespace digioz.Portal.Web.Pages.Comments
 
         public async Task<IActionResult> OnPostAsync()
         {
+            var referer = Request.Headers["Referer"].ToString();
             if (!User.Identity?.IsAuthenticated ?? true)
-                return Redirect(Request.Headers["Referer"].ToString() ?? "/");
+                return Redirect(referer ?? "/");
 
             if (string.IsNullOrWhiteSpace(comment) || comment.Length > 5000)
-                return Redirect(Request.Headers["Referer"].ToString() ?? "/");
+                return Redirect(referer ?? "/");
 
             var sanitized = Sanitize(comment);
 
@@ -54,28 +55,26 @@ namespace digioz.Portal.Web.Pages.Comments
             {
                 var secret = cfg.FirstOrDefault(c => c.ConfigKey == "RecaptchaPrivateKey")?.ConfigValue;
                 if (string.IsNullOrWhiteSpace(secret) || string.IsNullOrWhiteSpace(recaptchaToken) || !await VerifyRecaptchaV3Async(secret, recaptchaToken, "comment"))
-                    return Redirect(Request.Headers["Referer"].ToString() ?? "/");
+                    return Redirect(referer ?? "/");
             }
 
-            // If referenceType not posted, infer from referer path
             if (string.IsNullOrWhiteSpace(referenceType))
             {
                 try
                 {
-                    var refUrl = Request.Headers["Referer"].ToString();
-                    if (Uri.TryCreate(refUrl, UriKind.Absolute, out var uri))
+                    if (Uri.TryCreate(referer, UriKind.Absolute, out var uri))
                         referenceType = uri.AbsolutePath;
                 }
-                catch { referenceType = "/"; }
+                catch { referenceType = "/Index"; }
             }
+            if (string.IsNullOrWhiteSpace(referenceType) || referenceType == "/") referenceType = "/Index";
 
             var userName = User.Identity?.Name;
-
             var newComment = new Comment
             {
                 Id = Guid.NewGuid().ToString(),
                 ReferenceId = referenceId,
-                ReferenceType = referenceType ?? "/",
+                ReferenceType = referenceType,
                 Body = sanitized,
                 UserId = _userHelper.GetUserIdByEmail(userName),
                 Username = userName,
@@ -85,11 +84,9 @@ namespace digioz.Portal.Web.Pages.Comments
             };
             _commentService.Add(newComment);
 
-            // Invalidate page comments cache so view component refreshes
-            var cacheKey = "CommentsMenu_" + (referenceType ?? "/");
-            _cache.Remove(cacheKey);
+            _cache.Remove("CommentsMenu_" + referenceType); // defensive if reintroduced later
 
-            return Redirect(Request.Headers["Referer"].ToString() ?? "/");
+            return Redirect(referer ?? "/");
         }
 
         private static string Sanitize(string input)
