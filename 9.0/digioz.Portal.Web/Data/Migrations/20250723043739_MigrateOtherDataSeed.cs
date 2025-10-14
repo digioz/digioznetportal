@@ -54,7 +54,7 @@ namespace digioz.Portal.Web.Data.Migrations
 DECLARE @adminUserId nvarchar(128) = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'admin@domain.com');
 
 INSERT INTO Menu (UserId, Name, Location, Controller, Action, Url, Target, Visible, SortOrder, Timestamp) VALUES
-(@adminUserId, 'Home', 'TopMenu', 'Home', 'Index', NULL, NULL, 1, 1, GETDATE()),
+(@adminUserId, 'Home', 'TopMenu', 'Index', '', NULL, NULL, 1, 1, GETDATE()),
 (@adminUserId, 'About', 'TopMenu', 'Home', 'About', NULL, NULL, 1, 2, GETDATE()),
 (@adminUserId, 'Contact', 'TopMenu', 'Home', 'Contact', NULL, NULL, 1, 3, GETDATE()),
 (@adminUserId, 'Forum', 'TopMenu', 'Forum', 'Index', NULL, NULL, 0, 4, GETDATE()),
@@ -62,7 +62,7 @@ INSERT INTO Menu (UserId, Name, Location, Controller, Action, Url, Target, Visib
 (@adminUserId, 'Chat', 'TopMenu', 'Chat', 'Index', NULL, NULL, 1, 6, GETDATE()),
 (@adminUserId, 'Store', 'TopMenu', 'Store', 'Index', NULL, NULL, 0, 7, GETDATE()),
 (@adminUserId, 'Twitter', 'TopMenu', 'Twitter', 'Index', NULL, NULL, 0, 8, GETDATE()),
-(@adminUserId, 'Home', 'LeftMenu', 'Home', 'Index', NULL, NULL, 1, 9, GETDATE()),
+(@adminUserId, 'Home', 'LeftMenu', 'Index', '', NULL, NULL, 1, 9, GETDATE()),
 (@adminUserId, 'Pictures', 'LeftMenu', 'Pictures', 'Index', NULL, NULL, 1, 10, GETDATE()),
 (@adminUserId, 'Videos', 'LeftMenu', 'Videos', 'Index', NULL, NULL, 1, 11, GETDATE());
 ");
@@ -159,7 +159,7 @@ DELETE FROM Config WHERE ConfigKey IN (
     'SMTPServer','SMTPPort','SMTPUsername','SMTPPassword','SiteURL','SiteName','SiteEncryptionKey','WebmasterEmail',
     'PaymentLoginID','PaymentTransactionKey','PaymentTestMode','TwitterHandle','PaymentTransactionFee','NumberOfAnnouncements',
     'ShowContactForm','VisitorSessionPurgePeriod','PaypalMode','PaypalClientId','PaypalClientSecret','PaypalConnectionTimeout',
-    'EnableCommentsOnAllPages','TinyMCEApiKey'
+    'EnableCommentsOnAllPages','TinyMCEApiKey','RecaptchaEnabled','RecaptchaPublicKey','RecaptchaPrivateKey'
 );
 ");
 

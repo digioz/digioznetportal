@@ -1,12 +1,12 @@
 ﻿@model IEnumerable<digioz.Portal.Bo.Comment>
 
-<div class="card mb-3">
+<div class="card mb-3" id="comments-root">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span>Comments (@Model.Count())</span>
         <button type="button" class="btn btn-info btn-sm" data-bs-toggle="collapse" data-bs-target="#@ViewBag.ReferenceType@ViewBag.ReferenceId" aria-expanded="false" aria-controls="@ViewBag.ReferenceType@ViewBag.ReferenceId">View</button>
     </div>
 
-    <div id="@ViewBag.ReferenceType@ViewBag.ReferenceId" class="collapse">
+    <div id="@ViewBag.ReferenceType@ViewBag.ReferenceId" class="collapse show">
         @if (!Model.Any())
         {
             <div class="card-body">
@@ -50,7 +50,7 @@
                                 <span class="small me-1">Likes (<b>@comment.Likes</b>)</span>
                                 @if (User.Identity.IsAuthenticated)
                                 {
-                                    <form action="/Comments/Like?id=@comment.Id" method="post" class="d-inline">
+                                    <form action="/Comments/Like?id=@comment.Id" method="post" class="d-inline comment-like-form" data-comment-id="@comment.Id">
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="btn btn-sm btn-outline-secondary">
                                             <img src="~/img/images/icons/20x20/Like.png" alt="Like" />
@@ -67,10 +67,11 @@
         @if (User.Identity.IsAuthenticated)
         {
             <div class="card-body border-top">
-                <form action="/Comments/Add" method="post" class="mt-3">
+                <form action="/Comments/Add" method="post" class="mt-3" id="commentForm" data-refresh-target="#comments-container">
                     @Html.AntiForgeryToken()
                     <input type="hidden" id="referenceId" name="referenceId" value="@ViewBag.ReferenceId" />
                     <input type="hidden" id="referenceType" name="referenceType" value="@ViewBag.ReferenceType" />
+                    <input type="hidden" id="recaptchaToken" name="recaptchaToken" />
                     <div class="mb-3">
                         <textarea id="comment" name="comment" class="form-control" rows="3" placeholder="Your comments"></textarea>
                     </div>
@@ -88,5 +89,62 @@
         }
     </div>
 </div>
+
+@if (ViewBag.RecaptchaEnabled == true && !string.IsNullOrEmpty((string)ViewBag.RecaptchaPublicKey))
+{
+    <script src="https://www.google.com/recaptcha/api.js?render=@ViewBag.RecaptchaPublicKey"></script>
+}
+<script>
+(function(){
+    const containerId = 'comments-container';
+    function reloadComments(){
+        fetch(window.location.pathname + '?handler=CommentsPartial', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r=> r.text())
+            .then(html=>{
+                const wrapper = document.getElementById(containerId);
+                if(wrapper){ wrapper.innerHTML = html; }
+            })
+            .catch(()=>{});
+    }
+
+    // Intercept comment form submit for AJAX post (after recaptcha if enabled)
+    const commentForm = document.getElementById('commentForm');
+    if(commentForm){
+        commentForm.addEventListener('submit', function(e){
+            if(window.grecaptcha && '@ViewBag.RecaptchaEnabled' === 'True'){
+                e.preventDefault();
+                grecaptcha.ready(function(){
+                    grecaptcha.execute('@ViewBag.RecaptchaPublicKey', {action: 'comment'}).then(function(token){
+                        document.getElementById('recaptchaToken').value = token;
+                        submitCommentAjax();
+                    });
+                });
+            } else {
+                e.preventDefault();
+                submitCommentAjax();
+            }
+        });
+    }
+
+    function submitCommentAjax(){
+        const form = commentForm;
+        const formData = new FormData(form);
+        fetch(form.action, { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r=>{ if(r.ok) reloadComments(); })
+            .catch(()=>{});
+    }
+
+    // Intercept like forms
+    document.querySelectorAll('.comment-like-form').forEach(f=>{
+        f.addEventListener('submit', function(e){
+            e.preventDefault();
+            const formData = new FormData(f);
+            fetch(f.action, { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r=> { if(r.ok) reloadComments(); })
+                .catch(()=>{});
+        });
+    });
+})();
+</script>
 
 

@@ -7,9 +7,18 @@
         {
             if (!string.IsNullOrEmpty(item.Controller))
             {
-                <li class="nav-item">
-                    <a href="/@item.Controller/@item.Action" class="nav-link">@item.Name</a>
-                </li>
+                if (!string.IsNullOrEmpty(item.Action))
+                {
+                    <li class="nav-item">
+                        <a href="/@item.Controller/@item.Action" class="nav-link">@item.Name</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a href="/@item.Controller" class="nav-link">@item.Name</a>
+                    </li>
+                }
             }
             else
             {
@@ -22,7 +31,7 @@
     else
     {
         <li class="nav-item active">
-            <a href="/Home/Index" class="nav-link active" aria-current="page">Home</a>
+            <a href="/Index" class="nav-link active" aria-current="page">Home</a>
         </li>
     }
 </ul>

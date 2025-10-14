@@ -6,14 +6,14 @@
 }
 
 @section keywords {
-    @if (Model.PageContent != null && Model.PageContent.Keywords != null)
+    @if (Model.PageContent?.Keywords != null)
     {
         <meta name="keywords" content="@Model.PageContent.Keywords" />
     }
 }
 
 @section description {
-    @if (Model.PageContent != null && Model.PageContent.Description != null)
+    @if (Model.PageContent?.Description != null)
     {
         <meta name="description" content="@Model.PageContent.Description" />
     }
@@ -21,18 +21,14 @@
 
 @await Component.InvokeAsync("SlideShow")
 
-<!-- Render Latest Pictures if enabled  -->
-<!-- Render Latest Videos if enabled  -->
-<!-- Render RSS Feed if enabled  -->
 @{
     if (Model.PageContent != null)
     {
         @Html.Raw(Model.PageContent.Body)
     }
 
-    // Render comments section if enabled
     if (Model.AllowComments)
     {
-        @await Component.InvokeAsync("CommentsMenu", new { referenceType = "PageContent", referenceId = Model.PageContent?.Id.ToString() })
-	}
+        @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent?.Id.ToString() })
+    }
 }

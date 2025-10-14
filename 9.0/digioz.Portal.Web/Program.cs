@@ -78,6 +78,9 @@ builder.Services.AddScoped<IVisitorSessionService, VisitorSessionService>();
 builder.Services.AddScoped<IZoneService, ZoneService>();
 builder.Services.AddMemoryCache();
 
+// Recaptcha verification needs HttpClient
+builder.Services.AddHttpClient();
+
 // Helpers: wire CommentsHelper with delegates to avoid Utilities->Dal reference
 builder.Services.AddScoped<ICommentsHelper>(sp =>
 {
@@ -86,6 +89,13 @@ builder.Services.AddScoped<ICommentsHelper>(sp =>
     return new CommentsHelper(
         () => configSvc.GetAll(),
         () => commentConfigSvc.GetAll());
+});
+
+// UserHelper registration (delegate pulls from IAspNetUserService)
+builder.Services.AddScoped<IUserHelper>(sp =>
+{
+    var userSvc = sp.GetRequiredService<IAspNetUserService>();
+    return new UserHelper(() => userSvc.GetAll());
 });
 
 builder.Services.AddRazorPages();
