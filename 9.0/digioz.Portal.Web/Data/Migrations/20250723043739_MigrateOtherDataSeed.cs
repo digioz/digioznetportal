@@ -26,7 +26,7 @@ namespace digioz.Portal.Web.Data.Migrations
                     { Guid.NewGuid().ToString(), "SMTPPort", "587", false },
                     { Guid.NewGuid().ToString(), "SMTPUsername", "webmaster@domain.com", false },
                     { Guid.NewGuid().ToString(), "SMTPPassword", "[Enter Password]", true },
-                    { Guid.NewGuid().ToString(), "SiteURL", "https://localhost:44394/", false },
+                    { Guid.NewGuid().ToString(), "SiteURL", "https://localhost:5048/", false },
                     { Guid.NewGuid().ToString(), "SiteName", "DigiOz .NET Portal", false },
                     { Guid.NewGuid().ToString(), "SiteEncryptionKey", "[Enter Key]", false },
                     { Guid.NewGuid().ToString(), "WebmasterEmail", "webmaster@domain.com", false },
