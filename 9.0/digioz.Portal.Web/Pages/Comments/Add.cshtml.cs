@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Memory;
 using digioz.Portal.Utilities;
+using HtmlAgilityPack; // added for sanitization
+using System.Text.RegularExpressions;
 
 namespace digioz.Portal.Web.Pages.Comments
 {
@@ -84,16 +86,20 @@ namespace digioz.Portal.Web.Pages.Comments
             };
             _commentService.Add(newComment);
 
-            _cache.Remove("CommentsMenu_" + referenceType); // defensive if reintroduced later
-
+            _cache.Remove("CommentsMenu_" + referenceType);
             return Redirect(referer ?? "/");
         }
 
         private static string Sanitize(string input)
         {
-            var noHtml = System.Text.RegularExpressions.Regex.Replace(input, "<.*?>", string.Empty);
-            noHtml = noHtml.Replace("<", string.Empty).Replace(">", string.Empty);
-            return noHtml.Trim();
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            // Parse HTML then extract plain text only; remove all tags, scripts, attributes.
+            var doc = new HtmlDocument();
+            doc.LoadHtml(input);
+            var text = doc.DocumentNode.InnerText ?? string.Empty;
+            // Collapse excessive whitespace/newlines
+            text = Regex.Replace(text, "\\s+", " ").Trim();
+            return text;
         }
 
         private class RecaptchaResponse { public bool Success { get; set; } public float Score { get; set; } public string Action { get; set; } }
