@@ -26,7 +26,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
         public async Task<IViewComponentResult> InvokeAsync(string referenceId = null)
         {
             var pagePath = HttpContext?.Request?.Path.Value ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(pagePath) || pagePath == "/") pagePath = "/Index";
+            if (string.IsNullOrWhiteSpace(pagePath)) pagePath = "/";
 
             ViewBag.ReferenceId = referenceId; // optional external id (e.g. page db id)
             ViewBag.ReferenceType = pagePath;   // the logical grouping key
