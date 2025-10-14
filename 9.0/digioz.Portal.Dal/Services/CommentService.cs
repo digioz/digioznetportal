@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace digioz.Portal.Dal.Services
 {
@@ -21,7 +22,16 @@ namespace digioz.Portal.Dal.Services
 
         public List<Comment> GetAll()
         {
-            return _context.Comments.ToList();
+            return _context.Comments.AsNoTracking().ToList();
+        }
+
+        public List<Comment> GetByReferenceType(string referenceType)
+        {
+            return _context.Comments
+                .AsNoTracking()
+                .Where(c => c.ReferenceType == referenceType)
+                .OrderByDescending(c => c.ModifiedDate ?? c.CreatedDate)
+                .ToList();
         }
 
         public void Add(Comment comment)

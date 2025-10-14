@@ -12,34 +12,40 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
     public class CommentsMenuViewComponent : ViewComponent
     {
         private readonly ICommentService _commentService;
-        private readonly IMemoryCache _cache;
-        private const string CacheKeyPrefix = "CommentsMenu_";
+        private readonly IConfigService _configService;
+        private readonly IMemoryCache _cache; // still used for Recaptcha only
 
-        public CommentsMenuViewComponent(ICommentService commentService, IMemoryCache cache)
+        public CommentsMenuViewComponent(ICommentService commentService, IConfigService configService, IMemoryCache cache)
         {
             _commentService = commentService;
+            _configService = configService;
             _cache = cache;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync(string referenceId, string referenceType)
+        public async Task<IViewComponentResult> InvokeAsync(string referenceId = null)
         {
-            // Pass identifiers to the view (used by forms/links)
+            var pagePath = HttpContext?.Request?.Path.Value ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(pagePath) || pagePath == "/") pagePath = "/Index";
+
             ViewBag.ReferenceId = referenceId;
-            ViewBag.ReferenceType = referenceType;
+            ViewBag.ReferenceType = pagePath;
 
-            var cacheKey = $"{CacheKeyPrefix}{referenceType}_{referenceId}";
-
-            if (!_cache.TryGetValue(cacheKey, out List<Comment> comments))
+            // Recaptcha config (cache OK, low churn)
+            const string cfgCacheKey = "RecaptchaCfg";
+            if (!_cache.TryGetValue(cfgCacheKey, out (bool enabled, string publicKey) recaptchaCfg))
             {
-                comments = _commentService
-                    .GetAll()
-                    .Where(c => c.ReferenceId == referenceId && c.ReferenceType == referenceType)
-                    .OrderByDescending(c => c.ModifiedDate ?? c.CreatedDate)
-                    .ToList();
-
-                _cache.Set(cacheKey, comments, new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(15)));
+                var all = _configService.GetAll();
+                var enabledVal = all.FirstOrDefault(c => c.ConfigKey == "RecaptchaEnabled")?.ConfigValue;
+                var pub = all.FirstOrDefault(c => c.ConfigKey == "RecaptchaPublicKey")?.ConfigValue;
+                bool.TryParse(enabledVal, out var isEnabled);
+                recaptchaCfg = (isEnabled, pub ?? string.Empty);
+                _cache.Set(cfgCacheKey, recaptchaCfg, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15)));
             }
+            ViewBag.RecaptchaEnabled = recaptchaCfg.enabled;
+            ViewBag.RecaptchaPublicKey = recaptchaCfg.publicKey;
+
+            // Use repository-level filtering instead of loading all comments into memory
+            List<Comment> comments = _commentService.GetByReferenceType(pagePath);
 
             return View(comments);
         }
