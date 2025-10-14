@@ -12,6 +12,7 @@ using Microsoft.Extensions.Caching.Memory;
 using digioz.Portal.Utilities;
 using HtmlAgilityPack; // added for sanitization
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace digioz.Portal.Web.Pages.Comments
 {
@@ -109,7 +110,12 @@ namespace digioz.Portal.Web.Pages.Comments
             try
             {
                 var client = _httpClientFactory.CreateClient();
-                var response = await client.PostAsync($"https://www.google.com/recaptcha/api/siteverify?secret={Uri.EscapeDataString(secret)}&response={Uri.EscapeDataString(token)}", null);
+                var form = new FormUrlEncodedContent(new Dictionary<string,string>
+                {
+                    { "secret", secret },
+                    { "response", token }
+                });
+                var response = await client.PostAsync("https://www.google.com/recaptcha/api/siteverify", form);
                 if (!response.IsSuccessStatusCode) return false;
                 var payload = await response.Content.ReadFromJsonAsync<RecaptchaResponse>();
                 return payload?.Success == true && payload.Score >= 0.5f && (string.IsNullOrEmpty(action) || payload.Action == action);
