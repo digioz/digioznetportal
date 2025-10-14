@@ -110,7 +110,7 @@ namespace digioz.Portal.Web.Pages.Comments
             try
             {
                 var client = _httpClientFactory.CreateClient();
-                var form = new FormUrlEncodedContent(new Dictionary<string,string>
+                var form = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
                     { "secret", secret },
                     { "response", token }
