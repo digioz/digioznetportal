@@ -2,13 +2,81 @@
 @model digioz.Portal.Web.Areas.Admin.Pages.Page.IndexModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
-    ViewBag.Title = "Page";
+    ViewBag.Title = "Pages";
     Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="card shadow-sm">
-    <div class="card-header">Pages</div>
-    <div class="card-body">
-        <p class="text-muted">Build your admin UI for site pages here.</p>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Pages</span>
+        <a class="btn btn-sm btn-primary" asp-area="Admin" asp-page="/Page/Add">Add Page</a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Title</th>
+                        <th>Url</th>
+                        <th class="text-center">Visible</th>
+                        <th style="width:180px">Timestamp</th>
+                        <th style="width:160px" class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items.Any())
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@item.Title</td>
+                                <td>@item.Url</td>
+                                <td class="text-center">
+                                    @if (item.Visible)
+                                    {
+                                        <span class="badge bg-success">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">No</span>
+                                    }
+                                </td>
+                                <td>@item.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-secondary px-1 py-0 fs-6" asp-area="Admin" asp-page="/Page/Details" asp-route-id="@item.Id">Details</a>
+                                    <a class="btn btn-sm btn-outline-primary px-1 py-0 fs-6" asp-area="Admin" asp-page="/Page/Edit" asp-route-id="@item.Id">Edit</a>
+                                    <a class="btn btn-sm btn-outline-danger px-1 py-0 fs-6" asp-area="Admin" asp-page="/Page/Delete" asp-route-id="@item.Id">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">No pages found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <small class="text-muted">Page @Model.PageNumber of @Model.TotalPages (@Model.TotalCount total)</small>
+        <nav aria-label="Pagination">
+            <ul class="pagination mb-0">
+                <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                    <a class="page-link" asp-area="Admin" asp-page="/Page/Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize">Prev</a>
+                </li>
+                @for (var p = 1; p <= Model.TotalPages; p++)
+                {
+                    <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                        <a class="page-link" asp-area="Admin" asp-page="/Page/Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize">@p</a>
+                    </li>
+                }
+                <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-area="Admin" asp-page="/Page/Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize">Next</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
