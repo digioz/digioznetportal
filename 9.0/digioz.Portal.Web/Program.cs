@@ -32,6 +32,12 @@ builder.Services.AddDefaultIdentity<IdentityUser>(
     .AddRoles<IdentityRole>()   // Add this line to enable roles
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+// Authorization policy to restrict Admin area to Administrator role
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
+});
+
 // Add Custom Services
 builder.Services.AddDbContext<digiozPortalContext>(
     options => options.UseSqlServer(connectionString),
@@ -103,7 +109,11 @@ builder.Services.AddScoped<IUserHelper>(sp =>
     return new UserHelper(() => userSvc.GetAll());
 });
 
-builder.Services.AddRazorPages();
+// Razor Pages with convention to authorize entire Admin area
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizeAreaFolder("Admin", "/", "AdminOnly");
+});
 
 var app = builder.Build();
 
