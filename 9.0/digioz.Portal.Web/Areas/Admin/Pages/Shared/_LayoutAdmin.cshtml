@@ -1,14 +1,128 @@
-﻿<!DOCTYPE html>
-
-<html>
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Admin Dashboard - @ViewBag.Title</title>
+    <!-- Bootstrap 5 CSS (local) -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true">
+    <style>
+        body { min-height: 100vh; }
+        .sidebar { min-height: calc(100vh - 56px); }
+        .card-placeholder { height: 320px; display: flex; align-items: center; justify-content: center; color: #6c757d; background: repeating-linear-gradient(45deg, #f8f9fa, #f8f9fa 10px, #ffffff 10px, #ffffff 20px); }
+    </style>
 </head>
-<body>
-	<h1>Admin Dashboard</h1>
-    <div>
-        @RenderBody()
+<body class="bg-light">
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-area="Admin" asp-page="/Index">Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="adminNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-page="/Index">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-page="/Users/Index">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-page="/Content/Index">Content</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-page="/Settings/Index">Settings</a></li>
+                </ul>
+                <span class="navbar-text text-white-50">@DateTime.UtcNow.ToString("u")</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-3">
+        <div class="row g-3">
+            <!-- Sidebar -->
+            <aside class="col-12 col-lg-3">
+                <div class="card shadow-sm sidebar">
+                    <div class="card-header fw-semibold">Navigation</div>
+                    <div class="list-group list-group-flush">
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Index">Overview</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Visitors/Index">Visitors</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Logs/Index">Logs</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Media/Index">Media</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Plugins/Index">Plugins</a>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main content -->
+            <main class="col-12 col-lg-9">
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header fw-semibold">@ViewBag.Title</div>
+                    <div class="card-body">
+                        @RenderBody()
+                    </div>
+                </div>
+
+                <!-- Analytics and Logs Row -->
+                <div class="row g-3">
+                    <!-- Visitor Tracking Chart Area -->
+                    <div class="col-12 col-xl-7">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                                <span>Visitor Tracking</span>
+                                <small class="text-muted">Last 30 days</small>
+                            </div>
+                            <div class="card-body">
+                                <!-- Placeholder canvas/container for charts (e.g., Chart.js) -->
+                                <div class="card-placeholder rounded" id="visitorsChart">
+                                    <span>Chart placeholder</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Latest Logs Area -->
+                    <div class="col-12 col-xl-5">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                                <span>Latest Logs</span>
+                                <a class="small" asp-area="Admin" asp-page="/Logs/Index">View all</a>
+                            </div>
+                            <div class="card-body">
+                                <!-- Placeholder list for latest log entries -->
+                                <ul class="list-group list-group-flush" id="latestLogs">
+                                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="small text-muted">[Info]</div>
+                                            <div class="fw-semibold">System initialized</div>
+                                        </div>
+                                        <small class="text-muted">just now</small>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="small text-muted">[Warning]</div>
+                                            <div class="fw-semibold">High memory usage detected</div>
+                                        </div>
+                                        <small class="text-muted">2m</small>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="small text-muted">[Error]</div>
+                                            <div class="fw-semibold">Failed to send email</div>
+                                        </div>
+                                        <small class="text-muted">5m</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
+
+    <footer class="text-center text-muted py-4">
+        <small>&copy; @DateTime.UtcNow.Year - Admin Dashboard</small>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS (local) -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

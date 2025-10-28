@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace digioz.Portal.Web.Areas.Admin.Pages.Home
+namespace digioz.Portal.Web.Areas.Admin.Pages
 {
     public class IndexModel : PageModel
     {
