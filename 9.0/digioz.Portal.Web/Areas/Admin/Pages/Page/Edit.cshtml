@@ -2,79 +2,102 @@
 @model digioz.Portal.Web.Areas.Admin.Pages.Page.EditModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
-    ViewBag.Title = "Edit Page";
-    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+ ViewBag.Title = "Edit Page";
+ Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span>Edit Page</span>
-        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/Page/Index">Back</a>
-    </div>
-    <div class="card-body">
-        <form method="post">
-            <input type="hidden" asp-for="Item.Id" />
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label asp-for="Item.Title" class="form-label">Title</label>
-                    <input asp-for="Item.Title" class="form-control" />
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="Item.Url" class="form-label">Url</label>
-                    <input asp-for="Item.Url" class="form-control" />
-                </div>
-                <div class="col-12">
-                    <label asp-for="Item.Body" class="form-label">Content (UBB)</label>
-                    <textarea asp-for="Item.Body" class="form-control" id="editor" rows="12"></textarea>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="Item.Keywords" class="form-label">Keywords</label>
-                    <input asp-for="Item.Keywords" class="form-control" />
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="Item.Description" class="form-label">Description</label>
-                    <input asp-for="Item.Description" class="form-control" />
-                </div>
-                <div class="col-12">
-                    <div class="form-check">
-                        <input asp-for="Item.Visible" class="form-check-input" />
-                        <label asp-for="Item.Visible" class="form-check-label">Visible</label>
-                    </div>
-                </div>
-            </div>
-            <div class="mt-3 d-flex justify-content-end gap-2">
-                <button type="submit" class="btn btn-primary">Save</button>
-            </div>
-        </form>
-    </div>
+ <div class="card-header d-flex justify-content-between align-items-center">
+ <span>Edit Page</span>
+ <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/Page/Index">Back</a>
+ </div>
+ <div class="card-body">
+ <form method="post">
+ <input type="hidden" asp-for="Item.Id" />
+ <div class="row g-3">
+ <div class="col-md-6">
+ <label asp-for="Item.Title" class="form-label">Title</label>
+ <input asp-for="Item.Title" class="form-control" />
+ </div>
+ <div class="col-md-6">
+ <label asp-for="Item.Url" class="form-label">Url</label>
+ <input asp-for="Item.Url" class="form-control" />
+ </div>
+ <div class="col-12">
+ <label asp-for="Item.Body" class="form-label">Content</label>
+ <textarea asp-for="Item.Body" class="form-control" id="editor" rows="12"></textarea>
+ </div>
+ <div class="col-md-6">
+ <label asp-for="Item.Keywords" class="form-label">Keywords</label>
+ <input asp-for="Item.Keywords" class="form-control" />
+ </div>
+ <div class="col-md-6">
+ <label asp-for="Item.Description" class="form-label">Description</label>
+ <input asp-for="Item.Description" class="form-control" />
+ </div>
+ <div class="col-12">
+ <div class="form-check">
+ <input asp-for="Item.Visible" class="form-check-input" />
+ <label asp-for="Item.Visible" class="form-check-label">Visible</label>
+ </div>
+ </div>
+ </div>
+ <div class="mt-3 d-flex justify-content-end gap-2">
+ <button type="submit" class="btn btn-primary">Save</button>
+ </div>
+ </form>
+ </div>
 </div>
 
 @section Scripts{
-    <script>
-        (function(){
-            function btn(label, tag){
-                const b = document.createElement('button');
-                b.type = 'button';
-                b.className = 'btn btn-sm btn-outline-secondary me-1';
-                b.textContent = label;
-                b.addEventListener('click', function(){
-                    const ta = document.getElementById('editor');
-                    const start = ta.selectionStart, end = ta.selectionEnd;
-                    const before = ta.value.substring(0,start);
-                    const sel = ta.value.substring(start,end);
-                    const after = ta.value.substring(end);
-                    ta.value = before + '['+tag+']' + sel + '[/'+tag+']' + after;
-                    ta.focus();
-                    ta.selectionStart = start + tag.length + 2;
-                    ta.selectionEnd = ta.selectionStart + sel.length;
-                });
-                return b;
-            }
-            const toolbar = document.createElement('div');
-            toolbar.className = 'mb-2';
-            toolbar.append(btn('B','b'), btn('I','i'), btn('U','u'), btn('Quote','quote'), btn('Code','code'), btn('List','list'), btn('URL','url'));
-            const editor = document.getElementById('editor');
-            editor.parentNode.insertBefore(toolbar, editor);
-        })();
-    </script>
+ <!-- Prefer local CKEditor if provided by NuGet/static files; fallback to CDN -->
+ <script src="~/lib/ckeditor/ckeditor.js" asp-append-version="true"></script>
+ <script>
+ if (!window.ClassicEditor) {
+ var s = document.createElement('script');
+ s.src = 'https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js';
+ document.head.appendChild(s);
+ }
+ (function waitForCK() {
+ if (!window.ClassicEditor) return setTimeout(waitForCK,50);
+ ClassicEditor
+ .create(document.querySelector('#editor'))
+ .then(editor => {
+ window.__ck = editor;
+ const form = document.querySelector('form');
+ form.addEventListener('submit', function () {
+ const html = editor.getData();
+ const ubb = htmlToUbb(html);
+ document.getElementById('editor').value = ubb;
+ });
+ });
+ })();
+
+ function htmlToUbb(html) {
+ if (!html) return '';
+ let s = html;
+ s = s.replace(/\r/g, '');
+ s = s.replace(/<(strong|b)>([\s\S]*?)<\/(strong|b)>/gi, '[b]$2[/b]');
+ s = s.replace(/<(em|i)>([\s\S]*?)<\/(em|i)>/gi, '[i]$2[/i]');
+ s = s.replace(/<u>([\s\S]*?)<\/u>/gi, '[u]$1[/u]');
+ s = s.replace(/<s>([\s\S]*?)<\/s>/gi, '[s]$1[/s]');
+ s = s.replace(/<a[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, '[url=$1]$2[/url]');
+ s = s.replace(/<pre[^>]*>([\s\S]*?)<\/pre>/gi, '[code]$1[/code]');
+ s = s.replace(/<code[^>]*>([\s\S]*?)<\/code>/gi, '[code]$1[/code]');
+ s = s.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, '[quote]$1[/quote]');
+ s = s.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, function (_, inner) {
+ let body = inner.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '[*]$1');
+ return '[list]' + body + '[/list]';
+ });
+ s = s.replace(/<ol[^>]*>([\s\S]*?)<\/ol>/gi, function (_, inner) {
+ let body = inner.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '[*]$1');
+ return '[list=1]' + body + '[/list]';
+ });
+ s = s.replace(/<br\s*\/?>(?=\n)?/gi, "\n");
+ s = s.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, '$1\n\n');
+ s = s.replace(/<[^>]+>/g, '');
+ s = s.replace(/\n{3,}/g, '\n\n');
+ return s.trim();
+ }
+ </script>
 }
