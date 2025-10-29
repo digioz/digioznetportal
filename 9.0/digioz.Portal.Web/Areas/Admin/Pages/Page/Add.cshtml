@@ -49,7 +49,7 @@
 </div>
 
 @section Scripts {
-    <!-- Prefer local CKEditor if provided by NuGet/static files; fallback to CDN -->
+    <!-- Use local CKEditor from lib/static files -->
     <script src="~/lib/ckeditor/build/ckeditor.js" asp-append-version="true"></script>
     <script>
         // inject CSS rule to make CKEditor editable area keep a minimum height even after focus
@@ -60,16 +60,13 @@
             document.head.appendChild(st);
         }
 
-        if (!window.ClassicEditor) {
-            var s=document.createElement('script'); s.src='https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js'; document.head.appendChild(s);
-        }
         (function waitForCK(){
             if (!window.ClassicEditor) return setTimeout(waitForCK,50);
                 ClassicEditor
                 .create(document.querySelector('#editor'))
                 .then(editor => {
                     window.__ck = editor;
-                    // set editor editable area min-height to roughly 30 lines (fallback)
+                    // set editor editable area min-height to roughly30 lines (fallback)
                     try { editor.ui.view.editable.element.style.minHeight = '30em'; } catch(e){}
                     const form = document.querySelector('form');
                     form.addEventListener('submit', function(){
