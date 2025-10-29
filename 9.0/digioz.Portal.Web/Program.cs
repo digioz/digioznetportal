@@ -3,10 +3,15 @@ using digioz.Portal.Dal.Services;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
 using digioz.Portal.Web.Data;
+using digioz.Portal.Web.Logging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure DB logger provider from configuration (appsettings.json: DbLogger)
+builder.Services.Configure<DbLoggerOptions>(builder.Configuration.GetSection("DbLogger"));
+builder.Logging.AddDbLogger();
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -26,6 +31,12 @@ builder.Services.AddDefaultIdentity<IdentityUser>(
                         })
     .AddRoles<IdentityRole>()   // Add this line to enable roles
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+// Authorization policy to restrict Admin area to Administrator role
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
+});
 
 // Add Custom Services
 builder.Services.AddDbContext<digiozPortalContext>(
@@ -98,7 +109,11 @@ builder.Services.AddScoped<IUserHelper>(sp =>
     return new UserHelper(() => userSvc.GetAll());
 });
 
-builder.Services.AddRazorPages();
+// Razor Pages with convention to authorize entire Admin area
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizeAreaFolder("Admin", "/", "AdminOnly");
+});
 
 var app = builder.Build();
 

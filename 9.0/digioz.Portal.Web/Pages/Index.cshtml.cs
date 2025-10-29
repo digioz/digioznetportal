@@ -36,11 +36,11 @@ namespace digioz.Portal.Pages
         public void OnGet()
         {
             PageContent = _pageService.GetByTitle("Home");
+            _logger.LogInformation("Loaded Home page content. Title={Title}", PageContent?.Title);
+
 
             // Display comments if enabled for this page
-            AllowComments = _commentsHelper.IsCommentsEnabledForPageTitle(
-                PageContent?.Title
-            );
+            AllowComments = _commentsHelper.IsCommentsEnabledForPageTitle(PageContent?.Title);
         }
     }
 }

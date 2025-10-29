@@ -1,14 +1,164 @@
-﻿<!DOCTYPE html>
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Caching.Memory
+@using digioz.Portal.Bo
+@using digioz.Portal.Dal.Services.Interfaces
+@inject IConfigService ConfigService
+@inject Microsoft.Extensions.Caching.Memory.IMemoryCache MemoryCache
 
-<html>
+@{
+    // Cache keys
+    var cacheKeyConfigDictionary = "ConfigDictionary";
+    Dictionary<string, string> configDictionary;
+    var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
+    if (!MemoryCache.TryGetValue(cacheKeyConfigDictionary, out configDictionary))
+    {
+        var config = ConfigService.GetAll();
+        configDictionary = config.ToDictionary(c => c.ConfigKey, c => c.ConfigValue);
+        MemoryCache.Set(cacheKeyConfigDictionary, configDictionary, cacheEntryOptions);
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Admin Dashboard - @ViewBag.Title</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard - @configDictionary["SiteName"] - @ViewBag.Title</title>
+    <!-- Bootstrap 5 CSS (local) -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true">
+    <link href="~/css/admin.css" rel="stylesheet" asp-append-version="true" />
+    <!-- Bootstrap Icons (local via libman) -->
+    <link href="~/lib/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" asp-append-version="true" />
 </head>
-<body>
-	<h1>Admin Dashboard</h1>
-    <div>
-        @RenderBody()
+<body class="bg-light">
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-area="Admin" asp-page="/Index">Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="adminNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-page="/Index">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-page="/Users/Index">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-page="/Content/Index">Content</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-page="/Settings/Index">Settings</a></li>
+                </ul>
+                <span class="navbar-text text-white-50">@DateTime.UtcNow.ToString("u")</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-3">
+        <div class="row g-3">
+            <!-- Sidebar -->
+            <aside class="col-12 col-lg-3">
+                <div class="card shadow-sm sidebar">
+                    <div class="card-header fw-semibold">Navigation</div>
+                    <div class="list-group list-group-flush">
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Index">Overview</a>
+
+                        <!-- Content Category -->
+                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#cat-content" aria-expanded="false" aria-controls="cat-content">
+                            Content
+                        </button>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Content</div>
+                        <div id="cat-content" class="collapse d-lg-block">
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Announcement/Index">Announcements</a>
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Page/Index">Pages</a>
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Picture/Index">Pictures</a>
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Video/Index">Videos</a>
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Plugin/Index">Plugins</a>
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Menu/Index">Menus</a>
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Module/Index">Modules</a>
+                        </div>
+
+                        <!-- Communication Category -->
+                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#cat-comm" aria-expanded="false" aria-controls="cat-comm">
+                            Communication
+                        </button>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Communication</div>
+                        <div id="cat-comm" class="collapse d-lg-block">
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Chat/Index">Chat</a>
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Comment/Index">Comments</a>
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/CommentConfig/Index">Comment Config</a>
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/MailingList/Index">Mailing Lists</a>
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/MailingListSubscriber/Index">Subscribers</a>
+                        </div>
+
+                        <!-- Commerce Category -->
+                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#cat-commerce" aria-expanded="false" aria-controls="cat-commerce">
+                            Commerce
+                        </button>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Commerce</div>
+                        <div id="cat-commerce" class="collapse d-lg-block">
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Product/Index">Products</a>
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Order/Index">Orders</a>
+                        </div>
+
+                        <!-- Polls Category -->
+                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#cat-polls" aria-expanded="false" aria-controls="cat-polls">
+                            Polls
+                        </button>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Polls</div>
+                        <div id="cat-polls" class="collapse d-lg-block">
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Poll/Index">Polls</a>
+                        </div>
+
+                        <!-- Configuration Category -->
+                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#cat-config" aria-expanded="false" aria-controls="cat-config">
+                            Configuration
+                        </button>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Configuration</div>
+                        <div id="cat-config" class="collapse d-lg-block">
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Config/Index">Config</a>
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Link/Index">Links</a>
+                        </div>
+
+                        <!-- Monitoring Category -->
+                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#cat-monitor" aria-expanded="false" aria-controls="cat-monitor">
+                            Monitoring
+                        </button>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Monitoring</div>
+                        <div id="cat-monitor" class="collapse d-lg-block">
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Visitor/Index">Visitors</a>
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Log/Index">Logs</a>
+                        </div>
+
+                        <!-- Users Category -->
+                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#cat-users" aria-expanded="false" aria-controls="cat-users">
+                            Users
+                        </button>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Users</div>
+                        <div id="cat-users" class="collapse d-lg-block">
+                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/UserManager/Index">User Manager</a>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main content -->
+            <main class="col-12 col-lg-9">
+                @RenderBody()
+            </main>
+        </div>
     </div>
+
+    <footer class="text-center text-muted py-4">
+        <small><p>&copy; @DateTime.Now.Year - @configDictionary["SiteName"]</p></small>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS (local) -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
