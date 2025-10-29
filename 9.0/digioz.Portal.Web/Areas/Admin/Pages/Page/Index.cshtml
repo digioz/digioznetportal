@@ -43,9 +43,15 @@
                                 </td>
                                 <td>@item.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
                                 <td class="text-end">
-                                    <a class="btn btn-sm btn-outline-secondary px-1 py-0 fs-6" asp-area="Admin" asp-page="/Page/Details" asp-route-id="@item.Id">Details</a>
-                                    <a class="btn btn-sm btn-outline-primary px-1 py-0 fs-6" asp-area="Admin" asp-page="/Page/Edit" asp-route-id="@item.Id">Edit</a>
-                                    <a class="btn btn-sm btn-outline-danger px-1 py-0 fs-6" asp-area="Admin" asp-page="/Page/Delete" asp-route-id="@item.Id">Delete</a>
+                                    <a class="btn btn-sm btn-outline-secondary px-1 py-0 fs-6" asp-area="Admin" asp-page="/Page/Details" asp-route-id="@item.Id" title="Details" aria-label="Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-primary px-1 py-0 fs-6" asp-area="Admin" asp-page="/Page/Edit" asp-route-id="@item.Id" title="Edit" aria-label="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-danger px-1 py-0 fs-6" asp-area="Admin" asp-page="/Page/Delete" asp-route-id="@item.Id" title="Delete" aria-label="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         }
