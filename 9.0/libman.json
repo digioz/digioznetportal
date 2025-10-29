@@ -1,0 +1,13 @@
+{
+  "version": "1.0",
+  "defaultProvider": "unpkg",
+  "libraries": [
+    {
+      "library": "@ckeditor/ckeditor5-build-classic@41.4.2",
+      "destination": "wwwroot/lib/ckeditor/",
+      "files": [
+        "build/ckeditor.js"
+      ]
+    }
+  ]
+}
