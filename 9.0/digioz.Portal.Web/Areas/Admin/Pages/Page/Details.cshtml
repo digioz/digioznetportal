@@ -25,8 +25,8 @@
             <dd class="col-sm-9">@Model.Item?.Keywords</dd>
             <dt class="col-sm-3">Description</dt>
             <dd class="col-sm-9">@Model.Item?.Description</dd>
-            <dt class="col-sm-3">Body (UBB)</dt>
-            <dd class="col-sm-9"><pre class="mb-0">@Model.Item?.Body</pre></dd>
+            <dt class="col-sm-3">Body</dt>
+            <dd class="col-sm-9">@Html.Raw(Model.Item?.Body)</dd>
         </dl>
     </div>
 </div>

@@ -24,8 +24,7 @@
                 </div>
                 <div class="col-12">
                     <label asp-for="Item.Body" class="form-label">Content</label>
-                    <textarea asp-for="Item.Body" class="form-control" id="editor" rows="10"></textarea>
-                    <div class="form-text">Content is edited with CKEditor and saved as HTML.</div>
+                    <textarea asp-for="Item.Body" class="form-control" id="editor" rows="30"></textarea>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="Item.Keywords" class="form-label">Keywords</label>
@@ -53,6 +52,14 @@
     <!-- Prefer local CKEditor if provided by NuGet/static files; fallback to CDN -->
     <script src="~/lib/ckeditor/ckeditor.js" asp-append-version="true"></script>
     <script>
+        // inject CSS rule to make CKEditor editable area keep a minimum height even after focus
+        if (!document.getElementById('ck-minheight-style')) {
+            var st = document.createElement('style');
+            st.id = 'ck-minheight-style';
+            st.innerHTML = '.ck-editor__editable_inline { min-height:30em !important; }';
+            document.head.appendChild(st);
+        }
+
         if (!window.ClassicEditor) {
             var s=document.createElement('script'); s.src='https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js'; document.head.appendChild(s);
         }
@@ -62,6 +69,8 @@
                 .create(document.querySelector('#editor'))
                 .then(editor => {
                     window.__ck = editor;
+                    // set editor editable area min-height to roughly 30 lines (fallback)
+                    try { editor.ui.view.editable.element.style.minHeight = '30em'; } catch(e){}
                     const form = document.querySelector('form');
                     form.addEventListener('submit', function(){
                         // copy HTML from the editor into the textarea so it will be posted
