@@ -35,32 +35,38 @@
         <div class="card shadow-sm h-100">
             <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
                 <span>Latest Logs</span>
-                <a class="small" asp-area="Admin" asp-page="/Logs/Index">View all</a>
+                <a class="btn btn-sm btn-primary" href="@Url.Page("/Log/Index", new { area = "Admin" })">View all</a>
             </div>
             <div class="card-body">
-                <!-- Placeholder list for latest log entries -->
                 <ul class="list-group list-group-flush" id="latestLogs">
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="small text-muted">[Info]</div>
-                            <div class="fw-semibold">System initialized</div>
-                        </div>
-                        <small class="text-muted">just now</small>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="small text-muted">[Warning]</div>
-                            <div class="fw-semibold">High memory usage detected</div>
-                        </div>
-                        <small class="text-muted">2m</small>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="small text-muted">[Error]</div>
-                            <div class="fw-semibold">Failed to send email</div>
-                        </div>
-                        <small class="text-muted">5m</small>
-                    </li>
+                    @if (Model.LatestLogs != null && Model.LatestLogs.Count > 0)
+                    {
+                        foreach (var log in Model.LatestLogs)
+                        {
+                            var level = (!string.IsNullOrEmpty(log.LogEvent) ? log.LogEvent.Split('|')[0] : (string.IsNullOrEmpty(log.Level) ? "Info" : log.Level));
+                            var time = log.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "";
+                            var msg = log.Message ?? string.Empty;
+                            var preview = msg.Length > 100 ? msg.Substring(0, 100) : msg;
+                            var hasMore = msg.Length > 100;
+                            <li class="list-group-item">
+                                <div class="small text-muted">[@level] • Id: @log.Id • @time • @log.LogEvent</div>
+                                <div class="fw-semibold">
+                                    <span>@preview</span>
+                                    @if (hasMore)
+                                    {
+                                        <details class="mt-1">
+                                            <summary>Show more</summary>
+                                            <pre class="mb-0">@msg.Substring(100)</pre>
+                                        </details>
+                                    }
+                                </div>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="list-group-item text-muted">No logs found.</li>
+                    }
                 </ul>
             </div>
         </div>
