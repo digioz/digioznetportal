@@ -6,9 +6,89 @@
     Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
-<div class="card shadow-sm">
-    <div class="card-header">Visitors</div>
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Visitors</span>
+        <a asp-area="Admin" asp-page="/Index" class="btn btn-sm btn-outline-secondary">Back</a>
+    </div>
     <div class="card-body">
-        <p class="text-muted">Build your admin UI for visitors here.</p>
+        <form method="get" class="row g-2 align-items-center mb-3">
+            <div class="col-12 col-md-6">
+                <input asp-for="q" class="form-control" placeholder="Search user agent, href, referrer, or IP..." />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+            <div class="col-auto">
+                <a class="btn btn-outline-secondary" asp-area="Admin" asp-page="/Visitor/Index">Clear</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th style="width:80px;">Id</th>
+                        <th style="width:170px;">Timestamp</th>
+                        <th style="width:150px;">IP</th>
+                        <th>Href</th>
+                        <th>Referrer</th>
+                        <th>User Agent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Count > 0)
+                    {
+                        foreach (var v in Model.Items)
+                        {
+                            var time = v.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") ?? string.Empty;
+                            var href = v.Href ?? string.Empty;
+                            var referrer = v.Referrer ?? string.Empty;
+                            var ua = v.UserAgent ?? string.Empty;
+                            var uaPreview = ua.Length > 150 ? ua.Substring(0, 150) : ua;
+                            var uaHasMore = ua.Length > 150;
+                            <tr>
+                                <td>@v.Id</td>
+                                <td>@time</td>
+                                <td>@v.IpAddress</td>
+                                <td class="text-truncate" style="max-width:240px" title="@href">@href</td>
+                                <td class="text-truncate" style="max-width:240px" title="@referrer">@referrer</td>
+                                <td>
+                                    <span>@uaPreview</span>
+                                    @if (uaHasMore)
+                                    {
+                                        <details class="mt-1">
+                                            <summary>Show more</summary>
+                                            <pre class="mb-0">@ua.Substring(150)</pre>
+                                        </details>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" class="text-muted">No visitor records found.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <nav aria-label="Visitor pagination" class="mt-3">
+            <ul class="pagination mb-0">
+                <li class="page-item @(Model.pageNumber <= 1 ? "disabled" : "")">
+                    <a class="page-link" asp-area="Admin" asp-page="/Visitor/Index" asp-route-pageNumber="@(Model.pageNumber - 1)" asp-route-pageSize="@Model.pageSize" asp-route-q="@Model.q">Prev</a>
+                </li>
+                @for (var p = 1; p <= Model.TotalPages; p++)
+                {
+                    <li class="page-item @(p == Model.pageNumber ? "active" : "")">
+                        <a class="page-link" asp-area="Admin" asp-page="/Visitor/Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.pageSize" asp-route-q="@Model.q">@p</a>
+                    </li>
+                }
+                <li class="page-item @(Model.pageNumber >= Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-area="Admin" asp-page="/Visitor/Index" asp-route-pageNumber="@(Model.pageNumber + 1)" asp-route-pageSize="@Model.pageSize" asp-route-q="@Model.q">Next</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>

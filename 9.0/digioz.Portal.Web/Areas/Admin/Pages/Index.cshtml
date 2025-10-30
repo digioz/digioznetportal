@@ -30,8 +30,49 @@
         </div>
     </div>
 
-    <!-- Latest Logs Area -->
+    <!-- Latest Visitor Logs Area -->
     <div class="col-12 col-xl-7">
+        <div class="card shadow-sm h-100 mb-3">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>Latest Visitor Logs</span>
+                <a class="btn btn-sm btn-primary" href="@Url.Page("/Visitor/Index", new { area = "Admin" })">View All</a>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    @if (Model.LatestVisitorLogs != null && Model.LatestVisitorLogs.Count > 0)
+                    {
+                        foreach (var v in Model.LatestVisitorLogs)
+                        {
+                            var time = v.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "";
+                            var ua = v.UserAgent ?? string.Empty;
+                            var preview = ua.Length > 100 ? ua.Substring(0, 100) : ua;
+                            var hasMore = ua.Length > 100;
+                            <li class="list-group-item">
+                                <div class="small text-muted">Id: @v.Id • @time • IP: @v.IpAddress</div>
+                                <div class="fw-semibold">
+                                    <span>@preview</span>
+                                    @if (hasMore)
+                                    {
+                                        <details class="mt-1">
+                                            <summary>Show more</summary>
+                                            <pre class="mb-0">@ua.Substring(100)</pre>
+                                        </details>
+                                    }
+                                </div>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="list-group-item text-muted">No visitor logs found.</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest Logs Area -->
+    <div class="col-12 col-xl-12">
         <div class="card shadow-sm h-100">
             <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
                 <span>Latest Logs</span>

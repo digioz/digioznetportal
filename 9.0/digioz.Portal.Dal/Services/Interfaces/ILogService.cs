@@ -7,6 +7,7 @@ namespace digioz.Portal.Dal.Services.Interfaces
     {
         Log Get(int id);
         List<Log> GetAll();
+        List<Log> GetLastN(int n, string order);
         void Add(Log log);
         void AddRange(IEnumerable<Log> logs);
         void Update(Log log);
