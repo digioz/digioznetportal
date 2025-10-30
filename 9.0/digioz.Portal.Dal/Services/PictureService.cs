@@ -14,7 +14,7 @@ namespace digioz.Portal.Dal.Services
             _context = context;
         }
 
-        public Picture Get(string id)
+        public Picture Get(int id)
         {
             return _context.Pictures.Find(id);
         }
@@ -36,7 +36,7 @@ namespace digioz.Portal.Dal.Services
             _context.SaveChanges();
         }
 
-        public void Delete(string id)
+        public void Delete(int id)
         {
             var picture = _context.Pictures.Find(id);
             if (picture != null)

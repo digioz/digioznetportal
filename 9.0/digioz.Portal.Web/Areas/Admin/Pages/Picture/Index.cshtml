@@ -2,13 +2,20 @@
 @model digioz.Portal.Web.Areas.Admin.Pages.Picture.IndexModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
-    ViewBag.Title = "Picture";
+    ViewBag.Title = "Pictures";
     Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="card shadow-sm">
-    <div class="card-header">Pictures</div>
+    <div class="card-header">Picture Management</div>
     <div class="card-body">
-        <p class="text-muted">Build your admin UI for pictures here.</p>
+        <div class="list-group">
+            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Picture/PictureIndex">
+                Picture Manager
+            </a>
+            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Picture/PictureAlbumIndex">
+                Picture Album Manager
+            </a>
+        </div>
     </div>
 </div>
