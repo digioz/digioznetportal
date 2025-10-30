@@ -30,6 +30,14 @@ namespace digioz.Portal.Dal.Services
             _context.SaveChanges();
         }
 
+        public void AddRange(IEnumerable<VisitorInfo> infos)
+        {
+            var list = infos is IList<VisitorInfo> l ? l : infos.ToList();
+            if (list.Count == 0) return;
+            _context.VisitorInfos.AddRange(list);
+            _context.SaveChanges();
+        }
+
         public void Update(VisitorInfo info)
         {
             _context.VisitorInfos.Update(info);

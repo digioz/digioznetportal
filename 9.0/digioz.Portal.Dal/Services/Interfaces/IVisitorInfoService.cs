@@ -8,6 +8,7 @@ namespace digioz.Portal.Dal.Services.Interfaces
         VisitorInfo Get(int id);
         List<VisitorInfo> GetAll();
         void Add(VisitorInfo info);
+        void AddRange(IEnumerable<VisitorInfo> infos);
         void Update(VisitorInfo info);
         void Delete(int id);
     }
