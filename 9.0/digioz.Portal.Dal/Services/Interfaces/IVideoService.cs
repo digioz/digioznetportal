@@ -5,10 +5,10 @@ namespace digioz.Portal.Dal.Services.Interfaces
 {
     public interface IVideoService
     {
-        Video Get(string id);
+        Video Get(int id);
         List<Video> GetAll();
         void Add(Video video);
         void Update(Video video);
-        void Delete(string id);
+        void Delete(int id);
     }
 }

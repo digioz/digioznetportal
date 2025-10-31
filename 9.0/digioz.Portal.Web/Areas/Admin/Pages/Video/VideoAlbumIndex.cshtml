@@ -1,0 +1,82 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.Video.VideoAlbumIndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+ ViewBag.Title = "Video Album Manager";
+ Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+ <div class="card-header d-flex justify-content-between align-items-center">
+ <span>Video Album Manager</span>
+ <a class="btn btn-sm btn-primary" asp-area="Admin" asp-page="/Video/VideoAlbumAdd">Add Album</a>
+ </div>
+ <div class="card-body p-0">
+ <div class="table-responsive">
+ <table class="table table-sm table-hover mb-0 align-middle">
+ <thead class="table-light">
+ <tr>
+ <th>Name</th>
+ <th>Description</th>
+ <th class="text-center">Visible</th>
+ <th class="text-center">Approved</th>
+ <th class="text-center">Videos</th>
+ <th style="width:120px">Latest</th>
+ <th style="width:200px" class="text-end">Action</th>
+ </tr>
+ </thead>
+ <tbody>
+ @if (Model.Items.Any())
+ {
+ foreach (var item in Model.Items)
+ {
+ <tr>
+ <td>@item.Name</td>
+ <td>@item.Description</td>
+ <td class="text-center">@(item.Visible ? "Yes" : "No")</td>
+ <td class="text-center">@(item.Approved ? "Yes" : "No")</td>
+ <td class="text-center">@(Model.VideoCounts.TryGetValue(item.Id, out var c) ? c :0)</td>
+ <td>
+ @{ var thumb = Model.LatestThumbs.TryGetValue(item.Id, out var t) ? t : null; }
+ @if (!string.IsNullOrEmpty(thumb))
+ {
+ <img src="/img/Videos/Thumb/@thumb" alt="thumb" class="img-thumbnail" style="width:60px;height:60px" />
+ }
+ </td>
+ <td class="text-end">
+ <a class="btn btn-sm btn-outline-primary px-1 py-0" asp-area="Admin" asp-page="/Video/VideoAlbumEdit" asp-route-id="@item.Id">Edit</a>
+ <a class="btn btn-sm btn-outline-danger px-1 py-0" asp-area="Admin" asp-page="/Video/VideoAlbumDelete" asp-route-id="@item.Id">Delete</a>
+ </td>
+ </tr>
+ }
+ }
+ else
+ {
+ <tr>
+ <td colspan="7" class="text-center text-muted py-4">No albums found.</td>
+ </tr>
+ }
+ </tbody>
+ </table>
+ </div>
+ </div>
+ <div class="card-footer d-flex justify-content-between align-items-center">
+ <small class="text-muted">Page @Model.PageNumber of @Model.TotalPages (@Model.TotalCount total)</small>
+ <nav aria-label="Pagination">
+ <ul class="pagination mb-0">
+ <li class="page-item @(Model.PageNumber <=1 ? "disabled" : "")">
+ <a class="page-link" asp-area="Admin" asp-page="/Video/VideoAlbumIndex" asp-route-pageNumber="@(Model.PageNumber -1)" asp-route-pageSize="@Model.PageSize">Prev</a>
+ </li>
+ @for (var p =1; p <= Model.TotalPages; p++)
+ {
+ <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+ <a class="page-link" asp-area="Admin" asp-page="/Video/VideoAlbumIndex" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize">@p</a>
+ </li>
+ }
+ <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+ <a class="page-link" asp-area="Admin" asp-page="/Video/VideoAlbumIndex" asp-route-pageNumber="@(Model.PageNumber +1)" asp-route-pageSize="@Model.PageSize">Next</a>
+ </li>
+ </ul>
+ </nav>
+ </div>
+</div>

@@ -16,32 +16,32 @@ builder.Logging.AddDbLogger();
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+ options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(
-                        options =>
-                        {
-                            options.SignIn.RequireConfirmedAccount = false;
-                            options.SignIn.RequireConfirmedEmail = false;
-                            options.User.RequireUniqueEmail = true;
-                            options.Lockout.AllowedForNewUsers = true;
-                            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(120);
-                            options.Lockout.MaxFailedAccessAttempts = 5;
-                        })
-    .AddRoles<IdentityRole>()   // Add this line to enable roles
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+ options =>
+ {
+ options.SignIn.RequireConfirmedAccount = false;
+ options.SignIn.RequireConfirmedEmail = false;
+ options.User.RequireUniqueEmail = true;
+ options.Lockout.AllowedForNewUsers = true;
+ options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(120);
+ options.Lockout.MaxFailedAccessAttempts =5;
+ })
+ .AddRoles<IdentityRole>() // Add this line to enable roles
+ .AddEntityFrameworkStores<ApplicationDbContext>();
 
 // Authorization policy to restrict Admin area to Administrator role
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
+ options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
 });
 
 // Add Custom Services
 builder.Services.AddDbContext<digiozPortalContext>(
-    options => options.UseSqlServer(connectionString),
-    optionsLifetime: ServiceLifetime.Scoped);
+ options => options.UseSqlServer(connectionString),
+ optionsLifetime: ServiceLifetime.Scoped);
 builder.Services.AddDbContextFactory<digiozPortalContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
@@ -92,63 +92,77 @@ builder.Services.AddMemoryCache();
 // Recaptcha verification needs HttpClient
 builder.Services.AddHttpClient();
 
+// Session for capturing SessionId in visitor logs
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
+
 // Helpers: wire CommentsHelper with delegates to avoid Utilities->Dal reference
 builder.Services.AddScoped<ICommentsHelper>(sp =>
 {
-    var configSvc = sp.GetRequiredService<IConfigService>();
-    var commentConfigSvc = sp.GetRequiredService<ICommentConfigService>();
-    return new CommentsHelper(
-        () => configSvc.GetAll(),
-        () => commentConfigSvc.GetAll());
+ var configSvc = sp.GetRequiredService<IConfigService>();
+ var commentConfigSvc = sp.GetRequiredService<ICommentConfigService>();
+ return new CommentsHelper(
+ () => configSvc.GetAll(),
+ () => commentConfigSvc.GetAll());
 });
 
 // UserHelper registration (delegate pulls from IAspNetUserService)
 builder.Services.AddScoped<IUserHelper>(sp =>
 {
-    var userSvc = sp.GetRequiredService<IAspNetUserService>();
-    return new UserHelper(() => userSvc.GetAll());
+ var userSvc = sp.GetRequiredService<IAspNetUserService>();
+ return new UserHelper(() => userSvc.GetAll());
 });
 
 // Razor Pages with convention to authorize entire Admin area
 builder.Services.AddRazorPages(options =>
 {
-    options.Conventions.AuthorizeAreaFolder("Admin", "/", "AdminOnly");
+ options.Conventions.AuthorizeAreaFolder("Admin", "/", "AdminOnly");
 });
+
+// Visitor logging for all Razor Pages
+builder.Services.AddVisitorInfoLogging();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseMigrationsEndPoint();
+ app.UseMigrationsEndPoint();
 }
 else
 {
-    app.UseExceptionHandler("/Error");
+ app.UseExceptionHandler("/Error");
 }
 
-// Ensure database is created and migrations are applied
+// Ensure databases are created and migrations are applied
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-    try
-    {
-        var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate(); // This will create database if it doesn't exist and apply migrations
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating or initializing the database.");
-    }
+ var services = scope.ServiceProvider;
+ try
+ {
+ // Identity DB
+ var identityContext = services.GetRequiredService<ApplicationDbContext>();
+ identityContext.Database.Migrate();
+
+ // Main portal DB (digiozPortalContext)
+ var portalContext = services.GetRequiredService<digiozPortalContext>();
+ // EnsureCreated is used since this context does not use migrations in this project
+ portalContext.Database.EnsureCreated();
+ }
+ catch (Exception ex)
+ {
+ var logger = services.GetRequiredService<ILogger<Program>>();
+ logger.LogError(ex, "An error occurred while migrating or initializing the database.");
+ }
 }
 
 app.UseRouting();
+app.UseSession();
 app.UseAuthentication(); // Add authentication middleware
 app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorPages()
-   .WithStaticAssets();
+ .WithStaticAssets();
 
 app.Run();

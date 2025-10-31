@@ -5,10 +5,10 @@ namespace digioz.Portal.Dal.Services.Interfaces
 {
     public interface IPictureService
     {
-        Picture Get(string id);
+        Picture Get(int id);
         List<Picture> GetAll();
         void Add(Picture picture);
         void Update(Picture picture);
-        void Delete(string id);
+        void Delete(int id);
     }
 }

@@ -1,0 +1,38 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.Picture.PictureAlbumAddModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Add Picture Album";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header">Add Picture Album</div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input class="form-control" asp-for="Item.Name" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" asp-for="Item.Description"></textarea>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" asp-for="Item.Approved" />
+                <label class="form-check-label" asp-for="Item.Approved">Approved</label>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" asp-for="Item.Visible" />
+                <label class="form-check-label" asp-for="Item.Visible">Visible</label>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Upload pictures</label>
+                <input type="file" multiple class="form-control" name="Files" />
+                <span class="text-muted">Allowed types: jpg, png, gif, bmp, tif, tiff</span>
+            </div>
+            <button class="btn btn-primary" type="submit">Save</button>
+            <a class="btn btn-secondary" asp-area="Admin" asp-page="/Picture/PictureAlbumIndex">Cancel</a>
+        </form>
+    </div>
+</div>

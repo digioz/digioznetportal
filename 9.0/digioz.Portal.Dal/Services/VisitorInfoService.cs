@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace digioz.Portal.Dal.Services
 {
@@ -24,9 +25,79 @@ namespace digioz.Portal.Dal.Services
             return _context.VisitorInfos.ToList();
         }
 
+        public List<VisitorInfo> GetLastN(int n, string sortOrder)
+        {
+            var query = _context.VisitorInfos.AsQueryable();
+            if (sortOrder.ToLower() == "asc")
+            {
+                query = query.OrderBy(v => v.Timestamp ?? System.DateTime.MinValue).ThenBy(v => v.Id);
+            }
+            else
+            {
+                query = query.OrderByDescending(v => v.Timestamp ?? System.DateTime.MinValue).ThenByDescending(v => v.Id);
+            }
+            return query.Take(n).AsNoTracking().ToList();
+        }
+
+        public int CountAll() => _context.VisitorInfos.Count();
+
+        public int CountSearch(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term)) return CountAll();
+            var like = $"%{term.Trim()}%";
+            return _context.VisitorInfos
+                .Where(v => EF.Functions.Like(v.UserAgent, like)
+                         || EF.Functions.Like(v.Href, like)
+                         || EF.Functions.Like(v.Referrer, like)
+                         || EF.Functions.Like(v.IpAddress, like))
+                .Count();
+        }
+
+        public List<VisitorInfo> GetPaged(int page, int pageSize)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+            var skip = (page - 1) * pageSize;
+            return _context.VisitorInfos
+                .OrderByDescending(v => v.Timestamp ?? System.DateTime.MinValue)
+                .ThenByDescending(v => v.Id)
+                .Skip(skip)
+                .Take(pageSize)
+                .AsNoTracking()
+                .ToList();
+        }
+
+        public List<VisitorInfo> SearchPaged(string term, int page, int pageSize)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+            var skip = (page - 1) * pageSize;
+            if (string.IsNullOrWhiteSpace(term)) return GetPaged(page, pageSize);
+            var like = $"%{term.Trim()}%";
+            return _context.VisitorInfos
+                .Where(v => EF.Functions.Like(v.UserAgent, like)
+                         || EF.Functions.Like(v.Href, like)
+                         || EF.Functions.Like(v.Referrer, like)
+                         || EF.Functions.Like(v.IpAddress, like))
+                .OrderByDescending(v => v.Timestamp ?? System.DateTime.MinValue)
+                .ThenByDescending(v => v.Id)
+                .Skip(skip)
+                .Take(pageSize)
+                .AsNoTracking()
+                .ToList();
+        }
+
         public void Add(VisitorInfo info)
         {
             _context.VisitorInfos.Add(info);
+            _context.SaveChanges();
+        }
+
+        public void AddRange(IEnumerable<VisitorInfo> infos)
+        {
+            var list = infos is IList<VisitorInfo> l ? l : infos.ToList();
+            if (list.Count == 0) return;
+            _context.VisitorInfos.AddRange(list);
             _context.SaveChanges();
         }
 

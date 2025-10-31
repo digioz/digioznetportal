@@ -1,0 +1,43 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.Video.VideoAlbumAddModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+ ViewBag.Title = "Add Video Album";
+ Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+ <div class="card-header">Add Video Album</div>
+ <div class="card-body">
+ <form method="post" enctype="multipart/form-data">
+ <div class="mb-3">
+ <label class="form-label">Name</label>
+ <input class="form-control" asp-for="Item.Name" />
+ </div>
+ <div class="mb-3">
+ <label class="form-label">Description</label>
+ <textarea class="form-control" asp-for="Item.Description"></textarea>
+ </div>
+ <div class="form-check mb-2">
+ <input class="form-check-input" asp-for="Item.Approved" />
+ <label class="form-check-label" asp-for="Item.Approved">Approved</label>
+ </div>
+ <div class="form-check mb-3">
+ <input class="form-check-input" asp-for="Item.Visible" />
+ <label class="form-check-label" asp-for="Item.Visible">Visible</label>
+ </div>
+ <div class="mb-3">
+ <label class="form-label">Upload videos</label>
+ <input type="file" multiple class="form-control" name="VideoFiles" />
+ <span class="text-muted">Allowed video types: mp4, mov, avi, wmv, mkv, mpg, mpeg</span>
+ </div>
+ <div class="mb-3">
+ <label class="form-label">Upload thumbnails (optional, order must match videos)</label>
+ <input type="file" multiple class="form-control" name="ThumbnailFiles" />
+ <span class="text-muted">Allowed image types: jpg, jpeg, png, gif, bmp, tif, tiff</span>
+ </div>
+ <button class="btn btn-primary" type="submit">Save</button>
+ <a class="btn btn-secondary" asp-area="Admin" asp-page="/Video/VideoAlbumIndex">Cancel</a>
+ </form>
+ </div>
+</div>

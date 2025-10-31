@@ -14,7 +14,7 @@ namespace digioz.Portal.Dal.Services
             _context = context;
         }
 
-        public Video Get(string id)
+        public Video Get(int id)
         {
             return _context.Videos.Find(id);
         }
@@ -36,7 +36,7 @@ namespace digioz.Portal.Dal.Services
             _context.SaveChanges();
         }
 
-        public void Delete(string id)
+        public void Delete(int id)
         {
             var video = _context.Videos.Find(id);
             if (video != null)
