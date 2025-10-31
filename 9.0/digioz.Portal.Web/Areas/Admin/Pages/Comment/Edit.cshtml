@@ -1,0 +1,50 @@
+@page "{id}"
+@model digioz.Portal.Web.Areas.Admin.Pages.Comment.EditModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Edit Comment";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header">Edit Comment</div>
+    <div class="card-body">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Item.Id" />
+            <div class="mb-3">
+                <label class="form-label">User Id</label>
+                <input class="form-control" value="@Model.Item?.UserId" readonly />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input class="form-control" value="@Model.Item?.Username" readonly />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Reference Type</label>
+                <input class="form-control" value="@Model.Item?.ReferenceType" readonly />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Reference Id</label>
+                <input class="form-control" value="@Model.Item?.ReferenceId" readonly />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Created</label>
+                <input class="form-control" value="@Model.Item?.CreatedDate" readonly />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Item.Body" class="form-label"></label>
+                <textarea asp-for="Item.Body" rows="6" class="form-control"></textarea>
+                <span asp-validation-for="Item.Body" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Likes</label>
+                <input class="form-control" value="@Model.Item?.Likes" readonly />
+            </div>
+            <div class="d-flex justify-content-between">
+                <a asp-area="Admin" asp-page="/Comment/Index" class="btn btn-secondary">Back</a>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
