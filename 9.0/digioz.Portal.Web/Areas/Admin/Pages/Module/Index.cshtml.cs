@@ -13,8 +13,10 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Module
         public IndexModel(IModuleService service) { _service = service; }
 
         public IReadOnlyList<digioz.Portal.Bo.Module> Items { get; private set; } = Array.Empty<digioz.Portal.Bo.Module>();
-        [BindProperty(SupportsGet = true)] public int PageNumber { get; set; } =1;
-        [BindProperty(SupportsGet = true)] public int PageSize { get; set; } =10;
+        [BindProperty(SupportsGet = true)]
+        public int PageNumber { get; set; } = 1;
+        [BindProperty(SupportsGet = true)]
+        public int PageSize { get; set; } = 10;
         public int TotalCount { get; private set; }
         public int TotalPages => (int)Math.Ceiling((double)TotalCount / Math.Max(1, PageSize));
 

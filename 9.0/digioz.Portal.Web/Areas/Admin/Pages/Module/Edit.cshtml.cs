@@ -9,7 +9,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Module
         private readonly IModuleService _service;
         public EditModel(IModuleService service) { _service = service; }
 
-        [BindProperty] public Bo.Module Item { get; set; }
+        [BindProperty]
+        public Bo.Module Item { get; set; }
 
         public IActionResult OnGet(int id)
         {

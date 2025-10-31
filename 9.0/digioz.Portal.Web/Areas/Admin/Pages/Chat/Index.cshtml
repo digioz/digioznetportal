@@ -7,8 +7,64 @@
 }
 
 <div class="card shadow-sm">
-    <div class="card-header">Chat Management</div>
-    <div class="card-body">
-        <p class="text-muted">Build your admin UI for chat here.</p>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Chat Management</span>
+        <div class="d-flex gap-2">
+            <a class="btn btn-sm btn-outline-primary" asp-area="Admin" asp-page="/Chat/Export">Export</a>
+            <a class="btn btn-sm btn-outline-danger" asp-area="Admin" asp-page="/Chat/Purge">Purge</a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:90px">Id</th>
+                        <th style="width:190px">Timestamp</th>
+                        <th>UserId</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items.Any())
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@(item.Timestamp?.ToString("yyyy-MM-dd HH:mm:ss") ?? "-")</td>
+                                <td>@item.UserId</td>
+                                <td>@item.Message</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">No chat records found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <small class="text-muted">Page @Model.PageNumber of @Model.TotalPages (@Model.TotalCount total)</small>
+        <nav aria-label="Pagination">
+            <ul class="pagination mb-0">
+                <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                    <a class="page-link" asp-area="Admin" asp-page="/Chat/Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize">Prev</a>
+                </li>
+                @for (var p = 1; p <= Model.TotalPages; p++)
+                {
+                    <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                        <a class="page-link" asp-area="Admin" asp-page="/Chat/Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize">@p</a>
+                    </li>
+                }
+                <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-area="Admin" asp-page="/Chat/Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize">Next</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
