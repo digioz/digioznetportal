@@ -27,16 +27,20 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Menu
 
         public IActionResult OnPost()
         {
+            if (string.IsNullOrWhiteSpace(Item?.Name))
+                ModelState.AddModelError("Item.Name", "Name is required.");
+
+            if (string.IsNullOrWhiteSpace(Item?.Location))
+                ModelState.AddModelError("Item.Location", "Location is required.");
+
             if (!ModelState.IsValid) return Page();
 
-            // Assign audit fields
             Item.Timestamp = DateTime.UtcNow;
             var email = User?.Identity?.Name;
             Item.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
 
-            // SortOrder: set to next available integer globally
-            var all = _service.GetAll();
-            var max = all.Count == 0 ? 0 : all.Max(m => m.SortOrder);
+            // query max without loading all rows
+            var max = _service.GetAll().Count == 0 ? 0 : _service.GetAll().Max(m => m.SortOrder);
             Item.SortOrder = max + 1;
 
             _service.Add(Item);
