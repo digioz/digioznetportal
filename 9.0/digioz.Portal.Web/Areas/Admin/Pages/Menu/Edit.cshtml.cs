@@ -20,7 +20,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Menu
         }
 
         [BindProperty]
-        public digioz.Portal.Bo.Menu Item { get; set; }
+        public digioz.Portal.Bo.Menu? Item { get; set; }
 
         public IActionResult OnGet(int id)
         {
@@ -33,6 +33,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Menu
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid) return Page();
+            if (Item == null) return NotFound();
             // Use no-tracking read to avoid multiple tracked instances in same DbContext
             var existing = _service.GetNoTracking(Item.Id);
             if (existing == null) return NotFound();
@@ -41,7 +42,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Menu
             var keepSort = existing.SortOrder;
             Item.Timestamp = DateTime.UtcNow;
             var email = User?.Identity?.Name;
-            Item.UserId = _userHelper.GetUserIdByEmail(email);
+            Item.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
             Item.SortOrder = keepSort;
 
             _service.Update(Item);

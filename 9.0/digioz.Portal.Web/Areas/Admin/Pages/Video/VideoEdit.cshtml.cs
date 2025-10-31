@@ -27,7 +27,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
             _env = env;
         }
 
-        [BindProperty] public digioz.Portal.Bo.Video Item { get; set; }
+        [BindProperty] public digioz.Portal.Bo.Video? Item { get; set; }
         [BindProperty] public IFormFile? NewThumbnail { get; set; }
         [BindProperty] public IFormFile? NewVideo { get; set; }
         public List<digioz.Portal.Bo.VideoAlbum> Albums { get; private set; } = new();
@@ -43,7 +43,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
         public async Task<IActionResult> OnPostAsync()
         {
             Albums = _albumService.GetAll().OrderBy(a => a.Name).ToList();
-            if (!ModelState.IsValid) return Page();
+            if (!ModelState.IsValid) return Page(); 
+            if (Item == null) return RedirectToPage("/Video/VideoIndex", new { area = "Admin" }); 
             var existing = _videoService.Get(Item.Id);
             if (existing == null) return RedirectToPage("/Video/VideoIndex", new { area = "Admin" });
 
@@ -69,13 +70,24 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
                 }
                 var newThumb = Guid.NewGuid().ToString("N") + ext;
                 var thumbPath = Path.Combine(thumbDir, newThumb);
-                using (var ms = new MemoryStream())
+
+                // Save temp file first
+                var tempPath = Path.Combine(thumbDir, "temp_" + newThumb);
+                using (var fs = System.IO.File.Create(tempPath))
                 {
-                    await NewThumbnail.CopyToAsync(ms);
-                    ms.Position = 0;
-                    using var image = System.Drawing.Image.FromStream(ms);
+                    await NewThumbnail.CopyToAsync(fs);
+                }
+
+                // Create thumbnail using ImageSharp
+                using (var image = SixLabors.ImageSharp.Image.Load(tempPath))
+                {
                     ImageHelper.SaveImageWithCrop(image, 150, 150, thumbPath);
                 }
+
+                // Clean up temp file
+                if (System.IO.File.Exists(tempPath))
+                    System.IO.File.Delete(tempPath);
+
                 TryDeleteFileIfExists(Path.Combine(thumbDir, existing.Thumbnail ?? string.Empty));
                 existing.Thumbnail = newThumb;
             }
@@ -101,7 +113,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
 
             existing.Timestamp = DateTime.UtcNow;
             var email = User?.Identity?.Name;
-            existing.UserId = _userHelper.GetUserIdByEmail(email);
+            existing.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
             _videoService.Update(existing);
             return RedirectToPage("/Video/VideoIndex", new { area = "Admin" });
         }
@@ -112,3 +124,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
         }
     }
 }
+
+
+

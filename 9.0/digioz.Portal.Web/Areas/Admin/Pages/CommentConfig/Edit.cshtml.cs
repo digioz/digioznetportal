@@ -19,7 +19,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
             _announcementService = announcementService;
         }
 
-        [BindProperty] public Bo.CommentConfig Item { get; set; }
+        [BindProperty] public Bo.CommentConfig? Item { get; set; }
 
         public IActionResult OnGet(string id)
         {
@@ -30,6 +30,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
 
         public IActionResult OnPost()
         {
+            if (Item == null) return RedirectToPage("/CommentConfig/Index", new { area = "Admin" });
             if (string.IsNullOrWhiteSpace(Item.ReferenceType) || string.IsNullOrWhiteSpace(Item.ReferenceId))
             {
                 ModelState.AddModelError(string.Empty, "Reference Type and Reference Value are required.");

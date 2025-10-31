@@ -57,16 +57,26 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
                     {
                         thumbName = guid + tExt;
                         var thumbPath = Path.Combine(thumbDir, thumbName);
-                        using (var ms = new MemoryStream())
+
+                        // Save temp file first
+                        var tempPath = Path.Combine(thumbDir, "temp_" + thumbName);
+                        using (var fs = System.IO.File.Create(tempPath))
                         {
-                            await t.CopyToAsync(ms);
-                            ms.Position = 0;
-                            using var image = System.Drawing.Image.FromStream(ms);
+                            await t.CopyToAsync(fs);
+                        }
+
+                        // Create thumbnail using ImageSharp
+                        using (var image = SixLabors.ImageSharp.Image.Load(tempPath))
+                        {
                             digioz.Portal.Utilities.Helpers.ImageHelper.SaveImageWithCrop(image, 150, 150, thumbPath);
                         }
+
+                        // Clean up temp file
+                        if (System.IO.File.Exists(tempPath))
+                            System.IO.File.Delete(tempPath);
                     }
                 }
-                var userId = _userHelper.GetUserIdByEmail(User?.Identity?.Name);
+                var email = User?.Identity?.Name; var userId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
                 var video = new digioz.Portal.Bo.Video
                 {
                     AlbumId = Item.Id,
@@ -84,3 +94,4 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
         }
     }
 }
+

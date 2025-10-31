@@ -32,7 +32,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Menu
             // Assign audit fields
             Item.Timestamp = DateTime.UtcNow;
             var email = User?.Identity?.Name;
-            Item.UserId = _userHelper.GetUserIdByEmail(email);
+            Item.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
 
             // SortOrder: set to next available integer globally
             var all = _service.GetAll();

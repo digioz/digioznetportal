@@ -9,7 +9,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
     {
         private readonly IVideoAlbumService _albumService;
         public VideoAlbumEditModel(IVideoAlbumService albumService) { _albumService = albumService; }
-        [BindProperty] public digioz.Portal.Bo.VideoAlbum Item { get; set; }
+        [BindProperty] public digioz.Portal.Bo.VideoAlbum? Item { get; set; }
         public IActionResult OnGet(int id)
         {
             Item = _albumService.Get(id);
@@ -19,6 +19,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid) return Page();
+            if (Item == null) return RedirectToPage("/Video/VideoAlbumIndex", new { area = "Admin" });
             Item.Timestamp = DateTime.UtcNow;
             _albumService.Update(Item);
             return RedirectToPage("/Video/VideoAlbumIndex", new { area = "Admin" });

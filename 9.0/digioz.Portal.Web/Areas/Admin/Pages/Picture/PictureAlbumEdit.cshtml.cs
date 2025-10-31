@@ -11,7 +11,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
         private readonly IPictureAlbumService _albumService;
         public PictureAlbumEditModel(IPictureAlbumService albumService)
         { _albumService = albumService; }
-        [BindProperty] public PictureAlbum Item { get; set; }
+        [BindProperty] public PictureAlbum? Item { get; set; }
         public IActionResult OnGet(int id)
         {
             Item = _albumService.Get(id);
@@ -21,6 +21,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid) return Page();
+            if (Item == null) return RedirectToPage("/Picture/PictureAlbumIndex", new { area = "Admin" });
             Item.Timestamp = DateTime.UtcNow;
             _albumService.Update(Item);
             return RedirectToPage("/Picture/PictureAlbumIndex", new { area = "Admin" });

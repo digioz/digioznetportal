@@ -8,23 +8,20 @@ using System.Collections.Generic;
 
 namespace digioz.Portal.Web.Pages.Shared.Components.StoreMenu
 {
-    public class StoreMenuViewComponent : ViewComponent
+    public class StoreMenuViewComponent(
+        IProductCategoryService productCategoryService,
+        IPluginService pluginService,
+        IMemoryCache cache
+    ) : ViewComponent
     {
-        private readonly IProductCategoryService _productCategoryService;
-        private readonly IPluginService _pluginService;
-        private readonly IMemoryCache _cache;
+        private readonly IProductCategoryService _productCategoryService = productCategoryService;
+        private readonly IPluginService _pluginService = pluginService;
+        private readonly IMemoryCache _cache = cache;
         private const string CacheKey = "StoreMenu";
 
-        public StoreMenuViewComponent(IProductCategoryService productCategoryService, IPluginService pluginService, IMemoryCache cache)
+        public Task<IViewComponentResult> InvokeAsync()
         {
-            _productCategoryService = productCategoryService;
-            _pluginService = pluginService;
-            _cache = cache;
-        }
-
-        public async Task<IViewComponentResult> InvokeAsync()
-        {
-            if (!_cache.TryGetValue(CacheKey, out digioz.Portal.Bo.ViewModels.StoreMenuViewModel storeMenu))
+            if (!_cache.TryGetValue(CacheKey, out digioz.Portal.Bo.ViewModels.StoreMenuViewModel? storeMenu) || storeMenu == null)
             {
                 storeMenu = new digioz.Portal.Bo.ViewModels.StoreMenuViewModel
                 {
@@ -34,7 +31,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.StoreMenu
 
                 _cache.Set(CacheKey, storeMenu, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15)));
             }
-            return View(storeMenu);
+            return Task.FromResult<IViewComponentResult>(View(storeMenu));
         }
     }
 }

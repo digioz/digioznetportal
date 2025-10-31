@@ -47,7 +47,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
                 Directory.CreateDirectory(thumbDir);
                 var allowed = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff" };
                 var email = User?.Identity?.Name;
-                var userId = _userHelper.GetUserIdByEmail(email);
+                var userId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
                 foreach (var file in Files)
                 {
                     if (file == null || file.Length == 0) continue;
@@ -60,11 +60,9 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
                     {
                         await file.CopyToAsync(fs);
                     }
-                    using (var ms = new MemoryStream())
+                    // Create thumbnail using ImageSharp-based helper
+                    using (var image = SixLabors.ImageSharp.Image.Load(fullPath))
                     {
-                        await file.CopyToAsync(ms);
-                        ms.Position = 0;
-                        using var image = System.Drawing.Image.FromStream(ms);
                         ImageHelper.SaveImageWithCrop(image, 150, 150, thumbPath);
                     }
                     var pic = new digioz.Portal.Bo.Picture

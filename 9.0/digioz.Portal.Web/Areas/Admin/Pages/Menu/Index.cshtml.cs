@@ -37,7 +37,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Menu
             public int PageSize { get; set; }
         }
 
-        [ValidateAntiForgeryToken]
         public IActionResult OnPostReorder([FromBody] ReorderRequest request)
         {
             if (request == null || request.OrderedIds == null || request.OrderedIds.Count == 0)

@@ -22,7 +22,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
             _cache = cache;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync(string referenceId = null)
+        public Task<IViewComponentResult> InvokeAsync(string? referenceId = null)
         {
             var pagePath = HttpContext?.Request?.Path.Value ?? string.Empty;
             if (string.IsNullOrWhiteSpace(pagePath) || pagePath == "/") pagePath = "/Index";
@@ -47,7 +47,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
             // Use repository-level filtering instead of loading all comments into memory
             List<Comment> comments = _commentService.GetByReferenceType(pagePath);
 
-            return View(comments);
+            return Task.FromResult<IViewComponentResult>(View(comments));
         }
     }
 }
