@@ -61,9 +61,10 @@ namespace digioz.Portal.Web.Logging
                     _ = FlushAsync();
                 }
             }
-            catch
+            catch (Exception)
             {
                 // Avoid recursive logging if something goes wrong
+                // Intentionally swallowing exception to prevent logging failures from breaking the application
             }
         }
 
@@ -91,9 +92,10 @@ namespace digioz.Portal.Web.Logging
                         logService.AddRange(buffer);
                 }
             }
-            catch
+            catch (Exception)
             {
-                // swallow all to not break app logging path
+                // Intentionally swallowing exception to prevent database logging failures from breaking the application
+                // Common exceptions: database connection issues, timeout, serialization errors
             }
             finally
             {
@@ -104,7 +106,14 @@ namespace digioz.Portal.Web.Logging
 
         public void Dispose()
         {
-            try { FlushAsync().GetAwaiter().GetResult(); } catch { }
+            try 
+            { 
+                FlushAsync().GetAwaiter().GetResult(); 
+            } 
+            catch (Exception)
+            {
+                // Intentionally swallowing exception during disposal to prevent cleanup failures from breaking the application
+            }
         }
 
         private static string BuildMessage(string message, EventId eventId, LogLevel level)
