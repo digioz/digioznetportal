@@ -1,0 +1,80 @@
+@page "{id}"
+@model digioz.Portal.Web.Areas.Admin.Pages.CommentConfig.EditModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Edit Comment Config";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Edit Comment Config</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/CommentConfig/Index">Back</a>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <input type="hidden" asp-for="Item.Id" />
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="referenceType">Reference Type</label>
+                    <select class="form-select" id="referenceType" asp-for="Item.ReferenceType">
+                        <option value="">-- Select --</option>
+                        <option value="Page">Page</option>
+                        <option value="Announcement">Announcement</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="referenceValue">Reference Value</label>
+                    <select class="form-select" id="referenceValue" asp-for="Item.ReferenceId"></select>
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input class="form-check-input" asp-for="Item.Visible" />
+                        <label class="form-check-label" asp-for="Item.Visible">Visible</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3 d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function(){
+         const refTypeSel = document.getElementById('referenceType');
+         const refValSel = document.getElementById('referenceValue');
+         const currentValue = '@Model.Item?.ReferenceId';
+
+         async function loadValues(type, preselect){
+         refValSel.innerHTML = '';
+         if(!type){ return; }
+         const basePath = window.location.pathname.replace(/\/Edit\/.*/,'/Edit');
+         const url = basePath + `?handler=ReferenceValues&referenceType=${encodeURIComponent(type)}`;
+         const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+         if(!res.ok) return;
+         const data = await res.json();
+         const optEmpty = document.createElement('option');
+         optEmpty.value = '';
+         optEmpty.textContent = '-- Select --';
+         refValSel.appendChild(optEmpty);
+         data.forEach(x => {
+         const opt = document.createElement('option');
+         opt.value = x.value;
+         opt.textContent = x.text;
+         if(preselect && preselect === x.value) opt.selected = true;
+         refValSel.appendChild(opt);
+         });
+         }
+
+         refTypeSel.addEventListener('change', () => loadValues(refTypeSel.value));
+
+         // Initialize on load
+         if(refTypeSel.value){
+         loadValues(refTypeSel.value, currentValue);
+         }
+        })();
+    </script>
+}
