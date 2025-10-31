@@ -58,7 +58,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
  Directory.CreateDirectory(fullDir);
  Directory.CreateDirectory(thumbDir);
 
- if (NewThumbnail != null && NewThumbnail.Length >0)
+ if (NewThumbnail != null && NewThumbnail.Length > 0)
  {
  var ext = Path.GetExtension(NewThumbnail.FileName).ToLowerInvariant();
  var allowed = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff" };
@@ -72,7 +72,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
  using (var ms = new MemoryStream())
  {
  await NewThumbnail.CopyToAsync(ms);
- ms.Position =0;
+ ms.Position = 0;
  using var image = System.Drawing.Image.FromStream(ms);
  ImageHelper.SaveImageWithCrop(image,150,150, thumbPath);
  }
@@ -80,7 +80,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
  existing.Thumbnail = newThumb;
  }
 
- if (NewVideo != null && NewVideo.Length >0)
+ if (NewVideo != null && NewVideo.Length > 0)
  {
  var ext = Path.GetExtension(NewVideo.FileName).ToLowerInvariant();
  var allowed = new[] { ".mp4", ".mov", ".avi", ".wmv", ".mkv", ".mpg", ".mpeg" };
