@@ -77,11 +77,32 @@
                 <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
                     <a class="page-link" asp-area="Admin" asp-page="/Menu/Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize">Prev</a>
                 </li>
-                @for (var p = 1; p <= Model.TotalPages; p++)
+                @if (Model.TotalPages <= 10)
                 {
-                    <li class="page-item @(p == Model.PageNumber ? "active" : "")">
-                        <a class="page-link" asp-area="Admin" asp-page="/Menu/Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize">@p</a>
-                    </li>
+                    for (var p = 1; p <= Model.TotalPages; p++)
+                    {
+                        <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                            <a class="page-link" asp-area="Admin" asp-page="/Menu/Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize">@p</a>
+                        </li>
+                    }
+                }
+                else
+                {
+                    for (var p = 1; p <= 5; p++)
+                    {
+                        <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                            <a class="page-link" asp-area="Admin" asp-page="/Menu/Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize">@p</a>
+                        </li>
+                    }
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    var start = Model.TotalPages - 4;
+                    if (start < 6) { start = 6; }
+                    for (var p = start; p <= Model.TotalPages; p++)
+                    {
+                        <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                            <a class="page-link" asp-area="Admin" asp-page="/Menu/Index" asp-route-pageNumber="@p" asp-route-pageSize="@Model.PageSize">@p</a>
+                        </li>
+                    }
                 }
                 <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
                     <a class="page-link" asp-area="Admin" asp-page="/Menu/Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize">Next</a>
