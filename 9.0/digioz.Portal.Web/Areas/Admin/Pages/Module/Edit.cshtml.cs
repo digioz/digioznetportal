@@ -10,7 +10,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Module
         public EditModel(IModuleService service) { _service = service; }
 
         [BindProperty]
-        public Bo.Module Item { get; set; }
+        public Bo.Module? Item { get; set; }
 
         public IActionResult OnGet(int id)
         {
@@ -22,6 +22,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Module
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid) return Page();
+            if (Item == null) return RedirectToPage("/Module/Index", new { area = "Admin" });
             _service.Update(Item);
             return RedirectToPage("/Module/Index", new { area = "Admin" });
         }

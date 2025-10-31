@@ -27,7 +27,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
             _env = env;
         }
 
-        [BindProperty] public digioz.Portal.Bo.Picture Item { get; set; }
+        [BindProperty] public digioz.Portal.Bo.Picture? Item { get; set; }
         [BindProperty] public IFormFile? NewFile { get; set; }
         public System.Collections.Generic.List<digioz.Portal.Bo.PictureAlbum> Albums { get; private set; } = new();
 
@@ -43,6 +43,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
         {
             Albums = _albumService.GetAll().OrderBy(a => a.Name).ToList();
             if (!ModelState.IsValid) return Page();
+            if (Item == null) return RedirectToPage("/Picture/PictureIndex", new { area = "Admin" });
 
             var existing = _pictureService.Get(Item.Id);
             if (existing == null)
@@ -94,7 +95,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
 
             existing.Timestamp = DateTime.UtcNow;
             var email = User?.Identity?.Name;
-            existing.UserId = _userHelper.GetUserIdByEmail(email);
+            existing.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
 
             _pictureService.Update(existing);
             return RedirectToPage("/Picture/PictureIndex", new { area = "Admin" });

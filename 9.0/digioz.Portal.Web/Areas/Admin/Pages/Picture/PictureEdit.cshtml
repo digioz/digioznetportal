@@ -9,37 +9,37 @@
 <div class="card shadow-sm">
     <div class="card-header">Edit Picture</div>
     <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
+     <form method="post" enctype="multipart/form-data">
             <input type="hidden" asp-for="Item.Id" />
             <div class="mb-3">
-                <label class="form-label">Album</label>
-                <select asp-for="Item.AlbumId" class="form-select">
-                    @foreach (var a in Model.Albums)
-                    {
-                        <option value="@a.Id" selected="@(a.Id == Model.Item.AlbumId)">@a.Name</option>
-                    }
-                </select>
+  <label class="form-label">Album</label>
+      <select asp-for="Item.AlbumId" class="form-select">
+   @foreach (var a in Model?.Albums ?? new List<digioz.Portal.Bo.PictureAlbum>())
+        {
+               <option value="@a.Id" selected="@(a.Id == Model?.Item?.AlbumId)">@a.Name</option>
+           }
+    </select>
+         </div>
+     <div class="mb-3">
+<label class="form-label">Description</label>
+        <textarea asp-for="Item.Description" class="form-control"></textarea>
+         </div>
+         <div class="form-check mb-2">
+    <input class="form-check-input" asp-for="Item.Approved" />
+            <label class="form-check-label" asp-for="Item.Approved">Approved</label>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Description</label>
-                <textarea asp-for="Item.Description" class="form-control"></textarea>
+     <div class="form-check mb-3">
+      <input class="form-check-input" asp-for="Item.Visible" />
+       <label class="form-check-label" asp-for="Item.Visible">Visible</label>
             </div>
-            <div class="form-check mb-2">
-                <input class="form-check-input" asp-for="Item.Approved" />
-                <label class="form-check-label" asp-for="Item.Approved">Approved</label>
-            </div>
-            <div class="form-check mb-3">
-                <input class="form-check-input" asp-for="Item.Visible" />
-                <label class="form-check-label" asp-for="Item.Visible">Visible</label>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Replace image (optional)</label>
-                <input type="file" class="form-control" asp-for="NewFile" />
-                <span class="text-muted">Allowed types: jpg, png, gif, bmp, tif, tiff</span>
-                <span asp-validation-for="NewFile" class="text-danger"></span>
-            </div>
-            <button class="btn btn-primary" type="submit">Save</button>
-            <a class="btn btn-secondary" asp-area="Admin" asp-page="/Picture/PictureIndex">Cancel</a>
+ <div class="mb-3">
+  <label class="form-label">Replace image (optional)</label>
+   <input type="file" class="form-control" asp-for="NewFile" />
+    <span class="text-muted">Allowed types: jpg, png, gif, bmp, tif, tiff</span>
+   <span asp-validation-for="NewFile" class="text-danger"></span>
+        </div>
+<button class="btn btn-primary" type="submit">Save</button>
+       <a class="btn btn-secondary" asp-area="Admin" asp-page="/Picture/PictureIndex">Cancel</a>
         </form>
-    </div>
+ </div>
 </div>

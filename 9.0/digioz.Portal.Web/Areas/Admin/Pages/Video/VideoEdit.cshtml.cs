@@ -27,7 +27,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
             _env = env;
         }
 
-        [BindProperty] public digioz.Portal.Bo.Video Item { get; set; }
+        [BindProperty] public digioz.Portal.Bo.Video? Item { get; set; }
         [BindProperty] public IFormFile? NewThumbnail { get; set; }
         [BindProperty] public IFormFile? NewVideo { get; set; }
         public List<digioz.Portal.Bo.VideoAlbum> Albums { get; private set; } = new();
@@ -43,7 +43,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
         public async Task<IActionResult> OnPostAsync()
         {
             Albums = _albumService.GetAll().OrderBy(a => a.Name).ToList();
-            if (!ModelState.IsValid) return Page();
+            if (!ModelState.IsValid) return Page(); 
+            if (Item == null) return RedirectToPage("/Video/VideoIndex", new { area = "Admin" }); 
             var existing = _videoService.Get(Item.Id);
             if (existing == null) return RedirectToPage("/Video/VideoIndex", new { area = "Admin" });
 
@@ -112,7 +113,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
 
             existing.Timestamp = DateTime.UtcNow;
             var email = User?.Identity?.Name;
-            existing.UserId = _userHelper.GetUserIdByEmail(email);
+            existing.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
             _videoService.Update(existing);
             return RedirectToPage("/Video/VideoIndex", new { area = "Admin" });
         }
@@ -123,3 +124,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
         }
     }
 }
+
+
+

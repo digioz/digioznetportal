@@ -10,20 +10,24 @@ namespace digioz.Portal.Web.Pages.Shared.Components.SlideShow
 {
     public class SlideShowViewComponent : ViewComponent
     {
+        private const string CacheKey = "SlideShow_Items";
+        private const string PluginCacheKey = "SlideShow_PluginEnabled";
         private readonly ISlideShowService _slideShowService;
         private readonly IPluginService _pluginService;
         private readonly IMemoryCache _cache;
-        private const string CacheKey = "SlideShow_Items";
-        private const string PluginCacheKey = "SlideShow_PluginEnabled";
 
-        public SlideShowViewComponent(ISlideShowService slideShowService, IPluginService pluginService, IMemoryCache cache)
+        public SlideShowViewComponent(
+            ISlideShowService slideShowService,
+            IPluginService pluginService,
+            IMemoryCache cache
+        )
         {
             _slideShowService = slideShowService;
             _pluginService = pluginService;
             _cache = cache;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync()
+        public Task<IViewComponentResult> InvokeAsync()
         {
             if (!_cache.TryGetValue(PluginCacheKey, out bool isEnabled))
             {
@@ -33,10 +37,10 @@ namespace digioz.Portal.Web.Pages.Shared.Components.SlideShow
 
             if (!isEnabled)
             {
-                return Content(string.Empty);
+                return Task.FromResult<IViewComponentResult>(Content(string.Empty));
             }
 
-            if (!_cache.TryGetValue(CacheKey, out List<digioz.Portal.Bo.SlideShow> items))
+            if (!_cache.TryGetValue(CacheKey, out List<digioz.Portal.Bo.SlideShow>? items) || items == null)
             {
                 items = _slideShowService.GetAll()
                     .OrderByDescending(s => s.DateModified)
@@ -45,7 +49,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.SlideShow
                 _cache.Set(CacheKey, items, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15)));
             }
 
-            return View(items);
+            return Task.FromResult<IViewComponentResult>(View(items));
         }
     }
 }

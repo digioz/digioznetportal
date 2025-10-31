@@ -9,7 +9,7 @@ namespace digioz.Portal.Pages
     public class IndexModel : PageModel
     {
         [BindProperty]
-        public digioz.Portal.Bo.Page PageContent { get; set; }
+        public digioz.Portal.Bo.Page? PageContent { get; set; }
         [BindProperty]
         public bool AllowComments { get; set; }
 

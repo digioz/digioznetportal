@@ -108,10 +108,11 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
             Item.Thumbnail = thumbName;
             Item.Timestamp = DateTime.UtcNow;
             var email = User?.Identity?.Name;
-            Item.UserId = _userHelper.GetUserIdByEmail(email);
+            Item.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
 
             _videoService.Add(Item);
             return RedirectToPage("/Video/VideoIndex", new { area = "Admin" });
         }
     }
 }
+

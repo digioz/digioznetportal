@@ -9,7 +9,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
         private readonly ICommentConfigService _service;
         public DeleteModel(ICommentConfigService service) { _service = service; }
 
-        [BindProperty(SupportsGet = true)] public string Id { get; set; }
+        [BindProperty(SupportsGet = true)] public string? Id { get; set; }
         public Bo.CommentConfig? Item { get; private set; }
 
         public IActionResult OnGet(string id)
@@ -21,6 +21,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
 
         public IActionResult OnPost()
         {
+            if (string.IsNullOrEmpty(Id)) return RedirectToPage("/CommentConfig/Index", new { area = "Admin" });
             _service.Delete(Id);
             return RedirectToPage("/CommentConfig/Index", new { area = "Admin" });
         }

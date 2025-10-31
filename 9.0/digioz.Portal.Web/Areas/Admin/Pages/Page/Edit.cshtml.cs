@@ -17,7 +17,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Page
             _userHelper = userHelper;
         }
 
-        [BindProperty] public Bo.Page Item { get; set; }
+        [BindProperty] public Bo.Page? Item { get; set; }
 
         public IActionResult OnGet(int id)
         {
@@ -29,9 +29,10 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Page
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid) return Page();
+            if (Item == null) return RedirectToPage("/Page/Index", new { area = "Admin" });
             Item.Timestamp = DateTime.UtcNow;
             var email = User?.Identity?.Name;
-            Item.UserId = _userHelper.GetUserIdByEmail(email);
+            Item.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
             _service.Update(Item);
             return RedirectToPage("/Page/Index", new { area = "Admin" });
         }

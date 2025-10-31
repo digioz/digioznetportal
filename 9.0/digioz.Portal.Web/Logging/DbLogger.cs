@@ -29,11 +29,11 @@ namespace digioz.Portal.Web.Logging
             _options = options;
         }
 
-        public IDisposable BeginScope<TState>(TState state) => _options.IncludeScopes ? new NoopScope() : NoopScope.Instance;
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => _options.IncludeScopes ? new NoopScope() : NoopScope.Instance;
 
         public bool IsEnabled(LogLevel logLevel) => logLevel >= _options.MinLevel && logLevel != LogLevel.None;
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception?, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             if (!IsEnabled(logLevel) || formatter is null) return;
 

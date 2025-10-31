@@ -30,7 +30,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
         }
 
         [BindProperty] public digioz.Portal.Bo.Picture Item { get; set; } = new digioz.Portal.Bo.Picture { Visible = true, Approved = false, Timestamp = DateTime.UtcNow };
-        [BindProperty] public IFormFile? File { get; set; }
+        [BindProperty] public new IFormFile? File { get; set; }
         public List<PictureAlbum> Albums { get; private set; } = new();
 
         public void OnGet()
@@ -82,7 +82,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
             Item.Thumbnail = fileName;
             Item.Timestamp = DateTime.UtcNow;
             var email = User?.Identity?.Name;
-            Item.UserId = _userHelper.GetUserIdByEmail(email);
+            Item.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
 
             _pictureService.Add(Item);
             return RedirectToPage("/Picture/PictureIndex", new { area = "Admin" });

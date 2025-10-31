@@ -47,7 +47,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
                 Directory.CreateDirectory(thumbDir);
                 var allowed = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff" };
                 var email = User?.Identity?.Name;
-                var userId = _userHelper.GetUserIdByEmail(email);
+                var userId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
                 foreach (var file in Files)
                 {
                     if (file == null || file.Length == 0) continue;

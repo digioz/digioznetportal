@@ -11,7 +11,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Comment
         public EditModel(ICommentService service) { _service = service; }
 
         [BindProperty]
-        public Bo.Comment Item { get; set; }
+        public Bo.Comment? Item { get; set; }
 
         public IActionResult OnGet(string id)
         {
@@ -24,6 +24,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Comment
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid) return Page();
+            if (Item == null) return RedirectToPage("/Comment/Index", new { area = "Admin" });
             // Load the existing record and only update allowed fields
             var existing = _service.Get(Item.Id);
             if (existing == null) return RedirectToPage("/Comment/Index", new { area = "Admin" });

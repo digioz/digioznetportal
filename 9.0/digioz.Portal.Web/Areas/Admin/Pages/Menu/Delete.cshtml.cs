@@ -13,7 +13,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Menu
         public DeleteModel(IMenuService service, IMemoryCache cache) { _service = service; _cache = cache; }
 
         [BindProperty(SupportsGet = true)] public int Id { get; set; }
-        public digioz.Portal.Bo.Menu Item { get; private set; }
+        public digioz.Portal.Bo.Menu? Item { get; private set; }
 
         public IActionResult OnGet(int id)
         {

@@ -76,7 +76,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
                             System.IO.File.Delete(tempPath);
                     }
                 }
-                var userId = _userHelper.GetUserIdByEmail(User?.Identity?.Name);
+                var email = User?.Identity?.Name; var userId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
                 var video = new digioz.Portal.Bo.Video
                 {
                     AlbumId = Item.Id,
@@ -94,3 +94,4 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
         }
     }
 }
+

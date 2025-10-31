@@ -23,9 +23,9 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
             _cache = cache;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync()
+        public Task<IViewComponentResult> InvokeAsync()
         {
-            if (!_cache.TryGetValue(CacheKey, out WhoIsOnlineViewModel whoisOnline))
+            if (!_cache.TryGetValue(CacheKey, out WhoIsOnlineViewModel? whoisOnline) || whoisOnline == null)
             {
                 whoisOnline = new WhoIsOnlineViewModel();
 
@@ -41,7 +41,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
 
                 _cache.Set(CacheKey, whoisOnline, new MemoryCacheEntryOptions().SetSlidingExpiration(System.TimeSpan.FromMinutes(15)));
             }
-            return View(whoisOnline);
+            return Task.FromResult<IViewComponentResult>(View(whoisOnline));
         }
     }
 }

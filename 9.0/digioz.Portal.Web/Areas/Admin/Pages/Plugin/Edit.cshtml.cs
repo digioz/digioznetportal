@@ -9,7 +9,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Plugin
         private readonly IPluginService _service;
         public EditModel(IPluginService service) { _service = service; }
 
-        [BindProperty] public Bo.Plugin Item { get; set; }
+        [BindProperty] public Bo.Plugin? Item { get; set; }
 
         public IActionResult OnGet(int id)
         {
@@ -21,6 +21,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Plugin
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid) return Page();
+            if (Item == null) return RedirectToPage("/Plugin/Index", new { area = "Admin" });
             _service.Update(Item);
             return RedirectToPage("/Plugin/Index", new { area = "Admin" });
         }

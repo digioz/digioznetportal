@@ -36,10 +36,10 @@ namespace digioz.Portal.Web.Pages.Comments
             _userHelper = userHelper;
         }
 
-        [BindProperty] public string referenceId { get; set; }
-        [BindProperty] public string referenceType { get; set; }
-        [BindProperty] public string comment { get; set; }
-        [BindProperty] public string recaptchaToken { get; set; }
+        [BindProperty] public string? referenceId { get; set; }
+        [BindProperty] public string? referenceType { get; set; }
+        [BindProperty] public string? comment { get; set; }
+        [BindProperty] public string? recaptchaToken { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -79,7 +79,7 @@ namespace digioz.Portal.Web.Pages.Comments
                 ReferenceId = referenceId,
                 ReferenceType = referenceType,
                 Body = sanitized,
-                UserId = _userHelper.GetUserIdByEmail(userName),
+                UserId = !string.IsNullOrEmpty(userName) ? _userHelper.GetUserIdByEmail(userName) : null,
                 Username = userName,
                 CreatedDate = DateTime.UtcNow,
                 ModifiedDate = DateTime.UtcNow,
@@ -103,7 +103,7 @@ namespace digioz.Portal.Web.Pages.Comments
             return text;
         }
 
-        private class RecaptchaResponse { public bool Success { get; set; } public float Score { get; set; } public string Action { get; set; } }
+        private class RecaptchaResponse { public bool Success { get; set; } public float Score { get; set; } public string? Action { get; set; } }
 
         private async Task<bool> VerifyRecaptchaV3Async(string secret, string token, string action)
         {

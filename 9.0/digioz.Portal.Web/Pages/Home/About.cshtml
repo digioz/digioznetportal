@@ -6,27 +6,27 @@
 }
 
 @section keywords {
-    @if (Model != null && Model.PageContent != null && Model.PageContent.Keywords != null)
+    @if (Model?.PageContent?.Keywords != null)
     {
         <meta name="keywords" content="@Model.PageContent.Keywords" />
     }
 }
 
 @section description {
-    @if (Model != null && Model.PageContent.Description != null)
+    @if (Model?.PageContent?.Description != null)
     {
         <meta name="description" content="@Model.PageContent.Description" />
     }
 }
 
 @{
-    if (Model != null)
+    if (Model?.PageContent != null)
     {
         @Html.Raw(Model.PageContent.Body)
     }
 
     // Display comments if enabled for this page
-    if (Model.AllowComments)
+    if (Model?.AllowComments == true)
     {
         @await Component.InvokeAsync("CommentsMenu", new { referenceType = "PageContent", referenceId = Model.PageContent?.Id.ToString() })
     }

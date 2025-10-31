@@ -7,12 +7,12 @@
 @{
     // Cache keys
     var cacheKeyConfigDictionary = "ConfigDictionary";
-    Dictionary<string, string> configDictionary;
+    Dictionary<string, string>? configDictionary;
     var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
-    if (!MemoryCache.TryGetValue(cacheKeyConfigDictionary, out configDictionary))
+    if (!MemoryCache.TryGetValue(cacheKeyConfigDictionary, out configDictionary) || configDictionary == null)
     {
         var config = ConfigService.GetAll();
-        configDictionary = config.ToDictionary(c => c.ConfigKey, c => c.ConfigValue);
+    configDictionary = config.ToDictionary(c => c.ConfigKey, c => c.ConfigValue);
         MemoryCache.Set(cacheKeyConfigDictionary, configDictionary, cacheEntryOptions);
     }
 }
@@ -22,7 +22,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>@ViewData["Title"] - @configDictionary["SiteName"]</title>
+	<title>@ViewData["Title"] - @(configDictionary?["SiteName"] ?? "Portal")</title>
 	@if (IsSectionDefined("keywords"))
 	{
 		@RenderSection("keywords")
@@ -38,13 +38,13 @@
 <body>
 	<div class="container">
 		<div style="padding-left:20px;">
-            <a href="/"><img src="~/img/images/Logo_Small.png" alt="@configDictionary["SiteName"]" /></a>
+            <a href="/"><img src="~/img/images/Logo_Small.png" alt="@(configDictionary?["SiteName"] ?? "Portal")" /></a>
 			<h1 style="position:absolute; top:20px;">&nbsp;</h1><br /><br />
 		</div>
 	</div>
 
 	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-        <a class="navbar-brand" href="#">@configDictionary["SiteName"]</a>
+        <a class="navbar-brand" href="#">@(configDictionary?["SiteName"] ?? "Portal")</a>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
@@ -105,7 +105,7 @@
 
 		<hr />
 		<footer>
-            <p>&copy; @DateTime.Now.Year - @configDictionary["SiteName"]</p>
+            <p>&copy; @DateTime.Now.Year - @(configDictionary?["SiteName"] ?? "Portal")</p>
 		</footer>
 	</div>
 	<script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>

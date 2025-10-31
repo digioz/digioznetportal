@@ -8,13 +8,13 @@
 @{
     // Cache keys
     var cacheKeyConfigDictionary = "ConfigDictionary";
-    Dictionary<string, string> configDictionary;
+    Dictionary<string, string>? configDictionary;
     var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
-    if (!MemoryCache.TryGetValue(cacheKeyConfigDictionary, out configDictionary))
+    if (!MemoryCache.TryGetValue(cacheKeyConfigDictionary, out configDictionary) || configDictionary == null)
     {
         var config = ConfigService.GetAll();
-        configDictionary = config.ToDictionary(c => c.ConfigKey, c => c.ConfigValue);
-        MemoryCache.Set(cacheKeyConfigDictionary, configDictionary, cacheEntryOptions);
+      configDictionary = config.ToDictionary(c => c.ConfigKey, c => c.ConfigValue);
+      MemoryCache.Set(cacheKeyConfigDictionary, configDictionary, cacheEntryOptions);
     }
 }
 
@@ -23,7 +23,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin Dashboard - @configDictionary["SiteName"] - @ViewBag.Title</title>
+    <title>Admin Dashboard - @(configDictionary?["SiteName"] ?? "Portal") - @ViewBag.Title</title>
     <!-- Bootstrap 5 CSS (local) -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true">
     <link href="~/css/admin.css" rel="stylesheet" asp-append-version="true" />
@@ -153,7 +153,7 @@
     </div>
 
     <footer class="text-center text-muted py-4">
-        <small><p>&copy; @DateTime.Now.Year - @configDictionary["SiteName"]</p></small>
+       <small><p>&copy; @DateTime.Now.Year - @(configDictionary?["SiteName"] ?? "Portal")</p></small>
     </footer>
 
     <!-- Bootstrap 5 Bundle JS (local) -->
