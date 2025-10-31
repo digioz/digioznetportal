@@ -2,33 +2,33 @@
 @model digioz.Portal.Web.Areas.Admin.Pages.Video.VideoAlbumEditModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
- ViewBag.Title = "Edit Video Album";
- Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+    ViewBag.Title = "Edit Video Album";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="card shadow-sm">
- <div class="card-header">Edit Video Album</div>
- <div class="card-body">
- <form method="post">
- <input type="hidden" asp-for="Item.Id" />
- <div class="mb-3">
- <label class="form-label">Name</label>
- <input class="form-control" asp-for="Item.Name" />
- </div>
- <div class="mb-3">
- <label class="form-label">Description</label>
- <textarea class="form-control" asp-for="Item.Description"></textarea>
- </div>
- <div class="form-check mb-2">
- <input class="form-check-input" asp-for="Item.Approved" />
- <label class="form-check-label" asp-for="Item.Approved">Approved</label>
- </div>
- <div class="form-check mb-3">
- <input class="form-check-input" asp-for="Item.Visible" />
- <label class="form-check-label" asp-for="Item.Visible">Visible</label>
- </div>
- <button class="btn btn-primary" type="submit">Save</button>
- <a class="btn btn-secondary" asp-area="Admin" asp-page="/Video/VideoAlbumIndex">Cancel</a>
- </form>
- </div>
+    <div class="card-header">Edit Video Album</div>
+    <div class="card-body">
+        <form method="post">
+            <input type="hidden" asp-for="Item.Id" />
+            <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input class="form-control" asp-for="Item.Name" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" asp-for="Item.Description"></textarea>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" asp-for="Item.Approved" />
+                <label class="form-check-label" asp-for="Item.Approved">Approved</label>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" asp-for="Item.Visible" />
+                <label class="form-check-label" asp-for="Item.Visible">Visible</label>
+            </div>
+            <button class="btn btn-primary" type="submit">Save</button>
+            <a class="btn btn-secondary" asp-area="Admin" asp-page="/Video/VideoAlbumIndex">Cancel</a>
+        </form>
+    </div>
 </div>

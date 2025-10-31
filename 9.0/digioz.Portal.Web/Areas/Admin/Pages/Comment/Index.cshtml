@@ -47,11 +47,32 @@
                 <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : null)">
                     <a class="page-link" asp-area="Admin" asp-page="/Comment/Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize">Previous</a>
                 </li>
-                @for (var i = 1; i <= Model.TotalPages; i++)
+                @if (Model.TotalPages <= 10)
                 {
-                    <li class="page-item @(i == Model.PageNumber ? "active" : null)">
-                        <a class="page-link" asp-area="Admin" asp-page="/Comment/Index" asp-route-pageNumber="@i" asp-route-pageSize="@Model.PageSize">@i</a>
-                    </li>
+                    for (var i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : null)">
+                            <a class="page-link" asp-area="Admin" asp-page="/Comment/Index" asp-route-pageNumber="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+                        </li>
+                    }
+                }
+                else
+                {
+                    for (var i = 1; i <= 5; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : null)">
+                            <a class="page-link" asp-area="Admin" asp-page="/Comment/Index" asp-route-pageNumber="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+                        </li>
+                    }
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    var start = Model.TotalPages - 4;
+                    if (start < 6) { start = 6; }
+                    for (var i = start; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : null)">
+                            <a class="page-link" asp-area="Admin" asp-page="/Comment/Index" asp-route-pageNumber="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+                        </li>
+                    }
                 }
                 <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : null)">
                     <a class="page-link" asp-area="Admin" asp-page="/Comment/Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize">Next</a>

@@ -5,6 +5,7 @@ using digioz.Portal.Utilities;
 using digioz.Portal.Web.Data;
 using digioz.Portal.Web.Logging;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,7 +28,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(
  options.User.RequireUniqueEmail = true;
  options.Lockout.AllowedForNewUsers = true;
  options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(120);
- options.Lockout.MaxFailedAccessAttempts =5;
+ options.Lockout.MaxFailedAccessAttempts = 5;
  })
  .AddRoles<IdentityRole>() // Add this line to enable roles
  .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -137,23 +138,37 @@ else
 // Ensure databases are created and migrations are applied
 using (var scope = app.Services.CreateScope())
 {
- var services = scope.ServiceProvider;
- try
- {
- // Identity DB
- var identityContext = services.GetRequiredService<ApplicationDbContext>();
- identityContext.Database.Migrate();
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    
+    try
+    {
+        // Identity DB
+        var identityContext = services.GetRequiredService<ApplicationDbContext>();
+        identityContext.Database.Migrate();
 
- // Main portal DB (digiozPortalContext)
- var portalContext = services.GetRequiredService<digiozPortalContext>();
- // EnsureCreated is used since this context does not use migrations in this project
- portalContext.Database.EnsureCreated();
- }
- catch (Exception ex)
- {
- var logger = services.GetRequiredService<ILogger<Program>>();
- logger.LogError(ex, "An error occurred while migrating or initializing the database.");
- }
+        // Main portal DB (digiozPortalContext)
+        var portalContext = services.GetRequiredService<digiozPortalContext>();
+        // EnsureCreated is used since this context does not use migrations in this project
+        portalContext.Database.EnsureCreated();
+    }
+    catch (SqlException ex)
+    {
+        logger.LogError(ex, "A SQL Server error occurred while migrating or initializing the database. Error: {ErrorMessage}", ex.Message);
+    }
+    catch (DbUpdateException ex)
+    {
+        logger.LogError(ex, "A database update error occurred while migrating or initializing the database. Error: {ErrorMessage}", ex.Message);
+    }
+    catch (InvalidOperationException ex)
+    {
+        logger.LogError(ex, "An invalid operation occurred while migrating or initializing the database. This may indicate a configuration issue. Error: {ErrorMessage}", ex.Message);
+    }
+    catch (Exception ex)
+    {
+        // Catch any other unexpected exceptions to prevent application startup failure
+        logger.LogError(ex, "An unexpected error occurred while migrating or initializing the database. Error: {ErrorMessage}", ex.Message);
+    }
 }
 
 app.UseRouting();

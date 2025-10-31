@@ -24,9 +24,9 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Module
         {
             var all = _service.GetAll().OrderByDescending(m => m.Id).ToList();
             TotalCount = all.Count;
-            if (PageNumber <1) PageNumber =1;
-            if (PageSize <1) PageSize =10;
-            var skip = (PageNumber -1) * PageSize;
+            if (PageNumber < 1) PageNumber = 1;
+            if (PageSize < 1) PageSize = 10;
+            var skip = (PageNumber - 1) * PageSize;
             Items = all.Skip(skip).Take(PageSize).ToList();
         }
     }

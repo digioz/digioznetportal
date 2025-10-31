@@ -2,20 +2,20 @@
 @model digioz.Portal.Web.Areas.Admin.Pages.Video.VideoDeleteModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
- ViewBag.Title = "Delete Video";
- Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+    ViewBag.Title = "Delete Video";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="card shadow-sm">
- <div class="card-header">Delete Video</div>
- <div class="card-body">
- <div class="alert alert-warning">
- Are you sure you want to delete video <strong>#@Model.Item?.Id</strong>?
- </div>
- <form method="post">
- <input type="hidden" asp-for="Id" />
- <button class="btn btn-danger" type="submit">Delete</button>
- <a class="btn btn-secondary" asp-area="Admin" asp-page="/Video/VideoIndex">Cancel</a>
- </form>
- </div>
+    <div class="card-header">Delete Video</div>
+    <div class="card-body">
+        <div class="alert alert-warning">
+            Are you sure you want to delete video <strong>#@Model.Item?.Id</strong>?
+        </div>
+        <form method="post">
+            <input type="hidden" asp-for="Id" />
+            <button class="btn btn-danger" type="submit">Delete</button>
+            <a class="btn btn-secondary" asp-area="Admin" asp-page="/Video/VideoIndex">Cancel</a>
+        </form>
+    </div>
 </div>

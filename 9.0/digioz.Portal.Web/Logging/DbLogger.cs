@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -67,7 +68,7 @@ namespace digioz.Portal.Web.Logging
             }
         }
 
-        private async System.Threading.Tasks.Task FlushAsync()
+        private async Task FlushAsync()
         {
             if (!await _drainLock.WaitAsync(0)) return; // someone else is flushing
             try
@@ -104,7 +105,15 @@ namespace digioz.Portal.Web.Logging
 
         public void Dispose()
         {
-            try { FlushAsync().GetAwaiter().GetResult(); } catch { }
+            try 
+            { 
+                FlushAsync().GetAwaiter().GetResult(); 
+            } 
+            catch (Exception)
+            {
+                // Suppress exceptions during disposal to prevent application crashes
+                // Exceptions in Dispose should not propagate to avoid breaking cleanup
+            }
         }
 
         private static string BuildMessage(string message, EventId eventId, LogLevel level)
