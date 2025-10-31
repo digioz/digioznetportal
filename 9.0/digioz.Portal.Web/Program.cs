@@ -27,7 +27,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(
  options.User.RequireUniqueEmail = true;
  options.Lockout.AllowedForNewUsers = true;
  options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(120);
- options.Lockout.MaxFailedAccessAttempts =5;
+ options.Lockout.MaxFailedAccessAttempts = 5;
  })
  .AddRoles<IdentityRole>() // Add this line to enable roles
  .AddEntityFrameworkStores<ApplicationDbContext>();
