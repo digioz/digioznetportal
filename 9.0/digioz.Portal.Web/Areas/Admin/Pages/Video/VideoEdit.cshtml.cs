@@ -69,13 +69,24 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
                 }
                 var newThumb = Guid.NewGuid().ToString("N") + ext;
                 var thumbPath = Path.Combine(thumbDir, newThumb);
-                using (var ms = new MemoryStream())
+
+                // Save temp file first
+                var tempPath = Path.Combine(thumbDir, "temp_" + newThumb);
+                using (var fs = System.IO.File.Create(tempPath))
                 {
-                    await NewThumbnail.CopyToAsync(ms);
-                    ms.Position = 0;
-                    using var image = System.Drawing.Image.FromStream(ms);
+                    await NewThumbnail.CopyToAsync(fs);
+                }
+
+                // Create thumbnail using ImageSharp
+                using (var image = SixLabors.ImageSharp.Image.Load(tempPath))
+                {
                     ImageHelper.SaveImageWithCrop(image, 150, 150, thumbPath);
                 }
+
+                // Clean up temp file
+                if (System.IO.File.Exists(tempPath))
+                    System.IO.File.Delete(tempPath);
+
                 TryDeleteFileIfExists(Path.Combine(thumbDir, existing.Thumbnail ?? string.Empty));
                 existing.Thumbnail = newThumb;
             }

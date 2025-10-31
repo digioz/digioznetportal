@@ -87,14 +87,22 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
                 await VideoFile.CopyToAsync(fs);
             }
 
-            // Save thumbnail (crop150x150)
-            using (var ms = new MemoryStream())
+            // Save original thumbnail first
+            var tempThumbPath = Path.Combine(fullDir, "temp_" + thumbName);
+            using (var fs = System.IO.File.Create(tempThumbPath))
             {
-                await ThumbnailFile.CopyToAsync(ms);
-                ms.Position = 0;
-                using var image = System.Drawing.Image.FromStream(ms);
+                await ThumbnailFile.CopyToAsync(fs);
+            }
+
+            // Create thumbnail (crop150x150) using ImageSharp
+            using (var image = SixLabors.ImageSharp.Image.Load(tempThumbPath))
+            {
                 ImageHelper.SaveImageWithCrop(image, 150, 150, thumbPath);
             }
+
+            // Clean up temp file
+            if (System.IO.File.Exists(tempThumbPath))
+                System.IO.File.Delete(tempThumbPath);
 
             Item.Filename = videoName;
             Item.Thumbnail = thumbName;

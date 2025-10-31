@@ -80,11 +80,9 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
                     await NewFile.CopyToAsync(fs);
                 }
 
-                using (var ms = new MemoryStream())
+                // Create thumbnail using ImageSharp
+                using (var image = SixLabors.ImageSharp.Image.Load(fullPath))
                 {
-                    await NewFile.CopyToAsync(ms);
-                    ms.Position = 0;
-                    using var image = System.Drawing.Image.FromStream(ms);
                     ImageHelper.SaveImageWithCrop(image, 150, 150, thumbPath);
                 }
 

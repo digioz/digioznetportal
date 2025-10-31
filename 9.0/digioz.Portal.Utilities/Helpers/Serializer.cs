@@ -22,40 +22,17 @@ namespace digioz.Portal.Utilities.Helpers
 
         public static string SerializeObject(Object poObject)
         {
-            string lsResponse = "";
+            using MemoryStream loStream = new MemoryStream();
+            XmlSerializer loMessageSerialize = new XmlSerializer(poObject.GetType());
+            loMessageSerialize.Serialize(loStream, poObject);
 
-            try
-            {
-                MemoryStream loStream = new MemoryStream();
-                XmlSerializer loMessageSerialize = new XmlSerializer(poObject.GetType());
-                loMessageSerialize.Serialize(loStream, poObject);
-
-                lsResponse = GetString(loStream);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            return lsResponse;
+            return GetString(loStream);
         }
 
         public static object DeserializeObject(string psObjectXML, Object poObject)
         {
-            string loResponse = string.Empty;
-            object loObject = new object();
-
-            try
-            {
-                XmlSerializer loMessage = new XmlSerializer(poObject.GetType());
-                loObject = loMessage.Deserialize(new StringReader(psObjectXML));
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            return loObject;
+            XmlSerializer loMessage = new XmlSerializer(poObject.GetType());
+            return loMessage.Deserialize(new StringReader(psObjectXML));
         }
     }
 }
