@@ -2,21 +2,21 @@
 @model digioz.Portal.Web.Areas.Admin.Pages.Plugin.DeleteModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
- ViewBag.Title = "Delete Plugin";
- Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+    ViewBag.Title = "Delete Plugin";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="card shadow-sm">
- <div class="card-header d-flex justify-content-between align-items-center">
- <span>Delete</span>
- <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/Plugin/Index">Back</a>
- </div>
- <div class="card-body">
- <p>Are you sure you want to delete <strong>@Model.Item?.Name</strong>?</p>
- <form method="post">
- <input type="hidden" asp-for="Id" />
- <button type="submit" class="btn btn-danger">Delete</button>
- <a class="btn btn-secondary" asp-area="Admin" asp-page="/Plugin/Index">Cancel</a>
- </form>
- </div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Delete</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/Plugin/Index">Back</a>
+    </div>
+    <div class="card-body">
+        <p>Are you sure you want to delete <strong>@Model.Item?.Name</strong>?</p>
+        <form method="post">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a class="btn btn-secondary" asp-area="Admin" asp-page="/Plugin/Index">Cancel</a>
+        </form>
+    </div>
 </div>
