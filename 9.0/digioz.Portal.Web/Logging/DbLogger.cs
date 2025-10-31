@@ -104,7 +104,15 @@ namespace digioz.Portal.Web.Logging
 
         public void Dispose()
         {
-            try { FlushAsync().GetAwaiter().GetResult(); } catch { }
+            try 
+            { 
+                FlushAsync().GetAwaiter().GetResult(); 
+            } 
+            catch (Exception)
+            {
+                // Suppress exceptions during disposal to prevent application crashes
+                // Exceptions in Dispose should not propagate to avoid breaking cleanup
+            }
         }
 
         private static string BuildMessage(string message, EventId eventId, LogLevel level)
