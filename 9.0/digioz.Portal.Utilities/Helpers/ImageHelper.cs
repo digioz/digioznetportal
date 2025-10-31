@@ -52,7 +52,7 @@ namespace digioz.Portal.Utilities.Helpers
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log exception here if needed
             }
@@ -101,7 +101,7 @@ namespace digioz.Portal.Utilities.Helpers
                 }
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log exception here if needed
                 return false;
@@ -176,7 +176,7 @@ namespace digioz.Portal.Utilities.Helpers
                 }
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log exception here if needed
                 return false;

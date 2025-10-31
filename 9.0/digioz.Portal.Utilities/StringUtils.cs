@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
 
@@ -81,18 +82,12 @@ namespace digioz.Portal.Utilities
         #endregion
 
         public static string GetUniqueKey(int maxSize) {
-            char[] chars = new char[62];
-            chars =
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();
-            byte[] data = new byte[1];
-            RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider();
-            crypto.GetNonZeroBytes(data);
-            data = new byte[maxSize];
-            crypto.GetNonZeroBytes(data);
-            StringBuilder result = new StringBuilder(maxSize);
+            const string allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            byte[] data = RandomNumberGenerator.GetBytes(maxSize);
+            var result = new StringBuilder(maxSize);
 
             foreach (byte b in data) {
-                result.Append(chars[b % (chars.Length)]);
+                result.Append(allowed[b % allowed.Length]);
             }
 
             return result.ToString();
@@ -155,15 +150,25 @@ namespace digioz.Portal.Utilities
 
 
         /// <summary>
-        /// Downloads a web page and returns the HTML as a string
+        /// Downloads a web page and returns the HTML content as a string.
         /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        public static HttpWebResponse DownloadWebPage(string url) {
-            var ub = new UriBuilder(url);
-            var request = (HttpWebRequest)WebRequest.Create(ub.Uri);
-            request.Proxy = null;
-            return (HttpWebResponse)request.GetResponse();
+        /// <param name="url">The URL to download</param>
+        /// <returns>The HTML content as a string</returns>
+        public static async Task<string> DownloadWebPageAsync(string url)
+        {
+            using var client = new HttpClient();
+            return await client.GetStringAsync(url);
+        }
+
+        /// <summary>
+        /// Downloads a web page and returns the HTML content as a string (synchronous version).
+        /// </summary>
+        /// <param name="url">The URL to download</param>
+        /// <returns>The HTML content as a string</returns>
+        public static string DownloadWebPage(string url)
+        {
+            using var client = new HttpClient();
+            return client.GetStringAsync(url).GetAwaiter().GetResult();
         }
 
         #region Numeric Helpers
