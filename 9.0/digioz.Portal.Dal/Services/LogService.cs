@@ -22,14 +22,9 @@ namespace digioz.Portal.Dal.Services
         public List<Log> GetLastN(int n, string order)
         {
             var query = _context.Logs.AsQueryable();
-            if (order.ToLower() == "asc")
-            {
-                query = query.OrderBy(l => l.Id);
-            }
-            else
-            {
-                query = query.OrderByDescending(l => l.Id);
-            }
+            query = order.ToLower() == "asc"
+                ? query.OrderBy(l => l.Id)
+                : query.OrderByDescending(l => l.Id);
             return query.Take(n).ToList();
         }
 
