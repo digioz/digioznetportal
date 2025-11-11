@@ -1,0 +1,68 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.Link.AddModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Add Link";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Add Link</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/Link/Index">Back</a>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="Item.Name" class="form-label">Name</label>
+                    <input asp-for="Item.Name" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Item.Url" class="form-label">Url</label>
+                    <input asp-for="Item.Url" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Item.LinkCategory" class="form-label">Category</label>
+                    <select asp-for="Item.LinkCategory" class="form-select" asp-items="Model.CategoryList"></select>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Item.Description" class="form-label">Description</label>
+                    <textarea asp-for="Item.Description" class="form-control" id="editor" rows="20"></textarea>
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input asp-for="Item.Visible" class="form-check-input" />
+                        <label asp-for="Item.Visible" class="form-check-label">Visible</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3 d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/ckeditor/build/ckeditor.js" asp-append-version="true"></script>
+    <script>
+        if (!document.getElementById('ck-minheight-style')) {
+            var st = document.createElement('style');
+            st.id = 'ck-minheight-style';
+            st.innerHTML = '.ck-editor__editable_inline { min-height:20em !important; }';
+            document.head.appendChild(st);
+        }
+        (function waitForCK() {
+            if (!window.ClassicEditor) return setTimeout(waitForCK, 50);
+            ClassicEditor.create(document.querySelector('#editor')).then(editor => {
+                window.__ck = editor;
+                try { editor.ui.view.editable.element.style.minHeight = '20em'; } catch (e) { }
+                const form = document.querySelector('form');
+                form.addEventListener('submit', function () {
+                    document.getElementById('editor').value = editor.getData();
+                });
+            });
+        })();
+    </script>
+}
