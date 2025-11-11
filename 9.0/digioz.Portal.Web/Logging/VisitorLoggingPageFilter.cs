@@ -1,10 +1,10 @@
-using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using digioz.Portal.Bo;
+using digioz.Portal.Dal.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -15,10 +15,12 @@ namespace digioz.Portal.Web.Logging
     {
         private const string HandlerItemKey = "__Visitor.Handler__";
         private readonly IVisitorInfoQueue _queue;
+        private readonly IVisitorSessionService _visitorSessionService;
 
-        public VisitorLoggingPageFilter(IVisitorInfoQueue queue)
+        public VisitorLoggingPageFilter(IVisitorInfoQueue queue, IVisitorSessionService visitorSessionService)
         {
             _queue = queue;
+            _visitorSessionService = visitorSessionService;
         }
 
         public Task OnPageHandlerSelectionAsync(PageHandlerSelectedContext context)
@@ -30,11 +32,27 @@ namespace digioz.Portal.Web.Logging
 
         public async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
+            var http = context.HttpContext;
+            
+            // Force session to load and establish - write a value to ensure session cookie is set
+            string? sessionId = null;
+            if (http.Session != null)
+            {
+                await http.Session.LoadAsync();
+                
+                // Set a session value to force the session to be established and cookie to be sent
+                if (string.IsNullOrEmpty(http.Session.GetString("_SessionEstablished")))
+                {
+                    http.Session.SetString("_SessionEstablished", "true");
+                }
+                
+                sessionId = http.Session.Id;
+            }
+
             var sw = Stopwatch.StartNew();
             var executedContext = await next();
             sw.Stop();
 
-            var http = context.HttpContext;
             var req = http.Request;
             var route = context.RouteData.Values;
 
@@ -57,13 +75,7 @@ namespace digioz.Portal.Web.Logging
             // Map to existing BO VisitorInfo fields
             var info = new VisitorInfo
             {
-                JavaEnabled = null, // not from server side
                 Timestamp = DateTime.UtcNow,
-                Browser = null,
-                BrowserVersion = null,
-                ScreenHeight = null,
-                ScreenWidth = null,
-                BrowserEngineName = null,
                 Host = req.Host.HasValue ? req.Host.Value : null,
                 HostName = req.Host.Host,
                 IpAddress = ip,
@@ -72,11 +84,48 @@ namespace digioz.Portal.Web.Logging
                 Href = url,
                 UserAgent = userAgent,
                 UserLanguage = GetAcceptedLanguage(req),
-                SessionId = http.Session?.IsAvailable == true ? http.Session.Id : null,
-                OperatingSystem = null
+                SessionId = sessionId
             };
 
             _queue.TryEnqueue(info);
+
+            // Update or create VisitorSession record
+            if (!string.IsNullOrEmpty(sessionId))
+            {
+                try
+                {
+                    var existingSession = _visitorSessionService.GetAll()
+                        .FirstOrDefault(x => x.SessionId == sessionId);
+
+                    if (existingSession != null)
+                    {
+                        // Update existing session
+                        existingSession.PageUrl = url;
+                        existingSession.Username = userName;
+                        existingSession.IpAddress = ip;
+                        existingSession.DateModified = DateTime.Now;
+                        _visitorSessionService.Update(existingSession);
+                    }
+                    else
+                    {
+                        // Create new session
+                        var newSession = new VisitorSession
+                        {
+                            SessionId = sessionId,
+                            IpAddress = ip,
+                            PageUrl = url,
+                            Username = userName,
+                            DateCreated = DateTime.Now,
+                            DateModified = DateTime.Now
+                        };
+                        _visitorSessionService.Add(newSession);
+                    }
+                }
+                catch
+                {
+                    // Silently fail to not break page rendering
+                }
+            }
         }
 
         private static string? GetAcceptedLanguage(HttpRequest req)

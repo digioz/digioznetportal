@@ -8,31 +8,24 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace digioz.Portal.Web.Pages.Shared.Components.SlideShow
 {
-    public class SlideShowViewComponent : ViewComponent
+    public class SlideShowViewComponent(
+        ISlideShowService slideShowService,
+        IPluginService pluginService,
+        IMemoryCache cache
+    ) : ViewComponent
     {
         private const string CacheKey = "SlideShow_Items";
         private const string PluginCacheKey = "SlideShow_PluginEnabled";
-        private readonly ISlideShowService _slideShowService;
-        private readonly IPluginService _pluginService;
-        private readonly IMemoryCache _cache;
-
-        public SlideShowViewComponent(
-            ISlideShowService slideShowService,
-            IPluginService pluginService,
-            IMemoryCache cache
-        )
-        {
-            _slideShowService = slideShowService;
-            _pluginService = pluginService;
-            _cache = cache;
-        }
+        private readonly ISlideShowService _slideShowService = slideShowService;
+        private readonly IPluginService _pluginService = pluginService;
+        private readonly IMemoryCache _cache = cache;
 
         public Task<IViewComponentResult> InvokeAsync()
         {
             if (!_cache.TryGetValue(PluginCacheKey, out bool isEnabled))
             {
                 isEnabled = _pluginService.GetAll().Any(p => p.Name == "SlideShow" && p.IsEnabled);
-                _cache.Set(PluginCacheKey, isEnabled, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15)));
+                _cache.Set(PluginCacheKey, isEnabled, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(15) });
             }
 
             if (!isEnabled)
@@ -46,7 +39,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.SlideShow
                     .OrderByDescending(s => s.DateModified)
                     .ThenByDescending(s => s.DateCreated)
                     .ToList();
-                _cache.Set(CacheKey, items, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15)));
+                _cache.Set(CacheKey, items, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(15) });
             }
 
             return Task.FromResult<IViewComponentResult>(View(items));

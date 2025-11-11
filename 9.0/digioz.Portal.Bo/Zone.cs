@@ -9,6 +9,8 @@ namespace digioz.Portal.Bo
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string ZoneType { get; set; }
+        public string Body { get; set; }
+        public bool Visible { get; set; }
+        public DateTime Timestamp { get; set; }
     }
 }

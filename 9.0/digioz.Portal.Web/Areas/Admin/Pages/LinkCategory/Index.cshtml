@@ -1,0 +1,70 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.LinkCategory.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+@{
+    ViewBag.Title = "Link Categories";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Link Categories</span>
+        <a class="btn btn-sm btn-primary" asp-area="Admin" asp-page="/LinkCategory/Add">Add Category</a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th class="text-center">Visible</th>
+                        <th style="width:250px" class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items.Any())
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@item.Name</td>
+                                <td class="text-center">@(item.Visible ? "Yes" : "No")</td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-primary px-1 py-0 fs-6"
+                                       asp-page="/LinkCategory/Edit"
+                                       asp-route-id="@item.Id"
+                                       title="Edit"
+                                       aria-label="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-danger px-1 py-0 fs-6"
+                                       asp-page="/LinkCategory/Delete"
+                                       asp-route-id="@item.Id"
+                                       title="Delete"
+                                       aria-label="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="3" class="text-center text-muted py-4">No categories found.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <small class="text-muted">Page @Model.PageNumber of @Model.TotalPages (@Model.TotalCount total)</small>
+        <paging total-records="@Model.TotalCount"
+                page-no="@Model.PageNumber"
+                page-size="@Model.PageSize"
+                show-prev-next="true"
+                show-first-last="true"
+                query-string-key-page-no="pageNumber"
+                class="pagination mb-0"></paging>
+    </div>
+</div>

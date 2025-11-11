@@ -17,10 +17,10 @@ namespace digioz.Portal.Web.Pages.Shared.Components.TopMenu
             if (!_cache.TryGetValue(CacheKey, out List<digioz.Portal.Bo.Menu>? topMenu) || topMenu == null)
             {
                 topMenu = _menuService.GetAll()
-                    .Where(x => x.Location == "TopMenu" && x.Visible == true)
+                    .Where(x => x.Location == "TopMenu" && x.Visible)
                     .OrderBy(x => x.SortOrder)
                     .ToList();
-                _cache.Set(CacheKey, topMenu, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15)));
+                _cache.Set(CacheKey, topMenu, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(15) });
             }
             return Task.FromResult<IViewComponentResult>(View(topMenu));
         }

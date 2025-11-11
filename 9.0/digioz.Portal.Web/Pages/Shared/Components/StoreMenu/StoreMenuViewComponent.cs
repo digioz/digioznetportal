@@ -29,7 +29,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.StoreMenu
                     IsEnabled = _pluginService.GetAll().Any(x => x.Name == "Store" && x.IsEnabled)
                 };
 
-                _cache.Set(CacheKey, storeMenu, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15)));
+                _cache.Set(CacheKey, storeMenu, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(15) });
             }
             return Task.FromResult<IViewComponentResult>(View(storeMenu));
         }

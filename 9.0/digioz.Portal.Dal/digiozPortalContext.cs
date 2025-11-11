@@ -700,12 +700,6 @@ namespace digioz.Portal.Dal
             {
                 entity.ToTable("VisitorInfo");
 
-                entity.Property(e => e.Browser).HasMaxLength(25);
-
-                entity.Property(e => e.BrowserEngineName).HasMaxLength(25);
-
-                entity.Property(e => e.BrowserVersion).HasMaxLength(25);
-
                 entity.Property(e => e.IpAddress).HasMaxLength(25);
 
                 entity.Property(e => e.Platform).HasMaxLength(25);
@@ -713,8 +707,6 @@ namespace digioz.Portal.Dal
                 entity.Property(e => e.UserLanguage).HasMaxLength(25);
 
                 entity.Property(e => e.SessionId).HasMaxLength(128);
-
-                entity.Property(e => e.OperatingSystem).HasMaxLength(25);
             });
 
             modelBuilder.Entity<VisitorSession>(entity =>
@@ -732,7 +724,7 @@ namespace digioz.Portal.Dal
 
                 entity.Property(e => e.Name).IsRequired();
 
-                entity.Property(e => e.ZoneType).IsRequired();
+                entity.Property(e => e.Body).IsRequired();
             });
 
             OnModelCreatingPartial(modelBuilder);

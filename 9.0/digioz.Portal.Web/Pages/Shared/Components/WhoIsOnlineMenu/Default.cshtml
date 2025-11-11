@@ -1,28 +1,21 @@
 @model digioz.Portal.Bo.ViewModels.WhoIsOnlineViewModel
 
-@{
-    if (Model.WhoIsOnlineEnabled == true)
-    {
-        <div class="card bg-light mb-3">
-            <div class="card-header">Online</div>
-            <div class="card-body">
-                <div>
-                    <span>Visitors: </span>@Model.VisitorCount<br />
-                    @{
-                        var visitors = Model.RegisteredVisitors;
-
-                        if (visitors.Count > 0)
-                        {
-                            <span>Logged In: </span>
-
-                            @foreach (var visitor in visitors)
-                            {
-                                <a asp-page="/Profile/ShowDetails" asp-route-userId="@visitor.Username">@visitor.Username</a>@(visitor != visitors.Last() ? ", " : "")
-                            }
-                        }
+@if (Model.WhoIsOnlineEnabled)
+{
+    <div class="card bg-light mb-3">
+        <div class="card-header">Online</div>
+        <div class="card-body">
+            <div>
+                <span>Visitors: </span>@Model.VisitorCount<br />
+                @if (Model.RegisteredVisitors.Count > 0)
+                {
+                    <span>Logged In: </span>
+                    @foreach (var visitor in Model.RegisteredVisitors)
+                    {
+                        <a asp-page="/Profile/ShowDetails" asp-route-userId="@visitor.Username">@visitor.Username</a>@(visitor != Model.RegisteredVisitors.Last() ? ", " : "")
                     }
-                </div>
+                }
             </div>
         </div>
-    }
+    </div>
 }

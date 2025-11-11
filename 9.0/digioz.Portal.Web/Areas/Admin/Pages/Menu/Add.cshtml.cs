@@ -27,14 +27,25 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Menu
 
         public IActionResult OnPost()
         {
+            if (Item == null)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid menu data.");
+                return Page();
+            }
+
+            if (string.IsNullOrWhiteSpace(Item.Name))
+                ModelState.AddModelError("Item.Name", "Name is required.");
+
+            if (string.IsNullOrWhiteSpace(Item.Location))
+                ModelState.AddModelError("Item.Location", "Location is required.");
+
             if (!ModelState.IsValid) return Page();
 
-            // Assign audit fields
             Item.Timestamp = DateTime.UtcNow;
             var email = User?.Identity?.Name;
-            Item.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
+            if (!string.IsNullOrEmpty(email))
+                Item.UserId = _userHelper.GetUserIdByEmail(email);
 
-            // SortOrder: set to next available integer globally
             var all = _service.GetAll();
             var max = all.Count == 0 ? 0 : all.Max(m => m.SortOrder);
             Item.SortOrder = max + 1;
