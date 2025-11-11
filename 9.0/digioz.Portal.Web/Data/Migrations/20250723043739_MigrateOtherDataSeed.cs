@@ -135,17 +135,17 @@ INSERT INTO Page (UserId, Title, Url, Body, Keywords, Description, Visible, Time
             // Insert Zone Seed with explicit column types
             migrationBuilder.InsertData(
                 table: "Zone",
-                columns: new[] { "Name", "ZoneType" },
-                columnTypes: new[] { "nvarchar(128)", "nvarchar(128)" },
+                columns: new[] { "Name", "Body", "Visible", "Timestamp" },
+                columnTypes: new[] { "nvarchar(128)", "nvarchar(max)", "bit", "datetime2" },
                 values: new object[,]
                 {
-                    { "Top", "Module" },
-                    { "TopMenu", "Menu" },
-                    { "Left", "Module" },
-                    { "LeftMenu", "Menu" },
-                    { "BodyTop", "Module" },
-                    { "BodyBottom", "Module" },
-                    { "Bottom", "Module" }
+                    { "Top", null, true, DateTime.Now },
+                    { "TopMenu", null, true, DateTime.Now },
+                    { "Left", null, true, DateTime.Now },
+                    { "LeftMenu", null, true, DateTime.Now },
+                    { "BodyTop", null, true, DateTime.Now },
+                    { "BodyBottom", null, true, DateTime.Now },
+                    { "Bottom", null, true, DateTime.Now }
                 });
         }
 

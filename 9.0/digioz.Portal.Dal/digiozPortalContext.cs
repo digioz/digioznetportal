@@ -732,7 +732,7 @@ namespace digioz.Portal.Dal
 
                 entity.Property(e => e.Name).IsRequired();
 
-                entity.Property(e => e.ZoneType).IsRequired();
+                entity.Property(e => e.Body).IsRequired();
             });
 
             OnModelCreatingPartial(modelBuilder);

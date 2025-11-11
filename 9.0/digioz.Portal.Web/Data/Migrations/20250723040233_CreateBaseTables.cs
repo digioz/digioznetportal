@@ -702,7 +702,9 @@ namespace digioz.Portal.Web.Data.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: false),
-                    ZoneType = table.Column<string>(nullable: false)
+                    Body = table.Column<string>(nullable: true),
+                    Visible = table.Column<bool>(nullable: false),
+                    Timestamp = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
