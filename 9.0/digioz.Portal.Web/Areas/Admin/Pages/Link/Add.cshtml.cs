@@ -20,7 +20,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
         [BindProperty]
         public digioz.Portal.Bo.Link Item { get; set; } = new digioz.Portal.Bo.Link { Visible = true, Timestamp = DateTime.UtcNow };
 
-        public SelectList CategoryList { get; private set; }
+        public SelectList CategoryList { get; private set; } = new SelectList(Enumerable.Empty<object>());
 
         public void OnGet()
         {

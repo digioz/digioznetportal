@@ -15,7 +15,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
         { _service = service; _categoryService = categoryService; }
 
         [BindProperty] public digioz.Portal.Bo.Link? Item { get; set; }
-        public SelectList CategoryList { get; private set; }
+        public SelectList CategoryList { get; private set; } = new SelectList(Enumerable.Empty<object>());
 
         public IActionResult OnGet(int id)
         {
