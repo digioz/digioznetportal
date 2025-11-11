@@ -32,11 +32,27 @@ namespace digioz.Portal.Web.Logging
 
         public async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
+            var http = context.HttpContext;
+            
+            // Force session to load and establish - write a value to ensure session cookie is set
+            string? sessionId = null;
+            if (http.Session != null)
+            {
+                await http.Session.LoadAsync();
+                
+                // Set a session value to force the session to be established and cookie to be sent
+                if (string.IsNullOrEmpty(http.Session.GetString("_SessionEstablished")))
+                {
+                    http.Session.SetString("_SessionEstablished", "true");
+                }
+                
+                sessionId = http.Session.Id;
+            }
+
             var sw = Stopwatch.StartNew();
             var executedContext = await next();
             sw.Stop();
 
-            var http = context.HttpContext;
             var req = http.Request;
             var route = context.RouteData.Values;
 
@@ -55,7 +71,6 @@ namespace digioz.Portal.Web.Logging
             var referrer = req.Headers["Referer"].ToString();
             var userAgent = req.Headers["User-Agent"].ToString();
             var url = $"{req.Scheme}://{req.Host}{req.Path}{req.QueryString}";
-            var sessionId = http.Session?.IsAvailable == true ? http.Session.Id : null;
 
             // Map to existing BO VisitorInfo fields
             var info = new VisitorInfo

@@ -95,7 +95,19 @@ builder.Services.AddHttpClient();
 
 // Session for capturing SessionId in visitor logs
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession();
+builder.Services.AddSession(options =>
+{
+    var sessionConfig = builder.Configuration.GetSection("Session");
+    var cookieName = sessionConfig["CookieName"] ?? ".digiozPortal.Session";
+    var timeoutMinutes = int.TryParse(sessionConfig["IdleTimeoutMinutes"], out var minutes) ? minutes : 20;
+    
+    options.IdleTimeout = TimeSpan.FromMinutes(timeoutMinutes);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = cookieName;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None; // Allow HTTP in development
+});
 
 // Helpers: wire CommentsHelper with delegates to avoid Utilities->Dal reference
 builder.Services.AddScoped<ICommentsHelper>(sp =>
@@ -171,8 +183,8 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.UseRouting();
 app.UseSession();
+app.UseRouting();
 app.UseAuthentication(); // Add authentication middleware
 app.UseAuthorization();
 
