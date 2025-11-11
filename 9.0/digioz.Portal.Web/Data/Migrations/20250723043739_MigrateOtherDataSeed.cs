@@ -28,7 +28,6 @@ namespace digioz.Portal.Web.Data.Migrations
                     { Guid.NewGuid().ToString(), "SMTPPassword", "[Enter Password]", true },
                     { Guid.NewGuid().ToString(), "SiteURL", "https://localhost:5048/", false },
                     { Guid.NewGuid().ToString(), "SiteName", "DigiOz .NET Portal", false },
-                    { Guid.NewGuid().ToString(), "SiteEncryptionKey", "[Enter Key]", false },
                     { Guid.NewGuid().ToString(), "WebmasterEmail", "webmaster@domain.com", false },
                     { Guid.NewGuid().ToString(), "PaymentLoginID", "[Enter ID]", false },
                     { Guid.NewGuid().ToString(), "PaymentTransactionKey", "[Enter Key]", false },
