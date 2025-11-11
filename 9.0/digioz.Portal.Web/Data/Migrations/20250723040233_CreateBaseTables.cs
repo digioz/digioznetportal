@@ -654,13 +654,7 @@ namespace digioz.Portal.Web.Data.Migrations
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    JavaEnabled = table.Column<bool>(nullable: true),
                     Timestamp = table.Column<DateTime>(nullable: false),
-                    Browser = table.Column<string>(maxLength: 25, nullable: true),
-                    BrowserVersion = table.Column<string>(maxLength: 25, nullable: true),
-                    ScreenHeight = table.Column<int>(nullable: true),
-                    ScreenWidth = table.Column<int>(nullable: true),
-                    BrowserEngineName = table.Column<string>(maxLength: 25, nullable: true),
                     Host = table.Column<string>(nullable: true),
                     HostName = table.Column<string>(nullable: true),
                     IpAddress = table.Column<string>(maxLength: 25, nullable: true),
@@ -669,8 +663,7 @@ namespace digioz.Portal.Web.Data.Migrations
                     Href = table.Column<string>(nullable: true),
                     UserAgent = table.Column<string>(nullable: true),
                     UserLanguage = table.Column<string>(maxLength: 25, nullable: true),
-                    SessionId = table.Column<string>(maxLength: 128, nullable: true),
-                    OperatingSystem = table.Column<string>(maxLength: 25, nullable: true)
+                    SessionId = table.Column<string>(maxLength: 128, nullable: true)
                 },
                 constraints: table =>
                 {

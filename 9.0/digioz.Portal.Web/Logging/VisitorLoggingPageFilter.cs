@@ -57,13 +57,7 @@ namespace digioz.Portal.Web.Logging
             // Map to existing BO VisitorInfo fields
             var info = new VisitorInfo
             {
-                JavaEnabled = null, // not from server side
                 Timestamp = DateTime.UtcNow,
-                Browser = null,
-                BrowserVersion = null,
-                ScreenHeight = null,
-                ScreenWidth = null,
-                BrowserEngineName = null,
                 Host = req.Host.HasValue ? req.Host.Value : null,
                 HostName = req.Host.Host,
                 IpAddress = ip,
@@ -72,8 +66,7 @@ namespace digioz.Portal.Web.Logging
                 Href = url,
                 UserAgent = userAgent,
                 UserLanguage = GetAcceptedLanguage(req),
-                SessionId = http.Session?.IsAvailable == true ? http.Session.Id : null,
-                OperatingSystem = null
+                SessionId = http.Session?.IsAvailable == true ? http.Session.Id : null
             };
 
             _queue.TryEnqueue(info);
