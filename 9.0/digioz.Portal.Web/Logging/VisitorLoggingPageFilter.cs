@@ -1,10 +1,10 @@
-using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using digioz.Portal.Bo;
+using digioz.Portal.Dal.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -15,10 +15,12 @@ namespace digioz.Portal.Web.Logging
     {
         private const string HandlerItemKey = "__Visitor.Handler__";
         private readonly IVisitorInfoQueue _queue;
+        private readonly IVisitorSessionService _visitorSessionService;
 
-        public VisitorLoggingPageFilter(IVisitorInfoQueue queue)
+        public VisitorLoggingPageFilter(IVisitorInfoQueue queue, IVisitorSessionService visitorSessionService)
         {
             _queue = queue;
+            _visitorSessionService = visitorSessionService;
         }
 
         public Task OnPageHandlerSelectionAsync(PageHandlerSelectedContext context)
@@ -53,6 +55,7 @@ namespace digioz.Portal.Web.Logging
             var referrer = req.Headers["Referer"].ToString();
             var userAgent = req.Headers["User-Agent"].ToString();
             var url = $"{req.Scheme}://{req.Host}{req.Path}{req.QueryString}";
+            var sessionId = http.Session?.IsAvailable == true ? http.Session.Id : null;
 
             // Map to existing BO VisitorInfo fields
             var info = new VisitorInfo
@@ -66,10 +69,48 @@ namespace digioz.Portal.Web.Logging
                 Href = url,
                 UserAgent = userAgent,
                 UserLanguage = GetAcceptedLanguage(req),
-                SessionId = http.Session?.IsAvailable == true ? http.Session.Id : null
+                SessionId = sessionId
             };
 
             _queue.TryEnqueue(info);
+
+            // Update or create VisitorSession record
+            if (!string.IsNullOrEmpty(sessionId))
+            {
+                try
+                {
+                    var existingSession = _visitorSessionService.GetAll()
+                        .FirstOrDefault(x => x.SessionId == sessionId);
+
+                    if (existingSession != null)
+                    {
+                        // Update existing session
+                        existingSession.PageUrl = url;
+                        existingSession.Username = userName;
+                        existingSession.IpAddress = ip;
+                        existingSession.DateModified = DateTime.Now;
+                        _visitorSessionService.Update(existingSession);
+                    }
+                    else
+                    {
+                        // Create new session
+                        var newSession = new VisitorSession
+                        {
+                            SessionId = sessionId,
+                            IpAddress = ip,
+                            PageUrl = url,
+                            Username = userName,
+                            DateCreated = DateTime.Now,
+                            DateModified = DateTime.Now
+                        };
+                        _visitorSessionService.Add(newSession);
+                    }
+                }
+                catch
+                {
+                    // Silently fail to not break page rendering
+                }
+            }
         }
 
         private static string? GetAcceptedLanguage(HttpRequest req)

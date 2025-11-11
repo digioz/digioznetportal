@@ -39,7 +39,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
 
                 whoisOnline.WhoIsOnlineEnabled = configWhoIsOnline != null && configWhoIsOnline.IsEnabled;
 
-                _cache.Set(CacheKey, whoisOnline, new MemoryCacheEntryOptions().SetSlidingExpiration(System.TimeSpan.FromMinutes(15)));
+                _cache.Set(CacheKey, whoisOnline, new MemoryCacheEntryOptions().SetSlidingExpiration(System.TimeSpan.FromMinutes(1)));
             }
             return Task.FromResult<IViewComponentResult>(View(whoisOnline));
         }
