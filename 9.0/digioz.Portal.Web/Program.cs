@@ -166,20 +166,31 @@ using (var scope = app.Services.CreateScope())
     }
     catch (SqlException ex)
     {
-        logger.LogError(ex, "A SQL Server error occurred while migrating or initializing the database. Error: {ErrorMessage}", ex.Message);
+        var message = "FATAL: SQL Server error occurred during database initialization. Application cannot start.";
+        logger.LogCritical(ex, message);
+        StartupFileLogger.LogCritical(ex, message);
+        throw; // Re-throw to prevent app from running with broken database
     }
     catch (DbUpdateException ex)
     {
-        logger.LogError(ex, "A database update error occurred while migrating or initializing the database. Error: {ErrorMessage}", ex.Message);
+        var message = "FATAL: Database update error occurred during initialization. Application cannot start.";
+        logger.LogCritical(ex, message);
+        StartupFileLogger.LogCritical(ex, message);
+        throw; // Re-throw to prevent app from running with broken database
     }
     catch (InvalidOperationException ex)
     {
-        logger.LogError(ex, "An invalid operation occurred while migrating or initializing the database. This may indicate a configuration issue. Error: {ErrorMessage}", ex.Message);
+        var message = "FATAL: Configuration error occurred during database initialization. Application cannot start.";
+        logger.LogCritical(ex, message);
+        StartupFileLogger.LogCritical(ex, message);
+        throw; // Re-throw to prevent app from running with broken database
     }
     catch (Exception ex)
     {
-        // Catch any other unexpected exceptions to prevent application startup failure
-        logger.LogError(ex, "An unexpected error occurred while migrating or initializing the database. Error: {ErrorMessage}", ex.Message);
+        var message = "FATAL: Unexpected error occurred during database initialization. Application cannot start.";
+        logger.LogCritical(ex, message);
+        StartupFileLogger.LogCritical(ex, message);
+        throw; // Re-throw to prevent app from running with broken database
     }
 }
 
