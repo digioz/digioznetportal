@@ -1,8 +1,8 @@
 ﻿@page
 @model digioz.Portal.Web.Areas.Admin.Pages.IndexModel
 @{
-	ViewData["Title"] = "Admin Home";
-	Layout = "~/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Admin Home";
+    Layout = "~/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="card shadow-sm mb-3">
@@ -19,13 +19,27 @@
         <div class="card shadow-sm h-100">
             <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
                 <span>Visitor Tracking</span>
-                <small class="text-muted">Last 30 days</small>
+                <small class="text-muted">Last 15 days</small>
             </div>
             <div class="card-body">
-                <!-- Placeholder canvas/container for charts (e.g., Chart.js) -->
-                <div class="card-placeholder rounded" id="visitorsChart">
-                    <span>Chart placeholder</span>
-                </div>
+                @if (!string.IsNullOrEmpty(Model.VisitorChartBase64))
+                {
+                    <img src="data:image/png;base64,@Model.VisitorChartBase64"
+                         alt="Visitor Tracking Chart"
+                         class="img-fluid w-100" />
+                    <div class="text-center mt-2">
+                        <span style="display: inline-block;">
+                            <span style="display: inline-block; width: 20px; height: 12px; background-color: #0d6efd; margin-right: 5px; vertical-align: middle;"></span>
+                            <span style="vertical-align: middle; font-size: 12px; color: #212529;">Unique Visitors</span>
+                        </span>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-placeholder rounded" id="visitorsChart">
+                        <span>No chart data available</span>
+                    </div>
+                }
             </div>
         </div>
     </div>

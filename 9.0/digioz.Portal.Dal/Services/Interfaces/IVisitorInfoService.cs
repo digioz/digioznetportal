@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using digioz.Portal.Bo;
 
@@ -17,5 +18,6 @@ namespace digioz.Portal.Dal.Services.Interfaces
         List<VisitorInfo> SearchPaged(string term, int page, int pageSize);
         int CountAll();
         int CountSearch(string term);
+        Dictionary<DateTime, int> GetUniqueVisitorCountsByDate(DateTime startDate, DateTime endDate);
     }
 }
