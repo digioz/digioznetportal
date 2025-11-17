@@ -10,14 +10,15 @@
 <div class="mb-2 small text-muted">Signed in as: <strong>@Model.CurrentUserName</strong></div>
 
 <div class="card mb-3">
-    <div class="card-body p-2" style="max-height:350px; overflow-y:auto;">
+    <div class="card-body p-2" style="max-height:350px; overflow-y:auto;" id="chatContainer">
         <ul id="messagesList" class="list-unstyled mb-0">
             @foreach (var m in Model.History)
             {
-                var ts = m.Timestamp.HasValue ? string.Format("{0:HH:mm:ss}", m.Timestamp.Value) : "--";
+                var ts = m.Timestamp.HasValue ? m.Timestamp.Value.ToLocalTime().ToString("h:mm:ss tt") : "--";
+                var userName = Model.UserNames.ContainsKey(m.UserId) ? Model.UserNames[m.UserId] : m.UserId;
                 <li>
                     <span class="text-secondary" style="font-size:.7rem">@ts</span>
-                    <strong>@enc.Encode(m.UserId)</strong>: @enc.Encode(m.Message)
+                    <strong>@enc.Encode(userName)</strong>: @enc.Encode(m.Message)
                 </li>
             }
         </ul>
@@ -35,6 +36,7 @@
         const form = document.getElementById('chatForm');
         const input = document.getElementById('messageInput');
         const list = document.getElementById('messagesList');
+        const container = document.getElementById('chatContainer');
         const sendBtn = document.getElementById('sendButton');
         function escapeHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
         const connection = new signalR.HubConnectionBuilder().withUrl('/chatHub').withAutomaticReconnect().build();
@@ -42,9 +44,14 @@
             const li = document.createElement('li');
             li.innerHTML = `<span class=\"text-secondary\" style=\"font-size:.7rem\">${new Date().toLocaleTimeString()}</span> <strong>${escapeHtml(user)}</strong>: ${escapeHtml(message)}`;
             list.appendChild(li);
-            list.parentElement.scrollTop = list.parentElement.scrollHeight;
+            container.scrollTop = container.scrollHeight;
         });
-        connection.start().then(() => { sendBtn.disabled = false; input.focus(); }).catch(err => console.error(err));
+        connection.start().then(() => { 
+            sendBtn.disabled = false; 
+            input.focus(); 
+            // Scroll to bottom on load
+            container.scrollTop = container.scrollHeight;
+        }).catch(err => console.error(err));
         form.addEventListener('submit', e => {
             e.preventDefault();
             const msg = input.value.trim();
