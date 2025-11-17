@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authorization;
@@ -12,18 +13,23 @@ namespace digioz.Portal.Web.Hubs
     public class ChatHub : Hub
     {
         private readonly IChatService _chatService;
+        private readonly IProfileService _profileService;
         private readonly HtmlEncoder _encoder = HtmlEncoder.Default;
 
-        public ChatHub(IChatService chatService)
+        public ChatHub(IChatService chatService, IProfileService profileService)
         {
             _chatService = chatService;
+            _profileService = profileService;
         }
 
         public async Task SendMessage(string message)
         {
             if (string.IsNullOrWhiteSpace(message)) return;
             var userId = Context.UserIdentifier ?? string.Empty;
-            var userName = Context.User?.Identity?.Name ?? "Anonymous";
+            
+            // Get DisplayName from Profile
+            var profile = _profileService.GetAll().FirstOrDefault(p => p.UserId == userId);
+            var displayName = profile?.DisplayName ?? Context.User?.Identity?.Name ?? "Anonymous";
 
             // Encode before persisting to avoid script injection stored in DB
             var safe = _encoder.Encode(message.Trim());
@@ -34,8 +40,8 @@ namespace digioz.Portal.Web.Hubs
                 Message = safe
             });
 
-            // Broadcast raw (unencoded) message; clients are expected to encode
-            await Clients.All.SendAsync("ReceiveMessage", userName, message.Trim());
+            // Broadcast with DisplayName
+            await Clients.All.SendAsync("ReceiveMessage", displayName, message.Trim());
         }
     }
 }

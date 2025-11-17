@@ -7,7 +7,7 @@
 }
 
 <h2>Chat</h2>
-<div class="mb-2 small text-muted">Signed in as: <strong>@Model.CurrentUserName</strong></div>
+<div class="mb-2 small text-muted">Signed in as: <strong>@Model.CurrentDisplayName</strong></div>
 
 <div class="card mb-3">
     <div class="card-body p-2" style="max-height:350px; overflow-y:auto;" id="chatContainer">
@@ -15,10 +15,10 @@
             @foreach (var m in Model.History)
             {
                 var ts = m.Timestamp.HasValue ? m.Timestamp.Value.ToLocalTime().ToString("h:mm:ss tt") : "--";
-                var userName = Model.UserNames.ContainsKey(m.UserId) ? Model.UserNames[m.UserId] : m.UserId;
+                var displayName = Model.DisplayNames.ContainsKey(m.UserId) ? Model.DisplayNames[m.UserId] : "Anonymous";
                 <li>
                     <span class="text-secondary" style="font-size:.7rem">@ts</span>
-                    <strong>@enc.Encode(userName)</strong>: @enc.Encode(m.Message)
+                    <strong>@enc.Encode(displayName)</strong>: @enc.Encode(m.Message)
                 </li>
             }
         </ul>
@@ -40,9 +40,9 @@
         const sendBtn = document.getElementById('sendButton');
         function escapeHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
         const connection = new signalR.HubConnectionBuilder().withUrl('/chatHub').withAutomaticReconnect().build();
-        connection.on('ReceiveMessage', (user, message) => {
+        connection.on('ReceiveMessage', (displayName, message) => {
             const li = document.createElement('li');
-            li.innerHTML = `<span class=\"text-secondary\" style=\"font-size:.7rem\">${new Date().toLocaleTimeString()}</span> <strong>${escapeHtml(user)}</strong>: ${escapeHtml(message)}`;
+            li.innerHTML = `<span class=\"text-secondary\" style=\"font-size:.7rem\">${new Date().toLocaleTimeString()}</span> <strong>${escapeHtml(displayName)}</strong>: ${escapeHtml(message)}`;
             list.appendChild(li);
             container.scrollTop = container.scrollHeight;
         });
