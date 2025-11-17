@@ -541,6 +541,7 @@ namespace digioz.Portal.Web.Data.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<string>(maxLength: 128, nullable: true),
+                    DisplayName = table.Column<string>(maxLength: 50, nullable: true),
                     FirstName = table.Column<string>(maxLength: 50, nullable: true),
                     MiddleName = table.Column<string>(maxLength: 50, nullable: true),
                     LastName = table.Column<string>(maxLength: 50, nullable: true),
@@ -560,6 +561,14 @@ namespace digioz.Portal.Web.Data.Migrations
                 {
                     table.PrimaryKey("PK_Profile", x => x.Id);
                 });
+
+            // Create unique index on DisplayName for uniqueness validation
+            migrationBuilder.CreateIndex(
+                name: "IX_Profile_DisplayName",
+                table: "Profile",
+                column: "DisplayName",
+                unique: true,
+                filter: "[DisplayName] IS NOT NULL");
 
             migrationBuilder.CreateTable(
                 name: "Rss",

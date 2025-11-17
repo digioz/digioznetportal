@@ -620,6 +620,12 @@ namespace digioz.Portal.Dal
             {
                 entity.ToTable("Profile");
 
+                entity.HasIndex(e => e.DisplayName, "IX_Profile_DisplayName")
+                    .IsUnique()
+                    .HasFilter("[DisplayName] IS NOT NULL");
+
+                entity.Property(e => e.DisplayName).HasMaxLength(50);
+
                 entity.Property(e => e.Avatar).HasMaxLength(50);
 
                 entity.Property(e => e.City).HasMaxLength(50);
