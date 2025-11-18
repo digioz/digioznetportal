@@ -63,32 +63,27 @@
 
 		<div class="row">
             <div class="col-md-3">
+				@await Component.InvokeAsync("ZoneMenu", new { location = "Top" })
+				@await Component.InvokeAsync("LeftMenu")
+				@await Component.InvokeAsync("UserMenu")
+				@await Component.InvokeAsync("WhoIsOnlineMenu")
+				@await Component.InvokeAsync("StoreMenu")
+				
 
-            @await Component.InvokeAsync("LeftMenu")
-            @await Component.InvokeAsync("UserMenu")
-			@await Component.InvokeAsync("WhoIsOnlineMenu")
-            @await Component.InvokeAsync("StoreMenu")
+				@*	@Html.RenderAction("PollMenu", "Menu", new { area = "" })
+					@Html.RenderAction("TwitterMenu", "Menu", new { area = "" }) *@
 
-            @*
-
-            @Html.RenderAction("PollMenu", "Menu", new { area = "" })
-
-            @Html.RenderAction("TwitterMenu", "Menu", new { area = "" })
-
-            @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "Left" }) *@
+				@await Component.InvokeAsync("ZoneMenu", new { location = "Left" })
+				@await Component.InvokeAsync("ZoneMenu", new { location = "LeftMenu" })
 
             </div>
 			<div class="col-md-9">
 
-				@* @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "BodyTop" })
-
-				@RenderSection("featured", required: false)
-
-				@RenderSection("LatestPictures", required: false)
-
-				@RenderSection("LatestVideos", required: false)
-
-				@RenderSection("RSSFeed", required: false) *@
+				@await Component.InvokeAsync("ZoneMenu", new { location = "BodyTop" })
+				@*	@RenderSection("featured", required: false)
+					@RenderSection("LatestPictures", required: false)
+					@RenderSection("LatestVideos", required: false)
+					@RenderSection("RSSFeed", required: false) *@
 
 				<div class="card bg-light mb-5">
 					<div class="card-header" style="background-color:#428BCA;color:#ffffff;">@ViewBag.Title</div>
@@ -97,11 +92,11 @@
 					</div>
 				</div>
 
-				@* @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "BodyBottom" }) *@
+				@await Component.InvokeAsync("ZoneMenu", new { location = "BodyBottom" })
 			</div>
 		</div>
 
-		@* @Html.RenderAction("ZoneMenu", "Menu", new { area = "", zoneType = "Bottom" }) *@
+		@await Component.InvokeAsync("ZoneMenu", new { location = "Bottom" })
 
 		<hr />
 		<footer>

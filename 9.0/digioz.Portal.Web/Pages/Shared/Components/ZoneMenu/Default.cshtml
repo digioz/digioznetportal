@@ -1,0 +1,55 @@
+@model IEnumerable<digioz.Portal.Bo.Zone>
+@{
+    var loc = (string?)ViewBag.Location ?? string.Empty;
+    bool isTopBottom = loc.Equals("Top", System.StringComparison.OrdinalIgnoreCase) 
+                        || loc.Equals("BodyTop", System.StringComparison.OrdinalIgnoreCase)
+                        || loc.Equals("Bottom", System.StringComparison.OrdinalIgnoreCase)
+                        || loc.Equals("BodyBottom", System.StringComparison.OrdinalIgnoreCase);
+    bool isLeftMenu = loc.Equals("Left", System.StringComparison.OrdinalIgnoreCase) 
+                        || loc.Equals("LeftMenu", System.StringComparison.OrdinalIgnoreCase);
+}
+@if (Model != null && Model.Any())
+{
+    if (isTopBottom)
+    {
+        foreach (var z in Model)
+        {
+            <div class="zone-full mb-3" data-zone-id="@z.Id" data-zone-location="@loc">
+                <div class="card shadow-sm">
+                    @if (!string.IsNullOrWhiteSpace(z.Name))
+                    {
+                        <div class="card-header fw-semibold">@z.Name</div>
+                    }
+                    <div class="card-body">
+                        @if (!string.IsNullOrWhiteSpace(z.Body)) { @Html.Raw(z.Body) } else { <em class="text-muted">(Empty zone)</em> }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else if (isLeftMenu)
+    {
+        <div class="zone-menu" data-zone-location="@loc">
+            @foreach (var z in Model)
+            {
+                <div class="card mb-3 zone-item" data-zone-id="@z.Id">
+                    <div class="card-header py-1 px-2 fw-semibold">@z.Name</div>
+                    <div class="card-body p-2">
+                        @if (!string.IsNullOrWhiteSpace(z.Body)) { @Html.Raw(z.Body) } else { <em class="text-muted">(Empty)</em> }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="zone-generic" data-zone-location="@loc">
+            @foreach (var z in Model)
+            {
+                <div class="zone-item mb-3" data-zone-id="@z.Id">
+                    @if (!string.IsNullOrWhiteSpace(z.Body)) { @Html.Raw(z.Body) } else { <em class="text-muted">(Empty zone)</em> }
+                </div>
+            }
+        </div>
+    }
+}
