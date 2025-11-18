@@ -12,5 +12,6 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void Delete(int id);
         Page GetByTitle(string title);
         Page GetByUrl(string url);
+        List<Page> Search(string term, int skip, int take, out int totalCount);
     }
 }
