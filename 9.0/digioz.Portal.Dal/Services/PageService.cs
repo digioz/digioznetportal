@@ -50,5 +50,10 @@ namespace digioz.Portal.Dal.Services
         {
             return _context.Pages.FirstOrDefault(p => p.Title == title);
         }
+
+        public Page GetByUrl(string url)
+        {
+            return _context.Pages.FirstOrDefault(p => p.Url == url);
+        }
     }
 }

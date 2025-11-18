@@ -61,7 +61,6 @@
 
 	<div class="container body-content">
 
-        @* Full-width Top zone should be outside columns *@
         @await Component.InvokeAsync("ZoneMenu", new { location = "Top" })
 
 		<div class="row">
@@ -72,7 +71,7 @@
 				@await Component.InvokeAsync("StoreMenu")
 				
 
-				@*\t@Html.RenderAction("PollMenu", "Menu", new { area = "" })
+				@*  @Html.RenderAction("PollMenu", "Menu", new { area = "" })
 					@Html.RenderAction("TwitterMenu", "Menu", new { area = "" }) *@
 
 				@await Component.InvokeAsync("ZoneMenu", new { location = "Left" })
@@ -82,8 +81,7 @@
 			<div class="col-md-9">
 
 				@await Component.InvokeAsync("ZoneMenu", new { location = "BodyTop" })
-				@*\t@RenderSection("featured", required: false)
-					@RenderSection("LatestPictures", required: false)
+				@*	@RenderSection("LatestPictures", required: false)
 					@RenderSection("LatestVideos", required: false)
 					@RenderSection("RSSFeed", required: false) *@
 
