@@ -139,22 +139,6 @@ INSERT INTO Page (UserId, Title, Url, Body, Keywords, Description, Visible, Time
                     { "LatestPictures", null, false },
                     { "LatestVideos", null, false }
                 });
-
-            // Insert Zone Seed with explicit column types
-            migrationBuilder.InsertData(
-                table: "Zone",
-                columns: new[] { "Name", "Body", "Visible", "Timestamp" },
-                columnTypes: new[] { "nvarchar(128)", "nvarchar(max)", "bit", "datetime2" },
-                values: new object[,]
-                {
-                    { "Top", null, true, DateTime.Now },
-                    { "TopMenu", null, true, DateTime.Now },
-                    { "Left", null, true, DateTime.Now },
-                    { "LeftMenu", null, true, DateTime.Now },
-                    { "BodyTop", null, true, DateTime.Now },
-                    { "BodyBottom", null, true, DateTime.Now },
-                    { "Bottom", null, true, DateTime.Now }
-                });
         }
 
         /// <inheritdoc />
@@ -199,15 +183,6 @@ DELETE FROM Page WHERE UserId = @adminUserId2 AND Url IN ('/Index','/Home/Contac
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "RSSFeed");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "LatestPictures");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "LatestVideos");
-
-            // Remove Zone Seed
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "Top");
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "TopMenu");
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "Left");
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "LeftMenu");
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "BodyTop");
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "BodyBottom");
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "Bottom");
         }
     }
 }

@@ -244,7 +244,7 @@ namespace digioz.Portal.Web.Data.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<string>(maxLength: 128, nullable: true),
                     Name = table.Column<string>(maxLength: 255, nullable: false),
-                    Location = table.Column<string>(maxLength: 255, nullable: false),
+                    Location = table.Column<string>(maxLength: 50, nullable: false),
                     Controller = table.Column<string>(maxLength: 50, nullable: true),
                     Action = table.Column<string>(maxLength: 50, nullable: true),
                     Url = table.Column<string>(nullable: true),
@@ -704,6 +704,7 @@ namespace digioz.Portal.Web.Data.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: false),
+                    Location = table.Column<string>(maxLength: 50, nullable: true),
                     Body = table.Column<string>(nullable: true),
                     Visible = table.Column<bool>(nullable: false),
                     Timestamp = table.Column<DateTime>(nullable: true)
