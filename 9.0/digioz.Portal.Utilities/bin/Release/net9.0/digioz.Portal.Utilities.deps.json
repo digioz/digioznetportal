@@ -10,6 +10,7 @@
         "dependencies": {
           "HtmlAgilityPack": "1.12.2",
           "Microsoft.AspNetCore.Http": "2.3.0",
+          "SixLabors.ImageSharp": "3.1.12",
           "System.Drawing.Common": "9.0.7",
           "digioz.Portal.Bo": "1.0.0"
         },
@@ -42,8 +43,7 @@
       },
       "Microsoft.AspNetCore.Http.Abstractions/2.3.0": {
         "dependencies": {
-          "Microsoft.AspNetCore.Http.Features": "2.3.0",
-          "System.Text.Encodings.Web": "8.0.0"
+          "Microsoft.AspNetCore.Http.Features": "2.3.0"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.AspNetCore.Http.Abstractions.dll": {
@@ -65,8 +65,7 @@
       },
       "Microsoft.AspNetCore.WebUtilities/2.3.0": {
         "dependencies": {
-          "Microsoft.Net.Http.Headers": "2.3.0",
-          "System.Text.Encodings.Web": "8.0.0"
+          "Microsoft.Net.Http.Headers": "2.3.0"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.AspNetCore.WebUtilities.dll": {
@@ -113,8 +112,7 @@
       },
       "Microsoft.Net.Http.Headers/2.3.0": {
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "8.0.0",
-          "System.Buffers": "4.6.0"
+          "Microsoft.Extensions.Primitives": "8.0.0"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Net.Http.Headers.dll": {
@@ -139,7 +137,14 @@
           }
         }
       },
-      "System.Buffers/4.6.0": {},
+      "SixLabors.ImageSharp/3.1.12": {
+        "runtime": {
+          "lib/net6.0/SixLabors.ImageSharp.dll": {
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.1.12.0"
+          }
+        }
+      },
       "System.Drawing.Common/9.0.7": {
         "dependencies": {
           "Microsoft.Win32.SystemEvents": "9.0.7"
@@ -155,7 +160,6 @@
           }
         }
       },
-      "System.Text.Encodings.Web/8.0.0": {},
       "digioz.Portal.Bo/1.0.0": {
         "dependencies": {
           "Microsoft.AspNetCore.Http": "2.3.0"
@@ -252,12 +256,12 @@
       "path": "microsoft.win32.systemevents/9.0.7",
       "hashPath": "microsoft.win32.systemevents.9.0.7.nupkg.sha512"
     },
-    "System.Buffers/4.6.0": {
+    "SixLabors.ImageSharp/3.1.12": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-lN6tZi7Q46zFzAbRYXTIvfXcyvQQgxnY7Xm6C6xQ9784dEL1amjM6S6Iw4ZpsvesAKnRVsM4scrDQaDqSClkjA==",
-      "path": "system.buffers/4.6.0",
-      "hashPath": "system.buffers.4.6.0.nupkg.sha512"
+      "sha512": "sha512-iAg6zifihXEFS/t7fiHhZBGAdCp3FavsF4i2ZIDp0JfeYeDVzvmlbY1CNhhIKimaIzrzSi5M/NBFcWvZT2rB/A==",
+      "path": "sixlabors.imagesharp/3.1.12",
+      "hashPath": "sixlabors.imagesharp.3.1.12.nupkg.sha512"
     },
     "System.Drawing.Common/9.0.7": {
       "type": "package",
@@ -265,13 +269,6 @@
       "sha512": "sha512-1k/Pk7hcM3vP2tfIRRS2ECCCN7ya+hvocsM1JMc4ZDCU6qw7yOuUmqmCDfgXZ4Q4FS6jass2EAai5ByKodDi0g==",
       "path": "system.drawing.common/9.0.7",
       "hashPath": "system.drawing.common.9.0.7.nupkg.sha512"
-    },
-    "System.Text.Encodings.Web/8.0.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-yev/k9GHAEGx2Rg3/tU6MQh4HGBXJs70y7j1LaM1i/ER9po+6nnQ6RRqTJn1E7Xu0fbIFK80Nh5EoODxrbxwBQ==",
-      "path": "system.text.encodings.web/8.0.0",
-      "hashPath": "system.text.encodings.web.8.0.0.nupkg.sha512"
     },
     "digioz.Portal.Bo/1.0.0": {
       "type": "project",
