@@ -15,7 +15,8 @@
             @foreach (var m in Model.History)
             {
                 var ts = m.Timestamp.HasValue ? m.Timestamp.Value.ToLocalTime().ToString("h:mm:ss tt") : "--";
-                var displayName = Model.DisplayNames.ContainsKey(m.UserId) ? Model.DisplayNames[m.UserId] : "Anonymous";
+                string displayName;
+                if (!Model.DisplayNames.TryGetValue(m.UserId, out displayName)) displayName = "Anonymous";
                 <li>
                     <span class="text-secondary" style="font-size:.7rem">@ts</span>
                     <strong>@enc.Encode(displayName)</strong>: @enc.Encode(m.Message)
