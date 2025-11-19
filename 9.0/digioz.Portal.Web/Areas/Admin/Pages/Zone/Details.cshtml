@@ -1,0 +1,37 @@
+@page "{id:int}"
+@model digioz.Portal.Web.Areas.Admin.Pages.Zone.DetailsModel
+@{
+    ViewBag.Title = "Zone Details";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+  <div class="card-header fw-semibold">Zone Details</div>
+  <div class="card-body">
+    <dl class="row">
+      <dt class="col-sm-3">Name</dt>
+      <dd class="col-sm-9">@Model.Item?.Name</dd>
+      <dt class="col-sm-3">Location</dt>
+      <dd class="col-sm-9">@Model.Item?.Location</dd>
+      <dt class="col-sm-3">Visible</dt>
+      <dd class="col-sm-9">@(Model.Item?.Visible == true ? "Yes" : "No")</dd>
+      <dt class="col-sm-3">Updated</dt>
+      <dd class="col-sm-9">@Model.Item?.Timestamp.ToLocalTime().ToString("g")</dd>
+      <dt class="col-sm-3">Content</dt>
+      <dd class="col-sm-9">
+        @if (!string.IsNullOrWhiteSpace(Model.Item?.Body))
+        {
+            @Html.Raw(Model.Item!.Body)
+        }
+        else
+        {
+            <em>No content</em>
+        }
+      </dd>
+    </dl>
+    <div class="d-flex gap-2">
+      <a asp-area="Admin" asp-page="/Zone/Edit" asp-route-id="@Model.Item?.Id" class="btn btn-secondary"><i class="bi bi-pencil-square"></i> Edit</a>
+      <a asp-area="Admin" asp-page="/Zone/Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+  </div>
+</div>

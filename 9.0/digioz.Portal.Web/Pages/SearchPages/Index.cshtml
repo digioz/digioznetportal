@@ -1,3 +1,48 @@
 @page
-@model IndexModel
-<h2>SearchPages Index</h2>
+@model digioz.Portal.Pages.SearchPages.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+@{
+    ViewData["Title"] = "Search Results";
+}
+
+@if (Model.Items != null && Model.Items.Count > 0)
+{
+    <ul class="list-group list-group-flush">
+    @foreach (var item in Model.Items)
+    {
+        <li class="list-group-item">
+            <h5 class="mb-1">@Html.Raw(item.TitleHtml)</h5>
+            <p class="mb-1 text-muted">@Html.Raw(item.SnippetHtml)</p>
+            @if (!string.IsNullOrEmpty(item.Url))
+            {
+                <a class="small" href="@item.Url">@item.Url</a>
+            }
+        </li>
+    }
+    </ul>
+}
+else if (!string.IsNullOrWhiteSpace(Model.searchString))
+{
+    <div class="alert alert-warning mb-0">No results found.</div>
+}
+else
+{
+    <div class="text-muted">Enter a term to search.</div>
+}
+
+<div class="card-footer d-flex justify-content-between align-items-center">
+    <small class="text-muted">Page @Model.pageNumber of @((int)Math.Ceiling((double)Model.TotalCount / Math.Max(1, Model.pageSize))) (@Model.TotalCount total)</small>
+    <paging total-records="@Model.TotalCount"
+            page-no="@Model.pageNumber"
+            page-size="@Model.pageSize"
+            show-prev-next="true"
+            show-first-last="true"
+            query-string-key-page-no="pageNumber"
+            class="pagination mb-0">
+        <route-values>
+            <rv key="searchString" value="@Model.searchString"></rv>
+            <rv key="pageSize" value="@Model.pageSize"></rv>
+        </route-values>
+    </paging>
+</div>

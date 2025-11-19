@@ -1,3 +1,18 @@
-@page
-@model IndexModel
-<h2>Page Index</h2>
+@page "{id?}"
+@model digioz.Portal.Web.Pages.Page.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+	ViewData["Title"] = "Page";
+}
+
+<div class="container">
+	@if (!string.IsNullOrWhiteSpace(Model.BodyHtml))
+	{
+		@Html.Raw(Model.BodyHtml)
+	}
+	else
+	{
+		<div class="alert alert-warning">Page not found.</div>
+	}
+</div>

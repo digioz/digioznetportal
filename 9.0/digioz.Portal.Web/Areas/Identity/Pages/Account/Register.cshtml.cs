@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Bo;
 
 namespace digioz.Portal.Web.Areas.Identity.Pages.Account
 {
@@ -29,13 +31,15 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IProfileService _profileService;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IProfileService profileService)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -43,6 +47,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _profileService = profileService;
         }
 
         /// <summary>
@@ -84,6 +89,15 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required]
+            [StringLength(50, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
+            [Display(Name = "Display Name")]
+            public string DisplayName { get; set; }
+
+            /// <summary>
+            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
+            ///     directly from your code. This API may change or be removed in future releases.
+            /// </summary>
+            [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
@@ -112,6 +126,16 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
+                // Check if DisplayName already exists
+                var existingProfile = _profileService.GetAll()
+                    .FirstOrDefault(p => p.DisplayName != null && p.DisplayName.Equals(Input.DisplayName, StringComparison.OrdinalIgnoreCase));
+                
+                if (existingProfile != null)
+                {
+                    ModelState.AddModelError(string.Empty, "Display Name already exists!");
+                    return Page();
+                }
+
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
@@ -123,6 +147,25 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
+
+                    // Create Profile record
+                    try
+                    {
+                        var profile = new Profile
+                        {
+                            UserId = userId,
+                            DisplayName = Input.DisplayName,
+                            Email = Input.Email
+                        };
+                        _profileService.Add(profile);
+                        _logger.LogInformation("Profile created for user {UserId}", userId);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error creating profile for user {UserId}", userId);
+                        // Continue with registration flow even if profile creation fails
+                    }
+
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(

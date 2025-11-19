@@ -15,6 +15,14 @@ namespace digioz.Portal.Web.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Insert Profile record for admin user (lookup UserId at runtime)
+            migrationBuilder.Sql(@"
+DECLARE @adminUserId nvarchar(128) = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'admin@domain.com');
+
+INSERT INTO Profile (UserId, DisplayName, FirstName, MiddleName, LastName, Email, Birthday, BirthdayVisible, Address, Address2, City, State, Zip, Country, Signature, Avatar)
+VALUES (@adminUserId, 'Administrator', 'Admin', NULL, 'User', 'admin@domain.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+");
+
             // Insert Config Seed with runtime-generated IDs
             migrationBuilder.InsertData(
                 table: "Config",
@@ -131,27 +139,17 @@ INSERT INTO Page (UserId, Title, Url, Body, Keywords, Description, Visible, Time
                     { "LatestPictures", null, false },
                     { "LatestVideos", null, false }
                 });
-
-            // Insert Zone Seed with explicit column types
-            migrationBuilder.InsertData(
-                table: "Zone",
-                columns: new[] { "Name", "Body", "Visible", "Timestamp" },
-                columnTypes: new[] { "nvarchar(128)", "nvarchar(max)", "bit", "datetime2" },
-                values: new object[,]
-                {
-                    { "Top", null, true, DateTime.Now },
-                    { "TopMenu", null, true, DateTime.Now },
-                    { "Left", null, true, DateTime.Now },
-                    { "LeftMenu", null, true, DateTime.Now },
-                    { "BodyTop", null, true, DateTime.Now },
-                    { "BodyBottom", null, true, DateTime.Now },
-                    { "Bottom", null, true, DateTime.Now }
-                });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            // Remove Profile record
+            migrationBuilder.Sql(@"
+DELETE FROM Profile
+WHERE UserId = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'admin@domain.com');
+");
+
             // Remove Config Seed (IDs generated at runtime -> delete by keys)
             migrationBuilder.Sql(@"
 DELETE FROM Config WHERE ConfigKey IN (
@@ -185,15 +183,6 @@ DELETE FROM Page WHERE UserId = @adminUserId2 AND Url IN ('/Index','/Home/Contac
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "RSSFeed");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "LatestPictures");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "LatestVideos");
-
-            // Remove Zone Seed
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "Top");
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "TopMenu");
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "Left");
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "LeftMenu");
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "BodyTop");
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "BodyBottom");
-            migrationBuilder.DeleteData(table: "Zone", keyColumn: "Name", keyValue: "Bottom");
         }
     }
 }

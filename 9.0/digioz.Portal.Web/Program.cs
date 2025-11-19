@@ -7,6 +7,7 @@ using digioz.Portal.Web.Logging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using digioz.Portal.Web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +40,6 @@ builder.Services.AddAuthorization(options =>
  options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
 });
 
-// Add Custom Services
 builder.Services.AddDbContext<digiozPortalContext>(
  options => options.UseSqlServer(connectionString),
  optionsLifetime: ServiceLifetime.Scoped);
@@ -88,6 +88,7 @@ builder.Services.AddScoped<IVideoAlbumService, VideoAlbumService>();
 builder.Services.AddScoped<IVisitorInfoService, VisitorInfoService>();
 builder.Services.AddScoped<IVisitorSessionService, VisitorSessionService>();
 builder.Services.AddScoped<IZoneService, ZoneService>();
+
 builder.Services.AddMemoryCache();
 
 // Recaptcha verification needs HttpClient
@@ -135,6 +136,9 @@ builder.Services.AddRazorPages(options =>
 // Visitor logging for all Razor Pages
 builder.Services.AddVisitorInfoLogging();
 
+// SignalR registration
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -161,35 +165,47 @@ using (var scope = app.Services.CreateScope())
 
         // Main portal DB (digiozPortalContext)
         var portalContext = services.GetRequiredService<digiozPortalContext>();
-        // EnsureCreated is used since this context does not use migrations in this project
         portalContext.Database.EnsureCreated();
     }
     catch (SqlException ex)
     {
-        logger.LogError(ex, "A SQL Server error occurred while migrating or initializing the database. Error: {ErrorMessage}", ex.Message);
+        var message = "FATAL: SQL Server error occurred during database initialization. Application cannot start.";
+        logger.LogCritical(ex, message);
+        StartupFileLogger.LogCritical(ex, message);
+        throw;
     }
     catch (DbUpdateException ex)
     {
-        logger.LogError(ex, "A database update error occurred while migrating or initializing the database. Error: {ErrorMessage}", ex.Message);
+        var message = "FATAL: Database update error occurred during initialization. Application cannot start.";
+        logger.LogCritical(ex, message);
+        StartupFileLogger.LogCritical(ex, message);
+        throw;
     }
     catch (InvalidOperationException ex)
     {
-        logger.LogError(ex, "An invalid operation occurred while migrating or initializing the database. This may indicate a configuration issue. Error: {ErrorMessage}", ex.Message);
+        var message = "FATAL: Configuration error occurred during database initialization. Application cannot start.";
+        logger.LogCritical(ex, message);
+        StartupFileLogger.LogCritical(ex, message);
+        throw;
     }
     catch (Exception ex)
     {
-        // Catch any other unexpected exceptions to prevent application startup failure
-        logger.LogError(ex, "An unexpected error occurred while migrating or initializing the database. Error: {ErrorMessage}", ex.Message);
+        var message = "FATAL: Unexpected error occurred during database initialization. Application cannot start.";
+        logger.LogCritical(ex, message);
+        StartupFileLogger.LogCritical(ex, message);
+        throw;
     }
 }
 
 app.UseSession();
 app.UseRouting();
-app.UseAuthentication(); // Add authentication middleware
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
-app.MapRazorPages()
- .WithStaticAssets();
+app.MapRazorPages().WithStaticAssets();
+
+// Map ChatHub endpoint
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();

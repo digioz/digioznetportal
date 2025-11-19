@@ -2,22 +2,31 @@
  "version": "1.0",
  "defaultProvider": "unpkg",
  "libraries": [
- {
- "library": "@ckeditor/ckeditor5-build-classic@41.4.2",
- "destination": "wwwroot/lib/ckeditor/",
- "files": [
- "build/ckeditor.js"
- ]
- },
- {
- "library": "bootstrap-icons@1.10.5",
- "destination": "wwwroot/lib/bootstrap-icons/",
- "files": [
- "font/bootstrap-icons.css",
- "font/bootstrap-icons.woff2",
- "font/bootstrap-icons.woff",
- "font/bootstrap-icons.ttf"
- ]
- }
+  {
+   "library": "@ckeditor/ckeditor5-build-classic@41.4.2",
+   "destination": "wwwroot/lib/ckeditor/",
+   "files": [
+    "build/ckeditor.js"
+   ]
+  },
+  {
+   "library": "bootstrap-icons@1.10.5",
+   "destination": "wwwroot/lib/bootstrap-icons/",
+   "files": [
+    "font/bootstrap-icons.css",
+    "font/bootstrap-icons.min.css",
+    "font/fonts/bootstrap-icons.woff2",
+    "font/fonts/bootstrap-icons.woff"
+   ]
+  },
+  {
+   "library": "@microsoft/signalr@8.0.0",
+   "destination": "wwwroot/lib/signalr/",
+   "files": [
+    "dist/browser/signalr.min.js",
+    "dist/browser/signalr.js",
+    "dist/browser/signalr.min.js.map"
+   ]
+  }
  ]
 }

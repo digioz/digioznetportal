@@ -50,5 +50,35 @@ namespace digioz.Portal.Dal.Services
         {
             return _context.Pages.FirstOrDefault(p => p.Title == title);
         }
+
+        public Page GetByUrl(string url)
+        {
+            return _context.Pages.FirstOrDefault(p => p.Url == url);
+        }
+
+        public List<Page> Search(string term, int skip, int take, out int totalCount)
+        {
+            term = term ?? string.Empty;
+            var q = _context.Pages.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(term))
+            {
+                var t = term.ToLower();
+                q = q.Where(p => p.Visible && (
+                    (p.Title != null && p.Title.ToLower().Contains(t)) ||
+                    (p.Body != null && p.Body.ToLower().Contains(t))
+                ));
+            }
+            else
+            {
+                q = q.Where(p => p.Visible);
+            }
+
+            totalCount = q.Count();
+            return q
+                .OrderByDescending(p => p.Timestamp ?? System.DateTime.MinValue)
+                .Skip(skip)
+                .Take(take)
+                .ToList();
+        }
     }
 }
