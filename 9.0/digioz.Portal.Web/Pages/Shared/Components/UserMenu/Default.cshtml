@@ -2,6 +2,7 @@
 @{
     var SignInManager = (SignInManager<IdentityUser>)ViewBag.SignInManager;
     var UserManager = (UserManager<IdentityUser>)ViewBag.UserManager;
+    var displayName = (string)ViewBag.ProfileDisplayName;
 }
 
 <div class="card bg-light mb-3">
@@ -27,7 +28,7 @@
                 }
             </ul>
             <br />
-            <p style="font-size:x-small;width:100%;text-align:center;">Logged in as <a href="/Profile/Index">@(User.Identity?.Name ?? "Unknown")</a>.</p>
+            <p style="font-size:x-small;width:100%;text-align:center;">Logged in as <a href="/Profile/Index">@(displayName ?? User.Identity?.Name ?? "Unknown")</a>.</p>
         }
         else
         {

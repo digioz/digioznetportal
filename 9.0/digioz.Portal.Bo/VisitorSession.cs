@@ -14,5 +14,8 @@ namespace digioz.Portal.Bo
         public string Username { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateModified { get; set; }
+        
+        // Navigation property
+        public virtual Profile Profile { get; set; }
     }
 }

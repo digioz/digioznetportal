@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
 
@@ -17,17 +18,18 @@ namespace digioz.Portal.Dal.Services
 
         public VisitorSession Get(int id)
         {
-            return _context.VisitorSessions.Find(id);
+            return _context.VisitorSessions.Include(x => x.Profile).FirstOrDefault(x => x.Id == id);
         }
 
         public List<VisitorSession> GetAll()
         {
-            return _context.VisitorSessions.ToList();
+            return _context.VisitorSessions.Include(x => x.Profile).ToList();
         }
 
         public List<VisitorSession> GetAllGreaterThan(DateTime dateTime)
         {
             return _context.VisitorSessions
+                .Include(x => x.Profile)
                 .Where(x => x.DateModified >= dateTime)
                 .ToList();
         }

@@ -722,6 +722,13 @@ namespace digioz.Portal.Dal
                 entity.Property(e => e.IpAddress).HasMaxLength(25);
 
                 entity.Property(e => e.Username).HasMaxLength(255);
+
+                // Configure the relationship to Profile
+                entity.HasOne(d => d.Profile)
+                    .WithMany()
+                    .HasForeignKey(d => d.Username)
+                    .HasPrincipalKey(p => p.UserId)
+                    .IsRequired(false);
             });
 
             modelBuilder.Entity<Zone>(entity =>
