@@ -1,3 +1,60 @@
 @page
 @model AddModel
-<h2>Add Video</h2>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Add Video";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4">Add Video</h1>
+
+            @if (!string.IsNullOrEmpty(Model.StatusMessage))
+            {
+                <div class="alert alert-@(Model.IsSuccess ? "success" : "danger") alert-dismissible fade show" role="alert">
+                    @Model.StatusMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <form method="post" enctype="multipart/form-data" class="needs-validation">
+                <div class="mb-3">
+                    <label for="AlbumId" class="form-label">Select Album *</label>
+                    <select id="AlbumId" name="AlbumId" class="form-select" required>
+                        <option value="">-- Select an Album --</option>
+                        @foreach (var album in Model.Albums)
+                        {
+                            <option value="@album.Id">@album.Name</option>
+                        }
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select an album.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="ThumbnailFile" class="form-label">Upload Thumbnail Image *</label>
+                    <input type="file" id="ThumbnailFile" name="ThumbnailFile" class="form-control" accept="image/*" required />
+                    <small class="text-muted">Supported formats: JPG, PNG, GIF, BMP, TIF, TIFF</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="VideoFile" class="form-label">Upload Video File *</label>
+                    <input type="file" id="VideoFile" name="VideoFile" class="form-control" accept="video/*" required />
+                    <small class="text-muted">Supported formats: MP4, WebM, Ogg, MOV, AVI, MKV</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="Description" class="form-label">Description</label>
+                    <textarea id="Description" name="Description" class="form-control" rows="3" placeholder="Enter description for this video"></textarea>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">Upload Video</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
