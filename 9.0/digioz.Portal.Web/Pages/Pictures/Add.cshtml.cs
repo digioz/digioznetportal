@@ -30,13 +30,13 @@ namespace digioz.Portal.Pages.Pictures {
         public int AlbumId { get; set; }
 
         [BindProperty]
-        public List<IFormFile> Files { get; set; } = new();
+        public List<IFormFile>? Files { get; set; } = new();
 
         [BindProperty]
-        public List<string> Descriptions { get; set; } = new();
+        public List<string>? Descriptions { get; set; } = new();
 
         public List<PictureAlbum> Albums { get; private set; } = new();
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
         public bool IsSuccess { get; set; }
 
         public void OnGet() {
@@ -75,7 +75,7 @@ namespace digioz.Portal.Pages.Pictures {
 
             for (int i = 0; i < Files.Count; i++) {
                 var file = Files[i];
-                var description = i < Descriptions.Count ? Descriptions[i] : "";
+                var description = (Descriptions != null && i < Descriptions.Count) ? Descriptions[i] : string.Empty;
 
                 if (file == null || file.Length == 0)
                     continue;

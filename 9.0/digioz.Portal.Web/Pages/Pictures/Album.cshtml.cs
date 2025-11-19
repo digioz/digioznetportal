@@ -22,7 +22,7 @@ namespace digioz.Portal.Pages.Pictures
             _userHelper = userHelper;
         }
 
-        public PictureAlbum Album { get; private set; }
+        public PictureAlbum? Album { get; private set; }
         public IReadOnlyList<Picture> Pictures { get; private set; } = Array.Empty<Picture>();
 
         [BindProperty(SupportsGet = true)]

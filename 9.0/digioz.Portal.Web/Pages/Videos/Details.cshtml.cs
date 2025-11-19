@@ -20,10 +20,10 @@ namespace digioz.Portal.Pages.Videos
             _userHelper = userHelper;
         }
 
-        public Video Item { get; private set; }
-        public VideoAlbum Album { get; private set; }
+        public Video? Item { get; private set; }
+        public VideoAlbum? Album { get; private set; }
         public bool IsOwner { get; private set; }
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
         public bool IsSuccess { get; set; }
 
         public IActionResult OnGet(int id)

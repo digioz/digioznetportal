@@ -22,7 +22,7 @@ namespace digioz.Portal.Pages.Videos
             _userHelper = userHelper;
         }
 
-        public VideoAlbum Album { get; private set; }
+        public VideoAlbum? Album { get; private set; }
         public IReadOnlyList<Video> Videos { get; private set; } = Array.Empty<Video>();
 
         [BindProperty(SupportsGet = true)]

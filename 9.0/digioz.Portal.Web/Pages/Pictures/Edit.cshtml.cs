@@ -30,19 +30,20 @@ namespace digioz.Portal.Pages.Pictures
         }
 
         [BindProperty]
-        public Picture Item { get; set; }
+        public Picture? Item { get; set; }
+
+        // Hide PageModel.File intentionally (file download helper)
+        [BindProperty]
+        public new IFormFile? File { get; set; }
 
         [BindProperty]
-        public IFormFile File { get; set; }
-
-        [BindProperty]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [BindProperty]
         public int AlbumId { get; set; }
 
         public List<PictureAlbum> Albums { get; private set; } = new();
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
         public bool IsSuccess { get; set; }
         public bool IsOwner { get; set; }
 
@@ -92,7 +93,7 @@ namespace digioz.Portal.Pages.Pictures
             try
             {
                 // If a new file is provided, replace the old one
-                if (File != null && File.Length > 0)
+                if (File != null && File.Length > 0 && Item != null)
                 {
                     var ext = Path.GetExtension(File.FileName).ToLowerInvariant();
                     var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff" };
@@ -144,11 +145,14 @@ namespace digioz.Portal.Pages.Pictures
                     Item.Thumbnail = fileName;
                 }
 
-                Item.Description = Description;
-                Item.AlbumId = AlbumId;
-                Item.Timestamp = DateTime.UtcNow;
+                if (Item != null)
+                {
+                    Item.Description = Description ?? Item.Description;
+                    Item.AlbumId = AlbumId;
+                    Item.Timestamp = DateTime.UtcNow;
 
-                _pictureService.Update(Item);
+                    _pictureService.Update(Item);
+                }
 
                 StatusMessage = "Picture updated successfully.";
                 IsSuccess = true;

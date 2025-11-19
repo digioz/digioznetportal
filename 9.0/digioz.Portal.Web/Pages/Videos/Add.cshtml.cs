@@ -33,16 +33,16 @@ namespace digioz.Portal.Pages.Videos
         public int AlbumId { get; set; }
 
         [BindProperty]
-        public IFormFile ThumbnailFile { get; set; }
+        public IFormFile? ThumbnailFile { get; set; }
 
         [BindProperty]
-        public IFormFile VideoFile { get; set; }
+        public IFormFile? VideoFile { get; set; }
 
         [BindProperty]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public List<VideoAlbum> Albums { get; private set; } = new();
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
         public bool IsSuccess { get; set; }
 
         public void OnGet()
@@ -140,7 +140,7 @@ namespace digioz.Portal.Pages.Videos
                 {
                     Filename = videoFileName,
                     Thumbnail = thumbFileName,
-                    Description = Description ?? "",
+                    Description = Description ?? string.Empty,
                     AlbumId = AlbumId,
                     UserId = GetUserId(),
                     Visible = false,
@@ -154,9 +154,9 @@ namespace digioz.Portal.Pages.Videos
                 IsSuccess = true;
                 // Clear form
                 AlbumId = 0;
-                Description = "";
-                ThumbnailFile = null;
-                VideoFile = null;
+                Description = string.Empty;
+                ThumbnailFile = null; // okay nullable
+                VideoFile = null; // okay nullable
             }
             catch (Exception ex)
             {
@@ -167,7 +167,7 @@ namespace digioz.Portal.Pages.Videos
             return Page();
         }
 
-        private string GetUserId()
+        private string? GetUserId()
         {
             var email = User?.Identity?.Name;
             return !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;

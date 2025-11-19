@@ -20,10 +20,10 @@ namespace digioz.Portal.Pages.Pictures
             _userHelper = userHelper;
         }
 
-        public Picture Item { get; private set; }
-        public PictureAlbum Album { get; private set; }
+        public Picture? Item { get; private set; }
+        public PictureAlbum? Album { get; private set; }
         public bool IsOwner { get; private set; }
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
         public bool IsSuccess { get; set; }
 
         public IActionResult OnGet(int id)
