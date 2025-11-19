@@ -49,10 +49,9 @@ namespace digioz.Portal.Pages.SearchPages
                 }
 
                 var url = p.Url ?? string.Empty;
-                if (!string.IsNullOrWhiteSpace(url))
+                if (!string.IsNullOrWhiteSpace(url) && !url.StartsWith("/"))
                 {
-                    if (!url.StartsWith("/"))
-                        url = "/Page/" + url;
+                    url = "/Page/" + url;
                 }
 
                 return new SearchResultViewModel
