@@ -24,11 +24,13 @@
                         }
 
                         <div class="mb-4">
-                            <div class="border rounded p-3 bg-light text-center">
+                            <div class="border rounded p-3 bg-light text-center position-relative" style="overflow: hidden;" id="imageContainer" title="Click to zoom in">
                                 <img src="/img/Pictures/Full/@Model.Item.Filename" 
                                      alt="@Model.Item.Description" 
                                      class="img-fluid" 
-                                     style="max-width: 100%; max-height: 600px; object-fit: contain;" />
+                                     id="detailImage"
+                                     style="max-width: 100%; max-height: 600px; object-fit: contain; transition: transform 0.3s ease; cursor: zoom-in;" />
+                                <small class="text-muted d-block mt-2">Click image to zoom</small>
                             </div>
                         </div>
 
@@ -100,3 +102,104 @@
         </div>
     </div>
 </div>
+
+<!-- Full Size Image Modal -->
+<div class="modal fade" id="zoomModal" tabindex="-1" aria-labelledby="zoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content bg-dark">
+            <div class="modal-header bg-dark border-secondary">
+                <h5 class="modal-title text-light" id="zoomModalLabel">@Model.Item?.Description</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-dark p-0 d-flex align-items-center justify-content-center" id="zoomContainer" style="height: calc(100vh - 120px); overflow: auto;">
+                <img id="zoomImage" 
+                     src="/img/Pictures/Full/@Model.Item?.Filename" 
+                     alt="@Model.Item?.Description"
+                     style="max-width: 100%; height: auto; cursor: zoom-out;" 
+                     class="img-fluid clickable-image" />
+            </div>
+            <div class="modal-footer bg-dark border-secondary">
+                <small class="text-muted">Full size image | Click to close | Press Esc to close</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #detailImage {
+        cursor: zoom-in;
+    }
+
+    #detailImage:hover {
+        opacity: 0.9;
+    }
+
+    #zoomContainer {
+        background-color: #1a1a1a;
+    }
+
+    #zoomImage {
+        max-width: 100%;
+        height: auto;
+        width: 100%;
+        cursor: zoom-out;
+    }
+
+    #zoomImage:hover {
+        opacity: 0.95;
+    }
+
+    .clickable-image {
+        cursor: zoom-out !important;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageContainer = document.getElementById('imageContainer');
+        const detailImage = document.getElementById('detailImage');
+        const zoomModal = document.getElementById('zoomModal');
+        const zoomImage = document.getElementById('zoomImage');
+        const closeButton = document.querySelector('[data-bs-dismiss="modal"]');
+        
+        // Open modal on image click
+        if (imageContainer && zoomModal) {
+            imageContainer.addEventListener('click', function(e) {
+                e.preventDefault();
+                const modal = new bootstrap.Modal(zoomModal);
+                modal.show();
+            });
+        }
+        
+        // Close modal when clicking on the zoomed image
+        if (zoomImage && zoomModal) {
+            zoomImage.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const modal = bootstrap.Modal.getInstance(zoomModal);
+                if (modal) {
+                    modal.hide();
+                }
+            });
+        }
+        
+        // Clean up backdrop after modal closes
+        if (zoomModal) {
+            zoomModal.addEventListener('hidden.bs.modal', function() {
+                setTimeout(function() {
+                    // Remove all modal backdrops that might be lingering
+                    document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+                        backdrop.remove();
+                    });
+                    
+                    // Restore body overflow and remove modal-open class
+                    document.body.style.overflow = '';
+                    document.body.classList.remove('modal-open');
+                    
+                    // Remove padding added by Bootstrap for scrollbar compensation
+                    document.body.style.paddingRight = '';
+                }, 100);
+            });
+        }
+    });
+</script>
