@@ -72,6 +72,7 @@
 				@await Component.InvokeAsync("WhoIsOnlineMenu")
 				@await Component.InvokeAsync("StoreMenu")
 				
+				
 
 				@*  @Html.RenderAction("PollMenu", "Menu", new { area = "" })
 					@Html.RenderAction("TwitterMenu", "Menu", new { area = "" }) *@
@@ -83,8 +84,8 @@
 			<div class="col-md-9">
 
 				@await Component.InvokeAsync("ZoneMenu", new { location = "BodyTop" })
-				@* @RenderSection("LatestPictures", required: false)
-					@RenderSection("LatestVideos", required: false)
+				
+				@* 	@RenderSection("LatestVideos", required: false)
 					@RenderSection("RSSFeed", required: false) *@
 
 				<div class="card bg-light mb-5">
