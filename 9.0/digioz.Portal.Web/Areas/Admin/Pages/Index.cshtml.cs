@@ -60,74 +60,75 @@ namespace digioz.Portal.Web.Areas.Admin.Pages
                 }
 
                 // Create the plot
-                var plot = new Plot();
-
-                // Add bar plot
-                var bars = plot.Add.Bars(counts.ToArray());
-
-                // Set bar color and labels
-                foreach (var bar in bars.Bars)
+                using (var plot = new Plot())
                 {
-                    bar.FillColor = ScottPlot.Color.FromHex("#0d6efd"); // Bootstrap primary blue
-                    bar.Label = bar.Value.ToString("F0"); // Show value as label on each bar
+                    // Add bar plot
+                    var bars = plot.Add.Bars(counts.ToArray());
+
+                    // Set bar color and labels
+                    foreach (var bar in bars.Bars)
+                    {
+                        bar.FillColor = ScottPlot.Color.FromHex("#0d6efd"); // Bootstrap primary blue
+                        bar.Label = bar.Value.ToString("F0"); // Show value as label on each bar
+                    }
+
+                    // Customize value label style
+                    bars.ValueLabelStyle.Bold = true;
+                    bars.ValueLabelStyle.FontSize = 12;
+                    bars.ValueLabelStyle.ForeColor = ScottPlot.Color.FromHex("#212529");
+
+                    // Configure X-axis (Bottom) - dates under each bar
+                    plot.Axes.Bottom.TickGenerator = new ScottPlot.TickGenerators.NumericManual(
+                         dates.Select((d, i) => new Tick((double)i, d.ToString("MM/dd"))).ToArray()
+                     );
+                    plot.Axes.Bottom.MajorTickStyle.Length = 5;
+                    plot.Axes.Bottom.MajorTickStyle.Width = 1;
+                    plot.Axes.Bottom.MajorTickStyle.Color = ScottPlot.Color.FromHex("#212529");
+
+                    // X-axis styling - dark solid line
+                    plot.Axes.Bottom.FrameLineStyle.Color = ScottPlot.Color.FromHex("#212529");
+                    plot.Axes.Bottom.FrameLineStyle.Width = 2;
+
+                    // X-axis label - positioned below dates
+                    plot.Axes.Bottom.Label.Text = "Day";
+                    plot.Axes.Bottom.Label.Bold = true;
+                    plot.Axes.Bottom.Label.FontSize = 14;
+                    plot.Axes.Bottom.Label.ForeColor = ScottPlot.Color.FromHex("#212529");
+
+                    // X-axis tick labels styling
+                    plot.Axes.Bottom.TickLabelStyle.ForeColor = ScottPlot.Color.FromHex("#212529");
+                    plot.Axes.Bottom.TickLabelStyle.FontSize = 11;
+
+                    // Configure Y-axis (Left)
+                    plot.Axes.Left.MajorTickStyle.Length = 5;
+                    plot.Axes.Left.MajorTickStyle.Width = 1;
+                    plot.Axes.Left.MajorTickStyle.Color = ScottPlot.Color.FromHex("#212529");
+
+                    // Y-axis styling - dark solid line
+                    plot.Axes.Left.FrameLineStyle.Color = ScottPlot.Color.FromHex("#212529");
+                    plot.Axes.Left.FrameLineStyle.Width = 2;
+
+                    // Y-axis label - rotated sideways (to the left)
+                    plot.Axes.Left.Label.Text = "Unique Visitors Count";
+                    plot.Axes.Left.Label.Bold = true;
+                    plot.Axes.Left.Label.FontSize = 14;
+                    plot.Axes.Left.Label.ForeColor = ScottPlot.Color.FromHex("#212529");
+                    plot.Axes.Left.Label.Rotation = -90;
+
+                    // Y-axis tick labels styling
+                    plot.Axes.Left.TickLabelStyle.ForeColor = ScottPlot.Color.FromHex("#212529");
+                    plot.Axes.Left.TickLabelStyle.FontSize = 11;
+
+                    // Add title
+                    plot.Title("Visitor Tracking - Last 15 Days");
+
+                    // Add margins for labels
+                    plot.Axes.Margins(bottom: 0, top: 0.2);
+
+                    // Generate image and convert to base64
+                    var imageBytes = plot.GetImage(800, 400).GetImageBytes();
+                    return Convert.ToBase64String(imageBytes);
                 }
-
-                // Customize value label style
-                bars.ValueLabelStyle.Bold = true;
-                bars.ValueLabelStyle.FontSize = 12;
-                bars.ValueLabelStyle.ForeColor = ScottPlot.Color.FromHex("#212529");
-
-                // Configure X-axis (Bottom) - dates under each bar
-                plot.Axes.Bottom.TickGenerator = new ScottPlot.TickGenerators.NumericManual(
-                     dates.Select((d, i) => new Tick((double)i, d.ToString("MM/dd"))).ToArray()
-                 );
-                plot.Axes.Bottom.MajorTickStyle.Length = 5;
-                plot.Axes.Bottom.MajorTickStyle.Width = 1;
-                plot.Axes.Bottom.MajorTickStyle.Color = ScottPlot.Color.FromHex("#212529");
-
-                // X-axis styling - dark solid line
-                plot.Axes.Bottom.FrameLineStyle.Color = ScottPlot.Color.FromHex("#212529");
-                plot.Axes.Bottom.FrameLineStyle.Width = 2;
-
-                // X-axis label - positioned below dates
-                plot.Axes.Bottom.Label.Text = "Day";
-                plot.Axes.Bottom.Label.Bold = true;
-                plot.Axes.Bottom.Label.FontSize = 14;
-                plot.Axes.Bottom.Label.ForeColor = ScottPlot.Color.FromHex("#212529");
-
-                // X-axis tick labels styling
-                plot.Axes.Bottom.TickLabelStyle.ForeColor = ScottPlot.Color.FromHex("#212529");
-                plot.Axes.Bottom.TickLabelStyle.FontSize = 11;
-
-                // Configure Y-axis (Left)
-                plot.Axes.Left.MajorTickStyle.Length = 5;
-                plot.Axes.Left.MajorTickStyle.Width = 1;
-                plot.Axes.Left.MajorTickStyle.Color = ScottPlot.Color.FromHex("#212529");
-
-                // Y-axis styling - dark solid line
-                plot.Axes.Left.FrameLineStyle.Color = ScottPlot.Color.FromHex("#212529");
-                plot.Axes.Left.FrameLineStyle.Width = 2;
-
-                // Y-axis label - rotated sideways (to the left)
-                plot.Axes.Left.Label.Text = "Unique Visitors Count";
-                plot.Axes.Left.Label.Bold = true;
-                plot.Axes.Left.Label.FontSize = 14;
-                plot.Axes.Left.Label.ForeColor = ScottPlot.Color.FromHex("#212529");
-                plot.Axes.Left.Label.Rotation = -90;
-
-                // Y-axis tick labels styling
-                plot.Axes.Left.TickLabelStyle.ForeColor = ScottPlot.Color.FromHex("#212529");
-                plot.Axes.Left.TickLabelStyle.FontSize = 11;
-
-                // Add title
-                plot.Title("Visitor Tracking - Last 15 Days");
-
-                // Add margins for labels
-                plot.Axes.Margins(bottom: 0, top: 0.2);
-
-                // Generate image and convert to base64
-                var imageBytes = plot.GetImage(800, 400).GetImageBytes();
-                return Convert.ToBase64String(imageBytes);
             }
             catch (Exception)
             {
