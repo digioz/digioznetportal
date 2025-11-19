@@ -20,7 +20,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages
 
         public IReadOnlyList<digioz.Portal.Bo.Log> LatestLogs { get; private set; } = Array.Empty<digioz.Portal.Bo.Log>();
         public IReadOnlyList<digioz.Portal.Bo.VisitorInfo> LatestVisitorLogs { get; private set; } = Array.Empty<digioz.Portal.Bo.VisitorInfo>();
-        public string VisitorChartBase64 { get; private set; }
+        public string VisitorChartBase64 { get; private set; } = string.Empty;
 
         public void OnGet()
         {

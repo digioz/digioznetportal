@@ -22,12 +22,12 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Zone
         {
             public int Id { get; set; }
             [Required]
-            public string Name { get; set; }
+            public string Name { get; set; } = string.Empty;
             [Required]
             [Display(Name = "Location")]
-            public string Location { get; set; }
+            public string Location { get; set; } = string.Empty;
             [Display(Name = "Content")]
-            public string Body { get; set; }
+            public string Body { get; set; } = string.Empty;
             public bool Visible { get; set; }
         }
 
