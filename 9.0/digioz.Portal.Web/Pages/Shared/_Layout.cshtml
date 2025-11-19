@@ -12,7 +12,7 @@
     if (!MemoryCache.TryGetValue(cacheKeyConfigDictionary, out configDictionary) || configDictionary == null)
     {
         var config = ConfigService.GetAll();
-    configDictionary = config.ToDictionary(c => c.ConfigKey, c => c.ConfigValue);
+        configDictionary = config.ToDictionary(c => c.ConfigKey, c => c.ConfigValue);
         MemoryCache.Set(cacheKeyConfigDictionary, configDictionary, cacheEntryOptions);
     }
 }
@@ -44,19 +44,21 @@
 	</div>
 
 	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-        <a class="navbar-brand" href="#">@(configDictionary?["SiteName"] ?? "Portal")</a>
-		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-		<div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="container px-3">
+            <a class="navbar-brand" href="/">@(configDictionary?["SiteName"] ?? "Portal")</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarCollapse">
 
-            @await Component.InvokeAsync("TopMenu")
+                @await Component.InvokeAsync("TopMenu")
 
-			<form class="d-flex mt-2 mt-md-0" action="/SearchPages">
-				<input class="form-control me-2" type="text" placeholder="Search" aria-label="Search" name="searchString">
-				<button class="btn btn-primary my-2 my-md-0" type="submit">Search</button>
-			</form>
-		</div>
+				<form class="d-flex mt-2 mt-md-0" action="/SearchPages">
+					<input class="form-control me-2" type="text" placeholder="Search" aria-label="Search" name="searchString">
+					<button class="btn btn-primary my-2 my-md-0" type="submit">Search</button>
+				</form>
+			</div>
+        </div>
 	</nav>
 
 	<div class="container body-content">
@@ -81,7 +83,7 @@
 			<div class="col-md-9">
 
 				@await Component.InvokeAsync("ZoneMenu", new { location = "BodyTop" })
-				@*	@RenderSection("LatestPictures", required: false)
+				@* @RenderSection("LatestPictures", required: false)
 					@RenderSection("LatestVideos", required: false)
 					@RenderSection("RSSFeed", required: false) *@
 
