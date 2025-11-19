@@ -55,7 +55,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages
                     dates.Add(currentDate);
 
                     // Get count from dictionary or default to 0 if date not present
-                    var count = visitorCounts.ContainsKey(currentDate) ? visitorCounts[currentDate] : 0;
+                    visitorCounts.TryGetValue(currentDate, out var count);
                     counts.Add(count);
                 }
 
