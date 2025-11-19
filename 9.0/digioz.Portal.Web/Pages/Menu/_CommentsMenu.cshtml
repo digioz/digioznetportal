@@ -1,6 +1,0 @@
-@model digioz.Portal.Bo.ViewModels.CommentsMenuViewModel
-
-@if (Model != null && Model.CommentsEnabled == true)
-{
-    @await Component.InvokeAsync("CommentList", new { referenceId = Model.ReferenceId, referenceType = Model.ReferenceType })
-}

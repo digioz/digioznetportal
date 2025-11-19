@@ -13,12 +13,14 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
     {
         private readonly ICommentService _commentService;
         private readonly IConfigService _configService;
+        private readonly IProfileService _profileService; // added for avatar lookup
         private readonly IMemoryCache _cache; // still used for Recaptcha only
 
-        public CommentsMenuViewComponent(ICommentService commentService, IConfigService configService, IMemoryCache cache)
+        public CommentsMenuViewComponent(ICommentService commentService, IConfigService configService, IProfileService profileService, IMemoryCache cache)
         {
             _commentService = commentService;
             _configService = configService;
+            _profileService = profileService;
             _cache = cache;
         }
 
@@ -46,6 +48,18 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
 
             // Use repository-level filtering instead of loading all comments into memory
             List<Comment> comments = _commentService.GetByReferenceType(pagePath);
+
+            // Build avatar map (userId -> avatar filename) for performance (avoid calling controller for each)
+            var avatarMap = new Dictionary<string, string>();
+            foreach (var uid in comments.Select(c => c.UserId).Where(id => !string.IsNullOrWhiteSpace(id)).Distinct())
+            {
+                var profile = _profileService.GetByUserId(uid!);
+                if (profile != null && !string.IsNullOrWhiteSpace(profile.Avatar))
+                {
+                    avatarMap[uid!] = profile.Avatar.Trim();
+                }
+            }
+            ViewBag.AvatarMap = avatarMap; // consumed by view
 
             return Task.FromResult<IViewComponentResult>(View(comments));
         }

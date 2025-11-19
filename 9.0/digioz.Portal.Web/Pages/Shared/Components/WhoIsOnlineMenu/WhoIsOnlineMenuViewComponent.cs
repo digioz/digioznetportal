@@ -1,8 +1,11 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using digioz.Portal.Dal.Services.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using System.Linq;
+using System.Collections.Generic;
+using digioz.Portal.Bo;
 using digioz.Portal.Bo.ViewModels;
 
 namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
@@ -11,15 +14,18 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
     {
         private readonly IPluginService _pluginService;
         private readonly IVisitorSessionService _visitorSessionService;
+        private readonly IProfileService _profileService;
         private readonly IMemoryCache _cache;
         private const string CacheKey = "WhoIsOnlineMenu";
 
         public WhoIsOnlineMenuViewComponent(IPluginService pluginService, 
-                                            IVisitorSessionService visitorSessionService, 
+                                            IVisitorSessionService visitorSessionService,
+                                            IProfileService profileService,
                                             IMemoryCache cache)
         {
             _pluginService = pluginService;
             _visitorSessionService = visitorSessionService;
+            _profileService = profileService;
             _cache = cache;
         }
 
@@ -34,8 +40,30 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
                 var visitorRegistered = latestVisitors.Where(x => x.Username != null).ToList();
                 visitorRegistered = visitorRegistered.DistinctBy(x => x.Username).ToList();
 
+                // Load profile DisplayName for each visitor and create a new list with enriched data
+                var enrichedVisitors = new List<VisitorSession>();
+                foreach (var visitor in visitorRegistered)
+                {
+                    // Load the profile by email (VisitorSession.Username contains the email)
+                    var profile = _profileService.GetByEmail(visitor.Username);
+                    
+                    // Create a new VisitorSession object with the Profile data
+                    var enrichedVisitor = new VisitorSession
+                    {
+                        Id = visitor.Id,
+                        IpAddress = visitor.IpAddress,
+                        PageUrl = visitor.PageUrl,
+                        SessionId = visitor.SessionId,
+                        Username = visitor.Username,
+                        DateCreated = visitor.DateCreated,
+                        DateModified = visitor.DateModified,
+                        Profile = profile  // Assign the loaded profile
+                    };
+                    enrichedVisitors.Add(enrichedVisitor);
+                }
+
                 whoisOnline.VisitorCount = latestVisitors.Count;
-                whoisOnline.RegisteredVisitors = visitorRegistered;
+                whoisOnline.RegisteredVisitors = enrichedVisitors;
 
                 whoisOnline.WhoIsOnlineEnabled = configWhoIsOnline != null && configWhoIsOnline.IsEnabled;
 

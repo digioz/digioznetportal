@@ -21,6 +21,7 @@
 
 @await Component.InvokeAsync("SlideShow")
 
+
 @{
     if (Model.PageContent != null)
     {
@@ -32,3 +33,6 @@
         @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent?.Id.ToString() })
     }
 }
+
+@await Component.InvokeAsync("LatestPictures")
+@await Component.InvokeAsync("LatestVideos")

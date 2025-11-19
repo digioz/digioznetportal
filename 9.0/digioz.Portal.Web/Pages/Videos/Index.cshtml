@@ -1,3 +1,81 @@
 @page
 @model IndexModel
-<h2>Videos Index</h2>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+
+@{
+    ViewData["Title"] = "Video Albums";
+}
+
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Video Albums</h1>
+        </div>
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            <div class="col-md-4 text-end">
+                <a asp-page="Add" class="btn btn-primary">Add Video</a>
+            </div>
+        }
+    </div>
+
+    @if (Model.Albums.Any())
+    {
+        <div class="row">
+            @foreach (var album in Model.Albums)
+            {
+                var latestVideo = Model.LatestVideoByAlbum.ContainsKey(album.Id) 
+                    ? Model.LatestVideoByAlbum[album.Id] 
+                    : null;
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        @if (latestVideo != null && !string.IsNullOrEmpty(latestVideo.Thumbnail))
+                        {
+                            <a href="/Videos/Album?id=@album.Id" class="text-decoration-none">
+                                <img src="/img/Videos/Thumb/@latestVideo.Thumbnail" 
+                                     alt="@album.Name" 
+                                     class="card-img-top" 
+                                     style="height: 250px; object-fit: cover;" />
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <span class="text-muted">No videos</span>
+                            </div>
+                        }
+                        <div class="card-body">
+                            <h5 class="card-title">@album.Name</h5>
+                            <p class="card-text text-muted small">@album.Description</p>
+                            <a href="/Videos/Album?id=@album.Id" class="btn btn-sm btn-outline-primary">View Album</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <paging total-records="@Model.TotalCount"
+                        page-no="@Model.PageNumber"
+                        page-size="@Model.PageSize"
+                        show-prev-next="true"
+                        show-first-last="true"
+                        query-string-key-page-no="pageNumber"
+                        class="pagination mb-0"></paging>
+            </ul>
+        </nav>
+
+        <div class="text-center text-muted small mt-2">
+            Page @Model.PageNumber of @Model.TotalPages (@Model.TotalCount total albums)
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <p>No video albums found.</p>
+        </div>
+    }
+</div>

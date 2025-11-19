@@ -19,6 +19,16 @@ namespace digioz.Portal.Dal.Services
             return _context.Profiles.Find(id);
         }
 
+        public Profile GetByUserId(string userId)
+        {
+            return _context.Profiles.FirstOrDefault(p => p.UserId == userId);
+        }
+
+        public Profile GetByEmail(string email)
+        {
+            return _context.Profiles.FirstOrDefault(p => p.Email == email);
+        }
+
         public List<Profile> GetAll()
         {
             return _context.Profiles.ToList();

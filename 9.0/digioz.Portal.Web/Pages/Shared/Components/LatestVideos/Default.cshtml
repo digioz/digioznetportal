@@ -1,0 +1,27 @@
+@using digioz.Portal.Dal.Services.Interfaces
+@inject IPluginService PluginService
+@model List<digioz.Portal.Bo.Video>
+@{
+    bool pluginEnabled = PluginService.GetAll().Any(p => p.Name == "LatestVideos" && p.IsEnabled);
+}
+@if (pluginEnabled && Model != null && Model.Any())
+{
+    <div class="card mb-3 shadow-sm">
+        <div class="card-header py-1 fw-semibold">Latest Videos</div>
+        <div class="card-body p-2">
+            <div class="row g-2">
+                @foreach (var vid in Model)
+                {
+                    <div class="col-6 col-md-4 text-center">
+                        <a href="/Videos/Details/@vid.Id" class="d-inline-block" title="@vid.Description">
+                            <img src="/img/Videos/Thumb/@vid.Thumbnail" alt="@vid.Description" class="rounded d-block mx-auto" style="width:200px;height:200px;object-fit:cover;max-width:100%;" />
+                        </a>
+                    </div>
+                }
+            </div>
+            <div class="mt-3 text-center">
+                <a href="/Videos/List" class="btn btn-sm btn-outline-primary">View All Videos</a>
+            </div>
+        </div>
+    </div>
+}

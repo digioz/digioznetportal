@@ -1,3 +1,157 @@
 @page
 @model AddModel
-<h2>Add Picture</h2>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Add Pictures";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4">Add Pictures</h1>
+
+            @if (!string.IsNullOrEmpty(Model.StatusMessage))
+            {
+                <div class="alert alert-@(Model.IsSuccess ? "success" : "danger") alert-dismissible fade show" role="alert">
+                    @Model.StatusMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <form method="post" enctype="multipart/form-data" id="uploadForm" class="needs-validation">
+                <div class="mb-3">
+                    <label for="AlbumId" class="form-label">Select Album *</label>
+                    <select id="AlbumId" name="AlbumId" class="form-select" required>
+                        <option value="">-- Select an Album --</option>
+                        @foreach (var album in Model.Albums)
+                        {
+                            <option value="@album.Id">@album.Name</option>
+                        }
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select an album.
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Upload Images *</label>
+                    <div id="dropZone" class="border border-2 border-dashed rounded p-5 text-center" style="min-height: 200px; background-color: #f8f9fa; cursor: pointer;">
+                        <div id="dropText">
+                            <i class="bi bi-cloud-arrow-up" style="font-size: 2rem; color: #0d6efd;"></i>
+                            <p class="mt-2 mb-1"><strong>Drag and drop images here</strong></p>
+                            <p class="text-muted small">or click to select files</p>
+                            <p class="text-muted small">Supported formats: JPG, PNG, GIF, BMP, TIF, TIFF</p>
+                        </div>
+                        <div id="fileList" style="display: none;">
+                            <ul id="fileItems" class="list-unstyled"></ul>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" name="Files" multiple accept="image/*" style="display: none;" />
+                </div>
+
+                <div id="descriptionContainer" style="display: none;" class="mb-4">
+                    <label class="form-label">Add Descriptions (Optional)</label>
+                    <div id="descriptions"></div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>Upload Pictures</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const descriptionContainer = document.getElementById('descriptionContainer');
+    const descriptions = document.getElementById('descriptions');
+    const fileList = document.getElementById('fileList');
+    const fileItems = document.getElementById('fileItems');
+    const dropText = document.getElementById('dropText');
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('uploadForm');
+    let selectedFiles = [];
+
+    // Drag and drop handlers
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.backgroundColor = '#e7f3ff';
+        dropZone.style.borderColor = '#0d6efd';
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.style.backgroundColor = '#f8f9fa';
+        dropZone.style.borderColor = '#dee2e6';
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.backgroundColor = '#f8f9fa';
+        dropZone.style.borderColor = '#dee2e6';
+        handleFiles(e.dataTransfer.files);
+    });
+
+    // Click to select
+    dropZone.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+        selectedFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+        
+        if (selectedFiles.length === 0) {
+            alert('Please select image files only');
+            return;
+        }
+
+        fileItems.innerHTML = '';
+        descriptions.innerHTML = '';
+        selectedFiles.forEach((file, index) => {
+            const li = document.createElement('li');
+            li.className = 'mb-2';
+            li.innerHTML = `<span class="badge bg-primary">${file.name}</span>`;
+            fileItems.appendChild(li);
+
+            const descDiv = document.createElement('div');
+            descDiv.className = 'mb-3';
+            descDiv.innerHTML = `
+                <label class="form-label">Description for ${file.name}</label>
+                <textarea name="Descriptions" class="form-control" rows="2" placeholder="Enter description for this picture"></textarea>
+            `;
+            descriptions.appendChild(descDiv);
+        });
+
+        dropText.style.display = 'none';
+        fileList.style.display = 'block';
+        descriptionContainer.style.display = 'block';
+        submitBtn.disabled = false;
+    }
+
+    // Validate form on submit
+    form.addEventListener('submit', (e) => {
+        const albumId = document.getElementById('AlbumId').value;
+        if (!albumId || selectedFiles.length === 0) {
+            e.preventDefault();
+            alert('Please select an album and upload images');
+            return false;
+        }
+
+        // Populate the hidden file input
+        const dataTransfer = new DataTransfer();
+        selectedFiles.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+    });
+</script>
+
+<style>
+    #dropZone {
+        transition: all 0.3s ease;
+    }
+</style>
