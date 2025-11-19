@@ -1,4 +1,8 @@
 ﻿@model IEnumerable<digioz.Portal.Bo.Comment>
+@{
+    // Avatar map supplied by ViewComponent: Dictionary<string,string> userId -> avatar filename
+    var avatarMap = ViewBag.AvatarMap as IDictionary<string,string> ?? new Dictionary<string,string>();
+}
 
 <div class="card mb-3" id="comments-root">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -24,6 +28,7 @@
             <ul class="list-group list-group-flush">
                 @foreach (var comment in Model)
                 {
+                    var avatarFile = (comment.UserId != null && avatarMap.TryGetValue(comment.UserId, out var f) && !string.IsNullOrWhiteSpace(f)) ? f : "default.png";
                     <li class="list-group-item">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="d-flex align-items-start">
@@ -31,12 +36,12 @@
                                     @if (comment.UserId != null)
                                     {
                                         <a href="/Profile/ShowDetails?userId=@comment.UserId">
-                                            <img src="/Profile/ShowAvatar?userId=@comment.UserId" class="rounded-circle" width="40" height="40" alt="@comment.Username" />
+                                            <img src="/img/avatar/thumb/@avatarFile" class="rounded-circle" width="40" height="40" alt="@comment.Username" />
                                         </a>
                                     }
                                     else
                                     {
-                                        <img src="/Profile/ShowAvatar" class="rounded-circle" width="40" height="40" alt="avatar" />
+                                        <img src="/img/avatar/thumb/default.png" class="rounded-circle" width="40" height="40" alt="avatar" />
                                     }
                                 </div>
                                 <div>
