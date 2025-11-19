@@ -17,20 +17,28 @@ namespace digioz.Portal.Web.Pages.Shared.Components.StoreMenu
         private readonly IProductCategoryService _productCategoryService = productCategoryService;
         private readonly IPluginService _pluginService = pluginService;
         private readonly IMemoryCache _cache = cache;
-        private const string CacheKey = "StoreMenu";
+        private const string CategoriesCacheKey = "StoreMenu.Categories";
 
         public Task<IViewComponentResult> InvokeAsync()
         {
-            if (!_cache.TryGetValue(CacheKey, out digioz.Portal.Bo.ViewModels.StoreMenuViewModel? storeMenu) || storeMenu == null)
-            {
-                storeMenu = new digioz.Portal.Bo.ViewModels.StoreMenuViewModel
-                {
-                    ProductCategories = _productCategoryService.GetAll().ToList(),
-                    IsEnabled = _pluginService.GetAll().Any(x => x.Name == "Store" && x.IsEnabled)
-                };
+            // Always compute plugin enabled state fresh to reflect toggles immediately
+            bool isEnabled = _pluginService
+                .GetAll()
+                .Any(x => string.Equals(x.Name, "Store", StringComparison.OrdinalIgnoreCase) && x.IsEnabled);
 
-                _cache.Set(CacheKey, storeMenu, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(15) });
+            // Cache only the categories (low churn, independent of plugin toggle)
+            if (!_cache.TryGetValue(CategoriesCacheKey, out List<digioz.Portal.Bo.ProductCategory>? categories) || categories == null)
+            {
+                categories = _productCategoryService.GetAll().ToList();
+                _cache.Set(CategoriesCacheKey, categories, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(15) });
             }
+
+            var storeMenu = new digioz.Portal.Bo.ViewModels.StoreMenuViewModel
+            {
+                ProductCategories = categories,
+                IsEnabled = isEnabled
+            };
+
             return Task.FromResult<IViewComponentResult>(View(storeMenu));
         }
     }
