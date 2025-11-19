@@ -1,3 +1,75 @@
 @page
 @model ListModel
-<h2>Pictures List</h2>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+
+@{
+    ViewData["Title"] = "Pictures";
+}
+
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Pictures</h1>
+        </div>
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            <div class="col-md-4 text-end">
+                <a asp-page="Add" class="btn btn-primary">Add Pictures</a>
+            </div>
+        }
+    </div>
+
+    @if (Model.Pictures.Any())
+    {
+        <div class="row">
+            @foreach (var picture in Model.Pictures)
+            {
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <a asp-page="Details" asp-route-id="@picture.Id" class="text-decoration-none">
+                            <img src="/img/Pictures/Thumb/@picture.Thumbnail" 
+                                 alt="@picture.Description" 
+                                 class="card-img-top" 
+                                 style="height: 250px; object-fit: cover;" />
+                        </a>
+                        <div class="card-body">
+                            <p class="card-text small text-muted">@picture.Description</p>
+                            <small class="text-muted d-block">
+                                Album: @(Model.AlbumNames.TryGetValue(picture.AlbumId, out var name) ? name : "-")
+                            </small>
+                            <small class="text-muted d-block">
+                                @picture.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                            </small>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a asp-page="Details" asp-route-id="@picture.Id" class="btn btn-sm btn-outline-primary w-100">View</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <paging total-records="@Model.TotalCount"
+                        page-no="@Model.PageNumber"
+                        page-size="@Model.PageSize"
+                        show-prev-next="true"
+                        show-first-last="true"
+                        query-string-key-page-no="pageNumber"
+                        class="pagination mb-0"></paging>
+            </ul>
+        </nav>
+
+        <div class="text-center text-muted small mt-2">
+            Page @Model.PageNumber of @Model.TotalPages (@Model.TotalCount total pictures)
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <p>No pictures found.</p>
+        </div>
+    }
+</div>
