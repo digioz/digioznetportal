@@ -57,7 +57,7 @@ namespace digioz.Portal.Pages.Pictures
             var userId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
             
             IsOwner = Item.UserId == userId;
-            if (!IsOwner && !User?.IsInRole("Admin") == true)
+            if (!IsOwner && !(User?.IsInRole("Admin") == true))
                 return Forbid();
 
             Albums = _albumService.GetAll().OrderBy(a => a.Name).ToList();
