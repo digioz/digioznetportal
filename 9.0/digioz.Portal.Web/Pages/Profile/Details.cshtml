@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = Model.DisplayName + " Profile";
     var avatar = (Model.UserProfile == null || string.IsNullOrEmpty(Model.UserProfile.Avatar)) ? "default.png" : Model.UserProfile.Avatar;
+    var encodedDisplayName = System.Net.WebUtility.UrlEncode(Model.DisplayName ?? string.Empty);
 }
 <style>
     .comments-table td, .comments-table th { vertical-align: top; }
@@ -102,7 +103,7 @@ else
             }
         </div>
         <div class="text-center mb-4">
-            <a class="btn btn-sm btn-secondary" href="/Profile/Pictures?userId=@Model.DisplayName">View All Pictures</a>
+            <a class="btn btn-sm btn-secondary" href="/Profile/Pictures?userId=@encodedDisplayName">View All Pictures</a>
         </div>
     }
 
@@ -124,7 +125,7 @@ else
             }
         </div>
         <div class="text-center mb-4">
-            <a class="btn btn-sm btn-secondary" href="/Profile/Videos?userId=@Model.DisplayName">View All Videos</a>
+            <a class="btn btn-sm btn-secondary" href="/Profile/Videos?userId=@encodedDisplayName">View All Videos</a>
         </div>
     }
 }

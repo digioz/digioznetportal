@@ -4,6 +4,7 @@
 @addTagHelper *, LazZiya.TagHelpers
 @{
     ViewData["Title"] = (Model.DisplayName ?? "User") + " Pictures";
+    var encodedDisplayName = System.Net.WebUtility.UrlEncode(Model.DisplayName ?? string.Empty);
 }
 
 <div class="container my-5">
@@ -13,7 +14,7 @@
             <p class="text-muted">Latest pictures uploaded by @Model.DisplayName.</p>
         </div>
         <div class="col-md-4 text-end">
-            <a href="/Profile/Details?userId=@Model.DisplayName" class="btn btn-secondary">Back to Profile</a>
+            <a href="/Profile/Details?userId=@encodedDisplayName" class="btn btn-secondary">Back to Profile</a>
         </div>
     </div>
 

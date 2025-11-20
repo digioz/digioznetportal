@@ -3,6 +3,7 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     ViewData["Title"] = "Edit Profile";
+    var encodedDisplayName = System.Net.WebUtility.UrlEncode(Model.Input.DisplayName ?? string.Empty);
 }
 
 <h1>Edit Profile</h1>
@@ -85,7 +86,7 @@
     </div>
     <div class="mt-4">
         <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a class="btn btn-secondary" href="/Profile/Details?userid=@Model.Input.DisplayName">Cancel</a>
+        <a class="btn btn-secondary" href="/Profile/Details?userid=@encodedDisplayName">Cancel</a>
     </div>
 </form>
 

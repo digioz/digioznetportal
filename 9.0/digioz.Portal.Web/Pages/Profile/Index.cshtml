@@ -3,6 +3,7 @@
 @addTagHelper *, LazZiya.TagHelpers
 @{
     ViewData["Title"] = "User Profiles";
+    var encodedSearch = System.Net.WebUtility.UrlEncode(Model.SearchTerm ?? string.Empty);
 }
 
 <h1>User Profiles</h1>
@@ -42,7 +43,7 @@ else
             @foreach (var p in Model.Profiles)
             {
                 var avatar = string.IsNullOrEmpty(p.Avatar) ? "default.png" : p.Avatar;
-                var userId = Uri.EscapeDataString(p.DisplayName ?? string.Empty);
+                var userId = System.Net.WebUtility.UrlEncode(p.DisplayName ?? string.Empty);
                 <tr>
                     <td>
                         <a href="/Profile/Details?userid=@userId" title="View @p.DisplayName's profile">
@@ -59,7 +60,7 @@ else
                     <td>@p.Country</td>
                     <td>
                         <a class="btn btn-sm btn-primary" title="Send Private Message"
-                           href="/PrivateMessages/Index?id=@p.DisplayName">
+                           href="/PrivateMessages/Index?id=@System.Net.WebUtility.UrlEncode(p.DisplayName ?? string.Empty)">
                             <i class="fas fa-envelope"></i> PM
                         </a>
                     </td>
@@ -73,7 +74,7 @@ else
         <paging total-records="@Model.TotalRecords"
                 page-no="@Model.PageIndex"
                 page-size="@Model.PageSize"
-                url="/Profile/Index?page={0}&search=@Model.SearchTerm"
+                url="/Profile/Index?page={0}&search=@encodedSearch"
                 class="pagination"
                 show-first-last="true"
                 show-prev-next="true"
