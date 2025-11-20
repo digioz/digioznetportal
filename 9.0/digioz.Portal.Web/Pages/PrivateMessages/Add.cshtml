@@ -5,17 +5,10 @@
 }
 <h1>Compose Message</h1>
 <form method="post">
-    <div class="mb-3">
+    <div class="mb-3 autocomplete-container">
         <label asp-for="Input.ToDisplayName" class="form-label">To (Profile Display Name)</label>
-        <input id="toUser" asp-for="Input.ToDisplayName" class="form-control" list="usersList" autocomplete="off" />
-        <datalist id="usersList">
-            @foreach (var u in Model.Users)
-            {
-                <option value="@u.DisplayName">@u.DisplayName</option>
-            }
-        </datalist>
+        <input id="toUser" asp-for="Input.ToDisplayName" class="form-control" autocomplete="off" />
         <span asp-validation-for="Input.ToDisplayName" class="text-danger"></span>
-        <small class="text-muted">Type the profile display name exactly.</small>
     </div>
     <div class="mb-3">
         <label asp-for="Input.Subject" class="form-label"></label>
@@ -29,4 +22,9 @@
     </div>
     <button type="submit" class="btn btn-primary">Send</button>
 </form>
-@section Scripts {<partial name="_ValidationScriptsPartial" />}
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        autocomplete(document.getElementById("toUser"));
+    </script>
+}

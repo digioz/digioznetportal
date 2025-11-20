@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,8 +25,6 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
 
         public class UserLite { public string Id { get; set; } public string DisplayName { get; set; } }
 
-        public List<UserLite> Users { get; set; } = new();
-
         [BindProperty]
         public InputModel Input { get; set; } = new();
 
@@ -45,31 +41,25 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
 
         public void OnGet()
         {
-            // Pull DisplayName from Profiles
-            Users = _profileService.GetAll()
-                .Where(p => !string.IsNullOrWhiteSpace(p.DisplayName))
-                .Select(p => new UserLite { Id = p.UserId, DisplayName = p.DisplayName })
-                .ToList();
         }
 
         public IActionResult OnPost()
         {
-            Users = _profileService.GetAll()
-                .Where(p => !string.IsNullOrWhiteSpace(p.DisplayName))
-                .Select(p => new UserLite { Id = p.UserId, DisplayName = p.DisplayName })
-                .ToList();
-
             var typed = (Input.ToDisplayName ?? string.Empty).Trim();
             if (!string.IsNullOrEmpty(typed))
             {
+                var users = _profileService.GetAll()
+                    .Where(p => !string.IsNullOrWhiteSpace(p.DisplayName))
+                    .Select(p => new UserLite { Id = p.UserId, DisplayName = p.DisplayName })
+                    .ToList();
+
                 // First try exact (case-insensitive), then partial contains
-                var exact = Users.Where(u => string.Equals(u.DisplayName, typed, StringComparison.OrdinalIgnoreCase)).ToList();
-                List<UserLite> matches = exact.Count > 0 ? exact : Users.Where(u => u.DisplayName != null && u.DisplayName.Contains(typed, StringComparison.OrdinalIgnoreCase)).ToList();
-                if (matches.Count == 1)
+                var exact = users.Where(u => string.Equals(u.DisplayName, typed, StringComparison.OrdinalIgnoreCase)).ToList();
+                if (exact.Count == 1)
                 {
-                    Input.ToId = matches[0].Id;
+                    Input.ToId = exact[0].Id;
                 }
-                else if (matches.Count > 1)
+                else if (exact.Count > 1)
                 {
                     ModelState.AddModelError(nameof(Input.ToDisplayName), $"Multiple users match '{typed}'. Please refine.");
                 }
