@@ -60,10 +60,11 @@ namespace digioz.Portal.Pages.Profile
             IsOwner = loggedInUserId != null && loggedInUserId == UserProfile.UserId;
             IsAdmin = User?.IsInRole("Admin") == true;
 
-            var allPictures = _pictureService.GetAll()
-                .Where(p => p.UserId == UserProfile.UserId && ((p.Visible && p.Approved) || IsOwner || IsAdmin))
-                .OrderByDescending(p => p.Timestamp)
-                .ToList();
+            // Use service-level filtering for efficiency
+            var allPictures = _pictureService.GetByUserIdWithVisibility(
+                UserProfile.UserId,
+                includeUnapproved: IsOwner || IsAdmin
+            ).OrderByDescending(p => p.Timestamp).ToList();
 
             TotalCount = allPictures.Count;
             if (PageNumber < 1) PageNumber = 1;
