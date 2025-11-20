@@ -63,7 +63,6 @@ namespace digioz.Portal.Web.Data.Migrations
                     table.PrimaryKey("PK_Comment", x => x.Id);
                 });
 
-
             migrationBuilder.CreateTable(
                 name: "CommentConfig",
                 columns: table => new
@@ -410,7 +409,6 @@ namespace digioz.Portal.Web.Data.Migrations
                     table.PrimaryKey("PK_Plugin", x => x.Id);
                 });
 
-
             migrationBuilder.CreateTable(
                 name: "Poll",
                 columns: table => new
@@ -467,6 +465,35 @@ namespace digioz.Portal.Web.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PollVote", x => x.Id);
+                });
+
+
+
+            migrationBuilder.CreateTable(
+                name: "PrivateMessage",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ParentId = table.Column<int>(nullable: true),
+                    FromId = table.Column<string>(maxLength: 128, nullable: false),
+                    FromIp = table.Column<string>(maxLength: 64, nullable: false),
+                    ToId = table.Column<string>(maxLength: 128, nullable: false),
+                    SentDate = table.Column<DateTime>(nullable: true),
+                    Subject = table.Column<string>(maxLength: 255, nullable: true),
+                    Message = table.Column<string>(nullable: true),
+                    IsRead = table.Column<bool>(nullable: false),
+                    Reported = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PrivateMessage", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PrivateMessage_Parent",
+                        column: x => x.ParentId,
+                        principalTable: "PrivateMessage",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -744,6 +771,7 @@ namespace digioz.Portal.Web.Data.Migrations
             migrationBuilder.DropTable(name: "PollAnswer");
             migrationBuilder.DropTable(name: "PollUsersVote");
             migrationBuilder.DropTable(name: "PollVote");
+            migrationBuilder.DropTable(name: "PrivateMessage");
             migrationBuilder.DropTable(name: "Product");
             migrationBuilder.DropTable(name: "ProductCategory");
             migrationBuilder.DropTable(name: "ProductOption");
@@ -756,7 +784,6 @@ namespace digioz.Portal.Web.Data.Migrations
             migrationBuilder.DropTable(name: "VisitorInfo");
             migrationBuilder.DropTable(name: "VisitorSession");
             migrationBuilder.DropTable(name: "Zone");
-
         }
     }
 }

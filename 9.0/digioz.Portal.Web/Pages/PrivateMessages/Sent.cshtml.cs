@@ -1,53 +1,50 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Dal.Services.Interfaces;
 
 namespace digioz.Portal.Web.Pages.PrivateMessages
 {
     [Authorize]
-    public class IndexModel : PageModel
+    public class SentModel : PageModel
     {
         private readonly IPrivateMessageService _pmService;
         private readonly IProfileService _profileService;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public IndexModel(IPrivateMessageService pmService, IProfileService profileService, UserManager<IdentityUser> userManager)
+        public SentModel(IPrivateMessageService pmService, IProfileService profileService, UserManager<IdentityUser> userManager)
         {
             _pmService = pmService;
             _profileService = profileService;
             _userManager = userManager;
         }
 
-        public class InboxMessage
+        public class SentMessage
         {
             public int Id { get; set; }
-            public string FromDisplayName { get; set; } = string.Empty;
+            public string ToDisplayName { get; set; } = string.Empty;
             public string Subject { get; set; } = string.Empty;
             public System.DateTime? SentDate { get; set; }
-            public bool IsRead { get; set; }
         }
 
-        public List<InboxMessage> Messages { get; set; } = new();
+        public List<SentMessage> Messages { get; set; } = new();
 
         public void OnGet()
         {
             var currentUserId = _userManager.GetUserId(User);
-            var inbox = _pmService.GetInbox(currentUserId);
+            var sent = _pmService.GetSent(currentUserId);
             var profileLookup = _profileService.GetAll()
                 .Where(p => !string.IsNullOrWhiteSpace(p.UserId) && !string.IsNullOrWhiteSpace(p.DisplayName))
                 .ToDictionary(p => p.UserId, p => p.DisplayName);
             
-            Messages = inbox.Select(m => new InboxMessage
+            Messages = sent.Select(m => new SentMessage
             {
                 Id = m.Id,
-                FromDisplayName = profileLookup.GetValueOrDefault(m.FromId, "Unknown User"),
+                ToDisplayName = profileLookup.GetValueOrDefault(m.ToId, "Unknown User"),
                 Subject = m.Subject ?? "(No Subject)",
-                SentDate = m.SentDate,
-                IsRead = m.IsRead
+                SentDate = m.SentDate
             }).ToList();
         }
     }

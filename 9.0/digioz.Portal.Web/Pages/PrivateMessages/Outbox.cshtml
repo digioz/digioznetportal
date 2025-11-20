@@ -1,0 +1,28 @@
+@page
+@model digioz.Portal.Web.Pages.PrivateMessages.OutboxModel
+@{
+    ViewData["Title"] = "Outbox";
+}
+<h1>Outbox (Unopened messages)</h1>
+<p><a asp-page="/PrivateMessages/Index" class="btn btn-secondary">Inbox</a> <a asp-page="/PrivateMessages/Sent" class="btn btn-secondary">Sent</a></p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>To</th>
+            <th>Subject</th>
+            <th>Date</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var msg in Model.Messages)
+    {
+        <tr>
+            <td>@msg.ToDisplayName</td>
+            <td>@msg.Subject</td>
+            <td>@msg.SentDate?.ToLocalTime().ToString("g")</td>
+            <td><a asp-page="/PrivateMessages/Details" asp-route-id="@msg.Id" class="btn btn-sm btn-primary">Read</a></td>
+        </tr>
+    }
+    </tbody>
+</table>
