@@ -60,7 +60,7 @@ namespace digioz.Portal.Pages.Profile
 
             var allVideos = _videoService.GetAll()
                 .Where(v => v.UserId == UserProfile.UserId &&
-                    (IsOwner || IsAdmin || (v.IsPublic ?? false)))
+                    (IsOwner || IsAdmin || v.Visible))
                 .OrderByDescending(v => v.Timestamp)
                 .ToList();
 
