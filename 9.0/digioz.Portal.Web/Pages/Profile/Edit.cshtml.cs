@@ -1,6 +1,202 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities.Helpers; // ImageHelper / Utility.IsImage
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-namespace digioz.Portal.Pages.Profile {
-    public class EditModel : PageModel {
-        public void OnGet() { }
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+
+namespace digioz.Portal.Pages.Profile
+{
+    [Authorize]
+    public class EditModel : PageModel
+    {
+        private readonly IProfileService _profileService;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly IWebHostEnvironment _env;
+
+        public EditModel(IProfileService profileService, UserManager<IdentityUser> userManager, IWebHostEnvironment env)
+        {
+            _profileService = profileService;
+            _userManager = userManager;
+            _env = env;
+        }
+
+        [BindProperty]
+        public InputModel Input { get; set; } = new();
+
+        [BindProperty]
+        public IFormFile? AvatarFile { get; set; }
+
+        public string? StatusMessage { get; set; }
+
+        public class InputModel
+        {
+            public int Id { get; set; }
+            public string UserId { get; set; } = string.Empty;
+            [Required, StringLength(50, MinimumLength = 3)]
+            [Display(Name = "Display Name")]
+            public string? DisplayName { get; set; }
+            [Required, EmailAddress]
+            public string? Email { get; set; }
+            public string? FirstName { get; set; }
+            public string? MiddleName { get; set; }
+            public string? LastName { get; set; }
+            public DateTime? Birthday { get; set; }
+            public bool? BirthdayVisible { get; set; }
+            public string? Address { get; set; }
+            public string? Address2 { get; set; }
+            public string? City { get; set; }
+            public string? State { get; set; }
+            public string? Zip { get; set; }
+            public string? Country { get; set; }
+            public string? Signature { get; set; }
+            public string? Avatar { get; set; }
+        }
+
+        public async Task<IActionResult> OnGetAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var profile = _profileService.GetAll().FirstOrDefault(p => p.UserId == user.Id);
+            if (profile == null)
+            {
+                profile = new digioz.Portal.Bo.Profile
+                {
+                    UserId = user.Id,
+                    DisplayName = user.Email,
+                    Email = user.Email
+                };
+                _profileService.Add(profile);
+            }
+
+            Input = new InputModel
+            {
+                Id = profile.Id,
+                UserId = profile.UserId ?? string.Empty,
+                DisplayName = profile.DisplayName,
+                FirstName = profile.FirstName,
+                MiddleName = profile.MiddleName,
+                LastName = profile.LastName,
+                Email = profile.Email,
+                Birthday = profile.Birthday,
+                BirthdayVisible = profile.BirthdayVisible,
+                Address = profile.Address,
+                Address2 = profile.Address2,
+                City = profile.City,
+                State = profile.State,
+                Zip = profile.Zip,
+                Country = profile.Country,
+                Signature = profile.Signature,
+                Avatar = profile.Avatar
+            };
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            var profile = _profileService.GetAll().FirstOrDefault(p => p.Id == Input.Id && p.UserId == user.Id);
+            if (profile == null)
+            {
+                ModelState.AddModelError(string.Empty, "Profile not found.");
+                return Page();
+            }
+
+            if (!string.IsNullOrWhiteSpace(Input.DisplayName) && !string.Equals(Input.DisplayName, profile.DisplayName, StringComparison.OrdinalIgnoreCase))
+            {
+                var exists = _profileService.GetAll().Any(p => p.DisplayName != null && p.DisplayName.Equals(Input.DisplayName, StringComparison.OrdinalIgnoreCase));
+                if (exists)
+                {
+                    ModelState.AddModelError("Input.DisplayName", "Display Name already exists.");
+                    return Page();
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(Input.Email) && !string.Equals(Input.Email, user.Email, StringComparison.OrdinalIgnoreCase))
+            {
+                user.Email = Input.Email;
+                user.UserName = Input.Email;
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    foreach (var err in updateResult.Errors)
+                        ModelState.AddModelError(string.Empty, err.Description);
+                    return Page();
+                }
+            }
+
+            if (AvatarFile != null && AvatarFile.Length > 0 && digioz.Portal.Utilities.Helpers.Utility.IsImage(AvatarFile))
+            {
+                var imgRoot = Path.Combine(_env.WebRootPath, "img", "avatar");
+                Directory.CreateDirectory(Path.Combine(imgRoot, "Full"));
+                Directory.CreateDirectory(Path.Combine(imgRoot, "Thumb"));
+
+                var ext = Path.GetExtension(AvatarFile.FileName);
+                var fileName = Guid.NewGuid().ToString("N") + ext;
+                var fullPath = Path.Combine(imgRoot, "Full", fileName);
+                var thumbPath = Path.Combine(imgRoot, "Thumb", fileName);
+
+                using var ms = new MemoryStream();
+                await AvatarFile.CopyToAsync(ms);
+                var bytes = ms.ToArray();
+
+                using (var imgFull = Image.Load(bytes))
+                {
+                    ImageHelper.SaveJigsawImage(imgFull, 800, 800, fullPath);
+                }
+                using (var imgThumb = Image.Load(bytes))
+                {
+                    ImageHelper.SaveImageWithCrop(imgThumb, 100, 100, thumbPath);
+                }
+
+                if (!string.IsNullOrEmpty(profile.Avatar))
+                {
+                    var oldFull = Path.Combine(imgRoot, "Full", profile.Avatar);
+                    var oldThumb = Path.Combine(imgRoot, "Thumb", profile.Avatar);
+                    try { if (System.IO.File.Exists(oldFull)) System.IO.File.Delete(oldFull); } catch { }
+                    try { if (System.IO.File.Exists(oldThumb)) System.IO.File.Delete(oldThumb); } catch { }
+                }
+
+                profile.Avatar = fileName;
+            }
+
+            profile.DisplayName = Input.DisplayName;
+            profile.FirstName = Input.FirstName;
+            profile.MiddleName = Input.MiddleName;
+            profile.LastName = Input.LastName;
+            profile.Email = Input.Email;
+            profile.Birthday = Input.Birthday;
+            profile.BirthdayVisible = Input.BirthdayVisible;
+            profile.Address = Input.Address;
+            profile.Address2 = Input.Address2;
+            profile.City = Input.City;
+            profile.State = Input.State;
+            profile.Zip = Input.Zip;
+            profile.Country = Input.Country;
+            profile.Signature = Input.Signature;
+
+            _profileService.Update(profile);
+
+            StatusMessage = "Profile updated successfully.";
+            return Redirect($"/Profile/Details?userid={Uri.EscapeDataString(profile.DisplayName ?? string.Empty)}");
+        }
     }
 }

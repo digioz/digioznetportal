@@ -13,7 +13,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
     {
         private readonly ICommentService _commentService;
         private readonly IConfigService _configService;
-        private readonly IProfileService _profileService; // added for avatar lookup
+        private readonly IProfileService _profileService; // added for avatar and display name lookup
         private readonly IMemoryCache _cache; // still used for Recaptcha only
 
         public CommentsMenuViewComponent(ICommentService commentService, IConfigService configService, IProfileService profileService, IMemoryCache cache)
@@ -49,17 +49,26 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
             // Use repository-level filtering instead of loading all comments into memory
             List<Comment> comments = _commentService.GetByReferenceType(pagePath);
 
-            // Build avatar map (userId -> avatar filename) for performance (avoid calling controller for each)
+            // Build avatar and display name maps (userId -> avatar/DisplayName)
             var avatarMap = new Dictionary<string, string>();
+            var displayNameMap = new Dictionary<string, string>();
             foreach (var uid in comments.Select(c => c.UserId).Where(id => !string.IsNullOrWhiteSpace(id)).Distinct())
             {
                 var profile = _profileService.GetByUserId(uid!);
-                if (profile != null && !string.IsNullOrWhiteSpace(profile.Avatar))
+                if (profile != null)
                 {
-                    avatarMap[uid!] = profile.Avatar.Trim();
+                    if (!string.IsNullOrWhiteSpace(profile.Avatar))
+                    {
+                        avatarMap[uid!] = profile.Avatar.Trim();
+                    }
+                    if (!string.IsNullOrWhiteSpace(profile.DisplayName))
+                    {
+                        displayNameMap[uid!] = profile.DisplayName.Trim();
+                    }
                 }
             }
             ViewBag.AvatarMap = avatarMap; // consumed by view
+            ViewBag.DisplayNameMap = displayNameMap; // consumed by view
 
             return Task.FromResult<IViewComponentResult>(View(comments));
         }

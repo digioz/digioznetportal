@@ -71,7 +71,8 @@ INSERT INTO Menu (UserId, Name, Location, Controller, Action, Url, Target, Visib
 (@adminUserId, 'Twitter', 'TopMenu', 'Twitter', 'Index', NULL, NULL, 0, 8, GETDATE()),
 (@adminUserId, 'Home', 'LeftMenu', 'Index', '', NULL, NULL, 1, 9, GETDATE()),
 (@adminUserId, 'Pictures', 'LeftMenu', 'Pictures', 'Index', NULL, NULL, 1, 10, GETDATE()),
-(@adminUserId, 'Videos', 'LeftMenu', 'Videos', 'Index', NULL, NULL, 1, 11, GETDATE());
+(@adminUserId, 'Videos', 'LeftMenu', 'Videos', 'Index', NULL, NULL, 1, 11, GETDATE()),
+(@adminUserId, 'Members', 'LeftMenu', 'Profile', 'Index', NULL, NULL, 1, 12, GETDATE());
 ");
 
             // Insert Page rows with admin user resolved at runtime
