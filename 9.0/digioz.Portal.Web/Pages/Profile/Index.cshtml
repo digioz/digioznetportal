@@ -46,13 +46,13 @@ else
                 var userId = System.Net.WebUtility.UrlEncode(p.DisplayName ?? string.Empty);
                 <tr>
                     <td>
-                        <a href="/Profile/Details?userid=@userId" title="View @p.DisplayName's profile">
+                        <a href="/Profile/Details?userId=@userId" title="View @p.DisplayName's profile">
                             <img src="/img/avatar/thumb/@avatar" alt="@p.DisplayName" class="img-thumbnail"
                                  style="width:75px;height:75px;object-fit:cover;" />
                         </a>
                     </td>
                     <td>
-                        <a href="/Profile/Details?userid=@userId" title="View @p.DisplayName's profile">@p.DisplayName</a>
+                        <a href="/Profile/Details?userId=@userId" title="View @p.DisplayName's profile">@p.DisplayName</a>
                     </td>
                     <td>@p.City</td>
                     <td>@p.State</td>
