@@ -58,13 +58,11 @@ namespace digioz.Portal.Pages.Profile
             IsOwner = loggedInUserId != null && loggedInUserId == UserProfile.UserId;
             IsAdmin = User?.IsInRole("Admin") == true;
 
-            var allVideos = _videoService.GetByUserIdWithVisibility(
-                UserProfile.UserId,
-                IsOwner,
-                IsAdmin
-            )
-            .OrderByDescending(v => v.Timestamp)
-            .ToList();
+            var allVideos = _videoService.GetAll()
+                .Where(v => v.UserId == UserProfile.UserId &&
+                    (IsOwner || IsAdmin || (v.IsPublic ?? false)))
+                .OrderByDescending(v => v.Timestamp)
+                .ToList();
 
             TotalCount = allVideos.Count;
             if (PageNumber < 1) PageNumber = 1;
