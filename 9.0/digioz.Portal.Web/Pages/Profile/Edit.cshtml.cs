@@ -145,7 +145,7 @@ namespace digioz.Portal.Pages.Profile
 
             if (AvatarFile != null && AvatarFile.Length > 0 && digioz.Portal.Utilities.Helpers.Utility.IsImage(AvatarFile))
             {
-                var imgRoot = Path.Combine(_env.WebRootPath, "img", "Avatar");
+                var imgRoot = Path.Combine(_env.WebRootPath, "img", "avatar");
                 Directory.CreateDirectory(Path.Combine(imgRoot, "Full"));
                 Directory.CreateDirectory(Path.Combine(imgRoot, "Thumb"));
 
