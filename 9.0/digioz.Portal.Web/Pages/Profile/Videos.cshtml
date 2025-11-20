@@ -1,3 +1,64 @@
 @page
-@model VideosModel
-<h2>Profile Videos</h2>
+@model digioz.Portal.Pages.Profile.VideosModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+@{
+    ViewData["Title"] = (Model.DisplayName ?? "User") + " Videos";
+}
+
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>@Model.DisplayName's Videos</h1>
+            <p class="text-muted">Latest videos uploaded by @Model.DisplayName.</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/Profile/Details?userId=@Model.DisplayName" class="btn btn-secondary">Back to Profile</a>
+        </div>
+    </div>
+
+    @if (Model.Videos.Any())
+    {
+        <div class="row">
+            @foreach (var video in Model.Videos)
+            {
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <a asp-page="/Videos/Details" asp-route-id="@video.Id" class="text-decoration-none">
+                            <img src="/img/Videos/Thumb/@video.Thumbnail" alt="@video.Description" class="card-img-top" style="height: 250px; object-fit: cover;" />
+                        </a>
+                        <div class="card-body">
+                            <p class="card-text small text-muted">@video.Description</p>
+                            <small class="text-muted d-block">@video.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</small>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a asp-page="/Videos/Details" asp-route-id="@video.Id" class="btn btn-sm btn-outline-primary w-100">View</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <paging total-records="@Model.TotalCount"
+                        page-no="@Model.PageNumber"
+                        page-size="@Model.PageSize"
+                        show-prev-next="true"
+                        show-first-last="true"
+                        query-string-key-page-no="PageNumber"
+                        class="pagination mb-0"></paging>
+            </ul>
+        </nav>
+
+        <div class="text-center text-muted small mt-2">
+            Page @Model.PageNumber of @Model.TotalPages (@Model.TotalCount total videos)
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <p>No videos uploaded by this user yet.</p>
+        </div>
+    }
+</div>
