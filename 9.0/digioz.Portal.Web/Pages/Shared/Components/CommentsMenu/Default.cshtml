@@ -32,7 +32,7 @@
                 {
                     var avatarFile = (comment.UserId != null && avatarMap.TryGetValue(comment.UserId, out var f) && !string.IsNullOrWhiteSpace(f)) ? f : "default.png";
                     var displayName = (comment.UserId != null && displayNameMap.TryGetValue(comment.UserId, out var dn) && !string.IsNullOrWhiteSpace(dn)) ? dn : comment.Username;
-                    var urlDisplayName = System.Net.WebUtility.UrlEncode(displayName ?? string.Empty);
+                    var urlDisplayName = System.Uri.EscapeDataString(displayName ?? string.Empty);
                     <li class="list-group-item">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="d-flex align-items-start">
