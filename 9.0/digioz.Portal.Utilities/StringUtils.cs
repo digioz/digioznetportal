@@ -588,6 +588,9 @@ namespace digioz.Portal.Utilities
             return input;
         }
 
+        // Compiled regex for better performance in SanitizeUserInput
+        private static readonly Regex SanitizeWhitespaceRegex = new Regex("\\s+", RegexOptions.Compiled);
+
         /// <summary>
         /// Sanitizes user input by extracting plain text only, removing all HTML tags, scripts, and attributes.
         /// Collapses excessive whitespace for clean output. Use this for user-generated content to prevent XSS attacks.
@@ -614,9 +617,6 @@ namespace digioz.Portal.Utilities
                 return string.Empty;
             }
         }
-
-        // Compiled regex for better performance in SanitizeUserInput
-        private static readonly Regex SanitizeWhitespaceRegex = new Regex("\\s+", RegexOptions.Compiled);
         #endregion
 
         #region Html Element Helpers
