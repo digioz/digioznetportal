@@ -89,8 +89,9 @@ namespace digioz.Portal.Dal.Services
                 allMessages.AddRange(currentLevelMessages);
                 
                 // Get IDs of all children for the next level
+                var currentLevelMessageIds = currentLevelMessages.Select(cm => cm.Id).ToList();
                 currentLevelIds = _context.PrivateMessages.AsNoTracking()
-                    .Where(m => m.ParentId.HasValue && currentLevelMessages.Select(cm => cm.Id).Contains(m.ParentId.Value))
+                    .Where(m => m.ParentId.HasValue && currentLevelMessageIds.Contains(m.ParentId.Value))
                     .Select(m => m.Id)
                     .ToList();
             }
