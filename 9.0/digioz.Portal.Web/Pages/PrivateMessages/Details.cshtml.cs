@@ -28,8 +28,8 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
         public class ThreadMessage
         {
             public int Id { get; set; }
-            public string FromId { get; set; }
-            public string ToId { get; set; }
+            public string FromId { get; set; } = string.Empty;
+            public string ToId { get; set; } = string.Empty;
             public string FromDisplayName { get; set; } = string.Empty;
             public string ToDisplayName { get; set; } = string.Empty;
             public System.DateTime? SentDate { get; set; }
