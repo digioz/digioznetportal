@@ -93,5 +93,44 @@ namespace digioz.Portal.Dal.Services
                 _context.SaveChanges();
             }
         }
+
+        public int DeleteByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return 0;
+
+            var videos = _context.Videos
+                .Where(v => !string.IsNullOrEmpty(v.UserId) && v.UserId == userId)
+                .ToList();
+
+            if (videos.Any())
+            {
+                _context.Videos.RemoveRange(videos);
+                _context.SaveChanges();
+            }
+
+            return videos.Count;
+        }
+
+        public int ReassignByUserId(string fromUserId, string toUserId)
+        {
+            if (string.IsNullOrEmpty(fromUserId) || string.IsNullOrEmpty(toUserId))
+                return 0;
+
+            var videos = _context.Videos
+                .Where(v => !string.IsNullOrEmpty(v.UserId) && v.UserId == fromUserId)
+                .ToList();
+
+            if (videos.Any())
+            {
+                foreach (var video in videos)
+                {
+                    video.UserId = toUserId;
+                }
+                _context.SaveChanges();
+            }
+
+            return videos.Count;
+        }
     }
 }

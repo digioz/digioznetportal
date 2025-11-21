@@ -147,136 +147,64 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                     return Page();
                 }
 
-                // Handle Pictures - Delete or Reassign (using efficient filtered query)
-                var pictures = _pictureService.GetFiltered(userId: id, isAdmin: true);
-                if (pictures.Any())
+                // Handle Pictures - Delete or Reassign (using efficient bulk operations)
+                if (Options.DeletePictures)
                 {
-                    if (Options.DeletePictures)
-                    {
-                        foreach (var picture in pictures)
-                        {
-                            _pictureService.Delete(picture.Id);
-                        }
-                    }
-                    else
-                    {
-                        // Reassign to System user
-                        foreach (var picture in pictures)
-                        {
-                            picture.UserId = systemUserId;
-                            _pictureService.Update(picture);
-                        }
-                    }
+                    _pictureService.DeleteByUserId(id);
+                }
+                else
+                {
+                    _pictureService.ReassignByUserId(id, systemUserId);
                 }
 
-                // Handle Videos - Delete or Reassign (using efficient filtered query)
-                var videos = _videoService.GetFiltered(userId: id, isAdmin: true);
-                if (videos.Any())
+                // Handle Videos - Delete or Reassign (using efficient bulk operations)
+                if (Options.DeleteVideos)
                 {
-                    if (Options.DeleteVideos)
-                    {
-                        foreach (var video in videos)
-                        {
-                            _videoService.Delete(video.Id);
-                        }
-                    }
-                    else
-                    {
-                        // Reassign to System user
-                        foreach (var video in videos)
-                        {
-                            video.UserId = systemUserId;
-                            _videoService.Update(video);
-                        }
-                    }
+                    _videoService.DeleteByUserId(id);
+                }
+                else
+                {
+                    _videoService.ReassignByUserId(id, systemUserId);
                 }
 
-                // Handle Polls - Delete or Reassign (using efficient filtered query)
-                var polls = _pollService.GetByUserId(id);
-                if (polls.Any())
+                // Handle Polls - Delete or Reassign (using efficient bulk operations)
+                if (Options.DeletePolls)
                 {
-                    if (Options.DeletePolls)
-                    {
-                        foreach (var poll in polls)
-                        {
-                            _pollService.Delete(poll.Id);
-                        }
-                    }
-                    else
-                    {
-                        // Reassign to System user
-                        foreach (var poll in polls)
-                        {
-                            poll.UserId = systemUserId;
-                            _pollService.Update(poll);
-                        }
-                    }
+                    _pollService.DeleteByUserId(id);
+                }
+                else
+                {
+                    _pollService.ReassignByUserId(id, systemUserId);
                 }
 
-                // Handle Chat Messages - Delete or Reassign (using efficient filtered query)
-                var chats = _chatService.GetByUserId(id);
-                if (chats.Any())
+                // Handle Chat Messages - Delete or Reassign (using efficient bulk operations)
+                if (Options.DeleteChat)
                 {
-                    if (Options.DeleteChat)
-                    {
-                        foreach (var chat in chats)
-                        {
-                            _chatService.Delete(chat.Id);
-                        }
-                    }
-                    else
-                    {
-                        // Reassign to System user
-                        foreach (var chat in chats)
-                        {
-                            chat.UserId = systemUserId;
-                            _chatService.Update(chat);
-                        }
-                    }
+                    _chatService.DeleteByUserId(id);
+                }
+                else
+                {
+                    _chatService.ReassignByUserId(id, systemUserId);
                 }
 
-                // Handle Comments - Delete or Reassign (using efficient filtered query)
-                var comments = _commentService.GetByUserId(id);
-                if (comments.Any())
+                // Handle Comments - Delete or Reassign (using efficient bulk operations)
+                if (Options.DeleteComments)
                 {
-                    if (Options.DeleteComments)
-                    {
-                        foreach (var comment in comments)
-                        {
-                            _commentService.Delete(comment.Id);
-                        }
-                    }
-                    else
-                    {
-                        // Reassign to System user
-                        foreach (var comment in comments)
-                        {
-                            comment.UserId = systemUserId;
-                            _commentService.Update(comment);
-                        }
-                    }
+                    _commentService.DeleteByUserId(id);
+                }
+                else
+                {
+                    _commentService.ReassignByUserId(id, systemUserId);
                 }
 
-                // Handle Orders - Delete or Reassign (using efficient filtered query)
-                var orders = _orderService.GetByUserId(id);
-                if (orders.Any())
+                // Handle Orders - Delete or Reassign (using efficient bulk operations)
+                if (Options.DeleteOrders)
                 {
-                    if (Options.DeleteOrders)
-                    {
-                        foreach (var order in orders)
-                        {
-                            _orderService.Delete(order.Id);
-                        }
-                    }
-                    else
-                    {
-                        // Reassign to System user
-                        foreach (var order in orders)
-                        {
-                            order.UserId = systemUserId;
-                            _orderService.Update(order);
-                        }
-                    }
+                    _orderService.DeleteByUserId(id);
+                }
+                else
+                {
+                    _orderService.ReassignByUserId(id, systemUserId);
                 }
 
                 // Delete profile

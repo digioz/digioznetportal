@@ -12,5 +12,9 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void Add(Video video);
         void Update(Video video);
         void Delete(int id);
+        
+        // Bulk operations for performance
+        int DeleteByUserId(string userId);
+        int ReassignByUserId(string fromUserId, string toUserId);
     }
 }

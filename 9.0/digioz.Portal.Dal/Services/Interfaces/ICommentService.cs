@@ -13,5 +13,9 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void Add(Comment comment);
         void Update(Comment comment);
         void Delete(string id);
+        
+        // Bulk operations for performance
+        int DeleteByUserId(string userId);
+        int ReassignByUserId(string fromUserId, string toUserId);
     }
 }

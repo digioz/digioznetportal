@@ -12,5 +12,9 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void Add(Picture picture);
         void Update(Picture picture);
         void Delete(int id);
+        
+        // Bulk operations for performance
+        int DeleteByUserId(string userId);
+        int ReassignByUserId(string fromUserId, string toUserId);
     }
 }

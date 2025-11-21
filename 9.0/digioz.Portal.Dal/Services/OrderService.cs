@@ -61,5 +61,44 @@ namespace digioz.Portal.Dal.Services
                 _context.SaveChanges();
             }
         }
+
+        public int DeleteByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return 0;
+
+            var orders = _context.Orders
+                .Where(o => !string.IsNullOrEmpty(o.UserId) && o.UserId == userId)
+                .ToList();
+
+            if (orders.Any())
+            {
+                _context.Orders.RemoveRange(orders);
+                _context.SaveChanges();
+            }
+
+            return orders.Count;
+        }
+
+        public int ReassignByUserId(string fromUserId, string toUserId)
+        {
+            if (string.IsNullOrEmpty(fromUserId) || string.IsNullOrEmpty(toUserId))
+                return 0;
+
+            var orders = _context.Orders
+                .Where(o => !string.IsNullOrEmpty(o.UserId) && o.UserId == fromUserId)
+                .ToList();
+
+            if (orders.Any())
+            {
+                foreach (var order in orders)
+                {
+                    order.UserId = toUserId;
+                }
+                _context.SaveChanges();
+            }
+
+            return orders.Count;
+        }
     }
 }

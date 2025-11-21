@@ -12,5 +12,9 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void Add(Order order);
         void Update(Order order);
         void Delete(string id);
+        
+        // Bulk operations for performance
+        int DeleteByUserId(string userId);
+        int ReassignByUserId(string fromUserId, string toUserId);
     }
 }

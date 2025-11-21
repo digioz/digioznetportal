@@ -12,5 +12,9 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void Add(Chat chat);
         void Update(Chat chat);
         void Delete(int id);
+        
+        // Bulk operations for performance
+        int DeleteByUserId(string userId);
+        int ReassignByUserId(string fromUserId, string toUserId);
     }
 }
