@@ -11,6 +11,7 @@ using digioz.Portal.Dal.Services.Interfaces;
 namespace digioz.Portal.Web.Pages.PrivateMessages
 {
     [Authorize]
+    [ValidateAntiForgeryToken]
     public class DetailsModel : PageModel
     {
         private readonly IPrivateMessageService _pmService;
