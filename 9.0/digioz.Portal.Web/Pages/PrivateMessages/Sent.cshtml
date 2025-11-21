@@ -4,7 +4,7 @@
     ViewData["Title"] = "Sent";
 }
 <h1>Sent Messages (Read by recipient)</h1>
-<p><a asp-page="/PrivateMessages/Index" class="btn btn-secondary">Inbox</a> <a asp-page="/PrivateMessages/Outbox" class="btn btn-secondary">Outbox</a></p>
+<partial name="_PrivateMessagesNavigation" model="Sent" />
 <table class="table table-striped">
     <thead>
         <tr>
