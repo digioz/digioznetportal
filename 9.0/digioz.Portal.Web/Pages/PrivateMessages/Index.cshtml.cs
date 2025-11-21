@@ -37,7 +37,9 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
         {
             var currentUserId = _userManager.GetUserId(User);
             var inbox = _pmService.GetInbox(currentUserId);
-            var profileLookup = _profileService.GetAll()
+            var fromUserIds = inbox.Select(m => m.FromId).Where(id => !string.IsNullOrWhiteSpace(id)).Distinct().ToList();
+            var profiles = _profileService.GetByUserIds(fromUserIds);
+            var profileLookup = profiles
                 .Where(p => !string.IsNullOrWhiteSpace(p.UserId) && !string.IsNullOrWhiteSpace(p.DisplayName))
                 .ToDictionary(p => p.UserId, p => p.DisplayName);
             
