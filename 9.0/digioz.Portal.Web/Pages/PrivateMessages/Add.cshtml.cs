@@ -21,6 +21,7 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
         private readonly IMemoryCache _cache;
 
         private const string UserProfilesCacheKey = "UserProfilesForMessages";
+        private static readonly TimeSpan UserProfilesCacheExpiration = TimeSpan.FromMinutes(5);
 
         public AddModel(IPrivateMessageService pmService, IProfileService profileService, UserManager<IdentityUser> userManager, IMemoryCache cache)
         {
@@ -48,7 +49,7 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
 
         private List<UserLite> GetCachedUserProfiles()
         {
-            if (!_cache.TryGetValue(UserProfilesCacheKey, out List<UserLite>? cachedUsers) || cachedUsers == null)
+            if (!_cache.TryGetValue(UserProfilesCacheKey, out List<UserLite>? cachedUsers))
             {
                 cachedUsers = _profileService.GetAll()
                     .Where(p => !string.IsNullOrWhiteSpace(p.DisplayName))
@@ -56,12 +57,12 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
                     .ToList();
                 
                 var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(5));
+                    .SetSlidingExpiration(UserProfilesCacheExpiration);
                 
                 _cache.Set(UserProfilesCacheKey, cachedUsers, cacheOptions);
             }
             
-            return cachedUsers;
+            return cachedUsers!;
         }
 
         public void OnGet()
