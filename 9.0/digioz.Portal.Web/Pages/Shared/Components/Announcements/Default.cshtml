@@ -1,0 +1,29 @@
+@model IEnumerable<digioz.Portal.Bo.Announcement>
+@{
+    var commentsEnabledMap = ViewBag.CommentsEnabledMap as IDictionary<int, bool> ?? new Dictionary<int, bool>();
+}
+
+@if (Model.Any())
+{
+    @foreach (var announcement in Model)
+    {
+        <div class="card shadow-sm mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">@announcement.Title</h5>
+            </div>
+            <div class="card-body">
+                @Html.Raw(announcement.Body)
+            </div>
+            @if (commentsEnabledMap.TryGetValue(announcement.Id, out var commentsEnabled) && commentsEnabled)
+            {
+                <div class="card-footer">
+                    @await Component.InvokeAsync("CommentsMenu", new { referenceId = announcement.Id.ToString(), referenceType = "/Announcements" })
+                </div>
+            }
+        </div>
+    }
+
+    <div class="text-center mb-4">
+        <a href="/Announcements/Index" class="btn btn-primary">Read More</a>
+    </div>
+}

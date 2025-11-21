@@ -24,6 +24,28 @@ namespace digioz.Portal.Dal.Services
             return _context.Announcements.ToList();
         }
 
+        public List<Announcement> GetVisible(int count)
+        {
+            return _context.Announcements
+                .Where(a => a.Visible)
+                .OrderByDescending(a => a.Timestamp)
+                .Take(count)
+                .ToList();
+        }
+
+        public List<Announcement> GetPagedVisible(int pageNumber, int pageSize, out int totalCount)
+        {
+            var query = _context.Announcements.Where(a => a.Visible);
+            
+            totalCount = query.Count();
+            
+            return query
+                .OrderByDescending(a => a.Timestamp)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
         public void Add(Announcement announcement)
         {
             _context.Announcements.Add(announcement);
