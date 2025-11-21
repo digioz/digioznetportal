@@ -21,6 +21,7 @@ namespace digioz.Portal.Dal.Services
         public List<PrivateMessage> GetInbox(string userId)
         {
             return _context.PrivateMessages
+                .AsNoTracking()
                 .Where(pm => pm.ToId == userId)
                 .OrderByDescending(pm => pm.SentDate)
                 .ToList();
@@ -29,6 +30,7 @@ namespace digioz.Portal.Dal.Services
         public List<PrivateMessage> GetOutbox(string userId)
         {
             return _context.PrivateMessages
+                .AsNoTracking()
                 .Where(pm => pm.FromId == userId && !pm.IsRead)
                 .OrderByDescending(pm => pm.SentDate)
                 .ToList();
@@ -37,6 +39,7 @@ namespace digioz.Portal.Dal.Services
         public List<PrivateMessage> GetSent(string userId)
         {
             return _context.PrivateMessages
+                .AsNoTracking()
                 .Where(pm => pm.FromId == userId && pm.IsRead)
                 .OrderByDescending(pm => pm.SentDate)
                 .ToList();
