@@ -108,7 +108,7 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
                 ParentId = id
             };
             _pmService.Add(reply);
-            return RedirectToPage("/PrivateMessages/Details", new { id = reply.Id });
+            return RedirectToPage("/PrivateMessages/Details", new { id = root.Id });
         }
     }
 }
