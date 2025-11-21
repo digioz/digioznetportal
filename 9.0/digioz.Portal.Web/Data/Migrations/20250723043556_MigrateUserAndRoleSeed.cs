@@ -79,7 +79,7 @@ namespace digioz.Portal.Web.Data.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { systemUserId, 0, systemUserConcurrencyStamp, "system@domain.com", true, false, null, "SYSTEM@DOMAIN.COM", "SYSTEM@DOMAIN.COM", systemPasswordHash, null, false, systemSecurityStamp, false, "system@domain.com" });
+                values: new object[] { systemUserId, 0, systemUserConcurrencyStamp, "system@domain.com", true, true, DateTimeOffset.MaxValue, "SYSTEM@DOMAIN.COM", "SYSTEM@DOMAIN.COM", systemPasswordHash, null, false, systemSecurityStamp, false, "system@domain.com" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
