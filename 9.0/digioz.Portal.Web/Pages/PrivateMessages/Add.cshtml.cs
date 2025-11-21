@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +18,8 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
         private readonly IProfileService _profileService;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IMemoryCache _cache;
+
+        private const string UserProfilesCacheKey = "UserProfilesForMessages";
 
         public AddModel(IPrivateMessageService pmService, IProfileService profileService, UserManager<IdentityUser> userManager, IMemoryCache cache)
         {
@@ -46,11 +47,9 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
 
         private List<UserLite> GetCachedUserProfiles()
         {
-            const string cacheKey = "UserProfilesForMessages";
-            
-            if (!_cache.TryGetValue(cacheKey, out List<UserLite> users))
+            if (!_cache.TryGetValue(UserProfilesCacheKey, out List<UserLite>? cachedUsers) || cachedUsers == null)
             {
-                users = _profileService.GetAll()
+                cachedUsers = _profileService.GetAll()
                     .Where(p => !string.IsNullOrWhiteSpace(p.DisplayName))
                     .Select(p => new UserLite { Id = p.UserId, DisplayName = p.DisplayName })
                     .ToList();
@@ -58,10 +57,10 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
                 var cacheOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromMinutes(5));
                 
-                _cache.Set(cacheKey, users, cacheOptions);
+                _cache.Set(UserProfilesCacheKey, cachedUsers, cacheOptions);
             }
             
-            return users;
+            return cachedUsers;
         }
 
         public void OnGet()
