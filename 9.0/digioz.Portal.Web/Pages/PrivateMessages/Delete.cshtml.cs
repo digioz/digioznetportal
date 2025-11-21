@@ -33,11 +33,10 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             {
                 return NotFound();
             }
-            var profileLookup = _profileService.GetAll()
-                .Where(p => !string.IsNullOrWhiteSpace(p.UserId) && !string.IsNullOrWhiteSpace(p.DisplayName))
-                .ToDictionary(p => p.UserId, p => p.DisplayName);
+            var fromProfile = _profileService.GetAll()
+                .FirstOrDefault(p => p.UserId == Message.FromId && !string.IsNullOrWhiteSpace(p.DisplayName));
             
-            FromDisplayName = profileLookup.GetValueOrDefault(Message.FromId, "Unknown User");
+            FromDisplayName = fromProfile?.DisplayName ?? "Unknown User";
             return Page();
         }
 
