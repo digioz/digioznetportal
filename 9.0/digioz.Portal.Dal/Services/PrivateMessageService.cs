@@ -55,30 +55,60 @@ namespace digioz.Portal.Dal.Services
                 return thread;
             }
 
-            // Traverse up to find the root of the thread
-            while (current.ParentId != null)
+            // Find the root message ID by traversing up
+            int rootId = messageId;
+            var parentId = current.ParentId;
+            
+            while (parentId != null)
             {
-                current = _context.PrivateMessages.AsNoTracking().FirstOrDefault(p => p.Id == current.ParentId);
-                if (current == null) return new List<PrivateMessage>(); // Should not happen in consistent data
+                var parent = _context.PrivateMessages.AsNoTracking()
+                    .Where(p => p.Id == parentId.Value)
+                    .Select(p => new { p.Id, p.ParentId })
+                    .FirstOrDefault();
+                    
+                if (parent == null)
+                {
+                    break; // Should not happen in consistent data
+                }
+                
+                rootId = parent.Id;
+                parentId = parent.ParentId;
             }
 
-            // Now 'current' is the root. Collect all descendants.
-            var messages = _context.PrivateMessages.AsNoTracking().ToList();
-            var messageMap = messages.ToLookup(m => m.ParentId);
+            // Now collect all messages in the thread starting from the root
+            // We'll query iteratively by parent IDs to avoid loading all messages
+            var messagesToProcess = new Queue<int>();
+            messagesToProcess.Enqueue(rootId);
+            var processedIds = new HashSet<int>();
 
-            var queue = new Queue<PrivateMessage>();
-            queue.Enqueue(current);
-
-            while (queue.Count > 0)
+            while (messagesToProcess.Count > 0)
             {
-                var msg = queue.Dequeue();
-                thread.Add(msg);
-
-                if (messageMap.Contains(msg.Id))
+                var currentId = messagesToProcess.Dequeue();
+                
+                if (processedIds.Contains(currentId))
                 {
-                    foreach (var child in messageMap[msg.Id].OrderBy(m => m.SentDate))
+                    continue;
+                }
+                
+                processedIds.Add(currentId);
+
+                // Get the current message and its direct children
+                var currentMessage = _context.PrivateMessages.AsNoTracking()
+                    .FirstOrDefault(m => m.Id == currentId);
+                    
+                if (currentMessage != null)
+                {
+                    thread.Add(currentMessage);
+                    
+                    // Find all direct children of this message
+                    var childIds = _context.PrivateMessages.AsNoTracking()
+                        .Where(m => m.ParentId == currentId)
+                        .Select(m => m.Id)
+                        .ToList();
+                    
+                    foreach (var childId in childIds)
                     {
-                        queue.Enqueue(child);
+                        messagesToProcess.Enqueue(childId);
                     }
                 }
             }
