@@ -587,6 +587,23 @@ namespace digioz.Portal.Utilities
             }
             return input;
         }
+
+        /// <summary>
+        /// Sanitizes HTML input by extracting plain text only, removing all tags, scripts, and attributes.
+        /// Uses HtmlAgilityPack for secure parsing and collapses excessive whitespace.
+        /// </summary>
+        /// <param name="input">The HTML input to sanitize</param>
+        /// <returns>Plain text with collapsed whitespace</returns>
+        public static string SanitizeToPlainText(string input) {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            // Parse HTML then extract plain text only; remove all tags, scripts, attributes.
+            var doc = new HtmlDocument();
+            doc.LoadHtml(input);
+            var text = doc.DocumentNode.InnerText ?? string.Empty;
+            // Collapse excessive whitespace/newlines
+            text = Regex.Replace(text, "\\s+", " ").Trim();
+            return text;
+        }
         #endregion
 
         #region Html Element Helpers

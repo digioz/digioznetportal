@@ -7,8 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
-using HtmlAgilityPack;
-using System.Text.RegularExpressions;
+using digioz.Portal.Utilities;
 
 namespace digioz.Portal.Web.Pages.PrivateMessages
 {
@@ -103,8 +102,8 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
                 return OnGet(id); // reload data
             }
 
-            var sanitizedMessage = Sanitize(Reply.Message);
-            var sanitizedSubject = Sanitize(Reply.Subject);
+            var sanitizedMessage = StringUtils.SanitizeToPlainText(Reply.Message);
+            var sanitizedSubject = StringUtils.SanitizeToPlainText(Reply.Subject);
 
             var reply = new PrivateMessage
             {
@@ -116,18 +115,6 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             };
             _pmService.Add(reply);
             return RedirectToPage("/PrivateMessages/Details", new { id = root.Id });
-        }
-
-        private static string Sanitize(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
-            // Parse HTML then extract plain text only; remove all tags, scripts, attributes.
-            var doc = new HtmlDocument();
-            doc.LoadHtml(input);
-            var text = doc.DocumentNode.InnerText ?? string.Empty;
-            // Collapse excessive whitespace/newlines
-            text = Regex.Replace(text, "\\s+", " ").Trim();
-            return text;
         }
     }
 }
