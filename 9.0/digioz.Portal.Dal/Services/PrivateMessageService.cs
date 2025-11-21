@@ -48,16 +48,21 @@ namespace digioz.Portal.Dal.Services
         public List<PrivateMessage> GetThread(int messageId)
         {
             var thread = new List<PrivateMessage>();
-            var current = _context.PrivateMessages.AsNoTracking().FirstOrDefault(p => p.Id == messageId);
+            
+            // Get only the ParentId to start traversal
+            var messageInfo = _context.PrivateMessages.AsNoTracking()
+                .Where(p => p.Id == messageId)
+                .Select(p => new { p.Id, p.ParentId })
+                .FirstOrDefault();
 
-            if (current == null)
+            if (messageInfo == null)
             {
                 return thread;
             }
 
             // Find the root message ID by traversing up
-            int rootId = messageId;
-            var parentId = current.ParentId;
+            int rootId = messageInfo.Id;
+            var parentId = messageInfo.ParentId;
             
             while (parentId != null)
             {
