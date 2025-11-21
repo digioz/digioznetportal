@@ -48,18 +48,8 @@ namespace digioz.Portal.Pages.Pictures
             var userId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
             var isAdmin = User?.IsInRole("Admin") == true;
 
-            // Filter pictures based on ownership and admin status
-            var allPictures = _pictureService.GetAll()
-                .Where(p => p.AlbumId == Id && (
-                    // Show all pictures to admins
-                    isAdmin ||
-                    // Show all their own pictures to the owner (visible/hidden, approved/unapproved)
-                    (userId != null && p.UserId == userId) ||
-                    // Show only visible and approved pictures to everyone else
-                    (p.Visible && p.Approved)
-                ))
-                .OrderByDescending(p => p.Timestamp)
-                .ToList();
+            // Use filtered query to only retrieve needed pictures from database
+            var allPictures = _pictureService.GetFiltered(userId: userId, albumId: Id, isAdmin: isAdmin);
 
             TotalCount = allPictures.Count;
 

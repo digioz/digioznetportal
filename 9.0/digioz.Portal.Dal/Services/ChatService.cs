@@ -24,6 +24,22 @@ namespace digioz.Portal.Dal.Services
             return _context.Chats.ToList();
         }
 
+        public List<Chat> GetByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return new List<Chat>();
+
+            return _context.Chats.Where(c => !string.IsNullOrEmpty(c.UserId) && c.UserId == userId).ToList();
+        }
+
+        public int CountByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return 0;
+
+            return _context.Chats.Count(c => !string.IsNullOrEmpty(c.UserId) && c.UserId == userId);
+        }
+
         public void Add(Chat chat)
         {
             _context.Chats.Add(chat);

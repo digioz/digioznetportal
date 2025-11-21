@@ -96,15 +96,15 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
 
             Profile = _profileService.GetByUserId(id);
 
-            // Get counts of related data - Fixed to handle null UserId properly
+            // Use efficient count methods instead of loading all records into memory
             RelatedData = new UserRelatedData
             {
-                PictureCount = _pictureService.GetAll().Count(p => !string.IsNullOrEmpty(p.UserId) && p.UserId == id),
-                VideoCount = _videoService.GetAll().Count(v => !string.IsNullOrEmpty(v.UserId) && v.UserId == id),
-                PollCount = _pollService.GetAll().Count(p => !string.IsNullOrEmpty(p.UserId) && p.UserId == id),
-                ChatCount = _chatService.GetAll().Count(c => !string.IsNullOrEmpty(c.UserId) && c.UserId == id),
-                CommentCount = _commentService.GetAll().Count(c => !string.IsNullOrEmpty(c.UserId) && c.UserId == id),
-                OrderCount = _orderService.GetAll().Count(o => !string.IsNullOrEmpty(o.UserId) && o.UserId == id)
+                PictureCount = _pictureService.CountByUserId(id),
+                VideoCount = _videoService.CountByUserId(id),
+                PollCount = _pollService.CountByUserId(id),
+                ChatCount = _chatService.CountByUserId(id),
+                CommentCount = _commentService.CountByUserId(id),
+                OrderCount = _orderService.CountByUserId(id)
             };
 
             return Page();
@@ -147,8 +147,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                     return Page();
                 }
 
-                // Handle Pictures - Delete or Reassign (Fixed null check)
-                var pictures = _pictureService.GetAll().Where(p => !string.IsNullOrEmpty(p.UserId) && p.UserId == id).ToList();
+                // Handle Pictures - Delete or Reassign (using efficient filtered query)
+                var pictures = _pictureService.GetFiltered(userId: id, isAdmin: true);
                 if (pictures.Any())
                 {
                     if (Options.DeletePictures)
@@ -169,8 +169,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                     }
                 }
 
-                // Handle Videos - Delete or Reassign (Fixed null check)
-                var videos = _videoService.GetAll().Where(v => !string.IsNullOrEmpty(v.UserId) && v.UserId == id).ToList();
+                // Handle Videos - Delete or Reassign (using efficient filtered query)
+                var videos = _videoService.GetFiltered(userId: id, isAdmin: true);
                 if (videos.Any())
                 {
                     if (Options.DeleteVideos)
@@ -191,8 +191,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                     }
                 }
 
-                // Handle Polls - Delete or Reassign (Fixed null check)
-                var polls = _pollService.GetAll().Where(p => !string.IsNullOrEmpty(p.UserId) && p.UserId == id).ToList();
+                // Handle Polls - Delete or Reassign (using efficient filtered query)
+                var polls = _pollService.GetByUserId(id);
                 if (polls.Any())
                 {
                     if (Options.DeletePolls)
@@ -213,8 +213,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                     }
                 }
 
-                // Handle Chat Messages - Delete or Reassign (Fixed null check)
-                var chats = _chatService.GetAll().Where(c => !string.IsNullOrEmpty(c.UserId) && c.UserId == id).ToList();
+                // Handle Chat Messages - Delete or Reassign (using efficient filtered query)
+                var chats = _chatService.GetByUserId(id);
                 if (chats.Any())
                 {
                     if (Options.DeleteChat)
@@ -235,8 +235,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                     }
                 }
 
-                // Handle Comments - Delete or Reassign (Fixed null check)
-                var comments = _commentService.GetAll().Where(c => !string.IsNullOrEmpty(c.UserId) && c.UserId == id).ToList();
+                // Handle Comments - Delete or Reassign (using efficient filtered query)
+                var comments = _commentService.GetByUserId(id);
                 if (comments.Any())
                 {
                     if (Options.DeleteComments)
@@ -257,8 +257,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                     }
                 }
 
-                // Handle Orders - Delete or Reassign (Fixed null check)
-                var orders = _orderService.GetAll().Where(o => !string.IsNullOrEmpty(o.UserId) && o.UserId == id).ToList();
+                // Handle Orders - Delete or Reassign (using efficient filtered query)
+                var orders = _orderService.GetByUserId(id);
                 if (orders.Any())
                 {
                     if (Options.DeleteOrders)
@@ -340,14 +340,16 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             if (User != null)
             {
                 Profile = _profileService.GetByUserId(userId);
+                
+                // Use efficient count methods instead of loading all records into memory
                 RelatedData = new UserRelatedData
                 {
-                    PictureCount = _pictureService.GetAll().Count(p => !string.IsNullOrEmpty(p.UserId) && p.UserId == userId),
-                    VideoCount = _videoService.GetAll().Count(v => !string.IsNullOrEmpty(v.UserId) && v.UserId == userId),
-                    PollCount = _pollService.GetAll().Count(p => !string.IsNullOrEmpty(p.UserId) && p.UserId == userId),
-                    ChatCount = _chatService.GetAll().Count(c => !string.IsNullOrEmpty(c.UserId) && c.UserId == userId),
-                    CommentCount = _commentService.GetAll().Count(c => !string.IsNullOrEmpty(c.UserId) && c.UserId == userId),
-                    OrderCount = _orderService.GetAll().Count(o => !string.IsNullOrEmpty(o.UserId) && o.UserId == userId)
+                    PictureCount = _pictureService.CountByUserId(userId),
+                    VideoCount = _videoService.CountByUserId(userId),
+                    PollCount = _pollService.CountByUserId(userId),
+                    ChatCount = _chatService.CountByUserId(userId),
+                    CommentCount = _commentService.CountByUserId(userId),
+                    OrderCount = _orderService.CountByUserId(userId)
                 };
             }
         }

@@ -39,6 +39,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
 
         public async Task OnGetAsync()
         {
+            // Get all users and profiles (these are typically small datasets for admin pages)
             var allUsers = _userService.GetAll();
             var allProfiles = _profileService.GetAll();
 
@@ -71,7 +72,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                 });
             }
 
-            // Apply search filter
+            // Apply search filter (in-memory filtering is acceptable here since user counts are typically small)
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
                 var searchLower = SearchTerm.ToLowerInvariant();

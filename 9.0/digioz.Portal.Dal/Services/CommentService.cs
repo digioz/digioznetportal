@@ -34,6 +34,25 @@ namespace digioz.Portal.Dal.Services
                 .ToList();
         }
 
+        public List<Comment> GetByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return new List<Comment>();
+
+            return _context.Comments
+                .AsNoTracking()
+                .Where(c => !string.IsNullOrEmpty(c.UserId) && c.UserId == userId)
+                .ToList();
+        }
+
+        public int CountByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return 0;
+
+            return _context.Comments.Count(c => !string.IsNullOrEmpty(c.UserId) && c.UserId == userId);
+        }
+
         public void Add(Comment comment)
         {
             _context.Comments.Add(comment);

@@ -24,6 +24,22 @@ namespace digioz.Portal.Dal.Services
             return _context.Polls.ToList();
         }
 
+        public List<Poll> GetByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return new List<Poll>();
+
+            return _context.Polls.Where(p => !string.IsNullOrEmpty(p.UserId) && p.UserId == userId).ToList();
+        }
+
+        public int CountByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return 0;
+
+            return _context.Polls.Count(p => !string.IsNullOrEmpty(p.UserId) && p.UserId == userId);
+        }
+
         public void Add(Poll poll)
         {
             _context.Polls.Add(poll);

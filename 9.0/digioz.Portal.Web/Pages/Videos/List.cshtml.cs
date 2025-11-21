@@ -40,18 +40,8 @@ namespace digioz.Portal.Pages.Videos
             var userId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
             var isAdmin = User?.IsInRole("Admin") == true;
 
-            // Filter videos based on ownership and admin status
-            var allVideos = _videoService.GetAll()
-                .Where(v => 
-                    // Show all videos to admins
-                    isAdmin ||
-                    // Show all their own videos to the owner (visible/hidden, approved/unapproved)
-                    (userId != null && v.UserId == userId) ||
-                    // Show only visible and approved videos to everyone else
-                    (v.Visible && v.Approved)
-                )
-                .OrderByDescending(v => v.Timestamp)
-                .ToList();
+            // Use filtered query to only retrieve needed videos from database
+            var allVideos = _videoService.GetFiltered(userId: userId, isAdmin: isAdmin);
 
             TotalCount = allVideos.Count;
             

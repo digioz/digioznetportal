@@ -7,6 +7,8 @@ namespace digioz.Portal.Dal.Services.Interfaces
     {
         Poll Get(string id);
         List<Poll> GetAll();
+        List<Poll> GetByUserId(string userId);
+        int CountByUserId(string userId);
         void Add(Poll poll);
         void Update(Poll poll);
         void Delete(string id);

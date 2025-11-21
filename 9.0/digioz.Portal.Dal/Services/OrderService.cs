@@ -24,6 +24,22 @@ namespace digioz.Portal.Dal.Services
             return _context.Orders.ToList();
         }
 
+        public List<Order> GetByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return new List<Order>();
+
+            return _context.Orders.Where(o => !string.IsNullOrEmpty(o.UserId) && o.UserId == userId).ToList();
+        }
+
+        public int CountByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return 0;
+
+            return _context.Orders.Count(o => !string.IsNullOrEmpty(o.UserId) && o.UserId == userId);
+        }
+
         public void Add(Order order)
         {
             _context.Orders.Add(order);
