@@ -34,6 +34,15 @@ namespace digioz.Portal.Dal.Services
             return _context.Profiles.ToList();
         }
 
+        public List<Profile> GetByUserIds(List<string> userIds)
+        {
+            if (userIds == null || !userIds.Any())
+            {
+                return new List<Profile>();
+            }
+            return _context.Profiles.Where(p => p.UserId != null && userIds.Contains(p.UserId)).ToList();
+        }
+
         public void Add(Profile profile)
         {
             _context.Profiles.Add(profile);

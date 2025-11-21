@@ -12,6 +12,8 @@ namespace digioz.Portal.Dal.Services.Interfaces
         List<PrivateMessage> GetThread(int rootOrReplyId); // ordered newest first
         void Add(PrivateMessage message);
         void MarkRead(int id);
+        void MarkReadIfUnread(int id);
         void Delete(int id, string userId); // only allow if owner (sender or receiver)
+        bool DeleteIfOwnedByUser(int id, string userId);
     }
 }

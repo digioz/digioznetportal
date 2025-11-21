@@ -48,42 +48,60 @@ namespace digioz.Portal.Dal.Services
         public List<PrivateMessage> GetThread(int messageId)
         {
             var thread = new List<PrivateMessage>();
-            var current = _context.PrivateMessages.AsNoTracking().FirstOrDefault(p => p.Id == messageId);
+            
+            // Get only the ParentId to start traversal
+            var messageInfo = _context.PrivateMessages.AsNoTracking()
+                .Where(p => p.Id == messageId)
+                .Select(p => new { p.Id, p.ParentId })
+                .FirstOrDefault();
 
-            if (current == null)
+            if (messageInfo == null)
             {
                 return thread;
             }
 
-            // Traverse up to find the root of the thread
-            while (current.ParentId != null)
+            // Find the root message ID by traversing up
+            int rootId = messageInfo.Id;
+            var parentId = messageInfo.ParentId;
+            
+            while (parentId != null)
             {
-                current = _context.PrivateMessages.AsNoTracking().FirstOrDefault(p => p.Id == current.ParentId);
-                if (current == null) return new List<PrivateMessage>(); // Should not happen in consistent data
-            }
-
-            // Now 'current' is the root. Collect all descendants.
-            var messages = _context.PrivateMessages.AsNoTracking().ToList();
-            var messageMap = messages.ToLookup(m => m.ParentId);
-
-            var queue = new Queue<PrivateMessage>();
-            queue.Enqueue(current);
-
-            while (queue.Count > 0)
-            {
-                var msg = queue.Dequeue();
-                thread.Add(msg);
-
-                if (messageMap.Contains(msg.Id))
+                var parent = _context.PrivateMessages.AsNoTracking()
+                    .Where(p => p.Id == parentId.Value)
+                    .Select(p => new { p.Id, p.ParentId })
+                    .FirstOrDefault();
+                    
+                if (parent == null)
                 {
-                    foreach (var child in messageMap[msg.Id].OrderBy(m => m.SentDate))
-                    {
-                        queue.Enqueue(child);
-                    }
+                    break; // Should not happen in consistent data
                 }
+                
+                rootId = parent.Id;
+                parentId = parent.ParentId;
             }
 
-            return thread.OrderBy(m => m.SentDate).ToList();
+            // Collect all messages in the thread by querying level by level
+            var allMessages = new List<PrivateMessage>();
+            var currentLevelIds = new List<int> { rootId };
+
+            while (currentLevelIds.Any())
+            {
+                // Fetch all messages at the current level
+                var currentLevelMessages = _context.PrivateMessages.AsNoTracking()
+                    .Where(m => currentLevelIds.Contains(m.Id))
+                    .ToList();
+                
+                allMessages.AddRange(currentLevelMessages);
+                
+                // Get IDs of all children for the next level
+                var currentLevelMessageIds = currentLevelMessages.Select(cm => cm.Id).ToList();
+                currentLevelIds = _context.PrivateMessages.AsNoTracking()
+                    .Where(m => m.ParentId.HasValue && currentLevelMessageIds.Contains(m.ParentId.Value))
+                    .Select(m => m.Id)
+                    .ToList();
+            }
+
+            return allMessages.OrderBy(m => m.SentDate).ToList();
         }
 
 
@@ -102,6 +120,16 @@ namespace digioz.Portal.Dal.Services
             _context.SaveChanges();
         }
 
+        public void MarkReadIfUnread(int id)
+        {
+            var pm = _context.PrivateMessages.Find(id);
+            if (pm != null && !pm.IsRead)
+            {
+                pm.IsRead = true;
+                _context.SaveChanges();
+            }
+        }
+
         public void Delete(int id, string userId)
         {
             var pm = _context.PrivateMessages.Find(id);
@@ -109,6 +137,18 @@ namespace digioz.Portal.Dal.Services
             if (pm.FromId != userId && pm.ToId != userId) return; // not authorized
             _context.PrivateMessages.Remove(pm);
             _context.SaveChanges();
+        }
+
+        public bool DeleteIfOwnedByUser(int id, string userId)
+        {
+            var pm = _context.PrivateMessages.Find(id);
+            if (pm == null || (pm.FromId != userId && pm.ToId != userId))
+            {
+                return false;
+            }
+            _context.PrivateMessages.Remove(pm);
+            _context.SaveChanges();
+            return true;
         }
     }
 }

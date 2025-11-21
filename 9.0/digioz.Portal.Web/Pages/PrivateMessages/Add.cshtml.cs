@@ -7,6 +7,9 @@ using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
 using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.Caching.Memory;
+using digioz.Portal.Utilities;
 
 namespace digioz.Portal.Web.Pages.PrivateMessages
 {
@@ -16,12 +19,17 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
         private readonly IPrivateMessageService _pmService;
         private readonly IProfileService _profileService;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IMemoryCache _cache;
 
-        public AddModel(IPrivateMessageService pmService, IProfileService profileService, UserManager<IdentityUser> userManager)
+        private const string UserProfilesCacheKey = "UserProfilesForMessages";
+        private static readonly TimeSpan UserProfilesCacheExpiration = TimeSpan.FromMinutes(5);
+
+        public AddModel(IPrivateMessageService pmService, IProfileService profileService, UserManager<IdentityUser> userManager, IMemoryCache cache)
         {
             _pmService = pmService;
             _profileService = profileService;
             _userManager = userManager;
+            _cache = cache;
         }
 
         public class UserLite { public string Id { get; set; } = string.Empty; public string DisplayName { get; set; } = string.Empty; }
@@ -40,6 +48,26 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             public string Message { get; set; } = string.Empty;
         }
 
+        private List<UserLite> GetCachedUserProfiles()
+        {
+            if (_cache.TryGetValue(UserProfilesCacheKey, out List<UserLite>? cachedUsers) && cachedUsers != null)
+            {
+                return cachedUsers;
+            }
+
+            var users = _profileService.GetAll()
+                .Where(p => !string.IsNullOrWhiteSpace(p.DisplayName))
+                .Select(p => new UserLite { Id = p.UserId, DisplayName = p.DisplayName })
+                .ToList();
+            
+            var cacheOptions = new MemoryCacheEntryOptions()
+                .SetSlidingExpiration(UserProfilesCacheExpiration);
+            
+            _cache.Set(UserProfilesCacheKey, users, cacheOptions);
+            
+            return users;
+        }
+
         public void OnGet()
         {
         }
@@ -49,10 +77,7 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             var typed = (Input.ToDisplayName ?? string.Empty).Trim();
             if (!string.IsNullOrEmpty(typed))
             {
-                var users = _profileService.GetAll()
-                    .Where(p => !string.IsNullOrWhiteSpace(p.DisplayName))
-                    .Select(p => new UserLite { Id = p.UserId, DisplayName = p.DisplayName })
-                    .ToList();
+                var users = GetCachedUserProfiles();
 
                 // First try exact (case-insensitive), then partial contains
                 var exact = users.Where(u => string.Equals(u.DisplayName, typed, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -82,12 +107,14 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
                 return Page();
             }
 
-            var sanitizedMessage = StringUtils.SanitizeUserInput(Input.Message);
+            var sanitizedMessage = StringUtils.SanitizeToPlainText(Input.Message);
+            var sanitizedSubject = StringUtils.SanitizeToPlainText(Input.Subject);
+
             var pm = new PrivateMessage
             {
                 FromId = currentUserId,
                 ToId = Input.ToId,
-                Subject = Input.Subject,
+                Subject = sanitizedSubject,
                 Message = sanitizedMessage
             };
             _pmService.Add(pm);

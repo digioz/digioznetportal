@@ -62,9 +62,10 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
                 return NotFound();
             }
             
-            if (RootMessage.ToId == currentUserId && !RootMessage.IsRead)
+            // Atomically mark as read if unread to avoid race condition.
+            if (RootMessage.ToId == currentUserId)
             {
-                _pmService.MarkRead(id);
+                _pmService.MarkReadIfUnread(id); // Ensure this is atomic in the service implementation.
             }
 
             var rawThread = _pmService.GetThread(id);
@@ -107,12 +108,15 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             {
                 return OnGet(id); // reload data
             }
-            var sanitizedMessage = StringUtils.SanitizeUserInput(Reply.Message);
+
+            var sanitizedMessage = StringUtils.SanitizeToPlainText(Reply.Message);
+            var sanitizedSubject = StringUtils.SanitizeToPlainText(Reply.Subject);
+
             var reply = new PrivateMessage
             {
                 FromId = currentUserId,
                 ToId = currentUserId == root.FromId ? root.ToId : root.FromId,
-                Subject = Reply.Subject,
+                Subject = sanitizedSubject,
                 Message = sanitizedMessage,
                 ParentId = id
             };
