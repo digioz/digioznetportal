@@ -576,7 +576,9 @@ namespace digioz.Portal.Utilities
         }
 
         /// <summary>
-        /// Returns safe plain text using XSS library
+        /// Returns safe plain text using XSS library.
+        /// NOTE: This method uses regex-based HTML stripping. For more secure sanitization,
+        /// prefer using SanitizeToPlainText which uses HtmlAgilityPack for proper HTML parsing.
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -586,6 +588,25 @@ namespace digioz.Portal.Utilities
                 input = GetSafeHtml(input);
             }
             return input;
+        }
+
+        /// <summary>
+        /// Sanitizes HTML input by extracting plain text only, removing all tags, scripts, and attributes.
+        /// Uses HtmlAgilityPack for secure HTML parsing and collapses excessive whitespace.
+        /// This is the recommended method for sanitizing user-generated content to prevent XSS attacks.
+        /// </summary>
+        /// <param name="input">The HTML input to sanitize</param>
+        /// <returns>Plain text with collapsed whitespace</returns>
+        public static string SanitizeToPlainText(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            // Parse HTML then extract plain text only; remove all tags, scripts, attributes.
+            var doc = new HtmlDocument();
+            doc.LoadHtml(input);
+            var text = doc.DocumentNode.InnerText ?? string.Empty;
+            // Collapse excessive whitespace/newlines
+            text = Regex.Replace(text, @"\s+", " ").Trim();
+            return text;
         }
         #endregion
 

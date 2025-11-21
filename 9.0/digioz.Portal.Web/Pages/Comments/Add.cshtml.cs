@@ -10,8 +10,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Memory;
 using digioz.Portal.Utilities;
-using HtmlAgilityPack; // added for sanitization
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 namespace digioz.Portal.Web.Pages.Comments
@@ -50,7 +48,7 @@ namespace digioz.Portal.Web.Pages.Comments
             if (string.IsNullOrWhiteSpace(comment) || comment.Length > 5000)
                 return Redirect(referer ?? "/");
 
-            var sanitized = Sanitize(comment);
+            var sanitized = StringUtils.SanitizeToPlainText(comment);
 
             var cfg = _configService.GetAll();
             var recaptchaEnabled = bool.TryParse(cfg.FirstOrDefault(c => c.ConfigKey == "RecaptchaEnabled")?.ConfigValue, out var en) && en;
@@ -89,18 +87,6 @@ namespace digioz.Portal.Web.Pages.Comments
 
             _cache.Remove("CommentsMenu_" + referenceType);
             return Redirect(referer ?? "/");
-        }
-
-        private static string Sanitize(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
-            // Parse HTML then extract plain text only; remove all tags, scripts, attributes.
-            var doc = new HtmlDocument();
-            doc.LoadHtml(input);
-            var text = doc.DocumentNode.InnerText ?? string.Empty;
-            // Collapse excessive whitespace/newlines
-            text = Regex.Replace(text, "\\s+", " ").Trim();
-            return text;
         }
 
         private class RecaptchaResponse { public bool Success { get; set; } public float Score { get; set; } public string? Action { get; set; } }
