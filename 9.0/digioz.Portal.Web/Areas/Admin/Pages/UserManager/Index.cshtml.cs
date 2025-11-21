@@ -90,7 +90,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
 
             // Apply pagination
             if (PageNumber < 1) PageNumber = 1;
-            if (PageNumber > TotalPages && TotalPages > 0) PageNumber = TotalPages;
+            if (TotalPages > 0 && PageNumber > TotalPages) PageNumber = TotalPages;
 
             Users = usersWithProfiles
                 .OrderBy(up => up.User.UserName)

@@ -46,7 +46,7 @@ namespace digioz.Portal.Pages.Pictures
             // Get current user ID if logged in
             var email = User?.Identity?.Name;
             var userId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
-            var isAdmin = User?.IsInRole("Admin") == true;
+            var isAdmin = User?.IsInRole("Administrator") == true;
 
             // Use filtered query to only retrieve needed pictures from database
             var allPictures = _pictureService.GetFiltered(userId: userId, albumId: Id, isAdmin: isAdmin);
