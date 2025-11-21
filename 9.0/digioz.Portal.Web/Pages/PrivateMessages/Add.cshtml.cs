@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
-using HtmlAgilityPack;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using System;
 
 namespace digioz.Portal.Web.Pages.PrivateMessages
@@ -83,7 +82,7 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
                 return Page();
             }
 
-            var sanitizedMessage = Sanitize(Input.Message);
+            var sanitizedMessage = StringUtils.SanitizeUserInput(Input.Message);
             var pm = new PrivateMessage
             {
                 FromId = currentUserId,
@@ -93,18 +92,6 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             };
             _pmService.Add(pm);
             return RedirectToPage("/PrivateMessages/Details", new { id = pm.Id });
-        }
-
-        private static string Sanitize(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
-            // Parse HTML then extract plain text only; remove all tags, scripts, attributes.
-            var doc = new HtmlDocument();
-            doc.LoadHtml(input);
-            var text = doc.DocumentNode.InnerText ?? string.Empty;
-            // Collapse excessive whitespace/newlines
-            text = Regex.Replace(text, "\\s+", " ").Trim();
-            return text;
         }
     }
 }

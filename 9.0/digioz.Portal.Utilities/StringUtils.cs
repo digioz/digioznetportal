@@ -587,6 +587,24 @@ namespace digioz.Portal.Utilities
             }
             return input;
         }
+
+        /// <summary>
+        /// Sanitizes user input by extracting plain text only, removing all HTML tags, scripts, and attributes.
+        /// Collapses excessive whitespace for clean output. Use this for user-generated content to prevent XSS attacks.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string SanitizeUserInput(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            // Parse HTML then extract plain text only; remove all tags, scripts, attributes.
+            var doc = new HtmlDocument();
+            doc.LoadHtml(input);
+            var text = doc.DocumentNode.InnerText ?? string.Empty;
+            // Collapse excessive whitespace/newlines
+            text = Regex.Replace(text, "\\s+", " ").Trim();
+            return text;
+        }
         #endregion
 
         #region Html Element Helpers
