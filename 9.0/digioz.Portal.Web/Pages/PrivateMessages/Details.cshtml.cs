@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.RegularExpressions;
+using HtmlAgilityPack;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -106,16 +108,29 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             {
                 return OnGet(id); // reload data
             }
+            var sanitizedMessage = Sanitize(Reply.Message);
             var reply = new PrivateMessage
             {
                 FromId = currentUserId,
                 ToId = currentUserId == root.FromId ? root.ToId : root.FromId,
                 Subject = Reply.Subject,
-                Message = Reply.Message,
+                Message = sanitizedMessage,
                 ParentId = id
             };
             _pmService.Add(reply);
             return RedirectToPage("/PrivateMessages/Details", new { id = root.Id });
+        }
+
+        private static string Sanitize(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            // Parse HTML then extract plain text only; remove all tags, scripts, attributes.
+            var doc = new HtmlDocument();
+            doc.LoadHtml(input);
+            var text = doc.DocumentNode.InnerText ?? string.Empty;
+            // Collapse excessive whitespace/newlines
+            text = Regex.Replace(text, "\\s+", " ").Trim();
+            return text;
         }
     }
 }
