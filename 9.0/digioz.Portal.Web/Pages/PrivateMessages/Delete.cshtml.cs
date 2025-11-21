@@ -44,13 +44,12 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
         public IActionResult OnPost(int id)
         {
             var currentUserId = _userManager.GetUserId(User);
-            // Re-check ownership on POST to be safe
-            var messageToDelete = _pmService.Get(id);
-            if (messageToDelete == null || (messageToDelete.FromId != currentUserId && messageToDelete.ToId != currentUserId))
+            // Perform atomic check and delete
+            var deleted = _pmService.DeleteIfOwnedByUser(id, currentUserId);
+            if (!deleted)
             {
                 return NotFound();
             }
-            _pmService.Delete(id, currentUserId);
             return RedirectToPage("/PrivateMessages/Index");
         }
     }
