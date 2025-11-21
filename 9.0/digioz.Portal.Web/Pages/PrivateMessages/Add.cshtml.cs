@@ -9,7 +9,6 @@ using digioz.Portal.Utilities;
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Memory;
-using digioz.Portal.Utilities;
 
 namespace digioz.Portal.Web.Pages.PrivateMessages
 {
@@ -109,6 +108,12 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
 
             var sanitizedMessage = StringUtils.SanitizeToPlainText(Input.Message);
             var sanitizedSubject = StringUtils.SanitizeToPlainText(Input.Subject);
+
+            if (currentUserId == null)
+            {
+                // This should not happen due to [Authorize]
+                return Challenge();
+            }
 
             var pm = new PrivateMessage
             {

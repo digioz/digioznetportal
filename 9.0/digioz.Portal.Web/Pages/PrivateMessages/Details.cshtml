@@ -10,7 +10,7 @@
     <div>
         @foreach (var msg in Model.Thread)
         {
-            <div class="card mb-2 @(msg.Id == Model.RootMessage.Id ? "border-primary" : "")">
+            <div class="card mb-2 @(msg.Id == Model.RootMessage?.Id ? "border-primary" : "")">
                 <div class="card-header">
                     <strong>From:</strong> @msg.FromDisplayName to @msg.ToDisplayName
                     <span class="float-end">@msg.SentDate?.ToLocalTime().ToString("g")</span>
@@ -25,7 +25,7 @@
 <hr />
 <h3>Reply</h3>
 <form method="post">
-    <input type="hidden" asp-for="Reply.ParentId" value="@Model.RootMessage.Id" />
+    <input type="hidden" asp-for="Reply.ParentId" value="@Model.RootMessage?.Id" />
     <div class="mb-3">
         <label asp-for="Reply.Subject" class="form-label"></label>
         <input asp-for="Reply.Subject" class="form-control" />

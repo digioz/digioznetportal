@@ -602,7 +602,7 @@ namespace digioz.Portal.Utilities
         public static string SanitizeUserInput(string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return string.Empty;
-            
+
             try
             {
                 // Parse HTML then extract plain text only; remove all tags, scripts, attributes.
@@ -618,6 +618,8 @@ namespace digioz.Portal.Utilities
                 // If HTML parsing fails, fall back to returning empty string for safety
                 return string.Empty;
             }
+        }
+
         /// <summary>
         /// Sanitizes HTML input by extracting plain text only, removing all tags, scripts, and attributes.
         /// Uses HtmlAgilityPack for secure HTML parsing and collapses excessive whitespace.

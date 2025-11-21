@@ -22,7 +22,7 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             _userManager = userManager;
         }
 
-        public PrivateMessage Message { get; set; }
+        public PrivateMessage? Message { get; set; }
         public string FromDisplayName { get; set; } = string.Empty;
 
         public IActionResult OnGet(int id)

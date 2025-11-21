@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +16,7 @@ namespace digioz.Portal.Web.Pages.API
             _profileService = profileService;
         }
 
-        public class UserLite { public string Id { get; set; } public string DisplayName { get; set; } }
+        public class UserLite { public string? Id { get; set; } public string? DisplayName { get; set; } }
 
         public IActionResult OnGet(string term)
         {

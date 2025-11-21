@@ -38,7 +38,7 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             public string? Message { get; set; }
         }
 
-        public PrivateMessage RootMessage { get; set; }
+        public PrivateMessage? RootMessage { get; set; }
         public List<ThreadMessage> Thread { get; set; } = new();
 
         [BindProperty]
