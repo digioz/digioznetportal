@@ -57,6 +57,7 @@ namespace digioz.Portal.Dal
         public virtual DbSet<PollAnswer> PollAnswers { get; set; }
         public virtual DbSet<PollUsersVote> PollUsersVotes { get; set; }
         public virtual DbSet<PollVote> PollVotes { get; set; }
+        public virtual DbSet<PrivateMessage> PrivateMessages { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<ProductCategory> ProductCategories { get; set; }
         public virtual DbSet<ProductOption> ProductOptions { get; set; }
@@ -551,6 +552,21 @@ namespace digioz.Portal.Dal
                 entity.Property(e => e.UserId)
                     .IsRequired()
                     .HasMaxLength(128);
+            });
+
+            modelBuilder.Entity<PrivateMessage>(entity =>
+            {
+                entity.ToTable("PrivateMessage");
+                // entity.Property(e => e.Id).HasMaxLength(128);
+                entity.Property(e => e.FromId).HasMaxLength(128);
+                entity.Property(e => e.FromIp).HasMaxLength(25);
+                entity.Property(e => e.ToId).HasMaxLength(128);
+                entity.Property(e => e.Subject).HasMaxLength(255);
+                // ParentId relationship (self-referencing)
+                entity.HasOne<PrivateMessage>()
+                      .WithMany()
+                      .HasForeignKey(pm => pm.ParentId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Product>(entity =>

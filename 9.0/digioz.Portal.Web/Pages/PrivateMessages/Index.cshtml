@@ -1,6 +1,33 @@
 ﻿@page
 @model digioz.Portal.Web.Pages.PrivateMessages.IndexModel
 @{
+    ViewData["Title"] = "Inbox";
 }
-
-<h1>Private Messages</h1>
+<h1>Inbox</h1>
+<partial name="_PrivateMessagesNavigation" model='"Index"' />
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>From</th>
+            <th>Subject</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var msg in Model.Messages)
+    {
+        <tr class="@(msg.IsRead ? "" : "table-warning")">
+            <td>@msg.FromDisplayName</td>
+            <td>@msg.Subject</td>
+            <td>@msg.SentDate?.ToLocalTime().ToString("g")</td>
+            <td>@(msg.IsRead ? "Read" : "Unread")</td>
+            <td>
+                <a asp-page="/PrivateMessages/Details" asp-route-id="@msg.Id" class="btn btn-sm btn-primary">Read</a>
+                <a asp-page="/PrivateMessages/Delete" asp-route-id="@msg.Id" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

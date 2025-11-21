@@ -88,6 +88,7 @@ builder.Services.AddScoped<IVideoAlbumService, VideoAlbumService>();
 builder.Services.AddScoped<IVisitorInfoService, VisitorInfoService>();
 builder.Services.AddScoped<IVisitorSessionService, VisitorSessionService>();
 builder.Services.AddScoped<IZoneService, ZoneService>();
+builder.Services.AddScoped<IPrivateMessageService, PrivateMessageService>();
 
 builder.Services.AddMemoryCache();
 

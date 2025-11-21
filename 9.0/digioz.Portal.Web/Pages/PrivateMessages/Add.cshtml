@@ -1,0 +1,30 @@
+@page
+@model digioz.Portal.Web.Pages.PrivateMessages.AddModel
+@{
+    ViewData["Title"] = "Compose";
+}
+<h1>Compose Message</h1>
+<form method="post">
+    <div class="mb-3 autocomplete-container">
+        <label asp-for="Input.ToDisplayName" class="form-label">To (Profile Display Name)</label>
+        <input id="toUser" asp-for="Input.ToDisplayName" class="form-control" autocomplete="off" />
+        <span asp-validation-for="Input.ToDisplayName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.Subject" class="form-label"></label>
+        <input asp-for="Input.Subject" class="form-control" />
+        <span asp-validation-for="Input.Subject" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.Message" class="form-label"></label>
+        <textarea asp-for="Input.Message" rows="6" class="form-control"></textarea>
+        <span asp-validation-for="Input.Message" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Send</button>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        autocomplete(document.getElementById("toUser"));
+    </script>
+}
