@@ -8,6 +8,7 @@ using digioz.Portal.Dal.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Memory;
+using digioz.Portal.Utilities;
 
 namespace digioz.Portal.Web.Pages.PrivateMessages
 {
@@ -102,12 +103,15 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
                 return Page();
             }
 
+            var sanitizedMessage = StringUtils.SanitizeToPlainText(Input.Message);
+            var sanitizedSubject = StringUtils.SanitizeToPlainText(Input.Subject);
+
             var pm = new PrivateMessage
             {
                 FromId = currentUserId,
                 ToId = Input.ToId,
-                Subject = Input.Subject,
-                Message = Input.Message
+                Subject = sanitizedSubject,
+                Message = sanitizedMessage
             };
             _pmService.Add(pm);
             return RedirectToPage("/PrivateMessages/Details", new { id = pm.Id });

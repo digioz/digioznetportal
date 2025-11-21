@@ -83,7 +83,7 @@ namespace digioz.Portal.Dal.Services
                 }
             }
 
-            return thread.OrderByDescending(m => m.SentDate).ToList();
+            return thread.OrderBy(m => m.SentDate).ToList();
         }
 
 

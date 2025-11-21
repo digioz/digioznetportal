@@ -4,7 +4,7 @@
     ViewData["Title"] = "Outbox";
 }
 <h1>Outbox (Unopened messages)</h1>
-<p><a asp-page="/PrivateMessages/Index" class="btn btn-secondary">Inbox</a> <a asp-page="/PrivateMessages/Sent" class="btn btn-secondary">Sent</a></p>
+<partial name="_PrivateMessagesNavigation" model="Outbox" />
 <table class="table table-striped">
     <thead>
         <tr>
