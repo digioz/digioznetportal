@@ -4,7 +4,7 @@
     ViewData["Title"] = "Inbox";
 }
 <h1>Inbox</h1>
-<p><a asp-page="/PrivateMessages/Add" class="btn btn-success">Compose</a> <a asp-page="/PrivateMessages/Sent" class="btn btn-secondary">Sent</a> <a asp-page="/PrivateMessages/Outbox" class="btn btn-secondary">Outbox</a></p>
+<partial name="_PrivateMessagesNavigation" model="Index" />
 <table class="table table-striped">
     <thead>
         <tr>
