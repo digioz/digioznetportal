@@ -24,13 +24,18 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
             _cache = cache;
         }
 
-        public Task<IViewComponentResult> InvokeAsync(string? referenceId = null)
+        public Task<IViewComponentResult> InvokeAsync(string? referenceId = null, string? referenceType = null)
         {
-            var pagePath = HttpContext?.Request?.Path.Value ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(pagePath) || pagePath == "/") pagePath = "/Index";
+            // If referenceType is not provided, use the current page path
+            if (string.IsNullOrWhiteSpace(referenceType))
+            {
+                var pagePath = HttpContext?.Request?.Path.Value ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(pagePath) || pagePath == "/") pagePath = "/Index";
+                referenceType = pagePath;
+            }
 
             ViewBag.ReferenceId = referenceId;
-            ViewBag.ReferenceType = pagePath;
+            ViewBag.ReferenceType = referenceType;
 
             // Recaptcha config (cache OK, low churn)
             const string cfgCacheKey = "RecaptchaCfg";
@@ -46,8 +51,20 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
             ViewBag.RecaptchaEnabled = recaptchaCfg.enabled;
             ViewBag.RecaptchaPublicKey = recaptchaCfg.publicKey;
 
-            // Use repository-level filtering instead of loading all comments into memory
-            List<Comment> comments = _commentService.GetByReferenceType(pagePath);
+            // Get comments filtered by both ReferenceType and ReferenceId
+            List<Comment> comments;
+            if (!string.IsNullOrWhiteSpace(referenceId))
+            {
+                // Get comments for specific reference (e.g., specific announcement)
+                comments = _commentService.GetByReferenceType(referenceType)
+                    .Where(c => c.ReferenceId == referenceId)
+                    .ToList();
+            }
+            else
+            {
+                // Get all comments for this reference type
+                comments = _commentService.GetByReferenceType(referenceType);
+            }
 
             // Build avatar and display name maps (userId -> avatar/DisplayName)
             var avatarMap = new Dictionary<string, string>();

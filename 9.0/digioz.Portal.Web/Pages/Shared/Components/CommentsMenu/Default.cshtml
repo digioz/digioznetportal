@@ -4,15 +4,18 @@
     var avatarMap = ViewBag.AvatarMap as IDictionary<string,string> ?? new Dictionary<string,string>();
     // Display name map supplied by ViewComponent: Dictionary<string,string> userId -> display name
     var displayNameMap = ViewBag.DisplayNameMap as IDictionary<string,string> ?? new Dictionary<string,string>();
+    
+    // Create a unique ID for this comment section to avoid ID collisions when multiple instances exist on the same page
+    var uniqueId = $"{ViewBag.ReferenceType}_{ViewBag.ReferenceId}".Replace("/", "_").Replace(" ", "_");
 }
 
-<div class="card mb-3" id="comments-root">
+<div class="card mb-3" id="comments-root-@uniqueId">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span>Comments (@Model.Count())</span>
-        <button type="button" class="btn btn-info btn-sm" data-bs-toggle="collapse" data-bs-target="#@ViewBag.ReferenceType@ViewBag.ReferenceId" aria-expanded="false" aria-controls="@ViewBag.ReferenceType@ViewBag.ReferenceId">View</button>
+        <button type="button" class="btn btn-info btn-sm" data-bs-toggle="collapse" data-bs-target="#collapse-@uniqueId" aria-expanded="false" aria-controls="collapse-@uniqueId">View</button>
     </div>
 
-    <div id="@ViewBag.ReferenceType@ViewBag.ReferenceId" class="collapse hide">
+    <div id="collapse-@uniqueId" class="collapse hide">
         @if (!Model.Any())
         {
             <div class="card-body">
@@ -76,13 +79,13 @@
         @if (User.Identity?.IsAuthenticated == true)
         {
             <div class="card-body border-top">
-                <form action="/Comments/Add" method="post" class="mt-3" id="commentForm">
+                <form action="/Comments/Add" method="post" class="mt-3 comment-form" id="commentForm-@uniqueId" data-unique-id="@uniqueId">
                     @Html.AntiForgeryToken()
-                    <input type="hidden" id="referenceId" name="referenceId" value="@ViewBag.ReferenceId" />
-                    <input type="hidden" id="referenceType" name="referenceType" value="@ViewBag.ReferenceType" />
-                    <input type="hidden" id="recaptchaToken" name="recaptchaToken" />
+                    <input type="hidden" name="referenceId" value="@ViewBag.ReferenceId" />
+                    <input type="hidden" name="referenceType" value="@ViewBag.ReferenceType" />
+                    <input type="hidden" class="recaptchaToken" name="recaptchaToken" />
                     <div class="mb-3">
-                        <textarea id="comment" name="comment" class="form-control" rows="3" placeholder="Your comments"></textarea>
+                        <textarea name="comment" class="form-control" rows="3" placeholder="Your comments"></textarea>
                     </div>
                     <div class="d-flex justify-content-end">
                         <button type="submit" class="btn btn-info btn-sm">Post Comment</button>
@@ -105,9 +108,15 @@
 }
 <script>
 (function(){
+    const uniqueId = '@uniqueId';
     const recaptchaEnabled = '@( (ViewBag.RecaptchaEnabled ?? false).ToString().ToLower() )' === 'true';
+    const recaptchaPublicKey = '@ViewBag.RecaptchaPublicKey';
 
     function handleAjaxForm(form, beforeSend){
+        // Check if this form already has the handler attached
+        if (form.dataset.handlerAttached === 'true') return;
+        form.dataset.handlerAttached = 'true';
+        
         form.addEventListener('submit', function(e){
             if (beforeSend) {
                 const proceed = beforeSend(e);
@@ -122,14 +131,14 @@
         });
     }
 
-    const commentForm = document.getElementById('commentForm');
+    const commentForm = document.getElementById('commentForm-' + uniqueId);
     if(commentForm){
         if(recaptchaEnabled && window.grecaptcha){
             handleAjaxForm(commentForm, function(e){
                 e.preventDefault();
                 grecaptcha.ready(function(){
-                    grecaptcha.execute('@ViewBag.RecaptchaPublicKey', {action: 'comment'}).then(function(token){
-                        document.getElementById('recaptchaToken').value = token;
+                    grecaptcha.execute(recaptchaPublicKey, {action: 'comment'}).then(function(token){
+                        commentForm.querySelector('.recaptchaToken').value = token;
                         const data = new FormData(commentForm);
                         fetch(commentForm.action, { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                             .then(()=> window.location.reload())
@@ -143,7 +152,11 @@
         }
     }
 
-    document.querySelectorAll('.comment-like-form').forEach(f=>{
+    // Handle like forms only within this comment section
+    document.querySelectorAll('#comments-root-' + uniqueId + ' .comment-like-form').forEach(f=>{
+        if (f.dataset.handlerAttached === 'true') return;
+        f.dataset.handlerAttached = 'true';
+        
         f.addEventListener('submit', function(e){
             e.preventDefault();
             const data = new FormData(f);

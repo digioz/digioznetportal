@@ -8,6 +8,7 @@ namespace digioz.Portal.Utilities
     public interface ICommentsHelper
     {
         bool IsCommentsEnabledForPageTitle(string pageTitle);
+        bool IsCommentsEnabledForAnnouncement(int announcementId);
     }
 
     // This helper avoids referencing DAL by accepting data providers via delegates
@@ -38,6 +39,22 @@ namespace digioz.Portal.Utilities
             var commentConfigs = _getCommentConfigs() ?? Enumerable.Empty<CommentConfig>();
             var anyForPage = commentConfigs.Any(cc => cc.ReferenceTitle == pageTitle && cc.Visible);
             return anyForPage;
+        }
+
+        public bool IsCommentsEnabledForAnnouncement(int announcementId)
+        {
+            var configs = _getConfigs() ?? Enumerable.Empty<Config>();
+
+            var enableAllConfig = configs.FirstOrDefault(c => c.ConfigKey == "EnableCommentsOnAllPages");
+            if (enableAllConfig != null && bool.TryParse(enableAllConfig.ConfigValue, out var enableAll) && enableAll)
+                return true;
+
+            var commentConfigs = _getCommentConfigs() ?? Enumerable.Empty<CommentConfig>();
+            var anyForAnnouncement = commentConfigs.Any(cc => 
+                cc.ReferenceType == "/Announcements" && 
+                cc.ReferenceId == announcementId.ToString() && 
+                cc.Visible);
+            return anyForAnnouncement;
         }
     }
 }

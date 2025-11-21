@@ -28,6 +28,6 @@
     // Render comments section if enabled
     if (Model?.AllowComments == true)
     {
-        @await Component.InvokeAsync("CommentsMenu", new { referenceType = "PageContent", referenceId = Model.PageContent?.Id.ToString() })
+        @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent?.Id.ToString(), referenceType = "/Contact" })
     }
 }

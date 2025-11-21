@@ -3,7 +3,21 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
-	ViewData["Title"] = "Page";
+	ViewData["Title"] = Model.PageContent?.Title ?? "Page";
+}
+
+@section keywords {
+	@if (Model.PageContent?.Keywords != null)
+	{
+		<meta name="keywords" content="@Model.PageContent.Keywords" />
+	}
+}
+
+@section description {
+	@if (Model.PageContent?.Description != null)
+	{
+		<meta name="description" content="@Model.PageContent.Description" />
+	}
 }
 
 <div class="container">
@@ -14,5 +28,10 @@
 	else
 	{
 		<div class="alert alert-warning">Page not found.</div>
+	}
+
+	@if (Model.AllowComments && Model.PageContent != null)
+	{
+		@await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent.Id.ToString(), referenceType = "/Page" })
 	}
 </div>
