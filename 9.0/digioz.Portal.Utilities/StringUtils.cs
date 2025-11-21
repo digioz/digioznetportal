@@ -590,6 +590,34 @@ namespace digioz.Portal.Utilities
             return input;
         }
 
+        // Compiled regex for better performance in SanitizeUserInput
+        private static readonly Regex SanitizeWhitespaceRegex = new Regex("\\s+", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Sanitizes user input by extracting plain text only, removing all HTML tags, scripts, and attributes.
+        /// Collapses excessive whitespace for clean output. Use this for user-generated content to prevent XSS attacks.
+        /// </summary>
+        /// <param name="input">The user input string to sanitize, which may contain HTML or script content.</param>
+        /// <returns>A sanitized string containing only plain text with normalized whitespace, or empty string if input is null/whitespace.</returns>
+        public static string SanitizeUserInput(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            
+            try
+            {
+                // Parse HTML then extract plain text only; remove all tags, scripts, attributes.
+                var doc = new HtmlDocument();
+                doc.LoadHtml(input);
+                var text = doc.DocumentNode.InnerText ?? string.Empty;
+                // Collapse excessive whitespace/newlines using compiled regex for performance
+                text = SanitizeWhitespaceRegex.Replace(text, " ").Trim();
+                return text;
+            }
+            catch
+            {
+                // If HTML parsing fails, fall back to returning empty string for safety
+                return string.Empty;
+            }
         /// <summary>
         /// Sanitizes HTML input by extracting plain text only, removing all tags, scripts, and attributes.
         /// Uses HtmlAgilityPack for secure HTML parsing and collapses excessive whitespace.
