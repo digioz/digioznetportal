@@ -605,7 +605,7 @@ namespace digioz.Portal.Utilities
             doc.LoadHtml(input);
             var text = doc.DocumentNode.InnerText ?? string.Empty;
             // Collapse excessive whitespace/newlines
-            text = Regex.Replace(text, "\\s+", " ").Trim();
+            text = Regex.Replace(text, @"\s+", " ").Trim();
             return text;
         }
         #endregion
