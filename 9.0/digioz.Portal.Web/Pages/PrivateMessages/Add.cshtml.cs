@@ -49,20 +49,22 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
 
         private List<UserLite> GetCachedUserProfiles()
         {
-            if (!_cache.TryGetValue(UserProfilesCacheKey, out List<UserLite>? cachedUsers))
+            if (_cache.TryGetValue(UserProfilesCacheKey, out List<UserLite>? cachedUsers) && cachedUsers != null)
             {
-                cachedUsers = _profileService.GetAll()
-                    .Where(p => !string.IsNullOrWhiteSpace(p.DisplayName))
-                    .Select(p => new UserLite { Id = p.UserId, DisplayName = p.DisplayName })
-                    .ToList();
-                
-                var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(UserProfilesCacheExpiration);
-                
-                _cache.Set(UserProfilesCacheKey, cachedUsers, cacheOptions);
+                return cachedUsers;
             }
+
+            var users = _profileService.GetAll()
+                .Where(p => !string.IsNullOrWhiteSpace(p.DisplayName))
+                .Select(p => new UserLite { Id = p.UserId, DisplayName = p.DisplayName })
+                .ToList();
             
-            return cachedUsers!;
+            var cacheOptions = new MemoryCacheEntryOptions()
+                .SetSlidingExpiration(UserProfilesCacheExpiration);
+            
+            _cache.Set(UserProfilesCacheKey, users, cacheOptions);
+            
+            return users;
         }
 
         public void OnGet()
