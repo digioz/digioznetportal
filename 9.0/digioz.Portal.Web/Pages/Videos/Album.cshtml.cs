@@ -46,7 +46,7 @@ namespace digioz.Portal.Pages.Videos
             // Get current user ID if logged in
             var email = User?.Identity?.Name;
             var userId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
-            var isAdmin = User?.IsInRole("Admin") == true;
+            var isAdmin = User?.IsInRole("Administrator") == true;
 
             // Use filtered query to only retrieve needed videos from database
             var allVideos = _videoService.GetFiltered(userId: userId, albumId: Id, isAdmin: isAdmin);

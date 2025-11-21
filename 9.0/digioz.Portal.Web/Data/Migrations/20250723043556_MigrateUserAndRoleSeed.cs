@@ -63,7 +63,7 @@ namespace digioz.Portal.Web.Data.Migrations
             {
                 Id = systemUserId,
                 UserName = "system@domain.com",
-                NormalizedUserName = "SYSTEM",
+                NormalizedUserName = "SYSTEM@DOMAIN.COM",
                 Email = "system@domain.com",
                 NormalizedEmail = "SYSTEM@DOMAIN.COM",
                 SecurityStamp = systemSecurityStamp,
