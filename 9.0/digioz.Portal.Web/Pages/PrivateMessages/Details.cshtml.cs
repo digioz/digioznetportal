@@ -61,9 +61,10 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
                 return NotFound();
             }
             
-            if (RootMessage.ToId == currentUserId && !RootMessage.IsRead)
+            // Atomically mark as read if unread to avoid race condition.
+            if (RootMessage.ToId == currentUserId)
             {
-                _pmService.MarkRead(id);
+                _pmService.MarkReadIfUnread(id); // Ensure this is atomic in the service implementation.
             }
 
             var rawThread = _pmService.GetThread(id);
