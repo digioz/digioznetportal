@@ -27,20 +27,8 @@ namespace digioz.Portal.Web.Pages.Shared.Components.Announcements
 
         public Task<IViewComponentResult> InvokeAsync()
         {
-            // Get all visible announcements ordered by timestamp descending
-            var allAnnouncements = _announcementService.GetAll()
-                .Where(a => a.Visible)
-                .OrderByDescending(a => a.Timestamp)
-                .ToList();
-
-            if (!allAnnouncements.Any())
-            {
-                return Task.FromResult<IViewComponentResult>(View(new List<Announcement>()));
-            }
-
-            // Get the number of announcements to display from config
-            var numberOfAnnouncementsConfig = _configService.GetAll()
-                .FirstOrDefault(c => c.ConfigKey == "NumberOfAnnouncements");
+            // Get the number of announcements to display from config using targeted query
+            var numberOfAnnouncementsConfig = _configService.GetByKey("NumberOfAnnouncements");
             
             int numberOfAnnouncements = 3; // Default value
             if (numberOfAnnouncementsConfig != null && int.TryParse(numberOfAnnouncementsConfig.ConfigValue, out var configValue))
@@ -48,14 +36,19 @@ namespace digioz.Portal.Web.Pages.Shared.Components.Announcements
                 numberOfAnnouncements = configValue;
             }
 
-            var announcementsToDisplay = allAnnouncements.Take(numberOfAnnouncements).ToList();
+            // Get only the required number of visible announcements directly from database
+            // This avoids loading all announcements into memory
+            var announcementsToDisplay = _announcementService.GetVisible(numberOfAnnouncements);
 
-            // Build a dictionary of announcement ID -> comments enabled
-            var commentsEnabledMap = new Dictionary<int, bool>();
-            foreach (var announcement in announcementsToDisplay)
+            if (!announcementsToDisplay.Any())
             {
-                commentsEnabledMap[announcement.Id] = _commentsHelper.IsCommentsEnabledForAnnouncement(announcement.Id);
+                return Task.FromResult<IViewComponentResult>(View(new List<Announcement>()));
             }
+
+            // Use batch method to check comments enabled for all announcements at once
+            // This avoids N+1 query issue by fetching configuration data once
+            var announcementIds = announcementsToDisplay.Select(a => a.Id).ToList();
+            var commentsEnabledMap = _commentsHelper.AreCommentsEnabledForAnnouncements(announcementIds);
 
             ViewBag.CommentsEnabledMap = commentsEnabledMap;
 

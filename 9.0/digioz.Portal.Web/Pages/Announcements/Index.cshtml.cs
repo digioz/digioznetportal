@@ -32,25 +32,16 @@ namespace digioz.Portal.Web.Pages.Announcements
             PageNumber = pageNumber > 0 ? pageNumber : 1;
             PageSize = pageSize > 0 ? pageSize : 10;
 
-            // Get all visible announcements ordered by timestamp descending
-            var allAnnouncements = _announcementService.GetAll()
-                .Where(a => a.Visible)
-                .OrderByDescending(a => a.Timestamp)
-                .ToList();
+            // Get paginated visible announcements directly from database
+            // This avoids loading all announcements into memory and performs
+            // filtering, ordering, and pagination at the database level
+            Items = _announcementService.GetPagedVisible(PageNumber, PageSize, out int totalCount);
+            TotalCount = totalCount;
 
-            TotalCount = allAnnouncements.Count;
-
-            // Apply pagination
-            Items = allAnnouncements
-                .Skip((PageNumber - 1) * PageSize)
-                .Take(PageSize)
-                .ToList();
-
-            // Build comments enabled map
-            foreach (var announcement in Items)
-            {
-                CommentsEnabledMap[announcement.Id] = _commentsHelper.IsCommentsEnabledForAnnouncement(announcement.Id);
-            }
+            // Use batch method to build comments enabled map
+            // This avoids N+1 query issue by fetching all comment configurations at once
+            var announcementIds = Items.Select(a => a.Id).ToList();
+            CommentsEnabledMap = _commentsHelper.AreCommentsEnabledForAnnouncements(announcementIds);
         }
     }
 }
