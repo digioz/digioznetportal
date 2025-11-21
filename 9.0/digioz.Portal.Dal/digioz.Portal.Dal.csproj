@@ -18,8 +18,4 @@
     <ProjectReference Include="..\digioz.Portal.Utilities\digioz.Portal.Utilities.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
-
 </Project>

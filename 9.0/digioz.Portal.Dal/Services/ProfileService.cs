@@ -14,7 +14,7 @@ namespace digioz.Portal.Dal.Services
             _context = context;
         }
 
-        public Profile Get(string id)
+        public Profile Get(int id)
         {
             return _context.Profiles.Find(id);
         }
@@ -55,7 +55,7 @@ namespace digioz.Portal.Dal.Services
             _context.SaveChanges();
         }
 
-        public void Delete(string id)
+        public void Delete(int id)
         {
             var profile = _context.Profiles.Find(id);
             if (profile != null)

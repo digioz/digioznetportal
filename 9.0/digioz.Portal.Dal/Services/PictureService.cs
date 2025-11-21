@@ -24,6 +24,54 @@ namespace digioz.Portal.Dal.Services
             return _context.Pictures.ToList();
         }
 
+        public List<Picture> GetFiltered(string userId = null, int? albumId = null, bool? visible = null, bool? approved = null, bool isAdmin = false)
+        {
+            var query = _context.Pictures.AsQueryable();
+
+            // Apply album filter if specified
+            if (albumId.HasValue)
+            {
+                query = query.Where(p => p.AlbumId == albumId.Value);
+            }
+
+            // Apply visibility and approval filters based on user role
+            if (!isAdmin)
+            {
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    // User can see their own pictures (any visibility/approval) or public approved pictures
+                    query = query.Where(p => p.UserId == userId || (p.Visible && p.Approved));
+                }
+                else
+                {
+                    // Anonymous users only see visible and approved pictures
+                    query = query.Where(p => p.Visible && p.Approved);
+                }
+            }
+
+            // Apply explicit visibility filter if specified
+            if (visible.HasValue)
+            {
+                query = query.Where(p => p.Visible == visible.Value);
+            }
+
+            // Apply explicit approval filter if specified
+            if (approved.HasValue)
+            {
+                query = query.Where(p => p.Approved == approved.Value);
+            }
+
+            return query.OrderByDescending(p => p.Timestamp).ToList();
+        }
+
+        public int CountByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return 0;
+
+            return _context.Pictures.Count(p => !string.IsNullOrEmpty(p.UserId) && p.UserId == userId);
+        }
+
         public void Add(Picture picture)
         {
             _context.Pictures.Add(picture);
@@ -44,6 +92,45 @@ namespace digioz.Portal.Dal.Services
                 _context.Pictures.Remove(picture);
                 _context.SaveChanges();
             }
+        }
+
+        public int DeleteByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return 0;
+
+            var pictures = _context.Pictures
+                .Where(p => !string.IsNullOrEmpty(p.UserId) && p.UserId == userId)
+                .ToList();
+
+            if (pictures.Any())
+            {
+                _context.Pictures.RemoveRange(pictures);
+                _context.SaveChanges();
+            }
+
+            return pictures.Count;
+        }
+
+        public int ReassignByUserId(string fromUserId, string toUserId)
+        {
+            if (string.IsNullOrEmpty(fromUserId) || string.IsNullOrEmpty(toUserId))
+                return 0;
+
+            var pictures = _context.Pictures
+                .Where(p => !string.IsNullOrEmpty(p.UserId) && p.UserId == fromUserId)
+                .ToList();
+
+            if (pictures.Any())
+            {
+                foreach (var picture in pictures)
+                {
+                    picture.UserId = toUserId;
+                }
+                _context.SaveChanges();
+            }
+
+            return pictures.Count;
         }
     }
 }

@@ -41,9 +41,91 @@
             <div class="collapse navbar-collapse" id="adminNavbar">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link" asp-area="" asp-page="/Index">Site</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-page="/Users/Index">Users</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-page="/Content/Index">Content</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-page="/Settings/Index">Settings</a></li>
+                    
+                    <!-- Content Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarContentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Content
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarContentDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Announcement/Index">Announcements</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Page/Index">Pages</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Picture/Index">Pictures</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Video/Index">Videos</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Plugin/Index">Plugins</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Menu/Index">Menus</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Module/Index">Modules</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Zone/Index">Zones</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Communication Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarCommunicationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Communication
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarCommunicationDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Chat/Index">Chat</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Comment/Index">Comments</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/CommentConfig/Index">Comment Config</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/MailingList/Index">Mailing Lists</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/MailingListSubscriber/Index">Subscribers</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Commerce Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarCommerceDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Commerce
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarCommerceDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Product/Index">Products</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Order/Index">Orders</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Polls Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarPollsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Polls
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarPollsDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Poll/Index">Polls</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Configuration Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarConfigurationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Configuration
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarConfigurationDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Config/Index">Config</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Link/Index">Links</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/LinkCategory/Index">Link Category</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Monitoring Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarMonitoringDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Monitoring
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarMonitoringDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Visitor/Index">Visitors</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Log/Index">Logs</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Users Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarUsersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Users
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarUsersDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/UserManager/Index">User Manager</a></li>
+                        </ul>
+                    </li>
                 </ul>
                 <span class="navbar-text text-white-50">@DateTime.UtcNow.ToString("u")</span>
             </div>
@@ -52,102 +134,60 @@
 
     <div class="container-fluid py-3">
         <div class="row g-3">
-            <!-- Sidebar -->
-            <aside class="col-12 col-lg-3">
+            <!-- Sidebar - Hidden on mobile (< lg) -->
+            <aside class="col-lg-3 d-none d-lg-block">
                 <div class="card shadow-sm sidebar">
                     <div class="card-header fw-semibold">Navigation</div>
                     <div class="list-group list-group-flush">
                         <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Index">Overview</a>
 
                         <!-- Content Category -->
-                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#cat-content" aria-expanded="false" aria-controls="cat-content">
-                            Content
-                        </button>
-                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Content</div>
-                        <div id="cat-content" class="collapse d-lg-block">
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Announcement/Index">Announcements</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Page/Index">Pages</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Picture/Index">Pictures</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Video/Index">Videos</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Plugin/Index">Plugins</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Menu/Index">Menus</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Module/Index">Modules</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Zone/Index">Zones</a>
-                        </div>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white">Content</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Announcement/Index">Announcements</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Page/Index">Pages</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Picture/Index">Pictures</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Video/Index">Videos</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Plugin/Index">Plugins</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Menu/Index">Menus</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Module/Index">Modules</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Zone/Index">Zones</a>
 
                         <!-- Communication Category -->
-                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#cat-comm" aria-expanded="false" aria-controls="cat-comm">
-                            Communication
-                        </button>
-                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Communication</div>
-                        <div id="cat-comm" class="collapse d-lg-block">
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Chat/Index">Chat</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Comment/Index">Comments</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/CommentConfig/Index">Comment Config</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/MailingList/Index">Mailing Lists</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/MailingListSubscriber/Index">Subscribers</a>
-                        </div>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white">Communication</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Chat/Index">Chat</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Comment/Index">Comments</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/CommentConfig/Index">Comment Config</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/MailingList/Index">Mailing Lists</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/MailingListSubscriber/Index">Subscribers</a>
 
                         <!-- Commerce Category -->
-                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#cat-commerce" aria-expanded="false" aria-controls="cat-commerce">
-                            Commerce
-                        </button>
-                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Commerce</div>
-                        <div id="cat-commerce" class="collapse d-lg-block">
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Product/Index">Products</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Order/Index">Orders</a>
-                        </div>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white">Commerce</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Product/Index">Products</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Order/Index">Orders</a>
 
                         <!-- Polls Category -->
-                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#cat-polls" aria-expanded="false" aria-controls="cat-polls">
-                            Polls
-                        </button>
-                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Polls</div>
-                        <div id="cat-polls" class="collapse d-lg-block">
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Poll/Index">Polls</a>
-                        </div>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white">Polls</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Poll/Index">Polls</a>
 
                         <!-- Configuration Category -->
-                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#cat-config" aria-expanded="false" aria-controls="cat-config">
-                            Configuration
-                        </button>
-                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Configuration</div>
-                        <div id="cat-config" class="collapse d-lg-block">
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Config/Index">Config</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Link/Index">Links</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/LinkCategory/Index">Link Category</a>
-                        </div>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white">Configuration</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Config/Index">Config</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Link/Index">Links</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/LinkCategory/Index">Link Category</a>
 
                         <!-- Monitoring Category -->
-                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#cat-monitor" aria-expanded="false" aria-controls="cat-monitor">
-                            Monitoring
-                        </button>
-                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Monitoring</div>
-                        <div id="cat-monitor" class="collapse d-lg-block">
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Visitor/Index">Visitors</a>
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Log/Index">Logs</a>
-                        </div>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white">Monitoring</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Visitor/Index">Visitors</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Log/Index">Logs</a>
 
                         <!-- Users Category -->
-                        <button class="list-group-item fw-semibold small category bg-secondary text-white btn d-lg-none" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#cat-users" aria-expanded="false" aria-controls="cat-users">
-                            Users
-                        </button>
-                        <div class="list-group-item fw-semibold small category bg-secondary text-white d-none d-lg-block">Users</div>
-                        <div id="cat-users" class="collapse d-lg-block">
-                            <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/UserManager/Index">User Manager</a>
-                        </div>
+                        <div class="list-group-item fw-semibold small category bg-secondary text-white">Users</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/UserManager/Index">User Manager</a>
                     </div>
                 </div>
             </aside>
 
-            <!-- Main content -->
+            <!-- Main content - Full width on mobile, 9 cols on desktop -->
             <main class="col-12 col-lg-9">
                 @RenderBody()
             </main>

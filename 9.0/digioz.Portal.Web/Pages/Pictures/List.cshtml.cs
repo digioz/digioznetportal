@@ -38,16 +38,10 @@ namespace digioz.Portal.Pages.Pictures
             // Get current user ID if logged in
             var email = User?.Identity?.Name;
             var userId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
+            var isAdmin = User?.IsInRole("Administrator") == true;
 
-            var allPictures = _pictureService.GetAll()
-                .Where(p => p.Visible && (
-                    // Show approved pictures to everyone
-                    p.Approved || 
-                    // Show unapproved pictures only to their owner
-                    (userId != null && p.UserId == userId)
-                ))
-                .OrderByDescending(p => p.Timestamp)
-                .ToList();
+            // Use filtered query to only retrieve needed pictures from database
+            var allPictures = _pictureService.GetFiltered(userId: userId, isAdmin: isAdmin);
 
             TotalCount = allPictures.Count;
             

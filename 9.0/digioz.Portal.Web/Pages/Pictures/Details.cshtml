@@ -56,10 +56,38 @@
 
                         <div class="row mb-4">
                             <div class="col-md-6">
+                                <h6 class="text-muted">Uploaded By</h6>
+                                @if (Model.UploaderProfile != null)
+                                {
+                                    <p class="lead">
+                                        <i class="bi bi-person-circle"></i> 
+                                        @if (!string.IsNullOrEmpty(Model.UploaderProfile.DisplayName))
+                                        {
+                                            @Model.UploaderProfile.DisplayName
+                                        }
+                                        else if (!string.IsNullOrEmpty(Model.UploaderProfile.FirstName) || !string.IsNullOrEmpty(Model.UploaderProfile.LastName))
+                                        {
+                                            @($"{Model.UploaderProfile.FirstName} {Model.UploaderProfile.LastName}".Trim())
+                                        }
+                                        else
+                                        {
+                                            <text>Anonymous User</text>
+                                        }
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p class="lead"><i class="bi bi-person-circle"></i> Anonymous User</p>
+                                }
+                            </div>
+                            <div class="col-md-6">
                                 <h6 class="text-muted">Date Uploaded</h6>
                                 <p class="lead">@Model.Item.Timestamp?.ToLocalTime().ToString("MMMM dd, yyyy HH:mm")</p>
                             </div>
-                            <div class="col-md-6">
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-12">
                                 <h6 class="text-muted">Status</h6>
                                 <p class="lead">
                                     @if (Model.Item.Approved)

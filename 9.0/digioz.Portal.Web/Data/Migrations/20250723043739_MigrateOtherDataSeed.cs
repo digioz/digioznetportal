@@ -21,6 +21,11 @@ DECLARE @adminUserId nvarchar(128) = (SELECT TOP 1 Id FROM AspNetUsers WHERE Use
 
 INSERT INTO Profile (UserId, DisplayName, FirstName, MiddleName, LastName, Email, Birthday, BirthdayVisible, Address, Address2, City, State, Zip, Country, Signature, Avatar)
 VALUES (@adminUserId, 'Administrator', 'Admin', NULL, 'User', 'admin@domain.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+DECLARE @systemUserId nvarchar(128) = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'system@domain.com');
+
+INSERT INTO Profile (UserId, DisplayName, FirstName, MiddleName, LastName, Email, Birthday, BirthdayVisible, Address, Address2, City, State, Zip, Country, Signature, Avatar)
+VALUES (@systemUserId, 'System', 'System', NULL, 'User', 'system@domain.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 ");
 
             // Insert Config Seed with runtime-generated IDs
@@ -131,7 +136,7 @@ INSERT INTO Page (UserId, Title, Url, Body, Keywords, Description, Visible, Time
                 values: new object[,]
                 {
                     { "Chat", null, true },
-                    { "Store", null, true },
+                    { "Store", null, false },
                     { "Twitter", null, false },
                     { "WhoIsOnline", null, true },
                     { "SlideShow", null, false },
@@ -149,6 +154,8 @@ INSERT INTO Page (UserId, Title, Url, Body, Keywords, Description, Visible, Time
             migrationBuilder.Sql(@"
 DELETE FROM Profile
 WHERE UserId = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'admin@domain.com');
+DELETE FROM Profile
+WHERE UserId = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'system@domain.com');
 ");
 
             // Remove Config Seed (IDs generated at runtime -> delete by keys)

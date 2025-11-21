@@ -1,0 +1,161 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.UserManager.EditModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Edit User";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Edit User</h5>
+        <a asp-page="/UserManager/Index" class="btn btn-sm btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+    <div class="card-body">
+        @if (!string.IsNullOrEmpty(Model.StatusMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @Model.StatusMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (Model.Input != null)
+        {
+            <form method="post">
+                <input asp-for="Input.Id" type="hidden" />
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <h6 class="text-muted mb-3">Account Information</h6>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Input.UserName" class="form-label"></label>
+                        <input asp-for="Input.UserName" class="form-control" />
+                        <span asp-validation-for="Input.UserName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Input.Email" class="form-label"></label>
+                        <input asp-for="Input.Email" class="form-control" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Input.Password" class="form-label"></label>
+                        <input asp-for="Input.Password" class="form-control" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        <small class="form-text text-muted">Leave blank to keep current password</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Input.ConfirmPassword" class="form-label"></label>
+                        <input asp-for="Input.ConfirmPassword" class="form-control" />
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <h6 class="text-muted mb-3">Profile Information</h6>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Input.DisplayName" class="form-label"></label>
+                        <input asp-for="Input.DisplayName" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Input.FirstName" class="form-label"></label>
+                        <input asp-for="Input.FirstName" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Input.MiddleName" class="form-label"></label>
+                        <input asp-for="Input.MiddleName" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Input.LastName" class="form-label"></label>
+                        <input asp-for="Input.LastName" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Input.Birthday" class="form-label"></label>
+                        <input asp-for="Input.Birthday" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check mt-4">
+                            <input asp-for="Input.BirthdayVisible" class="form-check-input" />
+                            <label asp-for="Input.BirthdayVisible" class="form-check-label"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label asp-for="Input.Address" class="form-label"></label>
+                        <input asp-for="Input.Address" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label asp-for="Input.Address2" class="form-label"></label>
+                        <input asp-for="Input.Address2" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label asp-for="Input.City" class="form-label"></label>
+                        <input asp-for="Input.City" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Input.State" class="form-label"></label>
+                        <input asp-for="Input.State" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Input.Zip" class="form-label"></label>
+                        <input asp-for="Input.Zip" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Input.Country" class="form-label"></label>
+                        <input asp-for="Input.Country" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label asp-for="Input.Signature" class="form-label"></label>
+                        <textarea asp-for="Input.Signature" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Save Changes
+                    </button>
+                    <a asp-page="/UserManager/Details" asp-route-id="@Model.Input.Id" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> Unable to load user data.
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
