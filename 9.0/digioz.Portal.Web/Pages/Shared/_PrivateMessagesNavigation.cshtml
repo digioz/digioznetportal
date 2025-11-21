@@ -9,10 +9,7 @@
     {
         <a asp-page="/PrivateMessages/Index" class="btn btn-secondary">Inbox</a>
     }
-    @if (currentPage == "Index")
-    {
-        <a asp-page="/PrivateMessages/Add" class="btn btn-success">Compose</a>
-    }
+    <a asp-page="/PrivateMessages/Add" class="btn btn-success">Compose</a>
     @if (currentPage != "Sent")
     {
         <a asp-page="/PrivateMessages/Sent" class="btn btn-secondary">Sent</a>
