@@ -23,7 +23,7 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             _userManager = userManager;
         }
 
-        public class UserLite { public string Id { get; set; } public string DisplayName { get; set; } }
+        public class UserLite { public string Id { get; set; } = string.Empty; public string DisplayName { get; set; } = string.Empty; }
 
         [BindProperty]
         public InputModel Input { get; set; } = new();
