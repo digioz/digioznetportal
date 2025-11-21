@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<digioz.Portal.Bo.Comment>
+@using System.Text.RegularExpressions
 @{
     // Avatar map supplied by ViewComponent: Dictionary<string,string> userId -> avatar filename
     var avatarMap = ViewBag.AvatarMap as IDictionary<string,string> ?? new Dictionary<string,string>();
@@ -6,7 +7,15 @@
     var displayNameMap = ViewBag.DisplayNameMap as IDictionary<string,string> ?? new Dictionary<string,string>();
     
     // Create a unique ID for this comment section to avoid ID collisions when multiple instances exist on the same page
-    var uniqueId = $"{ViewBag.ReferenceType}_{ViewBag.ReferenceId}".Replace("/", "_").Replace(" ", "_");
+    // Use comprehensive sanitization to ensure valid HTML IDs (only alphanumeric, hyphens, and underscores)
+    var rawId = $"{ViewBag.ReferenceType}_{ViewBag.ReferenceId}";
+    var uniqueId = Regex.Replace(rawId, @"[^a-zA-Z0-9_-]", "_");
+    
+    // Ensure the ID starts with a letter (HTML requirement)
+    if (!string.IsNullOrEmpty(uniqueId) && !char.IsLetter(uniqueId[0]))
+    {
+        uniqueId = "c_" + uniqueId;
+    }
 }
 
 <div class="card mb-3" id="comments-root-@uniqueId">
