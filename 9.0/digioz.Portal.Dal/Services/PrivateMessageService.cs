@@ -75,45 +75,27 @@ namespace digioz.Portal.Dal.Services
                 parentId = parent.ParentId;
             }
 
-            // Now collect all messages in the thread starting from the root
-            // We'll query iteratively by parent IDs to avoid loading all messages
-            var messagesToProcess = new Queue<int>();
-            messagesToProcess.Enqueue(rootId);
-            var processedIds = new HashSet<int>();
+            // Collect all messages in the thread by querying level by level
+            var allMessages = new List<PrivateMessage>();
+            var currentLevelIds = new List<int> { rootId };
 
-            while (messagesToProcess.Count > 0)
+            while (currentLevelIds.Any())
             {
-                var currentId = messagesToProcess.Dequeue();
+                // Fetch all messages at the current level
+                var currentLevelMessages = _context.PrivateMessages.AsNoTracking()
+                    .Where(m => currentLevelIds.Contains(m.Id))
+                    .ToList();
                 
-                if (processedIds.Contains(currentId))
-                {
-                    continue;
-                }
+                allMessages.AddRange(currentLevelMessages);
                 
-                processedIds.Add(currentId);
-
-                // Get the current message and its direct children
-                var currentMessage = _context.PrivateMessages.AsNoTracking()
-                    .FirstOrDefault(m => m.Id == currentId);
-                    
-                if (currentMessage != null)
-                {
-                    thread.Add(currentMessage);
-                    
-                    // Find all direct children of this message
-                    var childIds = _context.PrivateMessages.AsNoTracking()
-                        .Where(m => m.ParentId == currentId)
-                        .Select(m => m.Id)
-                        .ToList();
-                    
-                    foreach (var childId in childIds)
-                    {
-                        messagesToProcess.Enqueue(childId);
-                    }
-                }
+                // Get IDs of all children for the next level
+                currentLevelIds = _context.PrivateMessages.AsNoTracking()
+                    .Where(m => m.ParentId.HasValue && currentLevelMessages.Select(cm => cm.Id).Contains(m.ParentId.Value))
+                    .Select(m => m.Id)
+                    .ToList();
             }
 
-            return thread.OrderBy(m => m.SentDate).ToList();
+            return allMessages.OrderBy(m => m.SentDate).ToList();
         }
 
 
