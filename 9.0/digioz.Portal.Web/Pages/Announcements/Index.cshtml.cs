@@ -29,8 +29,8 @@ namespace digioz.Portal.Web.Pages.Announcements
 
         public void OnGet(int pageNumber = 1, int pageSize = 10)
         {
-            PageNumber = pageNumber > 0 ? pageNumber : 1;
-            PageSize = pageSize > 0 ? pageSize : 10;
+            PageNumber = pageNumber > 0 ? Math.Min(pageNumber, 10000) : 1;
+            PageSize = pageSize > 0 ? Math.Min(pageSize, 100) : 10;
 
             // Get paginated visible announcements directly from database
             // This avoids loading all announcements into memory and performs
