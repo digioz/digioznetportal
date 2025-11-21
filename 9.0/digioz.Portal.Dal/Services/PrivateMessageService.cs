@@ -63,7 +63,6 @@ namespace digioz.Portal.Dal.Services
             }
 
             // Now 'current' is the root. Collect all descendants.
-            var rootId = current.Id;
             var messages = _context.PrivateMessages.AsNoTracking().ToList();
             var messageMap = messages.ToLookup(m => m.ParentId);
 
