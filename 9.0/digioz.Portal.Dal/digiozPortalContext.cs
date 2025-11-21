@@ -557,7 +557,7 @@ namespace digioz.Portal.Dal
             modelBuilder.Entity<PrivateMessage>(entity =>
             {
                 entity.ToTable("PrivateMessage");
-                entity.Property(e => e.Id).HasMaxLength(128);
+                // entity.Property(e => e.Id).HasMaxLength(128);
                 entity.Property(e => e.FromId).HasMaxLength(128);
                 entity.Property(e => e.FromIp).HasMaxLength(25);
                 entity.Property(e => e.ToId).HasMaxLength(128);
