@@ -29,8 +29,8 @@ namespace digioz.Portal.Web.Pages.Announcements
 
         public void OnGet(int pageNumber = 1, int pageSize = 10)
         {
-            PageNumber = pageNumber > 0 ? pageNumber : 1;
-            PageSize = pageSize > 0 ? pageSize : 10;
+            PageNumber = pageNumber > 0 ? Math.Min(pageNumber, 10000) : 1;
+            PageSize = pageSize > 0 ? Math.Min(pageSize, 100) : 10;
 
             // Get all visible announcements ordered by timestamp descending
             var allAnnouncements = _announcementService.GetAll()
