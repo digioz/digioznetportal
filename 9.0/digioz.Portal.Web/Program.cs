@@ -34,6 +34,30 @@ builder.Services.AddDefaultIdentity<IdentityUser>(
  .AddRoles<IdentityRole>() // Add this line to enable roles
  .AddEntityFrameworkStores<ApplicationDbContext>();
 
+// Configure application cookie with security stamp validation
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    options.SlidingExpiration = true;
+    
+    // Validate security stamp to detect compromised/deleted accounts
+    // This ensures deleted users are signed out quickly
+    options.Events.OnValidatePrincipal = SecurityStampValidator.ValidatePrincipalAsync;
+});
+
+// Configure security stamp validator
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    // Validate security stamp every 30 seconds for quick logout
+    // When a user is deleted, their security stamp is updated
+    // and they'll be signed out within this interval on their next request
+    // Balance: Lower = faster logout but more DB queries, Higher = slower logout but less DB load
+    options.ValidationInterval = TimeSpan.FromSeconds(30);
+    
+    // OnRefreshingPrincipal can be used for custom logic
+    // options.OnRefreshingPrincipal = context => Task.CompletedTask;
+});
+
 // Authorization policy to restrict Admin area to Administrator role
 builder.Services.AddAuthorization(options =>
 {

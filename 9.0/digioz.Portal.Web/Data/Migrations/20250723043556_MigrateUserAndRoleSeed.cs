@@ -25,6 +25,10 @@ namespace digioz.Portal.Web.Data.Migrations
             var userConcurrencyStamp = Guid.NewGuid().ToString();
             var securityStamp = Guid.NewGuid().ToString();
 
+            var systemUserId = Guid.NewGuid().ToString();
+            var systemUserConcurrencyStamp = Guid.NewGuid().ToString();
+            var systemSecurityStamp = Guid.NewGuid().ToString();
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
@@ -54,15 +58,38 @@ namespace digioz.Portal.Web.Data.Migrations
             };
             var passwordHash = hasher.HashPassword(tempUser, "Pass@word1");
 
+            // Generate password hash for System user with random password
+            var systemTempUser = new IdentityUser
+            {
+                Id = systemUserId,
+                UserName = "system@domain.com",
+                NormalizedUserName = "SYSTEM",
+                Email = "system@domain.com",
+                NormalizedEmail = "SYSTEM@DOMAIN.COM",
+                SecurityStamp = systemSecurityStamp,
+                ConcurrencyStamp = systemUserConcurrencyStamp
+            };
+            var systemPasswordHash = hasher.HashPassword(systemTempUser, Guid.NewGuid().ToString());
+
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[] { userId, 0, userConcurrencyStamp, "admin@domain.com", true, false, null, "ADMIN@DOMAIN.COM", "ADMIN@DOMAIN.COM", passwordHash, null, false, securityStamp, false, "admin@domain.com" });
 
             migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { systemUserId, 0, systemUserConcurrencyStamp, "system@domain.com", true, false, null, "SYSTEM@DOMAIN.COM", "SYSTEM@DOMAIN.COM", systemPasswordHash, null, false, systemSecurityStamp, false, "system@domain.com" });
+
+            migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
                 columns: new[] { "RoleId", "UserId" },
                 values: new object[] { adminRoleId, userId });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[] { standardRoleId, systemUserId });
         }
 
         /// <inheritdoc />
@@ -75,11 +102,20 @@ namespace digioz.Portal.Web.Data.Migrations
                   AND RoleId = (SELECT TOP 1 Id FROM AspNetRoles WHERE Name = 'Administrator');
             ");
 
+            migrationBuilder.Sql(@"
+                DELETE FROM AspNetUserRoles
+                WHERE UserId = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'system@domain.com')
+                  AND RoleId = (SELECT TOP 1 Id FROM AspNetRoles WHERE Name = 'Standard');
+            ");
+
             // Remove roles by Name (IDs were generated at runtime in Up)
             migrationBuilder.Sql("DELETE FROM AspNetRoles WHERE Name IN ('Administrator','Moderator','Standard');");
 
             // Remove the admin user by username/email
             migrationBuilder.Sql("DELETE FROM AspNetUsers WHERE UserName = 'admin@domain.com';");
+
+            // Remove the System user
+            migrationBuilder.Sql("DELETE FROM AspNetUsers WHERE UserName = 'system@domain.com';");
         }
     }
 }

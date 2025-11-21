@@ -7,8 +7,142 @@
 }
 
 <div class="card shadow-sm">
-    <div class="card-header">User Management</div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">User Management</h5>
+    </div>
     <div class="card-body">
-        <p class="text-muted">Build your admin UI for users here.</p>
+        <!-- Search Form -->
+        <form method="get" class="mb-4">
+            <div class="row g-2">
+                <div class="col-md-10">
+                    <input type="text" name="SearchTerm" value="@Model.SearchTerm" class="form-control" placeholder="Search by username, email, or name..." />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+            {
+                <div class="mt-2">
+                    <a asp-page="/UserManager/Index" class="btn btn-sm btn-secondary">Clear Search</a>
+                    <span class="ms-2 text-muted">Found @Model.TotalCount result(s)</span>
+                </div>
+            }
+        </form>
+
+        <!-- Users Table -->
+        @if (Model.Users.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Display Name</th>
+                            <th>Full Name</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Users)
+                        {
+                            <tr>
+                                <td>
+                                    @item.User.UserName
+                                    @if (item.IsProtected)
+                                    {
+                                        <span class="badge bg-info ms-2" title="Protected user - cannot be deleted">
+                                            <i class="bi bi-shield-lock"></i> Protected
+                                        </span>
+                                    }
+                                </td>
+                                <td>@item.User.Email</td>
+                                <td>@(item.Profile?.DisplayName ?? "-")</td>
+                                <td>@(item.Profile != null ? $"{item.Profile.FirstName} {item.Profile.LastName}".Trim() : "-")</td>
+                                <td class="text-end">
+                                    <a asp-page="/UserManager/Details" asp-route-id="@item.User.Id" class="btn btn-sm btn-info" title="Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-page="/UserManager/Edit" asp-route-id="@item.User.Id" class="btn btn-sm btn-warning" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-page="/UserManager/Roles" asp-route-id="@item.User.Id" class="btn btn-sm btn-secondary" title="Manage Roles">
+                                        <i class="bi bi-shield-lock"></i>
+                                    </a>
+                                    @if (!item.IsProtected)
+                                    {
+                                        <a asp-page="/UserManager/Delete" asp-route-id="@item.User.Id" class="btn btn-sm btn-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-sm btn-danger disabled" disabled title="Protected user - cannot be deleted">
+                                            <i class="bi bi-shield-x"></i>
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="User pagination">
+                    <ul class="pagination justify-content-center">
+                        @if (Model.PageNumber > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-page="/UserManager/Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-searchTerm="@Model.SearchTerm">Previous</a>
+                            </li>
+                        }
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                <a class="page-link" asp-page="/UserManager/Index" asp-route-pageNumber="@i" asp-route-searchTerm="@Model.SearchTerm">@i</a>
+                            </li>
+                        }
+                        @if (Model.PageNumber < Model.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-page="/UserManager/Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-searchTerm="@Model.SearchTerm">Next</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+
+            <div class="text-muted mt-3">
+                <small>Showing @Model.Users.Count of @Model.TotalCount user(s)</small>
+            </div>
+
+            @if (Model.Users.Any(u => u.IsProtected))
+            {
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle"></i> 
+                    <strong>Note:</strong> Users with the <span class="badge bg-info"><i class="bi bi-shield-lock"></i> Protected</span> badge cannot be deleted to prevent accidental removal of critical system accounts (Administrator role users and System user).
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> 
+                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                {
+                    <text>No users found matching "@Model.SearchTerm"</text>
+                }
+                else
+                {
+                    <text>No users found in the system.</text>
+                }
+            </div>
+        }
     </div>
 </div>

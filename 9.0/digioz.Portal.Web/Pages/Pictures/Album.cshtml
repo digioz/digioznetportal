@@ -5,6 +5,7 @@
 
 @{
     ViewData["Title"] = Model.Album?.Name ?? "Album";
+    var email = User?.Identity?.Name;
 }
 
 <div class="container my-5">
@@ -26,18 +27,49 @@
                 @foreach (var picture in Model.Pictures)
                 {
                     <div class="col-md-3 col-sm-6 mb-4">
-                        <div class="card h-100 shadow-sm">
-                            <a asp-page="Details" asp-route-id="@picture.Id" class="text-decoration-none">
+                        <div class="card h-100 shadow-sm @(!picture.Visible || !picture.Approved ? "border-warning" : "")">
+                            <a asp-page="Details" asp-route-id="@picture.Id" class="text-decoration-none position-relative">
                                 <img src="/img/Pictures/Thumb/@picture.Thumbnail" 
                                      alt="@picture.Description" 
                                      class="card-img-top" 
-                                     style="height: 250px; object-fit: cover;" />
+                                     style="height: 250px; object-fit: cover; @(!picture.Visible || !picture.Approved ? "opacity: 0.7;" : "")" />
+                                
+                                @if (!picture.Visible || !picture.Approved)
+                                {
+                                    <div class="position-absolute top-0 end-0 m-2">
+                                        @if (!picture.Visible)
+                                        {
+                                            <span class="badge bg-secondary" title="This picture is hidden">
+                                                <i class="bi bi-eye-slash"></i> Hidden
+                                            </span>
+                                        }
+                                        @if (!picture.Approved)
+                                        {
+                                            <span class="badge bg-warning text-dark" title="This picture is pending approval">
+                                                <i class="bi bi-clock-history"></i> Pending
+                                            </span>
+                                        }
+                                    </div>
+                                }
                             </a>
                             <div class="card-body">
                                 <p class="card-text small text-muted">@picture.Description</p>
                                 <small class="text-muted d-block">
                                     @picture.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
                                 </small>
+                                @if (!picture.Visible || !picture.Approved)
+                                {
+                                    <div class="mt-2">
+                                        @if (!picture.Visible)
+                                        {
+                                            <span class="badge bg-secondary small">Hidden</span>
+                                        }
+                                        @if (!picture.Approved)
+                                        {
+                                            <span class="badge bg-warning text-dark small">Pending Approval</span>
+                                        }
+                                    </div>
+                                }
                             </div>
                             <div class="card-footer bg-transparent">
                                 <a asp-page="Details" asp-route-id="@picture.Id" class="btn btn-sm btn-outline-primary w-100">View</a>

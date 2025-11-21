@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
+using ProfileEntity = digioz.Portal.Bo.Profile;
 
 namespace digioz.Portal.Pages.Videos
 {
@@ -11,17 +12,20 @@ namespace digioz.Portal.Pages.Videos
     {
         private readonly IVideoService _videoService;
         private readonly IVideoAlbumService _albumService;
+        private readonly IProfileService _profileService;
         private readonly IUserHelper _userHelper;
 
-        public DetailsModel(IVideoService videoService, IVideoAlbumService albumService, IUserHelper userHelper)
+        public DetailsModel(IVideoService videoService, IVideoAlbumService albumService, IProfileService profileService, IUserHelper userHelper)
         {
             _videoService = videoService;
             _albumService = albumService;
+            _profileService = profileService;
             _userHelper = userHelper;
         }
 
         public Video? Item { get; private set; }
         public VideoAlbum? Album { get; private set; }
+        public ProfileEntity? UploaderProfile { get; private set; }
         public bool IsOwner { get; private set; }
         public string? StatusMessage { get; set; }
         public bool IsSuccess { get; set; }
@@ -45,6 +49,13 @@ namespace digioz.Portal.Pages.Videos
             }
 
             Album = _albumService.Get(Item.AlbumId);
+            
+            // Get uploader profile
+            if (!string.IsNullOrEmpty(Item.UserId))
+            {
+                UploaderProfile = _profileService.GetByUserId(Item.UserId);
+            }
+
             return Page();
         }
 

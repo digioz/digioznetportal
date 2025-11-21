@@ -1,0 +1,105 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.UserManager.RolesModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Manage User Roles";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Manage Roles for @(Model.User?.UserName ?? "User")</h5>
+        <div>
+            <a asp-page="/UserManager/Details" asp-route-id="@Model.User?.Id" class="btn btn-sm btn-info">
+                <i class="bi bi-eye"></i> View Details
+            </a>
+            <a asp-page="/UserManager/Index" class="btn btn-sm btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (!string.IsNullOrEmpty(Model.StatusMessage))
+        {
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                @Model.StatusMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-muted mb-3">Current Roles</h6>
+                @if (Model.UserRoles.Any())
+                {
+                    <div class="list-group">
+                        @foreach (var role in Model.UserRoles)
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-shield-check text-success"></i>
+                                    <strong>@role.RoleName</strong>
+                                </div>
+                                <form method="post" asp-page-handler="RemoveRole" asp-route-id="@Model.User?.Id" asp-route-roleId="@role.RoleId">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to remove this role?');">
+                                        <i class="bi bi-trash"></i> Remove
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> No roles currently assigned to this user.
+                    </div>
+                }
+            </div>
+
+            <div class="col-md-6">
+                <h6 class="text-muted mb-3">Add Role</h6>
+                @if (Model.AvailableRoles.Any())
+                {
+                    <form method="post" asp-page-handler="AddRole" asp-route-id="@Model.User?.Id">
+                        <div class="mb-3">
+                            <label for="SelectedRoleId" class="form-label">Select a role to add:</label>
+                            <select asp-for="SelectedRoleId" asp-items="Model.AvailableRoles" class="form-select">
+                                <option value="">-- Select Role --</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-plus-circle"></i> Add Role
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> All available roles are already assigned to this user.
+                    </div>
+                }
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <div class="row">
+            <div class="col-md-12">
+                <h6 class="text-muted mb-3">About Roles</h6>
+                <div class="alert alert-light">
+                    <p class="mb-2">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Role Management:</strong>
+                    </p>
+                    <ul class="mb-0">
+                        <li>Roles control what actions users can perform in the system</li>
+                        <li>Users can have multiple roles assigned</li>
+                        <li>Removing a role immediately revokes associated permissions</li>
+                        <li>To create or manage roles themselves, use the Role Manager section</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

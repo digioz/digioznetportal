@@ -1,0 +1,248 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.UserManager.DeleteModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Delete User";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Delete User</h5>
+        <a asp-page="/UserManager/Index" class="btn btn-sm btn-light">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+    <div class="card-body">
+        @if (!string.IsNullOrEmpty(Model.StatusMessage))
+        {
+            var isError = Model.StatusMessage.StartsWith("Error");
+            var alertClass = isError ? "alert-danger" : "alert-success";
+            <div class="alert @alertClass alert-dismissible fade show" role="alert">
+                @Model.StatusMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (Model.User != null)
+        {
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle-fill"></i> 
+                <strong>Warning!</strong> You are about to permanently delete this user account. This action cannot be undone.
+            </div>
+
+            <div class="alert alert-info">
+                <i class="bi bi-shield-check"></i> 
+                <strong>Forced Logout Protection:</strong> When you delete this user, their authentication session will be immediately invalidated. If they are currently logged in, they will be forcefully signed out within <strong>30 seconds</strong> on their next page request or action. They will not be able to:
+                <ul class="mb-0 mt-2">
+                    <li>Post chat messages</li>
+                    <li>Send private messages</li>
+                    <li>Add comments</li>
+                    <li>Upload pictures or videos</li>
+                    <li>Perform any other authenticated actions</li>
+                </ul>
+            </div>
+
+            <h6 class="mb-3">User Information</h6>
+            <dl class="row">
+                <dt class="col-sm-3">Username</dt>
+                <dd class="col-sm-9">@Model.User.UserName</dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@Model.User.Email</dd>
+
+                @if (Model.Profile != null)
+                {
+                    <dt class="col-sm-3">Display Name</dt>
+                    <dd class="col-sm-9">@Model.Profile.DisplayName</dd>
+
+                    <dt class="col-sm-3">Full Name</dt>
+                    <dd class="col-sm-9">@($"{Model.Profile.FirstName} {Model.Profile.LastName}".Trim())</dd>
+                }
+            </dl>
+
+            <hr class="my-4" />
+
+            @if (Model.RelatedData != null)
+            {
+                <h6 class="mb-3">Related Data</h6>
+                <p class="text-muted">The following data is associated with this user account:</p>
+
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Data Type</th>
+                                <th class="text-end">Count</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><i class="bi bi-image"></i> Pictures</td>
+                                <td class="text-end">@Model.RelatedData.PictureCount</td>
+                                <td class="text-center">
+                                    @if (Model.RelatedData.PictureCount > 0)
+                                    {
+                                        <span class="badge bg-info">Delete or Reassign</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">None</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-camera-video"></i> Videos</td>
+                                <td class="text-end">@Model.RelatedData.VideoCount</td>
+                                <td class="text-center">
+                                    @if (Model.RelatedData.VideoCount > 0)
+                                    {
+                                        <span class="badge bg-info">Delete or Reassign</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">None</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-bar-chart"></i> Polls</td>
+                                <td class="text-end">@Model.RelatedData.PollCount</td>
+                                <td class="text-center">
+                                    @if (Model.RelatedData.PollCount > 0)
+                                    {
+                                        <span class="badge bg-info">Delete or Reassign</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">None</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-chat"></i> Chat Messages</td>
+                                <td class="text-end">@Model.RelatedData.ChatCount</td>
+                                <td class="text-center">
+                                    @if (Model.RelatedData.ChatCount > 0)
+                                    {
+                                        <span class="badge bg-info">Delete or Reassign</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">None</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-chat-left-text"></i> Comments</td>
+                                <td class="text-end">@Model.RelatedData.CommentCount</td>
+                                <td class="text-center">
+                                    @if (Model.RelatedData.CommentCount > 0)
+                                    {
+                                        <span class="badge bg-info">Delete or Reassign</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">None</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-cart"></i> Orders</td>
+                                <td class="text-end">@Model.RelatedData.OrderCount</td>
+                                <td class="text-center">
+                                    @if (Model.RelatedData.OrderCount > 0)
+                                    {
+                                        <span class="badge bg-info">Delete or Reassign</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">None</span>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <form method="post">
+                <h6 class="mb-3">Deletion Options</h6>
+                <p class="text-muted">Choose to delete or reassign user's data. Unchecked data will be reassigned to "System" user. </p>
+
+                @if (Model.RelatedData != null)
+                {
+                    <div class="form-check mb-2">
+                        <input asp-for="Options.DeletePictures" class="form-check-input" />
+                        <label asp-for="Options.DeletePictures" class="form-check-label">
+                            <strong>Delete</strong> all pictures (@Model.RelatedData.PictureCount)
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input asp-for="Options.DeleteVideos" class="form-check-input" />
+                        <label asp-for="Options.DeleteVideos" class="form-check-label">
+                            <strong>Delete</strong> all videos (@Model.RelatedData.VideoCount)
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input asp-for="Options.DeletePolls" class="form-check-input" />
+                        <label asp-for="Options.DeletePolls" class="form-check-label">
+                            <strong>Delete</strong> all polls (@Model.RelatedData.PollCount)
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input asp-for="Options.DeleteChat" class="form-check-input" />
+                        <label asp-for="Options.DeleteChat" class="form-check-label">
+                            <strong>Delete</strong> all chat messages (@Model.RelatedData.ChatCount)
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input asp-for="Options.DeleteComments" class="form-check-input" />
+                        <label asp-for="Options.DeleteComments" class="form-check-label">
+                            <strong>Delete</strong> all comments (@Model.RelatedData.CommentCount)
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input asp-for="Options.DeleteOrders" class="form-check-input" />
+                        <label asp-for="Options.DeleteOrders" class="form-check-label">
+                            <strong>Delete</strong> all orders (@Model.RelatedData.OrderCount)
+                        </label>
+                    </div>
+                }
+
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle"></i> 
+                    <strong>Important Notes:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>The user account and profile will always be permanently deleted.</li>
+                        <li><strong>Checked items</strong> will be permanently deleted from the system.</li>
+                        <li><strong>Unchecked items</strong> will be reassigned to the "System" user to preserve data integrity.</li>
+                        <li>Make sure a user with DisplayName "System" exists in your database.</li>
+                        <li><strong>Session Invalidation:</strong> The user's security stamp will be updated immediately, forcing them to sign out within 30 seconds on their next request. Any attempt to perform actions will fail with an authentication error.</li>
+                    </ul>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Confirm Delete User
+                    </button>
+                    <a asp-page="/UserManager/Details" asp-route-id="@Model.User.Id" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> User not found.
+            </div>
+        }
+    </div>
+</div>

@@ -46,12 +46,18 @@ namespace digioz.Portal.Pages.Videos
             // Get current user ID if logged in
             var email = User?.Identity?.Name;
             var userId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
+            var isAdmin = User?.IsInRole("Admin") == true;
 
-            // Show videos that are either:
-            // 1. In this album, visible and approved (for everyone)
-            // 2. Owned by current user regardless of Visible/Approved status
+            // Filter videos based on ownership and admin status
             var allVideos = _videoService.GetAll()
-                .Where(v => v.AlbumId == Id && ((v.Visible && v.Approved) || (userId != null && v.UserId == userId)))
+                .Where(v => v.AlbumId == Id && (
+                    // Show all videos to admins
+                    isAdmin ||
+                    // Show all their own videos to the owner (visible/hidden, approved/unapproved)
+                    (userId != null && v.UserId == userId) ||
+                    // Show only visible and approved videos to everyone else
+                    (v.Visible && v.Approved)
+                ))
                 .OrderByDescending(v => v.Timestamp)
                 .ToList();
 
