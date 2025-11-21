@@ -67,7 +67,13 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             }
 
             var rawThread = _pmService.GetThread(id);
-            var profileLookup = _profileService.GetAll()
+            var userIds = rawThread
+                .SelectMany(m => new[] { m.FromId, m.ToId })
+                .Where(uid => !string.IsNullOrWhiteSpace(uid))
+                .Distinct()
+                .ToList();
+            var profiles = _profileService.GetByUserIds(userIds);
+            var profileLookup = profiles
                 .Where(p => !string.IsNullOrWhiteSpace(p.UserId) && !string.IsNullOrWhiteSpace(p.DisplayName))
                 .ToDictionary(p => p.UserId, p => p.DisplayName);
 
