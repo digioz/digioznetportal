@@ -3,8 +3,8 @@
 @{
     ViewData["Title"] = "Outbox";
 }
-<h1>Outbox (Unopened messages)</h1>
-<partial name="_PrivateMessagesNavigation" model="Outbox" />
+<h1>Outbox (Waiting for recipient to read)</h1>
+<partial name="_PrivateMessagesNavigation" model='"Outbox"' />
 <table class="table table-striped">
     <thead>
         <tr>

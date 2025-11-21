@@ -102,6 +102,16 @@ namespace digioz.Portal.Dal.Services
             _context.SaveChanges();
         }
 
+        public void MarkReadIfUnread(int id)
+        {
+            var pm = _context.PrivateMessages.Find(id);
+            if (pm != null && !pm.IsRead)
+            {
+                pm.IsRead = true;
+                _context.SaveChanges();
+            }
+        }
+
         public void Delete(int id, string userId)
         {
             var pm = _context.PrivateMessages.Find(id);
@@ -109,6 +119,18 @@ namespace digioz.Portal.Dal.Services
             if (pm.FromId != userId && pm.ToId != userId) return; // not authorized
             _context.PrivateMessages.Remove(pm);
             _context.SaveChanges();
+        }
+
+        public bool DeleteIfOwnedByUser(int id, string userId)
+        {
+            var pm = _context.PrivateMessages.Find(id);
+            if (pm == null || (pm.FromId != userId && pm.ToId != userId))
+            {
+                return false;
+            }
+            _context.PrivateMessages.Remove(pm);
+            _context.SaveChanges();
+            return true;
         }
     }
 }
