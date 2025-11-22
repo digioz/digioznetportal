@@ -30,4 +30,22 @@
     <ProjectReference Include="..\digioz.Portal.Utilities\digioz.Portal.Utilities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\css\overrides\bootstrap_5_3_3_brown_and_beige_override.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\overrides\bootstrap_5_3_3_dark_override.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\overrides\bootstrap_5_3_3_magic_purple_override.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\overrides\bootstrap_5_3_3_pastel_dark_override.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\overrides\bootstrap_5_3_3_pastel_override.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

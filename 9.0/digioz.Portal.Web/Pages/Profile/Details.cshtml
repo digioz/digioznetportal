@@ -38,6 +38,10 @@ else
                         <tr><th>State</th><td>@Model.UserProfile.State</td></tr>
                         <tr><th>Zip</th><td>@Model.UserProfile.Zip</td></tr>
                         <tr><th>Country</th><td>@Model.UserProfile.Country</td></tr>
+                        @if (!string.IsNullOrEmpty(Model.ThemeName))
+                        {
+                            <tr><th>Theme</th><td>@Model.ThemeName</td></tr>
+                        }
                         <tr>
                             <th>Signature</th>
                             <td>

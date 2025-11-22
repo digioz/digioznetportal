@@ -13,3 +13,8 @@
 /9.0/digioz.Portal.Web/.vs
 /9.0/digioz.Portal.Web/bin
 /9.0/digioz.Portal.Web/obj
+/9.0/digioz.Portal.Web/.config
+/9.0/digioz.Portal.Web/bin/Release
+/9.0/digioz.Portal.Web/obj/Release/net9.0
+/9.0/digioz.Portal.Web/bin/Debug/*
+

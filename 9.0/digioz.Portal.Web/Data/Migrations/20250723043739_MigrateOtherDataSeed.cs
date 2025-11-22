@@ -58,8 +58,7 @@ VALUES (@systemUserId, 'System', 'System', NULL, 'User', 'system@domain.com', NU
                     { Guid.NewGuid().ToString(), "TinyMCEApiKey", "[Enter Key]", false },
                     { Guid.NewGuid().ToString(), "RecaptchaEnabled", "false", false },
                     { Guid.NewGuid().ToString(), "RecaptchaPublicKey", "[Enter Key]", false },
-                    { Guid.NewGuid().ToString(), "RecaptchaPrivateKey", "[Enter Key]", false },
-                    { Guid.NewGuid().ToString(), "BootstrapOverride", "", false }
+                    { Guid.NewGuid().ToString(), "RecaptchaPrivateKey", "[Enter Key]", false }
                 });
 
             // Resolve admin user ID at runtime and insert Menu rows

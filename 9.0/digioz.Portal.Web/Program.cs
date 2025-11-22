@@ -113,11 +113,15 @@ builder.Services.AddScoped<IVisitorInfoService, VisitorInfoService>();
 builder.Services.AddScoped<IVisitorSessionService, VisitorSessionService>();
 builder.Services.AddScoped<IZoneService, ZoneService>();
 builder.Services.AddScoped<IPrivateMessageService, PrivateMessageService>();
+builder.Services.AddScoped<IThemeService, ThemeService>();
 
 builder.Services.AddMemoryCache();
 
 // Recaptcha verification needs HttpClient
 builder.Services.AddHttpClient();
+
+// Add HttpContextAccessor for accessing HttpContext in view components
+builder.Services.AddHttpContextAccessor();
 
 // Session for capturing SessionId in visitor logs
 builder.Services.AddDistributedMemoryCache();

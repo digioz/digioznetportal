@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
@@ -20,12 +22,14 @@ namespace digioz.Portal.Pages.Profile
     public class EditModel : PageModel
     {
         private readonly IProfileService _profileService;
+        private readonly IThemeService _themeService;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IWebHostEnvironment _env;
 
-        public EditModel(IProfileService profileService, UserManager<IdentityUser> userManager, IWebHostEnvironment env)
+        public EditModel(IProfileService profileService, IThemeService themeService, UserManager<IdentityUser> userManager, IWebHostEnvironment env)
         {
             _profileService = profileService;
+            _themeService = themeService;
             _userManager = userManager;
             _env = env;
         }
@@ -37,6 +41,8 @@ namespace digioz.Portal.Pages.Profile
         public IFormFile? AvatarFile { get; set; }
 
         public string? StatusMessage { get; set; }
+        
+        public List<SelectListItem> Themes { get; set; } = new();
 
         public class InputModel
         {
@@ -60,6 +66,9 @@ namespace digioz.Portal.Pages.Profile
             public string? Country { get; set; }
             public string? Signature { get; set; }
             public string? Avatar { get; set; }
+            
+            [Display(Name = "Theme")]
+            public int? ThemeId { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -79,6 +88,9 @@ namespace digioz.Portal.Pages.Profile
                 _profileService.Add(profile);
             }
 
+            // Load themes for dropdown
+            LoadThemes(profile.ThemeId);
+
             Input = new InputModel
             {
                 Id = profile.Id,
@@ -97,7 +109,8 @@ namespace digioz.Portal.Pages.Profile
                 Zip = profile.Zip,
                 Country = profile.Country,
                 Signature = profile.Signature,
-                Avatar = profile.Avatar
+                Avatar = profile.Avatar,
+                ThemeId = profile.ThemeId
             };
 
             return Page();
@@ -110,22 +123,26 @@ namespace digioz.Portal.Pages.Profile
 
             if (!ModelState.IsValid)
             {
+                var profile = _profileService.GetAll().FirstOrDefault(p => p.UserId == user.Id);
+                LoadThemes(profile?.ThemeId);
                 return Page();
             }
 
-            var profile = _profileService.GetAll().FirstOrDefault(p => p.Id == Input.Id && p.UserId == user.Id);
-            if (profile == null)
+            var profileToUpdate = _profileService.GetAll().FirstOrDefault(p => p.Id == Input.Id && p.UserId == user.Id);
+            if (profileToUpdate == null)
             {
                 ModelState.AddModelError(string.Empty, "Profile not found.");
+                LoadThemes(Input.ThemeId);
                 return Page();
             }
 
-            if (!string.IsNullOrWhiteSpace(Input.DisplayName) && !string.Equals(Input.DisplayName, profile.DisplayName, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(Input.DisplayName) && !string.Equals(Input.DisplayName, profileToUpdate.DisplayName, StringComparison.OrdinalIgnoreCase))
             {
                 var exists = _profileService.GetAll().Any(p => p.DisplayName != null && p.DisplayName.Equals(Input.DisplayName, StringComparison.OrdinalIgnoreCase));
                 if (exists)
                 {
                     ModelState.AddModelError("Input.DisplayName", "Display Name already exists.");
+                    LoadThemes(Input.ThemeId);
                     return Page();
                 }
             }
@@ -139,6 +156,7 @@ namespace digioz.Portal.Pages.Profile
                 {
                     foreach (var err in updateResult.Errors)
                         ModelState.AddModelError(string.Empty, err.Description);
+                    LoadThemes(Input.ThemeId);
                     return Page();
                 }
             }
@@ -167,36 +185,53 @@ namespace digioz.Portal.Pages.Profile
                     ImageHelper.SaveImageWithCrop(imgThumb, 100, 100, thumbPath);
                 }
 
-                if (!string.IsNullOrEmpty(profile.Avatar))
+                if (!string.IsNullOrEmpty(profileToUpdate.Avatar))
                 {
-                    var oldFull = Path.Combine(imgRoot, "Full", profile.Avatar);
-                    var oldThumb = Path.Combine(imgRoot, "Thumb", profile.Avatar);
+                    var oldFull = Path.Combine(imgRoot, "Full", profileToUpdate.Avatar);
+                    var oldThumb = Path.Combine(imgRoot, "Thumb", profileToUpdate.Avatar);
                     try { if (System.IO.File.Exists(oldFull)) System.IO.File.Delete(oldFull); } catch { }
                     try { if (System.IO.File.Exists(oldThumb)) System.IO.File.Delete(oldThumb); } catch { }
                 }
 
-                profile.Avatar = fileName;
+                profileToUpdate.Avatar = fileName;
             }
 
-            profile.DisplayName = Input.DisplayName;
-            profile.FirstName = Input.FirstName;
-            profile.MiddleName = Input.MiddleName;
-            profile.LastName = Input.LastName;
-            profile.Email = Input.Email;
-            profile.Birthday = Input.Birthday;
-            profile.BirthdayVisible = Input.BirthdayVisible;
-            profile.Address = Input.Address;
-            profile.Address2 = Input.Address2;
-            profile.City = Input.City;
-            profile.State = Input.State;
-            profile.Zip = Input.Zip;
-            profile.Country = Input.Country;
-            profile.Signature = Input.Signature;
+            profileToUpdate.DisplayName = Input.DisplayName;
+            profileToUpdate.FirstName = Input.FirstName;
+            profileToUpdate.MiddleName = Input.MiddleName;
+            profileToUpdate.LastName = Input.LastName;
+            profileToUpdate.Email = Input.Email;
+            profileToUpdate.Birthday = Input.Birthday;
+            profileToUpdate.BirthdayVisible = Input.BirthdayVisible;
+            profileToUpdate.Address = Input.Address;
+            profileToUpdate.Address2 = Input.Address2;
+            profileToUpdate.City = Input.City;
+            profileToUpdate.State = Input.State;
+            profileToUpdate.Zip = Input.Zip;
+            profileToUpdate.Country = Input.Country;
+            profileToUpdate.Signature = Input.Signature;
+            profileToUpdate.ThemeId = Input.ThemeId;
 
-            _profileService.Update(profile);
+            _profileService.Update(profileToUpdate);
 
             StatusMessage = "Profile updated successfully.";
-            return Redirect($"/Profile/Details?userid={Uri.EscapeDataString(profile.DisplayName ?? string.Empty)}");
+            return Redirect($"/Profile/Details?userid={Uri.EscapeDataString(profileToUpdate.DisplayName ?? string.Empty)}");
+        }
+
+        private void LoadThemes(int? selectedThemeId)
+        {
+            var allThemes = _themeService.GetAll().OrderByDescending(t => t.IsDefault).ThenBy(t => t.Name).ToList();
+            var defaultTheme = allThemes.FirstOrDefault(t => t.IsDefault);
+
+            // If no theme is selected, default to the default theme
+            var effectiveThemeId = selectedThemeId ?? defaultTheme?.Id;
+
+            Themes = allThemes.Select(t => new SelectListItem
+            {
+                Value = t.Id.ToString(),
+                Text = t.IsDefault ? $"{t.Name} (Default)" : t.Name,
+                Selected = t.Id == effectiveThemeId
+            }).ToList();
         }
     }
 }

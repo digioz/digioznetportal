@@ -66,6 +66,19 @@
             <label asp-for="Input.Country" class="form-label"></label>
             <input asp-for="Input.Country" class="form-control" />
         </div>
+        
+        <!-- Theme Selection -->
+        <div class="col-md-12">
+            <label asp-for="Input.ThemeId" class="form-label"></label>
+            <select asp-for="Input.ThemeId" asp-items="Model.Themes" class="form-select">
+                <option value="">-- Use Default Theme --</option>
+            </select>
+            <small class="form-text text-muted">
+                Select a custom theme for your profile. If none is selected, the site's default theme will be used.
+            </small>
+            <span asp-validation-for="Input.ThemeId" class="text-danger"></span>
+        </div>
+        
         <div class="col-md-12">
             <label asp-for="Input.Signature" class="form-label"></label>
             <textarea asp-for="Input.Signature" rows="3" class="form-control"></textarea>
