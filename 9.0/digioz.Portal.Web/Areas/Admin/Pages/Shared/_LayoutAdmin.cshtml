@@ -29,6 +29,7 @@
     <link href="~/css/admin.css" rel="stylesheet" asp-append-version="true" />
     <!-- Bootstrap Icons (local via libman) -->
     <link href="~/lib/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" asp-append-version="true" />
+    @await Component.InvokeAsync("BootstrapOverride")
 </head>
 <body class="bg-light">
     <!-- Top Navbar -->
