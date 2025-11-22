@@ -227,12 +227,17 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseSession();
+
+// Use traditional static files middleware without fingerprinting
+// This allows direct file replacement on the server without cache-busting hashes
+app.UseStaticFiles();
+
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
-app.MapRazorPages().WithStaticAssets();
+// Remove MapStaticAssets() and use traditional MapRazorPages()
+app.MapRazorPages();
 
 // Map ChatHub endpoint
 app.MapHub<ChatHub>("/chatHub");
