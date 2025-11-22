@@ -729,7 +729,7 @@ namespace digioz.Portal.Dal
             {
                 entity.ToTable("VisitorInfo");
 
-                entity.Property(e => e.IpAddress).HasMaxLength(25);
+                entity.Property(e => e.IpAddress).HasMaxLength(64);
 
                 entity.Property(e => e.Platform).HasMaxLength(25);
 
@@ -742,7 +742,7 @@ namespace digioz.Portal.Dal
             {
                 entity.ToTable("VisitorSession");
 
-                entity.Property(e => e.IpAddress).HasMaxLength(25);
+                entity.Property(e => e.IpAddress).HasMaxLength(64);
 
                 entity.Property(e => e.Username).HasMaxLength(255);
 

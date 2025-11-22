@@ -693,7 +693,7 @@ namespace digioz.Portal.Web.Data.Migrations
                     Timestamp = table.Column<DateTime>(nullable: false),
                     Host = table.Column<string>(nullable: true),
                     HostName = table.Column<string>(nullable: true),
-                    IpAddress = table.Column<string>(maxLength: 25, nullable: true),
+                    IpAddress = table.Column<string>(maxLength: 64, nullable: true),
                     Platform = table.Column<string>(maxLength: 25, nullable: true),
                     Referrer = table.Column<string>(nullable: true),
                     Href = table.Column<string>(nullable: true),
@@ -712,7 +712,7 @@ namespace digioz.Portal.Web.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    IpAddress = table.Column<string>(maxLength: 25, nullable: true),
+                    IpAddress = table.Column<string>(maxLength: 64, nullable: true),
                     PageUrl = table.Column<string>(nullable: true),
                     SessionId = table.Column<string>(nullable: true),
                     Username = table.Column<string>(maxLength: 255, nullable: true),
