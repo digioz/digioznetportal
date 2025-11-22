@@ -32,6 +32,7 @@
 		@RenderSection("description")
 	}
 	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	@await Component.InvokeAsync("BootstrapOverride")
 	<link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/autocomplete.css" />
 	@RenderSection("Head", required: false)
@@ -90,7 +91,7 @@
 					@RenderSection("RSSFeed", required: false) *@
 
 				<div class="card bg-light mb-5">
-					<div class="card-header" style="background-color:#428BCA;color:#ffffff;">@ViewBag.Title</div>
+					<div class="card-header bg-primary text-white">@ViewBag.Title</div>
 					<div class="card-body">
 						@RenderBody()
 					</div>
