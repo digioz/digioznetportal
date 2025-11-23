@@ -38,12 +38,19 @@
 	@RenderSection("Head", required: false)
 </head>
 <body>
-	<div class="container">
-		<div style="padding-left:20px;">
-            <a href="/"><img src="~/img/images/Logo_Small.png" alt="@(configDictionary?["SiteName"] ?? "Portal")" /></a>
-			<h1 style="position:absolute; top:20px;">&nbsp;</h1><br /><br />
+	<header class="site-header">
+		<div class="container">
+			<div class="d-flex align-items-center justify-content-between py-3">
+				<div class="logo-container">
+					<a href="/">
+						<img src="~/img/images/Logo_Small.png" 
+							 alt="@(configDictionary?["SiteName"] ?? "Portal")" 
+							 class="img-fluid" />
+					</a>
+				</div>
+			</div>
 		</div>
-	</div>
+	</header>
 
 	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
         <div class="container px-3">

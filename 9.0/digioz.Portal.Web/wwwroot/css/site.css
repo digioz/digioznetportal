@@ -16,6 +16,36 @@ body {
   margin-bottom: 60px;
 }
 
+/* Site Header Styles */
+.site-header {
+  /* Inherit the page background color instead of forcing a specific color */
+  background-color: inherit !important;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Remove all padding from header flex container */
+.site-header .d-flex {
+  padding: 0 !important;
+}
+
+.logo-container img {
+  /* Set explicit minimum height to prevent excessive shrinking */
+  min-height: 80px;
+  max-height: 200px;
+  height: auto;
+  width: auto;
+  max-width: 100%;
+  display: block;
+}
+
+/* Responsive adjustments for header */
+@media (max-width: 767.98px) { 
+  .logo-container img {
+    min-height: 60px !important;
+    max-height: 200px !important;
+  }
+}
+
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
