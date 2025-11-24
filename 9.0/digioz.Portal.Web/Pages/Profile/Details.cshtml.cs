@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
@@ -31,12 +32,21 @@ namespace digioz.Portal.Pages.Profile
         public List<Video> RecentVideos { get; private set; } = new();
         public string? DisplayName { get; private set; }
         public string? ThemeName { get; private set; }
+        public string? CurrentUserDisplayName { get; private set; }
 
         public IActionResult OnGet(string? userId)
         {
             // userId query string carries DisplayName per requirements
             if (string.IsNullOrWhiteSpace(userId)) return NotFound();
             DisplayName = userId.Trim();
+
+            // Get current user's display name for comparison
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(currentUserId))
+            {
+                var currentProfile = _profileService.GetAll().FirstOrDefault(p => p.UserId == currentUserId);
+                CurrentUserDisplayName = currentProfile?.DisplayName;
+            }
 
             UserProfile = _profileService.GetAll()
                 .FirstOrDefault(p => p.DisplayName != null && p.DisplayName.Equals(DisplayName, StringComparison.OrdinalIgnoreCase));

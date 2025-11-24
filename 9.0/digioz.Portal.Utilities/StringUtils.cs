@@ -840,7 +840,7 @@ namespace digioz.Portal.Utilities
         /// </summary>
         /// <param name="source">The source parameter value to sanitize</param>
         /// <returns>A sanitized source value ("album" or "list"), or null if invalid</returns>
-        public static string? SanitizeMediaSource(string? source)
+        public static string SanitizeMediaSource(string source)
         {
             if (string.IsNullOrWhiteSpace(source))
                 return null;
