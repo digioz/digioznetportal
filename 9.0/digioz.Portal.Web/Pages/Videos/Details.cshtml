@@ -35,7 +35,7 @@
                             <div class="d-flex justify-content-between mt-3">
                                 @if (Model.PreviousId.HasValue)
                                 {
-                                    @if (!string.IsNullOrEmpty(Model.Source) && Model.Source.ToLower() == "album" && Model.AlbumId.HasValue)
+                                    @if (Model.IsAlbumSource)
                                     {
                                         <a href="/Videos/Details?id=@Model.PreviousId&source=album&albumId=@Model.AlbumId" class="btn btn-outline-primary">
                                             <i class="bi bi-chevron-left"></i> Previous
@@ -55,7 +55,7 @@
                                 
                                 @if (Model.NextId.HasValue)
                                 {
-                                    @if (!string.IsNullOrEmpty(Model.Source) && Model.Source.ToLower() == "album" && Model.AlbumId.HasValue)
+                                    @if (Model.IsAlbumSource)
                                     {
                                         <a href="/Videos/Details?id=@Model.NextId&source=album&albumId=@Model.AlbumId" class="btn btn-outline-primary">
                                             Next <i class="bi bi-chevron-right"></i>
@@ -152,7 +152,7 @@
                         </div>
 
                         <div class="d-flex gap-2">
-                            @if (!string.IsNullOrEmpty(Model.Source) && Model.Source.ToLower() == "album" && Model.AlbumId.HasValue)
+                            @if (Model.IsAlbumSource)
                             {
                                 <a href="/Videos/Album?id=@Model.AlbumId" class="btn btn-secondary">Back to Album</a>
                             }

@@ -48,6 +48,11 @@ namespace digioz.Portal.Pages.Pictures
         
         public int? PreviousId { get; private set; }
         public int? NextId { get; private set; }
+        
+        /// <summary>
+        /// Computed property to check if the source is an album view
+        /// </summary>
+        public bool IsAlbumSource => Source?.Equals("album", StringComparison.OrdinalIgnoreCase) == true && AlbumId.HasValue;
 
         public IActionResult OnGet()
         {
