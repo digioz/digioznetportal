@@ -78,6 +78,7 @@ INSERT INTO Menu (UserId, Name, Location, Controller, Action, Url, Target, Visib
 (@adminUserId, 'Pictures', 'LeftMenu', 'Pictures', 'Index', NULL, NULL, 1, 10, GETDATE()),
 (@adminUserId, 'Videos', 'LeftMenu', 'Videos', 'Index', NULL, NULL, 1, 11, GETDATE()),
 (@adminUserId, 'Members', 'LeftMenu', 'Profile', 'Index', NULL, NULL, 1, 12, GETDATE());
+(@adminUserId, 'Comments', 'LeftMenu', 'Comments', 'Index', NULL, NULL, 1, 12, GETDATE());
 ");
 
             // Insert Page rows with admin user resolved at runtime

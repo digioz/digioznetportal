@@ -43,38 +43,25 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
             }
             if (!ModelState.IsValid) return Page();
 
-            // Resolve ReferenceTitle and set proper ReferenceType path
-            string? title = null;
+            // Resolve ReferenceTitle using the reference type and id
+            string? title = GetReferenceTitle(Item.ReferenceType, Item.ReferenceId);
+
+            // Set proper ReferenceType path based on the input
             if (string.Equals(Item.ReferenceType, "Page", StringComparison.OrdinalIgnoreCase))
             {
-                if (int.TryParse(Item.ReferenceId, out var pid))
-                    title = _pageService.Get(pid)?.Title;
+                Item.ReferenceType = "Page";
             }
             else if (string.Equals(Item.ReferenceType, "Announcement", StringComparison.OrdinalIgnoreCase))
             {
-                if (int.TryParse(Item.ReferenceId, out var aid))
-                {
-                    title = _announcementService.Get(aid)?.Title;
-                    Item.ReferenceType = "/Announcements";
-                }
+                Item.ReferenceType = "/Announcements";
             }
             else if (string.Equals(Item.ReferenceType, "Picture", StringComparison.OrdinalIgnoreCase))
             {
-                if (int.TryParse(Item.ReferenceId, out var picId))
-                {
-                    var picture = _pictureService.Get(picId);
-                    title = picture?.Description;
-                    Item.ReferenceType = "/Pictures/Details";
-                }
+                Item.ReferenceType = "/Pictures/Details";
             }
             else if (string.Equals(Item.ReferenceType, "Video", StringComparison.OrdinalIgnoreCase))
             {
-                if (int.TryParse(Item.ReferenceId, out var vidId))
-                {
-                    var video = _videoService.Get(vidId);
-                    title = video?.Description;
-                    Item.ReferenceType = "/Videos/Details";
-                }
+                Item.ReferenceType = "/Videos/Details";
             }
 
             Item.Id = Guid.NewGuid().ToString();
@@ -83,6 +70,21 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
 
             _configService.Add(Item);
             return RedirectToPage("/CommentConfig/Index", new { area = "Admin" });
+        }
+
+        private string? GetReferenceTitle(string referenceType, string referenceId)
+        {
+            if (string.IsNullOrWhiteSpace(referenceId) || !int.TryParse(referenceId, out var id))
+                return null;
+
+            return referenceType switch
+            {
+                "Page" => _pageService.Get(id)?.Title,
+                "Announcement" => _announcementService.Get(id)?.Title,
+                "Picture" => _pictureService.Get(id)?.Description,
+                "Video" => _videoService.Get(id)?.Description,
+                _ => null
+            };
         }
 
         public JsonResult OnGetReferenceValues(string referenceType)
