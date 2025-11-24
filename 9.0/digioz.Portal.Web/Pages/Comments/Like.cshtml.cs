@@ -70,17 +70,14 @@ namespace digioz.Portal.Web.Pages.Comments
             // Validate referer header exists and is from same site
             var referer = Request.Headers["Referer"].ToString();
             
-            if (!string.IsNullOrWhiteSpace(referer))
+            if (!string.IsNullOrWhiteSpace(referer) && Uri.TryCreate(referer, UriKind.Absolute, out var refererUri))
             {
                 // Check if referer is from the same host
-                if (Uri.TryCreate(referer, UriKind.Absolute, out var refererUri))
+                var requestHost = Request.Host.Host;
+                if (refererUri.Host.Equals(requestHost, StringComparison.OrdinalIgnoreCase))
                 {
-                    var requestHost = Request.Host.Host;
-                    if (refererUri.Host.Equals(requestHost, StringComparison.OrdinalIgnoreCase))
-                    {
-                        // Safe to redirect to referer
-                        return Redirect(referer);
-                    }
+                    // Safe to redirect to referer
+                    return Redirect(referer);
                 }
             }
 
