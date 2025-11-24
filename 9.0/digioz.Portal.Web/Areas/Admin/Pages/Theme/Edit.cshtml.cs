@@ -32,9 +32,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
             [Display(Name = "Is Default Theme")]
             public bool IsDefault { get; set; }
 
-            [Required]
             [Display(Name = "CSS Body")]
-            public string Body { get; set; } = string.Empty;
+            public string? Body { get; set; }
         }
 
         public IActionResult OnGet(int? id)
@@ -76,19 +75,14 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
                 return NotFound();
             }
 
-            // If this theme is being set as default, update all other themes to not be default
+            // If this theme is being set as default, use the service method
             if (Input.IsDefault && !theme.IsDefault)
             {
-                var allThemes = _themeService.GetAll();
-                foreach (var existingTheme in allThemes.Where(t => t.IsDefault && t.Id != Input.Id))
-                {
-                    existingTheme.IsDefault = false;
-                    _themeService.Update(existingTheme);
-                }
+                _themeService.SetAsDefault(Input.Id);
             }
 
             theme.Name = Input.Name;
-            theme.Body = Input.Body;
+            theme.Body = Input.Body ?? string.Empty;
             theme.IsDefault = Input.IsDefault;
 
             _themeService.Update(theme);

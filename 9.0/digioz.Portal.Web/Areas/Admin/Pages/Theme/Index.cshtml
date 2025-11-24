@@ -59,6 +59,14 @@
                                 <a asp-page="Edit" asp-route-id="@theme.Id" class="btn btn-sm btn-warning" title="Edit">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
+                                @if (!theme.IsDefault)
+                                {
+                                    <form method="post" asp-page-handler="SetDefault" asp-route-id="@theme.Id" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-success" title="Set as Default" onclick="return confirm('Are you sure you want to set this theme as default?');">
+                                            <i class="fas fa-check-circle"></i> Set Default
+                                        </button>
+                                    </form>
+                                }
                                 <a asp-page="Delete" asp-route-id="@theme.Id" class="btn btn-sm btn-danger" title="Delete">
                                     <i class="fas fa-trash"></i> Delete
                                 </a>

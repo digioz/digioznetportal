@@ -280,6 +280,12 @@ textarea.form-control:focus {
     color: #ffffff !important;
 }
 
+.list-group-item-dark {
+    background-color: #6666cc !important;
+    border-color: #5555b3 !important;
+    color: #ffffff !important;
+}
+
 /* Badges */
 .badge.bg-primary {
     background-color: #6666cc !important;
