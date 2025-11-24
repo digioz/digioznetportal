@@ -35,6 +35,7 @@ namespace digioz.Portal.Web.Pages.Comments
 
         public void OnGet(int pageNumber = 1)
         {
+            // Validate page number
             PageNumber = pageNumber > 0 ? pageNumber : 1;
 
             // Get all comments ordered by newest first
@@ -75,17 +76,29 @@ namespace digioz.Portal.Web.Pages.Comments
                     // Use DisplayName if available, otherwise construct from first/last name
                     if (!string.IsNullOrWhiteSpace(viewModel.Profile.DisplayName))
                     {
-                        viewModel.DisplayName = viewModel.Profile.DisplayName;
+                        viewModel.DisplayName = viewModel.Profile.DisplayName.Trim();
                     }
                     else if (!string.IsNullOrWhiteSpace(viewModel.Profile.FirstName) || !string.IsNullOrWhiteSpace(viewModel.Profile.LastName))
                     {
                         viewModel.DisplayName = $"{viewModel.Profile.FirstName} {viewModel.Profile.LastName}".Trim();
                     }
 
-                    // Get avatar
+                    // Limit display name length
+                    if (viewModel.DisplayName.Length > 100)
+                    {
+                        viewModel.DisplayName = viewModel.DisplayName.Substring(0, 100);
+                    }
+
+                    // Get avatar - sanitize filename to prevent path traversal
                     if (!string.IsNullOrWhiteSpace(viewModel.Profile.Avatar))
                     {
-                        viewModel.AvatarUrl = $"/img/avatar/thumb/{viewModel.Profile.Avatar}";
+                        var avatarFilename = System.IO.Path.GetFileName(viewModel.Profile.Avatar.Trim());
+                        // Validate file extension
+                        if (!string.IsNullOrWhiteSpace(avatarFilename) && 
+                            System.Text.RegularExpressions.Regex.IsMatch(avatarFilename, @"^[a-zA-Z0-9_\-\.]+\.(jpg|jpeg|png|gif|webp)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                        {
+                            viewModel.AvatarUrl = $"/img/avatar/thumb/{avatarFilename}";
+                        }
                     }
                 }
             }
@@ -93,40 +106,58 @@ namespace digioz.Portal.Web.Pages.Comments
             // Determine media type and get thumbnail/details URL
             if (comment.ReferenceType == "/Pictures/Details" && !string.IsNullOrWhiteSpace(comment.ReferenceId))
             {
-                if (int.TryParse(comment.ReferenceId, out var pictureId))
+                if (int.TryParse(comment.ReferenceId, out var pictureId) && pictureId > 0)
                 {
                     var picture = _pictureService.Get(pictureId);
-                    if (picture != null)
+                    if (picture != null && !string.IsNullOrWhiteSpace(picture.Thumbnail))
                     {
-                        viewModel.ThumbnailUrl = $"/img/Pictures/Thumb/{picture.Thumbnail}";
-                        viewModel.DetailsUrl = $"/Pictures/Details/{pictureId}";
+                        // Sanitize thumbnail filename
+                        var thumbnailFilename = System.IO.Path.GetFileName(picture.Thumbnail);
+                        if (!string.IsNullOrWhiteSpace(thumbnailFilename))
+                        {
+                            viewModel.ThumbnailUrl = $"/img/Pictures/Thumb/{thumbnailFilename}";
+                            viewModel.DetailsUrl = $"/Pictures/Details/{pictureId}";
+                        }
                     }
                 }
             }
             else if (comment.ReferenceType == "/Videos/Details" && !string.IsNullOrWhiteSpace(comment.ReferenceId))
             {
-                if (int.TryParse(comment.ReferenceId, out var videoId))
+                if (int.TryParse(comment.ReferenceId, out var videoId) && videoId > 0)
                 {
                     var video = _videoService.Get(videoId);
-                    if (video != null)
+                    if (video != null && !string.IsNullOrWhiteSpace(video.Thumbnail))
                     {
-                        viewModel.ThumbnailUrl = $"/img/Videos/Thumb/{video.Thumbnail}";
-                        viewModel.DetailsUrl = $"/Videos/Details/{videoId}";
+                        // Sanitize thumbnail filename
+                        var thumbnailFilename = System.IO.Path.GetFileName(video.Thumbnail);
+                        if (!string.IsNullOrWhiteSpace(thumbnailFilename))
+                        {
+                            viewModel.ThumbnailUrl = $"/img/Videos/Thumb/{thumbnailFilename}";
+                            viewModel.DetailsUrl = $"/Videos/Details/{videoId}";
+                        }
                     }
                 }
             }
             else if (comment.ReferenceType == "/Announcements" && !string.IsNullOrWhiteSpace(comment.ReferenceId))
             {
-                viewModel.DetailsUrl = $"/Announcements/Index#{comment.ReferenceId}";
+                // Validate reference ID is numeric
+                if (int.TryParse(comment.ReferenceId, out var announcementId) && announcementId > 0)
+                {
+                    viewModel.DetailsUrl = $"/Announcements/Index#{announcementId}";
+                }
             }
             else if (comment.ReferenceType == "Page" && !string.IsNullOrWhiteSpace(comment.ReferenceId))
             {
-                viewModel.DetailsUrl = $"/Page/Index/{comment.ReferenceId}";
+                // Validate reference ID is numeric
+                if (int.TryParse(comment.ReferenceId, out var pageId) && pageId > 0)
+                {
+                    viewModel.DetailsUrl = $"/Page/Index/{pageId}";
+                }
             }
-            else
+            else if (!string.IsNullOrWhiteSpace(comment.ReferenceType) && comment.ReferenceType.StartsWith("/"))
             {
-                // Default to the reference type as the URL
-                viewModel.DetailsUrl = comment.ReferenceType ?? "/";
+                // Only use reference type if it starts with / (relative URL)
+                viewModel.DetailsUrl = comment.ReferenceType;
             }
 
             return viewModel;

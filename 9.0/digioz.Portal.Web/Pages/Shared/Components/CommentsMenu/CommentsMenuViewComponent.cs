@@ -13,8 +13,8 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
     {
         private readonly ICommentService _commentService;
         private readonly IConfigService _configService;
-        private readonly IProfileService _profileService; // added for avatar and display name lookup
-        private readonly IMemoryCache _cache; // still used for Recaptcha only
+        private readonly IProfileService _profileService;
+        private readonly IMemoryCache _cache;
 
         public CommentsMenuViewComponent(ICommentService commentService, IConfigService configService, IProfileService profileService, IMemoryCache cache)
         {
@@ -34,7 +34,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
                 referenceType = pagePath;
             }
 
-            ViewBag.ReferenceId = referenceId;
+            ViewBag.ReferenceId = referenceId ?? string.Empty;
             ViewBag.ReferenceType = referenceType;
 
             // Recaptcha config (cache OK, low churn)
@@ -58,34 +58,54 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
                 // Get comments for specific reference (e.g., specific announcement)
                 comments = _commentService.GetByReferenceType(referenceType)
                     .Where(c => c.ReferenceId == referenceId)
+                    .OrderByDescending(c => c.CreatedDate) // Order by newest first
                     .ToList();
             }
             else
             {
                 // Get all comments for this reference type
-                comments = _commentService.GetByReferenceType(referenceType);
+                comments = _commentService.GetByReferenceType(referenceType)
+                    .OrderByDescending(c => c.CreatedDate) // Order by newest first
+                    .ToList();
             }
 
             // Build avatar and display name maps (userId -> avatar/DisplayName)
             var avatarMap = new Dictionary<string, string>();
             var displayNameMap = new Dictionary<string, string>();
+            
             foreach (var uid in comments.Select(c => c.UserId).Where(id => !string.IsNullOrWhiteSpace(id)).Distinct())
             {
                 var profile = _profileService.GetByUserId(uid!);
                 if (profile != null)
                 {
+                    // Sanitize avatar filename - only store the filename, not any path components
                     if (!string.IsNullOrWhiteSpace(profile.Avatar))
                     {
-                        avatarMap[uid!] = profile.Avatar.Trim();
+                        var sanitizedAvatar = System.IO.Path.GetFileName(profile.Avatar.Trim());
+                        // Additional validation - only allow safe characters
+                        if (!string.IsNullOrWhiteSpace(sanitizedAvatar) && 
+                            System.Text.RegularExpressions.Regex.IsMatch(sanitizedAvatar, @"^[a-zA-Z0-9_\-\.]+\.(jpg|jpeg|png|gif|webp)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                        {
+                            avatarMap[uid!] = sanitizedAvatar;
+                        }
                     }
+                    
+                    // Sanitize display name - trim and limit length
                     if (!string.IsNullOrWhiteSpace(profile.DisplayName))
                     {
-                        displayNameMap[uid!] = profile.DisplayName.Trim();
+                        var sanitizedDisplayName = profile.DisplayName.Trim();
+                        // Limit display name length to prevent UI issues
+                        if (sanitizedDisplayName.Length > 100)
+                        {
+                            sanitizedDisplayName = sanitizedDisplayName.Substring(0, 100);
+                        }
+                        displayNameMap[uid!] = sanitizedDisplayName;
                     }
                 }
             }
-            ViewBag.AvatarMap = avatarMap; // consumed by view
-            ViewBag.DisplayNameMap = displayNameMap; // consumed by view
+            
+            ViewBag.AvatarMap = avatarMap;
+            ViewBag.DisplayNameMap = displayNameMap;
 
             return Task.FromResult<IViewComponentResult>(View(comments));
         }
