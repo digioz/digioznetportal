@@ -31,8 +31,14 @@ namespace digioz.Portal.Pages.Videos
         public string? StatusMessage { get; set; }
         public bool IsSuccess { get; set; }
         
+        private string? _source;
+        
         [BindProperty(SupportsGet = true)]
-        public string? Source { get; set; }
+        public string? Source 
+        { 
+            get => _source;
+            set => _source = StringUtils.SanitizeMediaSource(value);
+        }
         
         [BindProperty(SupportsGet = true)]
         public int? AlbumId { get; set; }
@@ -73,7 +79,7 @@ namespace digioz.Portal.Pages.Videos
             }
             
             // If AlbumId is not provided but source is album, use the current item's album
-            if (Source?.ToLower() == "album" && !AlbumId.HasValue)
+            if (Source?.Equals("album", StringComparison.OrdinalIgnoreCase) == true && !AlbumId.HasValue)
             {
                 AlbumId = Item.AlbumId;
             }
@@ -89,7 +95,8 @@ namespace digioz.Portal.Pages.Videos
             if (Item == null) return;
             
             // Determine which videos to navigate through
-            var videos = Source?.ToLower() == "album" && AlbumId.HasValue
+            // Use case-insensitive comparison with the sanitized value
+            var videos = Source?.Equals("album", StringComparison.OrdinalIgnoreCase) == true && AlbumId.HasValue
                 ? _videoService.GetFiltered(userId: userId, albumId: AlbumId.Value, isAdmin: isAdmin)
                 : _videoService.GetFiltered(userId: userId, isAdmin: isAdmin);
             

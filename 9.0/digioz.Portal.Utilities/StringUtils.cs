@@ -832,6 +832,34 @@ namespace digioz.Portal.Utilities
         }
         #endregion
 
+        #region Media Helpers
+
+        /// <summary>
+        /// Sanitizes media source parameter (e.g., "album" or "list") to only allow expected values.
+        /// Returns null if the value is not recognized to prevent injection attacks.
+        /// </summary>
+        /// <param name="source">The source parameter value to sanitize</param>
+        /// <returns>A sanitized source value ("album" or "list"), or null if invalid</returns>
+        public static string? SanitizeMediaSource(string? source)
+        {
+            if (string.IsNullOrWhiteSpace(source))
+                return null;
+            
+            // Only allow specific, expected values
+            var normalized = source.Trim();
+            
+            if (normalized.Equals("album", StringComparison.OrdinalIgnoreCase))
+                return "album";
+            
+            if (normalized.Equals("list", StringComparison.OrdinalIgnoreCase))
+                return "list";
+            
+            // Return null for any other value to prevent injection
+            return null;
+        }
+
+        #endregion
+
         /// <summary>
         /// Method to String HTML out of a string
         /// </summary>
