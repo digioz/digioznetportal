@@ -73,10 +73,20 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
             var avatarMap = new Dictionary<string, string>();
             var displayNameMap = new Dictionary<string, string>();
             
-            foreach (var uid in comments.Select(c => c.UserId).Where(id => !string.IsNullOrWhiteSpace(id)).Distinct())
+            // Batch load all required profiles to avoid N+1 queries
+            var userIds = comments
+                .Select(c => c.UserId)
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Distinct()
+                .ToList();
+
+            var profiles = _profileService.GetByUserIds(userIds!)
+                .Where(p => p.UserId != null)
+                .ToDictionary(p => p.UserId!, p => p);
+            
+            foreach (var uid in userIds)
             {
-                var profile = _profileService.GetByUserId(uid!);
-                if (profile != null)
+                if (profiles.TryGetValue(uid!, out var profile))
                 {
                     // Sanitize avatar filename - only store the filename, not any path components
                     if (!string.IsNullOrWhiteSpace(profile.Avatar))

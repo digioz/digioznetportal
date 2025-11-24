@@ -19,6 +19,15 @@ namespace digioz.Portal.Dal.Services
             return _context.Pictures.Find(id);
         }
 
+        public List<Picture> GetByIds(List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+            {
+                return new List<Picture>();
+            }
+            return _context.Pictures.Where(p => ids.Contains(p.Id)).ToList();
+        }
+
         public List<Picture> GetAll()
         {
             return _context.Pictures.ToList();

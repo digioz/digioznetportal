@@ -7,6 +7,7 @@ namespace digioz.Portal.Dal.Services.Interfaces
     {
         Video Get(int id);
         List<Video> GetAll();
+        List<Video> GetByIds(List<int> ids);
         List<Video> GetFiltered(string userId = null, int? albumId = null, bool? visible = null, bool? approved = null, bool isAdmin = false);
         int CountByUserId(string userId);
         void Add(Video video);

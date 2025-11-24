@@ -51,11 +51,43 @@ namespace digioz.Portal.Web.Pages.Comments
                 .Take(PageSize)
                 .ToList();
 
-            // Build view models with additional data
-            Comments = pagedComments.Select(c => CreateCommentViewModel(c)).ToList();
+            // Batch load all related data to avoid N+1 queries
+            var userIds = pagedComments
+                .Where(c => !string.IsNullOrEmpty(c.UserId))
+                .Select(c => c.UserId)
+                .Distinct()
+                .ToList();
+
+            var pictureIds = pagedComments
+                .Where(c => c.ReferenceType == "/Pictures/Details" && !string.IsNullOrWhiteSpace(c.ReferenceId))
+                .Select(c => c.ReferenceId)
+                .Where(id => int.TryParse(id, out _))
+                .Select(id => int.Parse(id))
+                .Distinct()
+                .ToList();
+
+            var videoIds = pagedComments
+                .Where(c => c.ReferenceType == "/Videos/Details" && !string.IsNullOrWhiteSpace(c.ReferenceId))
+                .Select(c => c.ReferenceId)
+                .Where(id => int.TryParse(id, out _))
+                .Select(id => int.Parse(id))
+                .Distinct()
+                .ToList();
+
+            // Fetch all related data in batch queries
+            var profiles = _profileService.GetByUserIds(userIds).ToDictionary(p => p.UserId, p => p);
+            var pictures = _pictureService.GetByIds(pictureIds).ToDictionary(p => p.Id, p => p);
+            var videos = _videoService.GetByIds(videoIds).ToDictionary(v => v.Id, v => v);
+
+            // Build view models using pre-loaded data
+            Comments = pagedComments.Select(c => CreateCommentViewModel(c, profiles, pictures, videos)).ToList();
         }
 
-        private CommentViewModel CreateCommentViewModel(Comment comment)
+        private CommentViewModel CreateCommentViewModel(
+            Comment comment,
+            Dictionary<string, ProfileEntity> profiles,
+            Dictionary<int, Picture> pictures,
+            Dictionary<int, Video> videos)
         {
             var viewModel = new CommentViewModel
             {
@@ -67,49 +99,45 @@ namespace digioz.Portal.Web.Pages.Comments
                 AvatarUrl = "/img/avatar/thumb/default.png"
             };
 
-            // Get user profile information
-            if (!string.IsNullOrEmpty(comment.UserId))
+            // Get user profile information from pre-loaded dictionary
+            if (!string.IsNullOrEmpty(comment.UserId) && profiles.TryGetValue(comment.UserId, out var profile))
             {
-                viewModel.Profile = _profileService.GetByUserId(comment.UserId);
-                if (viewModel.Profile != null)
+                viewModel.Profile = profile;
+                // Use DisplayName if available, otherwise construct from first/last name
+                if (!string.IsNullOrWhiteSpace(profile.DisplayName))
                 {
-                    // Use DisplayName if available, otherwise construct from first/last name
-                    if (!string.IsNullOrWhiteSpace(viewModel.Profile.DisplayName))
-                    {
-                        viewModel.DisplayName = viewModel.Profile.DisplayName.Trim();
-                    }
-                    else if (!string.IsNullOrWhiteSpace(viewModel.Profile.FirstName) || !string.IsNullOrWhiteSpace(viewModel.Profile.LastName))
-                    {
-                        viewModel.DisplayName = $"{viewModel.Profile.FirstName} {viewModel.Profile.LastName}".Trim();
-                    }
+                    viewModel.DisplayName = profile.DisplayName.Trim();
+                }
+                else if (!string.IsNullOrWhiteSpace(profile.FirstName) || !string.IsNullOrWhiteSpace(profile.LastName))
+                {
+                    viewModel.DisplayName = $"{profile.FirstName} {profile.LastName}".Trim();
+                }
 
-                    // Limit display name length
-                    if (viewModel.DisplayName.Length > 100)
-                    {
-                        viewModel.DisplayName = viewModel.DisplayName.Substring(0, 100);
-                    }
+                // Limit display name length
+                if (viewModel.DisplayName.Length > 100)
+                {
+                    viewModel.DisplayName = viewModel.DisplayName.Substring(0, 100);
+                }
 
-                    // Get avatar - sanitize filename to prevent path traversal
-                    if (!string.IsNullOrWhiteSpace(viewModel.Profile.Avatar))
+                // Get avatar - sanitize filename to prevent path traversal
+                if (!string.IsNullOrWhiteSpace(profile.Avatar))
+                {
+                    var avatarFilename = System.IO.Path.GetFileName(profile.Avatar.Trim());
+                    // Validate file extension
+                    if (!string.IsNullOrWhiteSpace(avatarFilename) && 
+                        System.Text.RegularExpressions.Regex.IsMatch(avatarFilename, @"^[a-zA-Z0-9_\-\.]+\.(jpg|jpeg|png|gif|webp)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
                     {
-                        var avatarFilename = System.IO.Path.GetFileName(viewModel.Profile.Avatar.Trim());
-                        // Validate file extension
-                        if (!string.IsNullOrWhiteSpace(avatarFilename) && 
-                            System.Text.RegularExpressions.Regex.IsMatch(avatarFilename, @"^[a-zA-Z0-9_\-\.]+\.(jpg|jpeg|png|gif|webp)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
-                        {
-                            viewModel.AvatarUrl = $"/img/avatar/thumb/{avatarFilename}";
-                        }
+                        viewModel.AvatarUrl = $"/img/avatar/thumb/{avatarFilename}";
                     }
                 }
             }
 
-            // Determine media type and get thumbnail/details URL
+            // Determine media type and get thumbnail/details URL from pre-loaded dictionaries
             if (comment.ReferenceType == "/Pictures/Details" && !string.IsNullOrWhiteSpace(comment.ReferenceId))
             {
-                if (int.TryParse(comment.ReferenceId, out var pictureId) && pictureId > 0)
+                if (int.TryParse(comment.ReferenceId, out var pictureId) && pictures.TryGetValue(pictureId, out var picture))
                 {
-                    var picture = _pictureService.Get(pictureId);
-                    if (picture != null && !string.IsNullOrWhiteSpace(picture.Thumbnail))
+                    if (!string.IsNullOrWhiteSpace(picture.Thumbnail))
                     {
                         // Sanitize thumbnail filename
                         var thumbnailFilename = System.IO.Path.GetFileName(picture.Thumbnail);
@@ -123,10 +151,9 @@ namespace digioz.Portal.Web.Pages.Comments
             }
             else if (comment.ReferenceType == "/Videos/Details" && !string.IsNullOrWhiteSpace(comment.ReferenceId))
             {
-                if (int.TryParse(comment.ReferenceId, out var videoId) && videoId > 0)
+                if (int.TryParse(comment.ReferenceId, out var videoId) && videos.TryGetValue(videoId, out var video))
                 {
-                    var video = _videoService.Get(videoId);
-                    if (video != null && !string.IsNullOrWhiteSpace(video.Thumbnail))
+                    if (!string.IsNullOrWhiteSpace(video.Thumbnail))
                     {
                         // Sanitize thumbnail filename
                         var thumbnailFilename = System.IO.Path.GetFileName(video.Thumbnail);
