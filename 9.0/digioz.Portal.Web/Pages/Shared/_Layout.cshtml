@@ -32,17 +32,25 @@
 		@RenderSection("description")
 	}
 	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	@await Component.InvokeAsync("BootstrapOverride")
 	<link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/autocomplete.css" />
 	@RenderSection("Head", required: false)
 </head>
 <body>
-	<div class="container">
-		<div style="padding-left:20px;">
-            <a href="/"><img src="~/img/images/Logo_Small.png" alt="@(configDictionary?["SiteName"] ?? "Portal")" /></a>
-			<h1 style="position:absolute; top:20px;">&nbsp;</h1><br /><br />
+	<header class="site-header">
+		<div class="container">
+			<div class="d-flex align-items-center justify-content-between py-3">
+				<div class="logo-container">
+					<a href="/">
+						<img src="~/img/images/Logo_Small.png" 
+							 alt="@(configDictionary?["SiteName"] ?? "Portal")" 
+							 class="img-fluid" />
+					</a>
+				</div>
+			</div>
 		</div>
-	</div>
+	</header>
 
 	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
         <div class="container px-3">
@@ -90,7 +98,7 @@
 					@RenderSection("RSSFeed", required: false) *@
 
 				<div class="card bg-light mb-5">
-					<div class="card-header" style="background-color:#428BCA;color:#ffffff;">@ViewBag.Title</div>
+					<div class="card-header bg-primary text-white">@ViewBag.Title</div>
 					<div class="card-body">
 						@RenderBody()
 					</div>
@@ -102,11 +110,11 @@
 
 		@await Component.InvokeAsync("ZoneMenu", new { location = "Bottom" })
 
-		<hr />
-		<footer>
-            <p>&copy; @DateTime.Now.Year - @(configDictionary?["SiteName"] ?? "Portal")</p>
-		</footer>
 	</div>
+	<hr />
+	<footer class="text-center py-2">
+		<p class="mb-0">&copy; @DateTime.Now.Year - @(configDictionary?["SiteName"] ?? "Portal")</p>
+	</footer>
 	<script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="~/js/autocomplete.js"></script>
 	<script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

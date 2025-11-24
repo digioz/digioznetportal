@@ -64,6 +64,21 @@ namespace digioz.Portal.Utilities
         }
 
         /// <summary>
+        /// Converts line breaks (CR, LF, CRLF) in a string to HTML br tags.
+        /// Handles all line break variations consistently: \r\n, \n, and \r
+        /// </summary>
+        /// <param name="input">The input string containing line breaks</param>
+        /// <returns>String with line breaks replaced by &lt;br /&gt; tags</returns>
+        public static string ConvertLineBreaksToHtml(this string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+            
+            return input.Replace("\r\n", "<br />")
+                        .Replace("\n", "<br />")
+                        .Replace("\r", "<br />");
+        }
+
+        /// <summary>
         /// Does a case insensitive contains
         /// </summary>
         /// <param name="source"></param>
@@ -830,6 +845,34 @@ namespace digioz.Portal.Utilities
 
             return str;
         }
+        #endregion
+
+        #region Media Helpers
+
+        /// <summary>
+        /// Sanitizes media source parameter (e.g., "album" or "list") to only allow expected values.
+        /// Returns null if the value is not recognized to prevent injection attacks.
+        /// </summary>
+        /// <param name="source">The source parameter value to sanitize</param>
+        /// <returns>A sanitized source value ("album" or "list"), or null if invalid</returns>
+        public static string SanitizeMediaSource(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source))
+                return null;
+            
+            // Only allow specific, expected values
+            var normalized = source.Trim();
+            
+            if (normalized.Equals("album", StringComparison.OrdinalIgnoreCase))
+                return "album";
+            
+            if (normalized.Equals("list", StringComparison.OrdinalIgnoreCase))
+                return "list";
+            
+            // Return null for any other value to prevent injection
+            return null;
+        }
+
         #endregion
 
         /// <summary>

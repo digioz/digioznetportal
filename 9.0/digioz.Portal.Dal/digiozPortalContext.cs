@@ -70,6 +70,7 @@ namespace digioz.Portal.Dal
         public virtual DbSet<VisitorInfo> VisitorInfos { get; set; }
         public virtual DbSet<VisitorSession> VisitorSessions { get; set; }
         public virtual DbSet<Zone> Zones { get; set; }
+        public virtual DbSet<Theme> Themes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -663,6 +664,12 @@ namespace digioz.Portal.Dal
                 entity.Property(e => e.UserId).HasMaxLength(128);
 
                 entity.Property(e => e.Zip).HasMaxLength(20);
+
+                // Foreign key relationship with Theme
+                entity.HasOne(d => d.Theme)
+                    .WithMany()
+                    .HasForeignKey(d => d.ThemeId)
+                    .IsRequired(false);
             });
 
             modelBuilder.Entity<Rss>(entity =>
@@ -722,7 +729,7 @@ namespace digioz.Portal.Dal
             {
                 entity.ToTable("VisitorInfo");
 
-                entity.Property(e => e.IpAddress).HasMaxLength(25);
+                entity.Property(e => e.IpAddress).HasMaxLength(64);
 
                 entity.Property(e => e.Platform).HasMaxLength(25);
 
@@ -735,7 +742,7 @@ namespace digioz.Portal.Dal
             {
                 entity.ToTable("VisitorSession");
 
-                entity.Property(e => e.IpAddress).HasMaxLength(25);
+                entity.Property(e => e.IpAddress).HasMaxLength(64);
 
                 entity.Property(e => e.Username).HasMaxLength(255);
 
@@ -754,6 +761,21 @@ namespace digioz.Portal.Dal
                 entity.Property(e => e.Name).IsRequired();
 
                 entity.Property(e => e.Body).IsRequired();
+            });
+
+            modelBuilder.Entity<Theme>(entity =>
+            {
+                entity.ToTable("Theme");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.Body).IsRequired();
+
+                entity.Property(e => e.CreateDate).IsRequired();
+
+                entity.Property(e => e.IsDefault).IsRequired();
             });
 
             OnModelCreatingPartial(modelBuilder);

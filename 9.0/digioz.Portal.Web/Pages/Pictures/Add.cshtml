@@ -35,13 +35,14 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">Upload Images *</label>
+                    <label class="form-label">Upload Images * (Maximum 5 images)</label>
                     <div id="dropZone" class="border border-2 border-dashed rounded p-5 text-center" style="min-height: 200px; background-color: #f8f9fa; cursor: pointer;">
                         <div id="dropText">
                             <i class="bi bi-cloud-arrow-up" style="font-size: 2rem; color: #0d6efd;"></i>
                             <p class="mt-2 mb-1"><strong>Drag and drop images here</strong></p>
                             <p class="text-muted small">or click to select files</p>
                             <p class="text-muted small">Supported formats: JPG, PNG, GIF, BMP, TIF, TIFF</p>
+                            <p class="text-muted small fw-bold">Maximum: 5 images at a time</p>
                         </div>
                         <div id="fileList" style="display: none;">
                             <ul id="fileItems" class="list-unstyled"></ul>
@@ -108,6 +109,14 @@
         
         if (selectedFiles.length === 0) {
             alert('Please select image files only');
+            return;
+        }
+
+        // Limit to maximum 5 files
+        if (selectedFiles.length > 5) {
+            alert('You can only upload a maximum of 5 images at a time. Please select 5 or fewer images.');
+            selectedFiles = [];
+            fileInput.value = '';
             return;
         }
 

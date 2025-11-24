@@ -2,14 +2,27 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
+# Visual Studio
 /.vs
+.vs/
+*.suo
+*.user
+
+# Build outputs
 /9.0/.vs
-/9.0/digioz.Portal.Bo/bin
-/9.0/digioz.Portal.Bo/obj
-/9.0/digioz.Portal.Dal/bin
-/9.0/digioz.Portal.Dal/obj
-/9.0/digioz.Portal.Utilities/bin
-/9.0/digioz.Portal.Utilities/obj
+/9.0/digioz.Portal.Bo/bin/
+/9.0/digioz.Portal.Bo/obj/
+/9.0/digioz.Portal.Dal/bin/
+/9.0/digioz.Portal.Dal/obj/
+/9.0/digioz.Portal.Utilities/bin/
+/9.0/digioz.Portal.Utilities/obj/
 /9.0/digioz.Portal.Web/.vs
-/9.0/digioz.Portal.Web/bin
-/9.0/digioz.Portal.Web/obj
+/9.0/digioz.Portal.Web/bin/
+/9.0/digioz.Portal.Web/obj/
+/9.0/digioz.Portal.Web/.config
+
+# Generic build folders
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/

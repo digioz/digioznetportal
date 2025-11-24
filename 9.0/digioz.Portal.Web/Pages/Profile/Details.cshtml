@@ -17,7 +17,15 @@
     .media-thumb-wrapper img { width:100%; height:auto; max-width:200px; max-height:200px; object-fit:cover; }
 </style>
 
-<h2>@Model.DisplayName Profile Details</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>@Model.DisplayName Profile Details</h2>
+    @if (User.Identity?.IsAuthenticated == true && Model.DisplayName != Model.CurrentUserDisplayName)
+    {
+        <a href="/PrivateMessages/Index?id=@encodedDisplayName" class="btn btn-primary">
+            <i class="fas fa-envelope"></i> Send Private Message
+        </a>
+    }
+</div>
 
 @if (Model.UserProfile == null)
 {
@@ -38,12 +46,16 @@ else
                         <tr><th>State</th><td>@Model.UserProfile.State</td></tr>
                         <tr><th>Zip</th><td>@Model.UserProfile.Zip</td></tr>
                         <tr><th>Country</th><td>@Model.UserProfile.Country</td></tr>
+                        @if (!string.IsNullOrEmpty(Model.ThemeName))
+                        {
+                            <tr><th>Theme</th><td>@Model.ThemeName</td></tr>
+                        }
                         <tr>
                             <th>Signature</th>
                             <td>
                                 @{
                                     var sig = Model.UserProfile.Signature ?? string.Empty;
-                                    var encodedWithBreaks = System.Net.WebUtility.HtmlEncode(sig).Replace("\r\n", "<br />").Replace("\n", "<br />");
+                                    var encodedWithBreaks = System.Net.WebUtility.HtmlEncode(sig).Replace("\r\n", "<br />").Replace("\n", "<br />").Replace("\r", "<br />");
                                 }
                                 @Html.Raw(encodedWithBreaks)
                             </td>

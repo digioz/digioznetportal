@@ -29,6 +29,7 @@
     <link href="~/css/admin.css" rel="stylesheet" asp-append-version="true" />
     <!-- Bootstrap Icons (local via libman) -->
     <link href="~/lib/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" asp-append-version="true" />
+    @await Component.InvokeAsync("BootstrapOverride")
 </head>
 <body class="bg-light">
     <!-- Top Navbar -->
@@ -103,6 +104,7 @@
                             <li><a class="dropdown-item" asp-area="Admin" asp-page="/Config/Index">Config</a></li>
                             <li><a class="dropdown-item" asp-area="Admin" asp-page="/Link/Index">Links</a></li>
                             <li><a class="dropdown-item" asp-area="Admin" asp-page="/LinkCategory/Index">Link Category</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Theme/Index">Themes</a></li>
                         </ul>
                     </li>
 
@@ -174,6 +176,7 @@
                         <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Config/Index">Config</a>
                         <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Link/Index">Links</a>
                         <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/LinkCategory/Index">Link Category</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Theme/Index">Themes</a>
 
                         <!-- Monitoring Category -->
                         <div class="list-group-item fw-semibold small category bg-secondary text-white">Monitoring</div>

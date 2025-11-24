@@ -27,7 +27,7 @@
             {
                 <div class="col-md-3 col-sm-6 mb-4">
                     <div class="card h-100 shadow-sm @(!video.Visible || !video.Approved ? "border-warning" : "")">
-                        <a asp-page="Details" asp-route-id="@video.Id" class="text-decoration-none position-relative">
+                        <a asp-page="Details" asp-route-id="@video.Id" asp-route-source="list" class="text-decoration-none position-relative">
                             <img src="/img/Videos/Thumb/@video.Thumbnail" 
                                  alt="@video.Description" 
                                  class="card-img-top" 
@@ -74,7 +74,7 @@
                             }
                         </div>
                         <div class="card-footer bg-transparent">
-                            <a asp-page="Details" asp-route-id="@video.Id" class="btn btn-sm btn-outline-primary w-100">View</a>
+                            <a asp-page="Details" asp-route-id="@video.Id" asp-route-source="list" class="btn btn-sm btn-outline-primary w-100">View</a>
                         </div>
                     </div>
                 </div>

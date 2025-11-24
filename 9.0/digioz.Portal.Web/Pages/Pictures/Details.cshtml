@@ -1,4 +1,4 @@
-@page "{id:int}"
+@page "{id:int?}"
 @model DetailsModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
@@ -6,9 +6,9 @@
     ViewData["Title"] = "Picture Details";
 }
 
-<div class="container my-5">
+<div class="container-fluid my-5">
     <div class="row">
-        <div class="col-md-8 offset-md-2">
+        <div class="col-12">
             @if (Model.Item != null)
             {
                 <div class="card shadow-sm">
@@ -24,13 +24,56 @@
                         }
 
                         <div class="mb-4">
-                            <div class="border rounded p-3 bg-light text-center position-relative" style="overflow: hidden;" id="imageContainer" title="Click to zoom in">
+                            <div class="border rounded p-3 bg-light text-center position-relative" style="overflow: hidden; width: 100%;" id="imageContainer" title="Click to zoom in">
                                 <img src="/img/Pictures/Full/@Model.Item.Filename" 
                                      alt="@Model.Item.Description" 
                                      class="img-fluid" 
                                      id="detailImage"
-                                     style="max-width: 100%; max-height: 600px; object-fit: contain; transition: transform 0.3s ease; cursor: zoom-in;" />
+                                     style="width: 100%; height: auto; object-fit: contain; transition: transform 0.3s ease; cursor: zoom-in;" />
                                 <small class="text-muted d-block mt-2">Click image to zoom</small>
+                            </div>
+                            
+                            <!-- Navigation Buttons -->
+                            <div class="d-flex justify-content-between mt-3">
+                                @if (Model.PreviousId.HasValue)
+                                {
+                                    @if (Model.IsAlbumSource)
+                                    {
+                                        <a href="/Pictures/Details?id=@Model.PreviousId&source=album&albumId=@Model.AlbumId" class="btn btn-outline-primary">
+                                            <i class="bi bi-chevron-left"></i> Previous
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a href="/Pictures/Details?id=@Model.PreviousId&source=list" class="btn btn-outline-primary">
+                                            <i class="bi bi-chevron-left"></i> Previous
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    <span></span>
+                                }
+                                
+                                @if (Model.NextId.HasValue)
+                                {
+                                    @if (Model.IsAlbumSource)
+                                    {
+                                        <a href="/Pictures/Details?id=@Model.NextId&source=album&albumId=@Model.AlbumId" class="btn btn-outline-primary">
+                                            Next <i class="bi bi-chevron-right"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a href="/Pictures/Details?id=@Model.NextId&source=list" class="btn btn-outline-primary">
+                                            Next <i class="bi bi-chevron-right"></i>
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    <span></span>
+                                }
                             </div>
                         </div>
 
@@ -111,7 +154,14 @@
                         </div>
 
                         <div class="d-flex gap-2">
-                            <a href="/Pictures/List" class="btn btn-secondary">Back to Gallery</a>
+                            @if (Model.IsAlbumSource)
+                            {
+                                <a href="/Pictures/Album?id=@Model.AlbumId" class="btn btn-secondary">Back to Album</a>
+                            }
+                            else
+                            {
+                                <a href="/Pictures/List" class="btn btn-secondary">Back to Gallery</a>
+                            }
                             @if (Model.IsOwner || User?.IsInRole("Admin") == true)
                             {
                                 <a asp-page="Edit" asp-route-id="@Model.Item.Id" class="btn btn-primary">Edit</a>
@@ -139,15 +189,30 @@
                 <h5 class="modal-title text-light" id="zoomModalLabel">@Model.Item?.Description</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body bg-dark p-0 d-flex align-items-center justify-content-center" id="zoomContainer" style="height: calc(100vh - 120px); overflow: auto;">
-                <img id="zoomImage" 
-                     src="/img/Pictures/Full/@Model.Item?.Filename" 
-                     alt="@Model.Item?.Description"
-                     style="max-width: 100%; height: auto; cursor: zoom-out;" 
-                     class="img-fluid clickable-image" />
+            <div class="bg-dark border-bottom border-secondary p-2 d-flex justify-content-center align-items-center">
+                <button type="button" class="btn btn-sm btn-outline-light me-2" id="zoomOut">
+                    <i class="bi bi-zoom-out"></i> Zoom Out
+                </button>
+                <span class="text-light mx-3">Zoom: <span id="zoomLevel">100</span>%</span>
+                <button type="button" class="btn btn-sm btn-outline-light me-2" id="zoomIn">
+                    <i class="bi bi-zoom-in"></i> Zoom In
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-light" id="resetZoom">
+                    <i class="bi bi-arrow-clockwise"></i> Reset
+                </button>
+                <small class="text-muted ms-4">Click and drag to pan</small>
+            </div>
+            <div class="modal-body bg-dark p-0" id="zoomContainer" style="height: calc(100vh - 180px); overflow: auto; position: relative;">
+                <div id="imageWrapper" style="display: inline-block; min-width: 100%; min-height: 100%; text-align: center;">
+                    <img id="zoomImage" 
+                         src="/img/Pictures/Full/@Model.Item?.Filename" 
+                         alt="@Model.Item?.Description"
+                         style="display: inline-block; vertical-align: middle;" 
+                         class="zoom-image" />
+                </div>
             </div>
             <div class="modal-footer bg-dark border-secondary">
-                <small class="text-muted">Full size image | Click to close | Press Esc to close</small>
+                <small class="text-muted">Use zoom buttons to zoom in/out | Click and drag to pan the image</small>
             </div>
         </div>
     </div>
@@ -164,21 +229,31 @@
 
     #zoomContainer {
         background-color: #1a1a1a;
+        cursor: grab;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #zoomContainer:active {
+        cursor: grabbing;
+    }
+
+    #imageWrapper {
+        position: relative;
     }
 
     #zoomImage {
-        max-width: 100%;
-        height: auto;
-        width: 100%;
-        cursor: zoom-out;
+        max-width: none;
+        max-height: none;
+        user-select: none;
+        -webkit-user-drag: none;
+        pointer-events: none;
     }
 
-    #zoomImage:hover {
-        opacity: 0.95;
-    }
-
-    .clickable-image {
-        cursor: zoom-out !important;
+    .zoom-image {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
     }
 </style>
 
@@ -188,7 +263,20 @@
         const detailImage = document.getElementById('detailImage');
         const zoomModal = document.getElementById('zoomModal');
         const zoomImage = document.getElementById('zoomImage');
-        const closeButton = document.querySelector('[data-bs-dismiss="modal"]');
+        const zoomContainer = document.getElementById('zoomContainer');
+        const imageWrapper = document.getElementById('imageWrapper');
+        const zoomLevelDisplay = document.getElementById('zoomLevel');
+        const zoomInBtn = document.getElementById('zoomIn');
+        const zoomOutBtn = document.getElementById('zoomOut');
+        const resetZoomBtn = document.getElementById('resetZoom');
+        
+        let scale = 1;
+        let initialScale = 1;
+        let panning = false;
+        let startX = 0;
+        let startY = 0;
+        let scrollLeft = 0;
+        let scrollTop = 0;
         
         // Open modal on image click
         if (imageContainer && zoomModal) {
@@ -199,21 +287,179 @@
             });
         }
         
-        // Close modal when clicking on the zoomed image
-        if (zoomImage && zoomModal) {
-            zoomImage.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                const modal = bootstrap.Modal.getInstance(zoomModal);
-                if (modal) {
-                    modal.hide();
-                }
+        // Initialize zoom when modal is shown
+        if (zoomModal) {
+            zoomModal.addEventListener('shown.bs.modal', function() {
+                initializeZoom();
             });
         }
         
-        // Clean up backdrop after modal closes
+        function initializeZoom() {
+            if (!zoomImage || !zoomContainer) return;
+            
+            // Wait for image to load
+            if (!zoomImage.complete) {
+                zoomImage.onload = function() {
+                    calculateInitialScale();
+                };
+            } else {
+                calculateInitialScale();
+            }
+        }
+        
+        function calculateInitialScale() {
+            const containerWidth = zoomContainer.clientWidth;
+            const containerHeight = zoomContainer.clientHeight;
+            const imageWidth = zoomImage.naturalWidth;
+            const imageHeight = zoomImage.naturalHeight;
+            
+            // Calculate scale to fit the largest dimension
+            const widthScale = containerWidth / imageWidth;
+            const heightScale = containerHeight / imageHeight;
+            
+            // Use the smaller scale to ensure the image fits within the viewport
+            initialScale = Math.min(widthScale, heightScale, 1);
+            scale = initialScale;
+            
+            // Apply initial scale and center the image
+            applyZoom();
+            centerImage();
+        }
+        
+        function applyZoom() {
+            if (!zoomImage || !imageWrapper) return;
+            
+            const scaledWidth = zoomImage.naturalWidth * scale;
+            const scaledHeight = zoomImage.naturalHeight * scale;
+            
+            zoomImage.style.width = scaledWidth + 'px';
+            zoomImage.style.height = scaledHeight + 'px';
+            
+            // Update wrapper to accommodate scaled image
+            imageWrapper.style.width = scaledWidth + 'px';
+            imageWrapper.style.height = scaledHeight + 'px';
+            
+            updateZoomDisplay();
+        }
+        
+        function centerImage() {
+            if (!zoomContainer || !zoomImage) return;
+            
+            const scaledWidth = zoomImage.naturalWidth * scale;
+            const scaledHeight = zoomImage.naturalHeight * scale;
+            const containerWidth = zoomContainer.clientWidth;
+            const containerHeight = zoomContainer.clientHeight;
+            
+            // Center horizontally
+            if (scaledWidth > containerWidth) {
+                zoomContainer.scrollLeft = (scaledWidth - containerWidth) / 2;
+            } else {
+                zoomContainer.scrollLeft = 0;
+            }
+            
+            // Center vertically
+            if (scaledHeight > containerHeight) {
+                zoomContainer.scrollTop = (scaledHeight - containerHeight) / 2;
+            } else {
+                zoomContainer.scrollTop = 0;
+            }
+        }
+        
+        function updateZoomDisplay() {
+            if (zoomLevelDisplay) {
+                zoomLevelDisplay.textContent = Math.round(scale * 100);
+            }
+        }
+        
+        function zoomIn() {
+            const oldScale = scale;
+            scale = Math.min(scale * 1.2, 5); // Max 500%
+            
+            if (scale !== oldScale) {
+                applyZoom();
+                maintainScrollPosition(oldScale, scale);
+            }
+        }
+        
+        function zoomOut() {
+            const oldScale = scale;
+            scale = Math.max(scale / 1.2, 0.1); // Min 10%
+            
+            if (scale !== oldScale) {
+                applyZoom();
+                maintainScrollPosition(oldScale, scale);
+            }
+        }
+        
+        function maintainScrollPosition(oldScale, newScale) {
+            if (!zoomContainer) return;
+            
+            const scaleRatio = newScale / oldScale;
+            const containerCenterX = zoomContainer.scrollLeft + zoomContainer.clientWidth / 2;
+            const containerCenterY = zoomContainer.scrollTop + zoomContainer.clientHeight / 2;
+            
+            zoomContainer.scrollLeft = containerCenterX * scaleRatio - zoomContainer.clientWidth / 2;
+            zoomContainer.scrollTop = containerCenterY * scaleRatio - zoomContainer.clientHeight / 2;
+        }
+        
+        // Zoom buttons
+        if (zoomInBtn) {
+            zoomInBtn.addEventListener('click', zoomIn);
+        }
+        
+        if (zoomOutBtn) {
+            zoomOutBtn.addEventListener('click', zoomOut);
+        }
+        
+        // Reset zoom button
+        if (resetZoomBtn) {
+            resetZoomBtn.addEventListener('click', function() {
+                scale = initialScale;
+                applyZoom();
+                centerImage();
+            });
+        }
+        
+        // Pan with mouse drag
+        if (zoomContainer) {
+            zoomContainer.addEventListener('mousedown', function(e) {
+                panning = true;
+                startX = e.pageX - zoomContainer.offsetLeft;
+                startY = e.pageY - zoomContainer.offsetTop;
+                scrollLeft = zoomContainer.scrollLeft;
+                scrollTop = zoomContainer.scrollTop;
+            });
+            
+            zoomContainer.addEventListener('mousemove', function(e) {
+                if (!panning) return;
+                e.preventDefault();
+                
+                const x = e.pageX - zoomContainer.offsetLeft;
+                const y = e.pageY - zoomContainer.offsetTop;
+                const walkX = (x - startX) * 2;
+                const walkY = (y - startY) * 2;
+                
+                zoomContainer.scrollLeft = scrollLeft - walkX;
+                zoomContainer.scrollTop = scrollTop - walkY;
+            });
+            
+            zoomContainer.addEventListener('mouseup', function() {
+                panning = false;
+            });
+            
+            zoomContainer.addEventListener('mouseleave', function() {
+                panning = false;
+            });
+        }
+        
+        // Clean up when modal closes
         if (zoomModal) {
             zoomModal.addEventListener('hidden.bs.modal', function() {
+                // Reset zoom state
+                scale = 1;
+                initialScale = 1;
+                panning = false;
+                
                 setTimeout(function() {
                     // Remove all modal backdrops that might be lingering
                     document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
