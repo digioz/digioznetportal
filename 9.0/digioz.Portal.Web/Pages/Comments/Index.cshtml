@@ -1,5 +1,6 @@
 @page
 @model digioz.Portal.Web.Pages.Comments.IndexModel
+@using digioz.Portal.Utilities
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @addTagHelper *, LazZiya.TagHelpers
 @{
@@ -70,7 +71,7 @@
 
                                     <!-- Comment Body -->
                                     <div class="comment-body py-2">
-                                        <p class="mb-0">@item.Comment.Body</p>
+                                        <p class="mb-0" style="word-wrap: break-word;">@Html.Raw(StringUtils.ConvertLineBreaksToHtml(item.Comment.Body))</p>
                                     </div>
                                 </div>
 

@@ -48,7 +48,8 @@ namespace digioz.Portal.Web.Pages.Comments
             if (string.IsNullOrWhiteSpace(comment) || comment.Length > 5000)
                 return Redirect(referer ?? "/");
 
-            var sanitized = StringUtils.SanitizeToPlainText(comment);
+            // Sanitize comment but preserve line breaks
+            var sanitized = StringUtils.SanitizeCommentPreservingLineBreaks(comment);
 
             var cfg = _configService.GetAll();
             var recaptchaEnabled = bool.TryParse(cfg.FirstOrDefault(c => c.ConfigKey == "RecaptchaEnabled")?.ConfigValue, out var en) && en;

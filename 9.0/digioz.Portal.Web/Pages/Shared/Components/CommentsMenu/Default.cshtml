@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<digioz.Portal.Bo.Comment>
 @using System.Text.RegularExpressions
+@using digioz.Portal.Utilities
 @{
     // Avatar map supplied by ViewComponent: Dictionary<string,string> userId -> avatar filename
     var avatarMap = ViewBag.AvatarMap as IDictionary<string,string> ?? new Dictionary<string,string>();
@@ -60,8 +61,8 @@
                                         <img src="/img/avatar/thumb/default.png" class="rounded-circle" width="40" height="40" alt="avatar" />
                                     }
                                 </div>
-                                <div>
-                                    <p class="mb-1">@comment.Body</p>
+                                <div style="flex: 1;">
+                                    <p class="mb-1" style="word-wrap: break-word;">@Html.Raw(StringUtils.ConvertLineBreaksToHtml(comment.Body))</p>
                                     <small class="text-muted">
                                         <a href="/Profile/Details?userId=@urlDisplayName">@displayName</a> on @comment.ModifiedDate
                                     </small>

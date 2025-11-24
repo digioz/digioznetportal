@@ -29,7 +29,7 @@ namespace digioz.Portal.Web.Pages.Comments
 
         public List<CommentViewModel> Comments { get; set; } = new();
         public int PageNumber { get; set; } = 1;
-        public int PageSize { get; set; } = 25;
+        public int PageSize { get; set; } = 20;
         public int TotalCount { get; set; }
         public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
 
