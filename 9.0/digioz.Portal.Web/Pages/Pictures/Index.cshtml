@@ -12,12 +12,15 @@
         <div class="col-md-8">
             <h1>Picture Albums</h1>
         </div>
-        @if (User?.Identity?.IsAuthenticated == true)
-        {
-            <div class="col-md-4 text-end">
+        <div class="col-md-4 text-end">
+            <a asp-page="List" class="btn btn-outline-secondary me-2">
+                <i class="bi bi-grid-3x3-gap"></i> View All Pictures
+            </a>
+            @if (User?.Identity?.IsAuthenticated == true)
+            {
                 <a asp-page="Add" class="btn btn-primary">Add Pictures</a>
-            </div>
-        }
+            }
+        </div>
     </div>
 
     @if (Model.Albums.Any())

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
@@ -29,10 +30,25 @@ namespace digioz.Portal.Pages.Pictures
         public bool IsOwner { get; private set; }
         public string? StatusMessage { get; set; }
         public bool IsSuccess { get; set; }
+        
+        [BindProperty(SupportsGet = true)]
+        public string? Source { get; set; }
+        
+        [BindProperty(SupportsGet = true)]
+        public int? AlbumId { get; set; }
+        
+        [BindProperty(SupportsGet = true)]
+        public int? Id { get; set; }
+        
+        public int? PreviousId { get; private set; }
+        public int? NextId { get; private set; }
 
-        public IActionResult OnGet(int id)
+        public IActionResult OnGet()
         {
-            Item = _pictureService.Get(id);
+            if (!Id.HasValue)
+                return NotFound();
+
+            Item = _pictureService.Get(Id.Value);
             if (Item == null)
                 return NotFound();
 
@@ -55,8 +71,66 @@ namespace digioz.Portal.Pages.Pictures
             {
                 UploaderProfile = _profileService.GetByUserId(Item.UserId);
             }
+            
+            // If AlbumId is not provided but source is album, use the current item's album
+            if (Source?.ToLower() == "album" && !AlbumId.HasValue)
+            {
+                AlbumId = Item.AlbumId;
+            }
+            
+            // Calculate previous and next based on source
+            CalculateNavigation(userId, isAdmin);
 
             return Page();
+        }
+        
+        private void CalculateNavigation(string? userId, bool isAdmin)
+        {
+            if (Item == null) return;
+            
+            // Determine which pictures to navigate through
+            var pictures = Source?.ToLower() == "album" && AlbumId.HasValue
+                ? _pictureService.GetFiltered(userId: userId, albumId: AlbumId.Value, isAdmin: isAdmin)
+                : _pictureService.GetFiltered(userId: userId, isAdmin: isAdmin);
+            
+            if (pictures == null || pictures.Count == 0)
+                return;
+                
+            // Find current item's index
+            var currentIndex = -1;
+            for (int i = 0; i < pictures.Count; i++)
+            {
+                if (pictures[i].Id == Item.Id)
+                {
+                    currentIndex = i;
+                    break;
+                }
+            }
+            
+            if (currentIndex == -1)
+                return; // Current item not found in the list
+            
+            // Calculate previous
+            if (currentIndex > 0)
+            {
+                PreviousId = pictures[currentIndex - 1].Id;
+            }
+            else if (pictures.Count > 1)
+            {
+                // Loop to last item
+                PreviousId = pictures[pictures.Count - 1].Id;
+            }
+            
+            // Calculate next
+            if (currentIndex < pictures.Count - 1)
+            {
+                NextId = pictures[currentIndex + 1].Id;
+            }
+            else if (pictures.Count > 1)
+            {
+                // Loop to first item
+                NextId = pictures[0].Id;
+            }
         }
 
         public IActionResult OnPostDelete(int id)
