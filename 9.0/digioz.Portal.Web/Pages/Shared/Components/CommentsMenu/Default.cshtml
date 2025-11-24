@@ -1,5 +1,8 @@
 ﻿@model IEnumerable<digioz.Portal.Bo.Comment>
 @using System.Text.RegularExpressions
+@using digioz.Portal.Utilities
+@using System.Text.Encodings.Web
+@using System.Net
 @{
     // Avatar map supplied by ViewComponent: Dictionary<string,string> userId -> avatar filename
     var avatarMap = ViewBag.AvatarMap as IDictionary<string,string> ?? new Dictionary<string,string>();
@@ -16,6 +19,10 @@
     {
         uniqueId = "c_" + uniqueId;
     }
+
+    // JavaScript-safe encoding for values injected into script blocks
+    var jsUniqueId = JavaScriptEncoder.Default.Encode(uniqueId);
+    var jsRecaptchaKey = JavaScriptEncoder.Default.Encode(ViewBag.RecaptchaPublicKey?.ToString() ?? string.Empty);
 }
 
 <div class="card mb-3" id="comments-root-@uniqueId">
@@ -42,9 +49,18 @@
             <ul class="list-group list-group-flush">
                 @foreach (var comment in Model)
                 {
-                    var avatarFile = (comment.UserId != null && avatarMap.TryGetValue(comment.UserId, out var f) && !string.IsNullOrWhiteSpace(f)) ? f : "default.png";
+                    // Sanitize avatar filename to prevent path traversal attacks
+                    var rawAvatarFile = (comment.UserId != null && avatarMap.TryGetValue(comment.UserId, out var f) && !string.IsNullOrWhiteSpace(f)) ? f : "default.png";
+                    var avatarFile = System.IO.Path.GetFileName(rawAvatarFile); // Remove any path components
+                    
                     var displayName = (comment.UserId != null && displayNameMap.TryGetValue(comment.UserId, out var dn) && !string.IsNullOrWhiteSpace(dn)) ? dn : comment.Username;
                     var urlDisplayName = System.Uri.EscapeDataString(displayName ?? string.Empty);
+                    
+                    // HTML encode display name for safe output
+                    var htmlDisplayName = WebUtility.HtmlEncode(displayName);
+                    var htmlAvatarFile = WebUtility.HtmlEncode(avatarFile);
+                    var htmlCommentId = WebUtility.HtmlEncode(comment.Id);
+                    
                     <li class="list-group-item">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="d-flex align-items-start">
@@ -52,7 +68,7 @@
                                     @if (comment.UserId != null)
                                     {
                                         <a href="/Profile/Details?userId=@urlDisplayName">
-                                            <img src="/img/avatar/thumb/@avatarFile" class="rounded-circle" width="40" height="40" alt="@displayName" />
+                                            <img src="/img/avatar/thumb/@htmlAvatarFile" class="rounded-circle" width="40" height="40" alt="@htmlDisplayName" />
                                         </a>
                                     }
                                     else
@@ -60,10 +76,10 @@
                                         <img src="/img/avatar/thumb/default.png" class="rounded-circle" width="40" height="40" alt="avatar" />
                                     }
                                 </div>
-                                <div>
-                                    <p class="mb-1">@comment.Body</p>
+                                <div style="flex: 1;">
+                                    <p class="mb-1" style="word-wrap: break-word;">@Html.Raw(StringUtils.ConvertLineBreaksToHtml(comment.Body))</p>
                                     <small class="text-muted">
-                                        <a href="/Profile/Details?userId=@urlDisplayName">@displayName</a> on @comment.ModifiedDate
+                                        <a href="/Profile/Details?userId=@urlDisplayName">@htmlDisplayName</a> on @comment.ModifiedDate
                                     </small>
                                 </div>
                             </div>
@@ -71,7 +87,7 @@
                                 <span class="small me-1">Likes (<b>@comment.Likes</b>)</span>
                                 @if (User.Identity?.IsAuthenticated == true)
                                 {
-                                    <form action="/Comments/Like?id=@comment.Id" method="post" class="d-inline comment-like-form" data-comment-id="@comment.Id">
+                                    <form action="/Comments/Like?id=@htmlCommentId" method="post" class="d-inline comment-like-form" data-comment-id="@htmlCommentId">
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="btn btn-outline-secondary p-0 like-btn" style="width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;line-height:1;" aria-label="Like">
                                             <img src="~/img/images/icons/20x20/Like.png" alt="Like" width="14" height="14" />
@@ -87,14 +103,18 @@
 
         @if (User.Identity?.IsAuthenticated == true)
         {
+            var htmlReferenceId = WebUtility.HtmlEncode(ViewBag.ReferenceId?.ToString() ?? string.Empty);
+            var htmlReferenceType = WebUtility.HtmlEncode(ViewBag.ReferenceType?.ToString() ?? string.Empty);
+            var htmlUniqueId = WebUtility.HtmlEncode(uniqueId);
+            
             <div class="card-body border-top">
-                <form action="/Comments/Add" method="post" class="mt-3 comment-form" id="commentForm-@uniqueId" data-unique-id="@uniqueId">
+                <form action="/Comments/Add" method="post" class="mt-3 comment-form" id="commentForm-@uniqueId" data-unique-id="@htmlUniqueId">
                     @Html.AntiForgeryToken()
-                    <input type="hidden" name="referenceId" value="@ViewBag.ReferenceId" />
-                    <input type="hidden" name="referenceType" value="@ViewBag.ReferenceType" />
+                    <input type="hidden" name="referenceId" value="@htmlReferenceId" />
+                    <input type="hidden" name="referenceType" value="@htmlReferenceType" />
                     <input type="hidden" class="recaptchaToken" name="recaptchaToken" />
                     <div class="mb-3">
-                        <textarea name="comment" class="form-control" rows="3" placeholder="Your comments"></textarea>
+                        <textarea name="comment" class="form-control" rows="3" placeholder="Your comments" maxlength="5000"></textarea>
                     </div>
                     <div class="d-flex justify-content-end">
                         <button type="submit" class="btn btn-info btn-sm">Post Comment</button>
@@ -113,13 +133,13 @@
 
 @if (ViewBag.RecaptchaEnabled == true && !string.IsNullOrEmpty((string)ViewBag.RecaptchaPublicKey))
 {
-    <script src="https://www.google.com/recaptcha/api.js?render=@ViewBag.RecaptchaPublicKey"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=@jsRecaptchaKey"></script>
 }
 <script>
 (function(){
-    const uniqueId = '@uniqueId';
-    const recaptchaEnabled = '@( (ViewBag.RecaptchaEnabled ?? false).ToString().ToLower() )' === 'true';
-    const recaptchaPublicKey = '@ViewBag.RecaptchaPublicKey';
+    const uniqueId = '@Html.Raw(jsUniqueId)';
+    const recaptchaEnabled = @Json.Serialize(ViewBag.RecaptchaEnabled ?? false);
+    const recaptchaPublicKey = '@Html.Raw(jsRecaptchaKey)';
 
     function handleAjaxForm(form, beforeSend){
         // Check if this form already has the handler attached

@@ -25,5 +25,20 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
         {
             Themes = _themeService.GetAll().OrderByDescending(t => t.IsDefault).ThenBy(t => t.Name).ToList();
         }
+
+        public IActionResult OnPostSetDefault(int id)
+        {
+            var theme = _themeService.Get(id);
+
+            if (theme == null)
+            {
+                return NotFound();
+            }
+
+            _themeService.SetAsDefault(id);
+
+            StatusMessage = $"Theme '{theme.Name}' has been set as the default theme.";
+            return RedirectToPage();
+        }
     }
 }

@@ -11,5 +11,6 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void Add(Theme theme);
         void Update(Theme theme);
         void Delete(int id);
+        void SetAsDefault(int id);
     }
 }

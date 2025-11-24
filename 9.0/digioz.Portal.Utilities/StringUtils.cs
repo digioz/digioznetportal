@@ -653,6 +653,45 @@ namespace digioz.Portal.Utilities
             text = Regex.Replace(text, @"\s+", " ").Trim();
             return text;
         }
+
+        /// <summary>
+        /// Sanitizes comment text by removing HTML/scripts but preserving line breaks.
+        /// Use this for user comments where you want to maintain formatting with line breaks.
+        /// Limits excessive consecutive line breaks to prevent abuse.
+        /// </summary>
+        /// <param name="input">The comment text to sanitize, which may contain HTML or script content</param>
+        /// <returns>A sanitized string with HTML removed but line breaks preserved, or empty string if input is null/whitespace</returns>
+        public static string SanitizeCommentPreservingLineBreaks(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+
+            try
+            {
+                // Parse HTML and extract plain text only (removes all tags, scripts, attributes)
+                var doc = new HtmlDocument();
+                doc.LoadHtml(input);
+                var text = doc.DocumentNode.InnerText ?? string.Empty;
+
+                // Decode HTML entities (e.g., &lt; becomes <)
+                text = System.Net.WebUtility.HtmlDecode(text);
+
+                // Normalize line breaks to \n
+                text = text.Replace("\r\n", "\n").Replace("\r", "\n");
+
+                // Trim excessive consecutive line breaks (more than 2 in a row)
+                while (text.Contains("\n\n\n"))
+                {
+                    text = text.Replace("\n\n\n", "\n\n");
+                }
+
+                return text.Trim();
+            }
+            catch
+            {
+                // If HTML parsing fails, fall back to returning empty string for safety
+                return string.Empty;
+            }
+        }
         #endregion
 
         #region Html Element Helpers

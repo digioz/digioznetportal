@@ -327,7 +327,17 @@
 
 /* Tables */
 .table {
-    color: #E0E0E0 !important;
+    color: #FFFFFF !important;
+}
+
+.table thead th {
+    background-color: #2A3A4A !important;
+    color: #FFFFFF !important;
+    border-color: #404550 !important;
+}
+
+.table tbody td {
+    color: #FFFFFF !important;
 }
 
 .table-primary {
@@ -361,7 +371,7 @@
 }
 
 .table-striped > tbody > tr:nth-of-type(odd) > * {
-    background-color: rgba(255, 255, 255, 0.03) !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .table-hover > tbody > tr:hover > * {
@@ -398,6 +408,12 @@
 .list-group-item-danger {
     background-color: #5A2A2A !important;
     color: #E8A8A8 !important;
+}
+
+.list-group-item-dark {
+    background-color: #5E9FD8 !important;
+    border-color: #4A8BC4 !important;
+    color: #F0F0F0 !important;
 }
 
 /* Dropdowns */

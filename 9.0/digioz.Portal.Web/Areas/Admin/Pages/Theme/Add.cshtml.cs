@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
@@ -30,9 +29,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
             [Display(Name = "Is Default Theme")]
             public bool IsDefault { get; set; }
 
-            [Required]
             [Display(Name = "CSS Body")]
-            public string Body { get; set; } = string.Empty;
+            public string? Body { get; set; }
         }
 
         public IActionResult OnGet()
@@ -47,26 +45,21 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
                 return Page();
             }
 
-            // If this theme is being set as default, update all other themes to not be default
-            if (Input.IsDefault)
-            {
-                var allThemes = _themeService.GetAll();
-                foreach (var existingTheme in allThemes.Where(t => t.IsDefault))
-                {
-                    existingTheme.IsDefault = false;
-                    _themeService.Update(existingTheme);
-                }
-            }
-
             var theme = new Bo.Theme
             {
                 Name = Input.Name,
-                Body = Input.Body,
+                Body = Input.Body ?? string.Empty,
                 IsDefault = Input.IsDefault,
                 CreateDate = DateTime.Now
             };
 
             _themeService.Add(theme);
+
+            // If this theme is being set as default, use the service method
+            if (Input.IsDefault)
+            {
+                _themeService.SetAsDefault(theme.Id);
+            }
 
             TempData["StatusMessage"] = $"Theme '{theme.Name}' has been created successfully.";
             return RedirectToPage("./Index");

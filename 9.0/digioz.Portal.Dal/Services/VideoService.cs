@@ -19,6 +19,15 @@ namespace digioz.Portal.Dal.Services
             return _context.Videos.Find(id);
         }
 
+        public List<Video> GetByIds(List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+            {
+                return new List<Video>();
+            }
+            return _context.Videos.Where(v => ids.Contains(v.Id)).ToList();
+        }
+
         public List<Video> GetAll()
         {
             return _context.Videos.ToList();

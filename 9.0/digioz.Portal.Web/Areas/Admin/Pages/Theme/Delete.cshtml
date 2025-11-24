@@ -5,65 +5,70 @@
     Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
-<h1>Delete Theme</h1>
-
-@if (Model.CannotDelete)
-{
-    <div class="alert alert-danger" role="alert">
-        <h4 class="alert-heading">Cannot Delete Default Theme!</h4>
-        <p>This theme is currently set as the default theme and cannot be deleted. Please set another theme as default before deleting this one.</p>
-        <hr>
-        <p class="mb-0">
-            <a asp-page="Index" class="btn btn-primary">Back to Theme List</a>
-        </p>
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-trash me-1"></i> Delete Theme
     </div>
-}
-else
-{
-    <div class="alert alert-warning" role="alert">
-        <h4 class="alert-heading">Warning!</h4>
-        <p>Are you sure you want to delete this theme?</p>
-        @if (Model.UsersAffected > 0)
+    <div class="card-body">
+        @if (Model.CannotDelete)
         {
-            <p class="mb-0">
-                <strong>Note:</strong> @Model.UsersAffected user(s) currently have this theme selected. 
-                They will be automatically switched to the default theme.
-            </p>
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">Cannot Delete Default Theme!</h4>
+                <p>This theme is currently set as the default theme and cannot be deleted. Please set another theme as default before deleting this one.</p>
+                <hr>
+                <p class="mb-0">
+                    <a asp-page="Index" class="btn btn-primary">Back to Theme List</a>
+                </p>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning" role="alert">
+                <h4 class="alert-heading">Warning!</h4>
+                <p>Are you sure you want to delete this theme?</p>
+                @if (Model.UsersAffected > 0)
+                {
+                    <p class="mb-0">
+                        <strong>Note:</strong> @Model.UsersAffected user(s) currently have this theme selected. 
+                        They will be automatically switched to the default theme.
+                    </p>
+                }
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">Theme Details</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Name</dt>
+                        <dd class="col-sm-9">@Model.Theme.Name</dd>
+
+                        <dt class="col-sm-3">Is Default</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.Theme.IsDefault)
+                            {
+                                <span class="badge bg-success">Yes</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">No</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Created Date</dt>
+                        <dd class="col-sm-9">@Model.Theme.CreateDate.ToString("MMMM dd, yyyy h:mm tt")</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <form method="post">
+                <input type="hidden" asp-for="Theme.Id" />
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Confirm Delete
+                </button>
+                <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+            </form>
         }
     </div>
-
-    <div class="card">
-        <div class="card-header">
-            <h4>Theme Details</h4>
-        </div>
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-3">Name</dt>
-                <dd class="col-sm-9">@Model.Theme.Name</dd>
-
-                <dt class="col-sm-3">Is Default</dt>
-                <dd class="col-sm-9">
-                    @if (Model.Theme.IsDefault)
-                    {
-                        <span class="badge bg-success">Yes</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary">No</span>
-                    }
-                </dd>
-
-                <dt class="col-sm-3">Created Date</dt>
-                <dd class="col-sm-9">@Model.Theme.CreateDate.ToString("MMMM dd, yyyy h:mm tt")</dd>
-            </dl>
-        </div>
-    </div>
-
-    <form method="post" class="mt-3">
-        <input type="hidden" asp-for="Theme.Id" />
-        <button type="submit" class="btn btn-danger">
-            <i class="fas fa-trash"></i> Confirm Delete
-        </button>
-        <a asp-page="Index" class="btn btn-secondary">Cancel</a>
-    </form>
-}
+</div>

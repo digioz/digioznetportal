@@ -14,13 +14,16 @@
     <div class="card-body">
         <form method="post">
             <input type="hidden" asp-for="Item.Id" />
+            <input type="hidden" asp-for="Item.ReferenceType" />
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label" for="referenceType">Reference Type</label>
-                    <select class="form-select" id="referenceType" asp-for="Item.ReferenceType">
+                    <select class="form-select" id="referenceType" asp-for="DisplayReferenceType">
                         <option value="">-- Select --</option>
                         <option value="Page">Page</option>
                         <option value="Announcement">Announcement</option>
+                        <option value="Picture">Picture</option>
+                        <option value="Video">Video</option>
                     </select>
                 </div>
                 <div class="col-md-6">
@@ -47,15 +50,22 @@
          const refTypeSel = document.getElementById('referenceType');
          const refValSel = document.getElementById('referenceValue');
          const currentValue = '@Model.Item?.ReferenceId';
+         const currentDisplayType = '@Model.DisplayReferenceType';
 
          async function loadValues(type, preselect){
+         console.log('Loading values for type:', type, 'preselect:', preselect);
          refValSel.innerHTML = '';
          if(!type){ return; }
-         const basePath = window.location.pathname.replace(/\/Edit\/.*/,'/Edit');
-         const url = basePath + `?handler=ReferenceValues&referenceType=${encodeURIComponent(type)}`;
+         const url = window.location.pathname + `?handler=ReferenceValues&referenceType=${encodeURIComponent(type)}`;
+         console.log('Fetching from URL:', url);
          const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-         if(!res.ok) return;
+         console.log('Response status:', res.status);
+         if(!res.ok) {
+             console.error('Failed to fetch reference values');
+             return;
+         }
          const data = await res.json();
+         console.log('Received data:', data);
          const optEmpty = document.createElement('option');
          optEmpty.value = '';
          optEmpty.textContent = '-- Select --';
@@ -67,13 +77,15 @@
          if(preselect && preselect === x.value) opt.selected = true;
          refValSel.appendChild(opt);
          });
+         console.log('Dropdown populated with', data.length, 'items');
          }
 
          refTypeSel.addEventListener('change', () => loadValues(refTypeSel.value));
 
-         // Initialize on load
-         if(refTypeSel.value){
-         loadValues(refTypeSel.value, currentValue);
+         // Initialize on load - use DisplayReferenceType instead of ReferenceType
+         console.log('Initial load with currentDisplayType:', currentDisplayType, 'currentValue:', currentValue);
+         if(currentDisplayType){
+         loadValues(currentDisplayType, currentValue);
          }
         })();
     </script>

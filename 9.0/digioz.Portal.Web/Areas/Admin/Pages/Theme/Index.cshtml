@@ -5,12 +5,6 @@
     Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
-<h1>Theme Manager</h1>
-
-<p>
-    <a asp-page="Add" class="btn btn-primary">Create New Theme</a>
-</p>
-
 @if (Model.StatusMessage != null)
 {
     <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -20,9 +14,9 @@
 }
 
 <div class="card">
-    <div class="card-header">
-        <i class="fas fa-table me-1"></i>
-        All Themes
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-palette me-1"></i> Themes</span>
+        <a asp-page="Add" class="btn btn-sm btn-primary">Create New Theme</a>
     </div>
     <div class="card-body">
         <table class="table table-striped table-hover">
@@ -59,6 +53,15 @@
                                 <a asp-page="Edit" asp-route-id="@theme.Id" class="btn btn-sm btn-warning" title="Edit">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
+                                @if (!theme.IsDefault)
+                                {
+                                    <form method="post" asp-page-handler="SetDefault" asp-route-id="@theme.Id" style="display: inline;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-success" title="Set as Default" onclick="return confirm('Are you sure you want to set this theme as default?');">
+                                            <i class="fas fa-check-circle"></i> Set Default
+                                        </button>
+                                    </form>
+                                }
                                 <a asp-page="Delete" asp-route-id="@theme.Id" class="btn btn-sm btn-danger" title="Delete">
                                     <i class="fas fa-trash"></i> Delete
                                 </a>
