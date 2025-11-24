@@ -64,6 +64,21 @@ namespace digioz.Portal.Utilities
         }
 
         /// <summary>
+        /// Converts line breaks (CR, LF, CRLF) in a string to HTML br tags.
+        /// Handles all line break variations consistently: \r\n, \n, and \r
+        /// </summary>
+        /// <param name="input">The input string containing line breaks</param>
+        /// <returns>String with line breaks replaced by &lt;br /&gt; tags</returns>
+        public static string ConvertLineBreaksToHtml(this string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+            
+            return input.Replace("\r\n", "<br />")
+                        .Replace("\n", "<br />")
+                        .Replace("\r", "<br />");
+        }
+
+        /// <summary>
         /// Does a case insensitive contains
         /// </summary>
         /// <param name="source"></param>
