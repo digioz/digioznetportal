@@ -15,13 +15,15 @@ namespace digioz.Portal.Pages.Pictures
         private readonly IPictureAlbumService _albumService;
         private readonly IProfileService _profileService;
         private readonly IUserHelper _userHelper;
+        private readonly ICommentsHelper _commentsHelper;
 
-        public DetailsModel(IPictureService pictureService, IPictureAlbumService albumService, IProfileService profileService, IUserHelper userHelper)
+        public DetailsModel(IPictureService pictureService, IPictureAlbumService albumService, IProfileService profileService, IUserHelper userHelper, ICommentsHelper commentsHelper)
         {
             _pictureService = pictureService;
             _albumService = albumService;
             _profileService = profileService;
             _userHelper = userHelper;
+            _commentsHelper = commentsHelper;
         }
 
         public Picture? Item { get; private set; }
@@ -30,6 +32,7 @@ namespace digioz.Portal.Pages.Pictures
         public bool IsOwner { get; private set; }
         public string? StatusMessage { get; set; }
         public bool IsSuccess { get; set; }
+        public bool AllowComments { get; set; }
         
         private string? _source;
         
@@ -91,6 +94,9 @@ namespace digioz.Portal.Pages.Pictures
             
             // Calculate previous and next based on source
             CalculateNavigation(userId, isAdmin);
+
+            // Check if comments are enabled for this picture
+            AllowComments = _commentsHelper.IsCommentsEnabledForPicture(Item.Id);
 
             return Page();
         }

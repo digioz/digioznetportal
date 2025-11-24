@@ -172,6 +172,13 @@
                         </div>
                     </div>
                 </div>
+
+                @if (Model.AllowComments)
+                {
+                    <div class="mt-4">
+                        @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.Item.Id.ToString(), referenceType = "/Pictures/Details" })
+                    </div>
+                }
             }
             else
             {

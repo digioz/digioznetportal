@@ -10,6 +10,8 @@ namespace digioz.Portal.Utilities
         bool IsCommentsEnabledForPageTitle(string pageTitle);
         bool IsCommentsEnabledForAnnouncement(int announcementId);
         Dictionary<int, bool> AreCommentsEnabledForAnnouncements(IEnumerable<int> announcementIds);
+        bool IsCommentsEnabledForPicture(int pictureId);
+        bool IsCommentsEnabledForVideo(int videoId);
     }
 
     // This helper avoids referencing DAL by accepting data providers via delegates
@@ -56,6 +58,38 @@ namespace digioz.Portal.Utilities
                 cc.ReferenceId == announcementId.ToString() && 
                 cc.Visible);
             return anyForAnnouncement;
+        }
+
+        public bool IsCommentsEnabledForPicture(int pictureId)
+        {
+            var configs = _getConfigs() ?? Enumerable.Empty<Config>();
+
+            var enableAllConfig = configs.FirstOrDefault(c => c.ConfigKey == "EnableCommentsOnAllPages");
+            if (enableAllConfig != null && bool.TryParse(enableAllConfig.ConfigValue, out var enableAll) && enableAll)
+                return true;
+
+            var commentConfigs = _getCommentConfigs() ?? Enumerable.Empty<CommentConfig>();
+            var anyForPicture = commentConfigs.Any(cc => 
+                cc.ReferenceType == "/Pictures/Details" && 
+                cc.ReferenceId == pictureId.ToString() && 
+                cc.Visible);
+            return anyForPicture;
+        }
+
+        public bool IsCommentsEnabledForVideo(int videoId)
+        {
+            var configs = _getConfigs() ?? Enumerable.Empty<Config>();
+
+            var enableAllConfig = configs.FirstOrDefault(c => c.ConfigKey == "EnableCommentsOnAllPages");
+            if (enableAllConfig != null && bool.TryParse(enableAllConfig.ConfigValue, out var enableAll) && enableAll)
+                return true;
+
+            var commentConfigs = _getCommentConfigs() ?? Enumerable.Empty<CommentConfig>();
+            var anyForVideo = commentConfigs.Any(cc => 
+                cc.ReferenceType == "/Videos/Details" && 
+                cc.ReferenceId == videoId.ToString() && 
+                cc.Visible);
+            return anyForVideo;
         }
 
         /// <summary>

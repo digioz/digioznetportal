@@ -12,44 +12,89 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
         private readonly ICommentConfigService _configService;
         private readonly IPageService _pageService;
         private readonly IAnnouncementService _announcementService;
-        public EditModel(ICommentConfigService configService, IPageService pageService, IAnnouncementService announcementService)
+        private readonly IPictureService _pictureService;
+        private readonly IVideoService _videoService;
+
+        public EditModel(
+            ICommentConfigService configService, 
+            IPageService pageService, 
+            IAnnouncementService announcementService,
+            IPictureService pictureService,
+            IVideoService videoService)
         {
             _configService = configService;
             _pageService = pageService;
             _announcementService = announcementService;
+            _pictureService = pictureService;
+            _videoService = videoService;
         }
 
         [BindProperty] public Bo.CommentConfig? Item { get; set; }
+
+        [BindProperty] public string DisplayReferenceType { get; set; } = string.Empty;
 
         public IActionResult OnGet(string id)
         {
             Item = _configService.Get(id);
             if (Item == null) return RedirectToPage("/CommentConfig/Index", new { area = "Admin" });
+
+            // Convert stored ReferenceType path back to display name
+            DisplayReferenceType = Item.ReferenceType switch
+            {
+                "/Announcements" => "Announcement",
+                "/Pictures/Details" => "Picture",
+                "/Videos/Details" => "Video",
+                _ => Item.ReferenceType // Page or other
+            };
+
             return Page();
         }
 
         public IActionResult OnPost()
         {
             if (Item == null) return RedirectToPage("/CommentConfig/Index", new { area = "Admin" });
-            if (string.IsNullOrWhiteSpace(Item.ReferenceType) || string.IsNullOrWhiteSpace(Item.ReferenceId))
+            if (string.IsNullOrWhiteSpace(DisplayReferenceType) || string.IsNullOrWhiteSpace(Item.ReferenceId))
             {
                 ModelState.AddModelError(string.Empty, "Reference Type and Reference Value are required.");
                 return Page();
             }
             if (!ModelState.IsValid) return Page();
 
-            // Resolve ReferenceTitle
+            // Resolve ReferenceTitle and set proper ReferenceType path
             string? title = null;
-            if (string.Equals(Item.ReferenceType, "Page", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(DisplayReferenceType, "Page", StringComparison.OrdinalIgnoreCase))
             {
                 if (int.TryParse(Item.ReferenceId, out var pid))
                     title = _pageService.Get(pid)?.Title;
+                Item.ReferenceType = "Page";
             }
-            else if (string.Equals(Item.ReferenceType, "Announcement", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(DisplayReferenceType, "Announcement", StringComparison.OrdinalIgnoreCase))
             {
                 if (int.TryParse(Item.ReferenceId, out var aid))
+                {
                     title = _announcementService.Get(aid)?.Title;
+                    Item.ReferenceType = "/Announcements";
+                }
             }
+            else if (string.Equals(DisplayReferenceType, "Picture", StringComparison.OrdinalIgnoreCase))
+            {
+                if (int.TryParse(Item.ReferenceId, out var picId))
+                {
+                    var picture = _pictureService.Get(picId);
+                    title = picture?.Description;
+                    Item.ReferenceType = "/Pictures/Details";
+                }
+            }
+            else if (string.Equals(DisplayReferenceType, "Video", StringComparison.OrdinalIgnoreCase))
+            {
+                if (int.TryParse(Item.ReferenceId, out var vidId))
+                {
+                    var video = _videoService.Get(vidId);
+                    title = video?.Description;
+                    Item.ReferenceType = "/Videos/Details";
+                }
+            }
+
             Item.ReferenceTitle = title ?? Item.ReferenceTitle;
             Item.Timestamp = Item.Timestamp ?? DateTime.UtcNow;
 
@@ -72,6 +117,20 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
                 list = _announcementService.GetAll()
                 .OrderBy(a => a.Title)
                 .Select(a => new { value = a.Id.ToString(), text = $"{a.Id} - {a.Title}" })
+                .Cast<object>().ToList();
+            }
+            else if (string.Equals(referenceType, "Picture", StringComparison.OrdinalIgnoreCase))
+            {
+                list = _pictureService.GetAll()
+                .OrderBy(p => p.Description)
+                .Select(p => new { value = p.Id.ToString(), text = $"{p.Id} - {p.Description}" })
+                .Cast<object>().ToList();
+            }
+            else if (string.Equals(referenceType, "Video", StringComparison.OrdinalIgnoreCase))
+            {
+                list = _videoService.GetAll()
+                .OrderBy(v => v.Description)
+                .Select(v => new { value = v.Id.ToString(), text = $"{v.Id} - {v.Description}" })
                 .Cast<object>().ToList();
             }
             return new JsonResult(list);
