@@ -5,12 +5,6 @@
     Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
-<h1>Theme Manager</h1>
-
-<p>
-    <a asp-page="Add" class="btn btn-primary">Create New Theme</a>
-</p>
-
 @if (Model.StatusMessage != null)
 {
     <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -20,9 +14,9 @@
 }
 
 <div class="card">
-    <div class="card-header">
-        <i class="fas fa-table me-1"></i>
-        All Themes
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-palette me-1"></i> Themes</span>
+        <a asp-page="Add" class="btn btn-sm btn-primary">Create New Theme</a>
     </div>
     <div class="card-body">
         <table class="table table-striped table-hover">
