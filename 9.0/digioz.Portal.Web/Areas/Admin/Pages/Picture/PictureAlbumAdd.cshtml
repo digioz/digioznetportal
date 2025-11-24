@@ -9,7 +9,7 @@
 <div class="card shadow-sm">
     <div class="card-header">Add Picture Album</div>
     <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" id="albumForm">
             <div class="mb-3">
                 <label class="form-label">Name</label>
                 <input class="form-control" asp-for="Item.Name" />
@@ -27,12 +27,56 @@
                 <label class="form-check-label" asp-for="Item.Visible">Visible</label>
             </div>
             <div class="mb-3">
-                <label class="form-label">Upload pictures</label>
-                <input type="file" multiple class="form-control" name="Files" />
-                <span class="text-muted">Allowed types: jpg, png, gif, bmp, tif, tiff</span>
+                <label class="form-label">Upload pictures (Maximum 5 images)</label>
+                <input type="file" multiple class="form-control" name="Files" id="fileInput" accept="image/*" />
+                <span class="text-muted">Allowed types: jpg, png, gif, bmp, tif, tiff | Maximum: 5 images</span>
+                <div id="fileCount" class="mt-2" style="display: none;">
+                    <span class="badge bg-info">Selected: <span id="fileCountNumber">0</span> file(s)</span>
+                </div>
             </div>
             <button class="btn btn-primary" type="submit">Save</button>
             <a class="btn btn-secondary" asp-area="Admin" asp-page="/Picture/PictureAlbumIndex">Cancel</a>
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('fileInput');
+        const fileCount = document.getElementById('fileCount');
+        const fileCountNumber = document.getElementById('fileCountNumber');
+        const form = document.getElementById('albumForm');
+
+        fileInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            const imageFiles = files.filter(f => f.type.startsWith('image/'));
+
+            if (files.length > imageFiles.length) {
+                alert('Some files were not selected because they are not images. Only image files are allowed.');
+            }
+
+            if (imageFiles.length > 5) {
+                alert('You can only upload a maximum of 5 images. Please select 5 or fewer images.');
+                fileInput.value = '';
+                fileCount.style.display = 'none';
+                return;
+            }
+
+            if (imageFiles.length > 0) {
+                fileCountNumber.textContent = imageFiles.length;
+                fileCount.style.display = 'block';
+            } else {
+                fileCount.style.display = 'none';
+            }
+        });
+
+        form.addEventListener('submit', function(e) {
+            const files = Array.from(fileInput.files);
+            if (files.length > 5) {
+                e.preventDefault();
+                alert('You can only upload a maximum of 5 images. Please select 5 or fewer images.');
+                return false;
+            }
+        });
+    });
+</script>
