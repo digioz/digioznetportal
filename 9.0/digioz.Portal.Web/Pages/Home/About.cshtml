@@ -28,6 +28,6 @@
     // Display comments if enabled for this page
     if (Model?.AllowComments == true)
     {
-        @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent?.Id.ToString(), referenceType = "/About" })
+        @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent?.Id.ToString(), referenceType = "/Home/About" })
     }
 }

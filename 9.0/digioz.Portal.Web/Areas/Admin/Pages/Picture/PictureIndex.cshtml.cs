@@ -45,5 +45,22 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
             var albums = _albumService.GetAll();
             AlbumNames = albums.ToDictionary(a => a.Id, a => a.Name);
         }
+
+        public IActionResult OnPostApprove(int id)
+        {
+            var picture = _pictureService.Get(id);
+            if (picture == null)
+            {
+                return RedirectToPage();
+            }
+
+            // Set approved and visible to true, preserving original UserId and Timestamp
+            picture.Approved = true;
+            picture.Visible = true;
+
+            _pictureService.Update(picture);
+
+            return RedirectToPage(new { pageNumber = PageNumber, pageSize = PageSize });
+        }
     }
 }
