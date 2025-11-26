@@ -93,10 +93,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
                 existing.Thumbnail = newFileName;
             }
 
-            existing.Timestamp = DateTime.UtcNow;
-            var email = User?.Identity?.Name;
-            existing.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
-
+            // Do not update Timestamp or UserId - preserve original uploader information
             _pictureService.Update(existing);
             return RedirectToPage("/Picture/PictureIndex", new { area = "Admin" });
         }

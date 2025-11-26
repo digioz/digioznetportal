@@ -48,6 +48,12 @@
                                 <td class="text-center">@(item.Visible ? "Yes" : "No")</td>
                                 <td>@item.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
                                 <td class="text-end">
+                                    @if (!item.Approved || !item.Visible)
+                                    {
+                                        <form method="post" asp-page-handler="Approve" asp-route-id="@item.Id" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-outline-success px-1 py-0" title="Approve">Approve</button>
+                                        </form>
+                                    }
                                     <a class="btn btn-sm btn-outline-primary px-1 py-0" asp-area="Admin" asp-page="/Video/VideoEdit" asp-route-id="@item.Id">Edit</a>
                                     <a class="btn btn-sm btn-outline-danger px-1 py-0" asp-area="Admin" asp-page="/Video/VideoDelete" asp-route-id="@item.Id">Delete</a>
                                 </td>

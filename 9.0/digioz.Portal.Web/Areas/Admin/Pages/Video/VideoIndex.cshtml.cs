@@ -33,5 +33,22 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
             var albums = _albumService.GetAll();
             AlbumNames = albums.ToDictionary(a => a.Id, a => a.Name);
         }
+
+        public IActionResult OnPostApprove(int id)
+        {
+            var video = _videoService.Get(id);
+            if (video == null)
+            {
+                return RedirectToPage();
+            }
+
+            // Set approved and visible to true, preserving original UserId and Timestamp
+            video.Approved = true;
+            video.Visible = true;
+
+            _videoService.Update(video);
+
+            return RedirectToPage(new { pageNumber = PageNumber, pageSize = PageSize });
+        }
     }
 }

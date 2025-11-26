@@ -111,9 +111,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
                 existing.Filename = newVid;
             }
 
-            existing.Timestamp = DateTime.UtcNow;
-            var email = User?.Identity?.Name;
-            existing.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
+            // Do not update Timestamp or UserId - preserve original uploader information
             _videoService.Update(existing);
             return RedirectToPage("/Video/VideoIndex", new { area = "Admin" });
         }
@@ -124,6 +122,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
         }
     }
 }
+
+
 
 
 
