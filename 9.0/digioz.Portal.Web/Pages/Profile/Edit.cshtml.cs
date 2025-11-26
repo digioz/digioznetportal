@@ -128,6 +128,12 @@ namespace digioz.Portal.Pages.Profile
                 return Page();
             }
 
+            // Trim DisplayName to remove leading and trailing whitespace
+            if (!string.IsNullOrEmpty(Input.DisplayName))
+            {
+                Input.DisplayName = Input.DisplayName.Trim();
+            }
+
             var profileToUpdate = _profileService.GetAll().FirstOrDefault(p => p.Id == Input.Id && p.UserId == user.Id);
             if (profileToUpdate == null)
             {

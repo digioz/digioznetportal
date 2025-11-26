@@ -126,6 +126,12 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
+                // Trim DisplayName to remove leading and trailing whitespace
+                if (!string.IsNullOrEmpty(Input.DisplayName))
+                {
+                    Input.DisplayName = Input.DisplayName.Trim();
+                }
+
                 // Check if DisplayName already exists
                 var existingProfile = _profileService.GetAll()
                     .FirstOrDefault(p => p.DisplayName != null && p.DisplayName.Equals(Input.DisplayName, StringComparison.OrdinalIgnoreCase));
