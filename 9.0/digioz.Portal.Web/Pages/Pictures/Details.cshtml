@@ -103,14 +103,16 @@
                                 @if (Model.UploaderProfile != null)
                                 {
                                     <p class="lead">
-                                        <i class="bi bi-person-circle"></i> 
+                                        <i class="bi bi-person-circle"></i>
                                         @if (!string.IsNullOrEmpty(Model.UploaderProfile.DisplayName))
                                         {
-                                            @Model.UploaderProfile.DisplayName
+                                            <a href="/Profile/Details?userId=@Model.UploaderProfile.DisplayName">@Model.UploaderProfile.DisplayName</a>
                                         }
                                         else if (!string.IsNullOrEmpty(Model.UploaderProfile.FirstName) || !string.IsNullOrEmpty(Model.UploaderProfile.LastName))
                                         {
-                                            @($"{Model.UploaderProfile.FirstName} {Model.UploaderProfile.LastName}".Trim())
+                                            <a href="/Profile/Details?userId=@($"{Model.UploaderProfile.FirstName} {Model.UploaderProfile.LastName}".Trim())">
+                                                @($"{Model.UploaderProfile.FirstName} {Model.UploaderProfile.LastName}".Trim())
+                                            </a>
                                         }
                                         else
                                         {
