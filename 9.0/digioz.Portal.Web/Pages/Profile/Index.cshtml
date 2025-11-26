@@ -72,18 +72,20 @@ else
 
     <div class="d-flex justify-content-center">
         <paging total-records="@Model.TotalRecords"
-                page-no="@Model.PageIndex"
+                page-no="@Model.PageNumber"
                 page-size="@Model.PageSize"
-                url="/Profile/Index?page={0}&search=@encodedSearch"
-                class="pagination"
                 show-first-last="true"
                 show-prev-next="true"
                 show-total-pages="true"
                 show-total-records="false"
+                query-string-key-page-no="pageNumber"
                 text-first="<<"
                 text-last=">>"
                 text-prev="<"
                 text-next=">">
+            <route-values>
+                <rv key="search" value="@Model.SearchTerm"></rv>
+            </route-values>
         </paging>
     </div>
 }

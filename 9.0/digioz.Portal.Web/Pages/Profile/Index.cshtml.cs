@@ -18,21 +18,24 @@ namespace digioz.Portal.Pages.Profile
         }
 
         public List<digioz.Portal.Bo.Profile> Profiles { get; private set; } = new();
-        public int PageIndex { get; private set; }
+        
+        [BindProperty(SupportsGet = true)]
+        public int PageNumber { get; set; } = 1;
+        
         public int PageSize => DefaultPageSize;
         public int TotalRecords { get; private set; }
+        
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
 
-        public IActionResult OnGet(int page = 1, string? search = null)
+        public IActionResult OnGet(string? search = null)
         {
             if (!string.IsNullOrWhiteSpace(search))
             {
                 SearchTerm = search.Trim();
             }
 
-            if (page < 1) page = 1;
-            PageIndex = page;
+            if (PageNumber < 1) PageNumber = 1;
 
             var all = _profileService.GetAll();
 
@@ -48,7 +51,7 @@ namespace digioz.Portal.Pages.Profile
                 .ToList();
 
             TotalRecords = ordered.Count;
-            Profiles = ordered.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToList();
+            Profiles = ordered.Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
 
             return Page();
         }
