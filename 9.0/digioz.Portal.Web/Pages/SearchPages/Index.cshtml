@@ -16,6 +16,19 @@
         }
     </div>
     
+    @if (Model.HasLargeResultSet && Model.searchScope == "All")
+    {
+        <div class="alert alert-info mb-3">
+            <i class="bi bi-info-circle"></i>
+            <strong>Large Result Set:</strong> Your search returned a very large number of results. 
+            For better performance and more precise results, consider:
+            <ul class="mb-0 mt-2">
+                <li>Using the search scope dropdown to narrow your search to specific content types</li>
+                <li>Adding more specific search terms</li>
+            </ul>
+        </div>
+    }
+    
     <ul class="list-group list-group-flush">
     @foreach (var item in Model.Items)
     {

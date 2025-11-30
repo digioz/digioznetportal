@@ -41,6 +41,7 @@ namespace digioz.Portal.Pages.SearchPages
         [BindProperty(SupportsGet = true)] public int pageSize { get; set; } = 10;
 
         public int TotalCount { get; private set; }
+        public bool HasLargeResultSet { get; private set; }
         public IReadOnlyList<SearchResultViewModel> Items { get; private set; } = Array.Empty<SearchResultViewModel>();
 
         public void OnGet()
@@ -84,6 +85,9 @@ namespace digioz.Portal.Pages.SearchPages
 
             TotalCount = totalCount;
             Items = results;
+
+            // Determine if the result set is large
+            HasLargeResultSet = TotalCount > (pageSize * 5);
         }
 
         private List<SearchResultViewModel> SearchPages(string term, int skip, int take, out int total)
@@ -124,31 +128,106 @@ namespace digioz.Portal.Pages.SearchPages
 
         private List<SearchResultViewModel> SearchAll(string term, int skip, int take, out int total)
         {
+            // To avoid loading too much data into memory, we'll use a multi-pass approach:
+            // 1. Get counts from each content type
+            // 2. Retrieve a reasonable batch from each type (distributed based on their counts)
+            // 3. Merge and sort in memory
+            // 4. Apply pagination
+            
+            // Maximum records to retrieve from any single content type in one query
+            const int maxPerType = 1000;
+            const int maxTotalResults = 6000; // Maximum total results we'll work with
+            
+            // Get counts from each content type
+            _pageService.Search(term, 0, 0, out int pagesTotal);
+            _announcementService.Search(term, 0, 0, out int announcementsTotal);
+            _commentService.Search(term, 0, 0, out int commentsTotal);
+            _pictureService.Search(term, 0, 0, out int picturesTotal);
+            _videoService.Search(term, 0, 0, out int videosTotal);
+            _linkService.Search(term, 0, 0, out int linksTotal);
+            
+            var grandTotal = pagesTotal + announcementsTotal + commentsTotal + picturesTotal + videosTotal + linksTotal;
+            total = grandTotal;
+            
+            // Set flag if we have a very large result set
+            if (grandTotal > maxTotalResults)
+            {
+                HasLargeResultSet = true;
+            }
+            
+            // If total is 0, return empty
+            if (grandTotal == 0)
+            {
+                return new List<SearchResultViewModel>();
+            }
+            
+            // Calculate how many records we need to fetch to satisfy the pagination request
+            // We need to fetch enough to cover skip + take, but cap it at a reasonable maximum
+            var recordsNeeded = Math.Min(skip + take, maxPerType * 6);
+            
+            // Distribute the fetch across content types proportionally to their totals
+            // But ensure we fetch at least some from each type if they have results
             var allResults = new List<SearchResultViewModel>();
-
-            // Search all content types and combine results
-            var pages = _pageService.Search(term, 0, int.MaxValue, out _);
-            allResults.AddRange(pages.Select(p => MapPageToResult(p, term)));
-
-            var announcements = _announcementService.Search(term, 0, int.MaxValue, out _);
-            allResults.AddRange(announcements.Select(a => MapAnnouncementToResult(a, term)));
-
-            var comments = _commentService.Search(term, 0, int.MaxValue, out _);
-            allResults.AddRange(comments.Select(c => MapCommentToResult(c, term)));
-
-            var pictures = _pictureService.Search(term, 0, int.MaxValue, out _);
-            allResults.AddRange(pictures.Select(p => MapPictureToResult(p, term)));
-
-            var videos = _videoService.Search(term, 0, int.MaxValue, out _);
-            allResults.AddRange(videos.Select(v => MapVideoToResult(v, term)));
-
-            var links = _linkService.Search(term, 0, int.MaxValue, out _);
-            allResults.AddRange(links.Select(l => MapLinkToResult(l, term)));
-
+            
+            // Helper method to calculate proportional fetch amounts
+            int CalculateFetchAmount(int typeTotal, int totalRecords)
+            {
+                if (typeTotal == 0) return 0;
+                if (totalRecords == 0) return 0;
+                
+                // Calculate proportion, but ensure minimum of 1 and maximum of maxPerType
+                var proportional = (int)Math.Ceiling((double)typeTotal / totalRecords * recordsNeeded);
+                return Math.Min(Math.Max(proportional, typeTotal > 0 ? Math.Min(typeTotal, 10) : 0), Math.Min(typeTotal, maxPerType));
+            }
+            
+            var pagesToFetch = CalculateFetchAmount(pagesTotal, grandTotal);
+            var announcementsToFetch = CalculateFetchAmount(announcementsTotal, grandTotal);
+            var commentsToFetch = CalculateFetchAmount(commentsTotal, grandTotal);
+            var picturesToFetch = CalculateFetchAmount(picturesTotal, grandTotal);
+            var videosToFetch = CalculateFetchAmount(videosTotal, grandTotal);
+            var linksToFetch = CalculateFetchAmount(linksTotal, grandTotal);
+            
+            // Fetch from each content type
+            if (pagesToFetch > 0)
+            {
+                var pages = _pageService.Search(term, 0, pagesToFetch, out _);
+                allResults.AddRange(pages.Select(p => MapPageToResult(p, term)));
+            }
+            
+            if (announcementsToFetch > 0)
+            {
+                var announcements = _announcementService.Search(term, 0, announcementsToFetch, out _);
+                allResults.AddRange(announcements.Select(a => MapAnnouncementToResult(a, term)));
+            }
+            
+            if (commentsToFetch > 0)
+            {
+                var comments = _commentService.Search(term, 0, commentsToFetch, out _);
+                allResults.AddRange(comments.Select(c => MapCommentToResult(c, term)));
+            }
+            
+            if (picturesToFetch > 0)
+            {
+                var pictures = _pictureService.Search(term, 0, picturesToFetch, out _);
+                allResults.AddRange(pictures.Select(p => MapPictureToResult(p, term)));
+            }
+            
+            if (videosToFetch > 0)
+            {
+                var videos = _videoService.Search(term, 0, videosToFetch, out _);
+                allResults.AddRange(videos.Select(v => MapVideoToResult(v, term)));
+            }
+            
+            if (linksToFetch > 0)
+            {
+                var links = _linkService.Search(term, 0, linksToFetch, out _);
+                allResults.AddRange(links.Select(l => MapLinkToResult(l, term)));
+            }
+            
             // Sort by timestamp descending
-            allResults = allResults.OrderByDescending(r => r.Timestamp).ToList();
-
-            total = allResults.Count;
+            allResults = allResults.OrderByDescending(r => r.Timestamp ?? DateTime.MinValue).ToList();
+            
+            // Apply pagination
             return allResults.Skip(skip).Take(take).ToList();
         }
 
