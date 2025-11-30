@@ -29,6 +29,7 @@ namespace digioz.Portal.BulkMediaImport
 
                 // Set up dependency injection
                 var serviceProvider = new ServiceCollection()
+                    .AddSingleton<IConfiguration>(configuration)
                     .AddDbContext<digiozPortalContext>(options =>
                         options.UseSqlServer(
                             configuration.GetConnectionString("DefaultConnection"),

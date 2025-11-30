@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -17,17 +18,22 @@ namespace digioz.Portal.BulkMediaImport
         private readonly IVideoService _videoService;
         private readonly IPictureAlbumService _pictureAlbumService;
         private readonly IVideoAlbumService _videoAlbumService;
+        private readonly int _videoThumbnailCaptureTimeSeconds;
 
         public MediaImporter(
             IPictureService pictureService,
             IVideoService videoService,
             IPictureAlbumService pictureAlbumService,
-            IVideoAlbumService videoAlbumService)
+            IVideoAlbumService videoAlbumService,
+            IConfiguration configuration)
         {
             _pictureService = pictureService;
             _videoService = videoService;
             _pictureAlbumService = pictureAlbumService;
             _videoAlbumService = videoAlbumService;
+            
+            // Read the video thumbnail capture time from configuration, default to 10 seconds
+            _videoThumbnailCaptureTimeSeconds = configuration.GetValue<int>("VideoThumbnail:CaptureTimeSeconds", 10);
         }
 
         public async Task<(int successCount, int errorCount)> ImportPicturesAsync(
@@ -172,7 +178,7 @@ namespace digioz.Portal.BulkMediaImport
                     // Generate thumbnail from video
                     try
                     {
-                        var tempThumbPath = await VideoThumbnailHelper.GenerateThumbnailAsync(videoFullPath, thumbDir);
+                        var tempThumbPath = await VideoThumbnailHelper.GenerateThumbnailAsync(videoFullPath, thumbDir, _videoThumbnailCaptureTimeSeconds);
                         
                         // Resize and crop the thumbnail to 150x150
                         VideoThumbnailHelper.ResizeAndCropThumbnail(tempThumbPath, thumbPath, 150, 150);

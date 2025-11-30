@@ -62,14 +62,23 @@ Video thumbnail generation requires FFmpeg. Without it, the app will still impor
 
 ## Usage
 
-1. Update `appsettings.json` with your database connection string:
+1. Update `appsettings.json` with your database connection string and desired settings:
    ```json
    {
      "ConnectionStrings": {
        "DefaultConnection": "Server=localhost;Database=digiozPortal9;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
+     },
+     "VideoThumbnail": {
+       "CaptureTimeSeconds": 10
      }
    }
    ```
+   
+   **Configuration Options:**
+   - `ConnectionStrings:DefaultConnection` - Database connection string (required)
+   - `VideoThumbnail:CaptureTimeSeconds` - Time in seconds to capture video thumbnail frame (default: 10)
+     - For shorter videos, the app will capture at 10% of the video duration instead
+     - Recommended values: 5-15 seconds depending on your video content
 
 2. Run the application:
    ```

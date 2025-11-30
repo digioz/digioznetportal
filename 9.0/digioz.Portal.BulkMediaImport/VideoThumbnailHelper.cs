@@ -11,7 +11,7 @@ namespace digioz.Portal.BulkMediaImport
 {
     public static class VideoThumbnailHelper
     {
-        public static async Task<string> GenerateThumbnailAsync(string videoPath, string outputDirectory)
+        public static async Task<string> GenerateThumbnailAsync(string videoPath, string outputDirectory, int captureTimeSeconds = 10)
         {
             try
             {
@@ -27,9 +27,10 @@ namespace digioz.Portal.BulkMediaImport
                 var thumbnailFileName = Path.GetFileNameWithoutExtension(videoPath) + "_thumb.jpg";
                 var thumbnailPath = Path.Combine(outputDirectory, thumbnailFileName);
                 
-                // Extract a frame at 1 second (or at 10% of video duration if shorter)
+                // Extract a frame at the configured time (or at 10% of video duration if video is too short)
                 var duration = videoStream.Duration;
-                var captureTime = duration.TotalSeconds > 10 ? TimeSpan.FromSeconds(1) : duration.Multiply(0.1);
+                var minDuration = captureTimeSeconds * 10; // Video should be at least 10x the capture time
+                var captureTime = duration.TotalSeconds > minDuration ? TimeSpan.FromSeconds(captureTimeSeconds) : duration.Multiply(0.1);
                 
                 var conversion = await FFmpeg.Conversions.FromSnippet.Snapshot(videoPath, thumbnailPath, captureTime);
                 await conversion.Start();
