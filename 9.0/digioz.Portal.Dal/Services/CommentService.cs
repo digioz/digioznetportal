@@ -113,5 +113,23 @@ namespace digioz.Portal.Dal.Services
 
             return comments.Count;
         }
+
+        public List<Comment> Search(string term, int skip, int take, out int totalCount)
+        {
+            term = term ?? string.Empty;
+            var q = _context.Comments.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(term))
+            {
+                var t = term.ToLower();
+                q = q.Where(c => c.Body != null && c.Body.ToLower().Contains(t));
+            }
+
+            totalCount = q.Count();
+            return q
+                .OrderByDescending(c => c.ModifiedDate ?? c.CreatedDate ?? System.DateTime.MinValue)
+                .Skip(skip)
+                .Take(take)
+                .ToList();
+        }
     }
 }

@@ -63,6 +63,15 @@
                 @await Component.InvokeAsync("TopMenu")
 
 				<form class="d-flex mt-2 mt-md-0" action="/SearchPages">
+					<select class="form-select me-2" name="searchScope" aria-label="Search scope" style="max-width: 150px;">
+						<option value="All">All</option>
+						<option value="Page">Page</option>
+						<option value="Announcement">Announcement</option>
+						<option value="Comment">Comment</option>
+						<option value="Picture">Picture</option>
+						<option value="Video">Video</option>
+						<option value="Link">Link</option>
+					</select>
 					<input class="form-control me-2" type="text" placeholder="Search" aria-label="Search" name="searchString">
 					<button class="btn btn-primary my-2 my-md-0" type="submit">Search</button>
 				</form>

@@ -141,5 +141,30 @@ namespace digioz.Portal.Dal.Services
 
             return pictures.Count;
         }
+
+        public List<Picture> Search(string term, int skip, int take, out int totalCount)
+        {
+            term = term ?? string.Empty;
+            var q = _context.Pictures.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(term))
+            {
+                var t = term.ToLower();
+                q = q.Where(p => p.Visible && p.Approved && (
+                    (p.Filename != null && p.Filename.ToLower().Contains(t)) ||
+                    (p.Description != null && p.Description.ToLower().Contains(t))
+                ));
+            }
+            else
+            {
+                q = q.Where(p => p.Visible && p.Approved);
+            }
+
+            totalCount = q.Count();
+            return q
+                .OrderByDescending(p => p.Timestamp ?? System.DateTime.MinValue)
+                .Skip(skip)
+                .Take(take)
+                .ToList();
+        }
     }
 }
