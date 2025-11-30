@@ -41,7 +41,7 @@ namespace digioz.Portal.BulkMediaImport
             string sourceDirectory,
             string baseImageDirectory,
             bool useFileNameAsDescription,
-            string ownerId = null)
+            string? ownerId = null)
         {
             int successCount = 0;
             int errorCount = 0;
@@ -127,7 +127,7 @@ namespace digioz.Portal.BulkMediaImport
             string sourceDirectory,
             string baseImageDirectory,
             bool useFileNameAsDescription,
-            string ownerId = null)
+            string? ownerId = null)
         {
             int successCount = 0;
             int errorCount = 0;

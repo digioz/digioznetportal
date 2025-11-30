@@ -49,7 +49,6 @@ namespace digioz.Portal.BulkMediaImport
 
                 // Initialize FFmpeg (required for video thumbnail generation)
                 Console.WriteLine("Checking FFmpeg availability...");
-                bool ffmpegAvailable = false;
                 try
                 {
                     // Try to find FFmpeg in common locations
@@ -62,7 +61,7 @@ namespace digioz.Portal.BulkMediaImport
                         @"C:\ffmpeg\bin"
                     };
                     
-                    string ffmpegPath = null;
+                    string? ffmpegPath = null;
                     foreach (var path in possiblePaths)
                     {
                         if (Directory.Exists(path))
@@ -80,7 +79,6 @@ namespace digioz.Portal.BulkMediaImport
                     {
                         Xabe.FFmpeg.FFmpeg.SetExecutablesPath(ffmpegPath);
                         Console.WriteLine($"✓ FFmpeg found at: {ffmpegPath}");
-                        ffmpegAvailable = true;
                     }
                     else
                     {
@@ -258,7 +256,7 @@ namespace digioz.Portal.BulkMediaImport
                     Console.Write("Enter the UserName of the user to set as owner (or leave blank for no owner): ");
                     var ownerUsername = Console.ReadLine()?.Trim();
                     
-                    string ownerId = null;
+                    string? ownerId = null;
                     if (!string.IsNullOrWhiteSpace(ownerUsername))
                     {
                         var selectedUser = adminUsers.FirstOrDefault(u => 

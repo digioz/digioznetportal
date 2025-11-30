@@ -172,11 +172,12 @@ namespace digioz.Portal.Pages.SearchPages
 
             return new SearchResultViewModel
             {
-                Id = page.Id,
+                Id = page.Id.ToString(),
                 TitleHtml = title,
                 SnippetHtml = snippet,
                 Url = url,
-                Timestamp = page.Timestamp
+                Timestamp = page.Timestamp,
+                ContentType = "Page"
             };
         }
 
@@ -194,11 +195,12 @@ namespace digioz.Portal.Pages.SearchPages
 
             return new SearchResultViewModel
             {
-                Id = announcement.Id,
+                Id = announcement.Id.ToString(),
                 TitleHtml = title,
                 SnippetHtml = snippet,
                 Url = $"/Announcements/Details?id={announcement.Id}",
-                Timestamp = announcement.Timestamp
+                Timestamp = announcement.Timestamp,
+                ContentType = "Announcement"
             };
         }
 
@@ -215,11 +217,12 @@ namespace digioz.Portal.Pages.SearchPages
 
             return new SearchResultViewModel
             {
-                Id = comment.Id,
+                Id = comment.Id ?? string.Empty,
                 TitleHtml = title,
                 SnippetHtml = snippet,
                 Url = comment.ReferenceType ?? "/",
-                Timestamp = comment.ModifiedDate ?? comment.CreatedDate
+                Timestamp = comment.ModifiedDate ?? comment.CreatedDate,
+                ContentType = "Comment"
             };
         }
 
@@ -236,11 +239,12 @@ namespace digioz.Portal.Pages.SearchPages
 
             return new SearchResultViewModel
             {
-                Id = picture.Id,
+                Id = picture.Id.ToString(),
                 TitleHtml = title,
                 SnippetHtml = snippet,
                 Url = $"/Pictures/Details?id={picture.Id}",
-                Timestamp = picture.Timestamp
+                Timestamp = picture.Timestamp,
+                ContentType = "Picture"
             };
         }
 
@@ -257,11 +261,12 @@ namespace digioz.Portal.Pages.SearchPages
 
             return new SearchResultViewModel
             {
-                Id = video.Id,
+                Id = video.Id.ToString(),
                 TitleHtml = title,
                 SnippetHtml = snippet,
                 Url = $"/Videos/Details?id={video.Id}",
-                Timestamp = video.Timestamp
+                Timestamp = video.Timestamp,
+                ContentType = "Video"
             };
         }
 
@@ -278,11 +283,12 @@ namespace digioz.Portal.Pages.SearchPages
 
             return new SearchResultViewModel
             {
-                Id = link.Id,
+                Id = link.Id.ToString(),
                 TitleHtml = title,
                 SnippetHtml = snippet,
                 Url = $"/Links?id={link.Id}",
-                Timestamp = link.Timestamp
+                Timestamp = link.Timestamp,
+                ContentType = "Link"
             };
         }
 
