@@ -215,12 +215,20 @@ namespace digioz.Portal.Pages.SearchPages
                 snippet = Highlight(snippet, term);
             }
 
+            // ReferenceType contains the URL path where the comment was made
+            // Ensure it's a valid path and starts with /
+            var url = comment.ReferenceType ?? "/";
+            if (!url.StartsWith("/"))
+            {
+                url = "/" + url;
+            }
+
             return new SearchResultViewModel
             {
                 Id = comment.Id ?? string.Empty,
                 TitleHtml = title,
                 SnippetHtml = snippet,
-                Url = comment.ReferenceType ?? "/",
+                Url = url,
                 Timestamp = comment.ModifiedDate ?? comment.CreatedDate,
                 ContentType = "Comment"
             };
