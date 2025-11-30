@@ -3,6 +3,7 @@ using System.Linq;
 using digioz.Portal.Bo;
 using digioz.Portal.Bo.ViewModels;
 using digioz.Portal.Dal.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace digioz.Portal.Pages.Links {
@@ -16,10 +17,27 @@ namespace digioz.Portal.Pages.Links {
             _linkCategoryService = linkCategoryService;
         }
 
+        [BindProperty(SupportsGet = true)]
+        public int? id { get; set; }
+
+        public Link? SelectedLink { get; set; }
         public List<LinkCategoryGroup> LinksByCategory { get; set; } = new();
 
         public void OnGet()
         {
+            // If an ID is provided, show only that link
+            if (id.HasValue)
+            {
+                SelectedLink = _linkService.Get(id.Value);
+                if (SelectedLink != null && !SelectedLink.Visible)
+                {
+                    // Don't show non-visible links
+                    SelectedLink = null;
+                }
+                return;
+            }
+
+            // Otherwise, show all links grouped by category
             var categories = _linkCategoryService.GetAll()
                 .Where(c => c.Visible)
                 .OrderBy(c => c.Name)

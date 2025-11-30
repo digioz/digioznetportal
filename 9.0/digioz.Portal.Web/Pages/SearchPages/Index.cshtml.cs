@@ -281,7 +281,7 @@ namespace digioz.Portal.Pages.SearchPages
                 Id = link.Id,
                 TitleHtml = title,
                 SnippetHtml = snippet,
-                Url = link.Url ?? "/",
+                Url = $"/Links?id={link.Id}",
                 Timestamp = link.Timestamp
             };
         }
