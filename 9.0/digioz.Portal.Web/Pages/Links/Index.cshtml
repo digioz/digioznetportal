@@ -1,36 +1,76 @@
 @page
 @model IndexModel
 @{
-	ViewData["Title"] = "Links";
+	ViewData["Title"] = Model.SelectedLink != null ? Model.SelectedLink.Name : "Links";
 }
 
-<h2>Links</h2>
-
-@if (Model.LinksByCategory.Any())
+@if (Model.SelectedLink != null)
 {
-	foreach (var group in Model.LinksByCategory)
-	{
-		<div class="link-category mb-4">
-			<h3>@group.Category.Name</h3>
-			<ul class="list-group">
-				@foreach (var link in group.Links)
-				{
-					<li class="list-group-item">
-						<a href="@link.Url" target="_blank" rel="noopener noreferrer">
-							<strong>@link.Name</strong>
-						</a>
-						@if (!string.IsNullOrEmpty(link.Description))
-						{
-							<br />
-							<small class="text-muted">@Html.Raw(link.Description)</small>
-						}
-					</li>
-				}
-			</ul>
+	<div class="card">
+		<div class="card-header">
+			<h2>@Model.SelectedLink.Name</h2>
 		</div>
-	}
+		<div class="card-body">
+			@if (!string.IsNullOrEmpty(Model.SelectedLink.Description))
+			{
+				<p class="mb-3">@Html.Raw(Model.SelectedLink.Description)</p>
+			}
+			
+			<div class="alert alert-info">
+				<i class="bi bi-info-circle"></i>
+				You are about to visit an external website.
+			</div>
+			
+			<p>
+				<strong>URL:</strong> 
+				<a href="@Model.SelectedLink.Url" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+					Visit Link <i class="bi bi-box-arrow-up-right"></i>
+				</a>
+			</p>
+			
+			<p class="text-muted small">@Model.SelectedLink.Url</p>
+			
+			<a href="/Links" class="btn btn-secondary mt-3">Back to All Links</a>
+		</div>
+	</div>
+}
+else if (Model.id.HasValue)
+{
+	<div class="alert alert-warning">
+		<p>Link not found.</p>
+		<a href="/Links" class="btn btn-secondary">Back to All Links</a>
+	</div>
 }
 else
 {
-	<p>No links available at this time.</p>
+	<h2>Links</h2>
+
+	@if (Model.LinksByCategory.Any())
+	{
+		foreach (var group in Model.LinksByCategory)
+		{
+			<div class="link-category mb-4">
+				<h3>@group.Category.Name</h3>
+				<ul class="list-group">
+					@foreach (var link in group.Links)
+					{
+						<li class="list-group-item">
+							<a href="/Links?id=@link.Id">
+								<strong>@link.Name</strong>
+							</a>
+							@if (!string.IsNullOrEmpty(link.Description))
+							{
+								<br />
+								<small class="text-muted">@Html.Raw(link.Description)</small>
+							}
+						</li>
+					}
+				</ul>
+			</div>
+		}
+	}
+	else
+	{
+		<p>No links available at this time.</p>
+	}
 }

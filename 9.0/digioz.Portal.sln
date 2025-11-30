@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36301.6
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11222.15 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "digioz.Portal.Web", "digioz.Portal.Web\digioz.Portal.Web.csproj", "{B229D009-5912-D339-6272-1C3DBE4A832C}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "digioz.Portal.Dal", "digioz.Portal.Dal\digioz.Portal.Dal.csproj", "{B3A5D3C4-9363-78FF-9CB7-624A73CC67F8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "digioz.Portal.Utilities", "digioz.Portal.Utilities\digioz.Portal.Utilities.csproj", "{E9326E67-D5D5-CB54-7BF6-CE958E640B05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "digioz.Portal.BulkMediaImport", "digioz.Portal.BulkMediaImport\digioz.Portal.BulkMediaImport.csproj", "{59B3892F-8821-4AD9-B07B-9ABD7098AE02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{E9326E67-D5D5-CB54-7BF6-CE958E640B05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9326E67-D5D5-CB54-7BF6-CE958E640B05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9326E67-D5D5-CB54-7BF6-CE958E640B05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59B3892F-8821-4AD9-B07B-9ABD7098AE02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59B3892F-8821-4AD9-B07B-9ABD7098AE02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59B3892F-8821-4AD9-B07B-9ABD7098AE02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59B3892F-8821-4AD9-B07B-9ABD7098AE02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
