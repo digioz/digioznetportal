@@ -1,9 +1,10 @@
-@page
-@model digioz.Portal.Pages.Polls.AddModel
+@page "{id}"
+@model digioz.Portal.Pages.Polls.EditModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-<h2>Add Poll</h2>
+<h2>Edit Poll</h2>
 <form method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Item.Id" />
     <div class="mb-3">
         <label class="form-label">Poll Question</label>
         <input asp-for="Item.Slug" class="form-control" />
@@ -23,8 +24,8 @@
     </div>
     <div class="mb-3">
         <label class="form-label">Answers (comma separated)</label>
-        <input asp-for="NewAnswersCsv" class="form-control" placeholder="Yes, No, Maybe" />
+        <input asp-for="NewAnswersCsv" class="form-control" />
     </div>
-    <button type="submit" class="btn btn-primary">Create</button>
+    <button type="submit" class="btn btn-primary">Save</button>
     <a class="btn btn-secondary" asp-page="/Polls/Index">Cancel</a>
 </form>

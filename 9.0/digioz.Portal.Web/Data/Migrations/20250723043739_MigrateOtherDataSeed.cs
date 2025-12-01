@@ -144,7 +144,8 @@ INSERT INTO Page (UserId, Title, Url, Body, Keywords, Description, Visible, Time
                     { "Comments", null, false },
                     { "RSSFeed", null, false },
                     { "LatestPictures", null, false },
-                    { "LatestVideos", null, false }
+                    { "LatestVideos", null, false },
+                    { "Polls", null, false }
                 });
         }
 

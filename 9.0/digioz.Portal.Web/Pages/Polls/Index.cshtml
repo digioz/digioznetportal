@@ -1,3 +1,68 @@
 @page
-@model IndexModel
-<h2>Polls Index</h2>
+@model digioz.Portal.Pages.Polls.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+@{
+    ViewData["Title"] = "Polls";
+    var isLoggedIn = !string.IsNullOrEmpty(Model.CurrentUserId);
+}
+
+<h1 class="mt-4">Polls</h1>
+@if (isLoggedIn)
+{
+    <p><a class="btn btn-sm btn-primary" asp-page="/Polls/Add">Add Poll</a></p>
+}
+<div class="table-responsive">
+    <table class="table table-sm table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Question</th>
+                <th>Featured</th>
+                <th>Created</th>
+                <th>Closed</th>
+                <th class="text-end" style="width:260px">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @if (Model.Items.Any())
+        {
+            foreach (var p in Model.Items)
+            {
+                var isOwner = isLoggedIn && p.UserId == Model.CurrentUserId;
+                <tr>
+                    <td>@p.Slug</td>
+                    <td>@(p.Featured ? "Yes" : "No")</td>
+                    <td>@p.DateCreated.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@(p.IsClosed ? "Yes" : "No")</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary" asp-page="/Polls/Details" asp-route-id="@p.Id">Details</a>
+                        @if (isOwner)
+                        {
+                            <a class="btn btn-sm btn-outline-primary" asp-page="/Polls/Edit" asp-route-id="@p.Id">Edit</a>
+                            <a class="btn btn-sm btn-outline-danger" asp-page="/Polls/Delete" asp-route-id="@p.Id">Delete</a>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr><td colspan="5" class="text-muted">No polls found.</td></tr>
+        }
+        </tbody>
+    </table>
+</div>
+<div class="d-flex justify-content-between align-items-center mt-2">
+    <small class="text-muted">Page @Model.pageNumber of @Model.TotalPages (@Model.TotalCount total)</small>
+    <paging total-records="@Model.TotalCount"
+            page-no="@Model.pageNumber"
+            page-size="@Model.pageSize"
+            show-prev-next="true"
+            show-first-last="true"
+            query-string-key-page-no="pageNumber"
+            class="pagination mb-0">
+        <route-values>
+            <rv key="pageSize" value="@Model.pageSize"></rv>
+        </route-values>
+    </paging>
+</div>
