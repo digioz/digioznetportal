@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using digioz.Portal.Bo;
@@ -26,12 +27,28 @@ namespace digioz.Portal.Dal.Services
 
         public void Add(PollAnswer answer)
         {
+            if (answer == null) return;
+            answer.Answer = (answer.Answer ?? string.Empty).Trim();
+
+            // Prevent duplicates (case-insensitive) within the same poll
+            bool exists = _context.PollAnswers
+                .Any(a => a.PollId == answer.PollId && a.Answer != null && a.Answer.ToLower() == answer.Answer.ToLower());
+            if (exists) return;
+
             _context.PollAnswers.Add(answer);
             _context.SaveChanges();
         }
 
         public void Update(PollAnswer answer)
         {
+            if (answer == null) return;
+            answer.Answer = (answer.Answer ?? string.Empty).Trim();
+
+            // Prevent making a duplicate on update
+            bool exists = _context.PollAnswers
+                .Any(a => a.PollId == answer.PollId && a.Id != answer.Id && a.Answer != null && a.Answer.ToLower() == answer.Answer.ToLower());
+            if (exists) return;
+
             _context.PollAnswers.Update(answer);
             _context.SaveChanges();
         }

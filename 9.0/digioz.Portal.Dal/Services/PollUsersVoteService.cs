@@ -16,7 +16,8 @@ namespace digioz.Portal.Dal.Services
 
         public PollUsersVote Get(string pollId, string userId)
         {
-            return _context.PollUsersVotes.Find(pollId, userId);
+            return _context.PollUsersVotes
+                .FirstOrDefault(x => x.PollId == pollId && x.UserId == userId);
         }
 
         public List<PollUsersVote> GetAll()
@@ -38,7 +39,8 @@ namespace digioz.Portal.Dal.Services
 
         public void Delete(string pollId, string userId)
         {
-            var usersVote = _context.PollUsersVotes.Find(pollId, userId);
+            var usersVote = _context.PollUsersVotes
+                .FirstOrDefault(x => x.PollId == pollId && x.UserId == userId);
             if (usersVote != null)
             {
                 _context.PollUsersVotes.Remove(usersVote);

@@ -1,0 +1,124 @@
+@page "{id}"
+@model digioz.Portal.Web.Areas.Admin.Pages.Poll.EditModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Edit Poll";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1 class="mt-4">Edit Poll</h1>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item">Admin</li>
+    <li class="breadcrumb-item"><a asp-page="Index">Poll</a></li>
+    <li class="breadcrumb-item active">Edit</li>
+</ol>
+
+<form method="post" id="pollForm">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Item.Id" />
+    <div class="mb-3">
+        <label class="form-label">Poll Question</label>
+        <input asp-for="Item.Slug" class="form-control" />
+        <span asp-validation-for="Item.Slug" class="text-danger"></span>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Existing Answers</div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label mb-0">Manage Answers</label>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="addAnswerBtn">Add Answers</button>
+            </div>
+            <div id="answersContainer"></div>
+            <input type="hidden" asp-for="NewAnswersCsv" id="answersCsv" />
+            <small class="form-text text-muted">Ensure at least 2 answers. Remove or add as needed.</small>
+            <div class="text-danger d-none" id="answersError">Please provide at least 2 answers.</div>
+        </div>
+    </div>
+
+    <div class="form-check mb-2">
+        <input class="form-check-input" asp-for="Item.Featured" />
+        <label class="form-check-label" asp-for="Item.Featured"></label>
+    </div>
+    <div class="form-check mb-2">
+        <input class="form-check-input" asp-for="Item.IsClosed" />
+        <label class="form-check-label" asp-for="Item.IsClosed"></label>
+    </div>
+    <div class="form-check mb-3">
+        <input class="form-check-input" asp-for="Item.AllowMultipleOptionsVote" />
+        <label class="form-check-label" asp-for="Item.AllowMultipleOptionsVote"></label>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a class="btn btn-secondary" asp-page="Index">Cancel</a>
+</form>
+
+<script>
+(function() {
+    const container = document.getElementById('answersContainer');
+    const addBtn = document.getElementById('addAnswerBtn');
+    const form = document.getElementById('pollForm');
+    const csvInput = document.getElementById('answersCsv');
+    const errorEl = document.getElementById('answersError');
+
+    function createAnswerInput(value = '') {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'input-group mb-2';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-control';
+        input.placeholder = 'Answer option';
+        input.value = value;
+
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'input-group-append';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn btn-outline-danger';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', function() {
+            container.removeChild(wrapper);
+        });
+
+        btnGroup.appendChild(removeBtn);
+        wrapper.appendChild(input);
+        wrapper.appendChild(btnGroup);
+        return wrapper;
+    }
+
+    function addAnswer(value = '') {
+        container.appendChild(createAnswerInput(value));
+    }
+
+    addBtn.addEventListener('click', function() {
+        addAnswer('');
+    });
+
+    // Prefill existing answers from server-side model
+    const existing = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ExistingAnswers.Select(a => a.Answer)));
+    if (existing.length > 0) {
+        existing.forEach(v => addAnswer(v));
+    } else {
+        // ensure at least two empty inputs
+        addAnswer('');
+        addAnswer('');
+    }
+
+    form.addEventListener('submit', function(e) {
+        const values = Array.from(container.querySelectorAll('input.form-control'))
+            .map(i => i.value.trim())
+            .filter(v => v.length > 0);
+
+        if (values.length < 2) {
+            e.preventDefault();
+            errorEl.classList.remove('d-none');
+            errorEl.textContent = 'Please provide at least 2 answers.';
+            return;
+        }
+
+        errorEl.classList.add('d-none');
+        csvInput.value = values.join(',');
+    });
+})();
+</script>
