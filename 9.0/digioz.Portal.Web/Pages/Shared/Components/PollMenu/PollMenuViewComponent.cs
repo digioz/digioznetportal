@@ -34,7 +34,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.PollMenu
                 return View("Disabled");
             }
 
-            var polls = _pollService.GetLatest(2);
+            var polls = _pollService.GetLatestFeatured(2);
             var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
             var model = new List<PollMenuItemViewModel>();

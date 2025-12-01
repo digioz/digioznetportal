@@ -22,30 +22,38 @@
                 }
                 else if (!item.Poll.IsClosed)
                 {
-                    <form method="post" asp-area="Admin" asp-page="/Poll/Details" asp-route-id="@item.Poll.Id">
-                        @if (item.Poll.AllowMultipleOptionsVote)
-                        {
-                            foreach (var a in item.Answers)
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <form method="post" asp-page="/Polls/Details" asp-page-handler="Vote" asp-route-id="@item.Poll.Id" asp-antiforgery="true">
+                            @if (item.Poll.AllowMultipleOptionsVote)
                             {
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="SelectedAnswerIds" value="@a.Id" id="pm_@a.Id">
-                                    <label class="form-check-label" for="pm_@a.Id">@a.Answer</label>
-                                </div>
+                                foreach (var a in item.Answers)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="SelectedAnswerIds" value="@a.Id" id="pm_@a.Id">
+                                        <label class="form-check-label" for="pm_@a.Id">@a.Answer</label>
+                                    </div>
+                                }
                             }
-                        }
-                        else
-                        {
-                            foreach (var a in item.Answers)
+                            else
                             {
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="SelectedAnswerIds" value="@a.Id" id="pm_@a.Id">
-                                    <label class="form-check-label" for="pm_@a.Id">@a.Answer</label>
-                                </div>
+                                foreach (var a in item.Answers)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="SelectedAnswerIds" value="@a.Id" id="pm_@a.Id">
+                                        <label class="form-check-label" for="pm_@a.Id">@a.Answer</label>
+                                    </div>
+                                }
                             }
-                        }
-                        <button type="submit" class="btn btn-sm btn-primary mt-2">Vote</button>
-                        <a class="btn btn-sm btn-outline-secondary mt-2" asp-page="/Polls/Details" asp-route-id="@item.Poll.Id">Details</a>
-                    </form>
+                            <button type="submit" class="btn btn-sm btn-primary mt-2">Vote</button>
+                            <a class="btn btn-sm btn-outline-secondary mt-2" asp-page="/Polls/Details" asp-route-id="@item.Poll.Id">Details</a>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-secondary p-1 mb-2">Sign in to vote.</div>
+                        <a class="btn btn-sm btn-outline-secondary" asp-page="/Polls/Details" asp-route-id="@item.Poll.Id">Details</a>
+                    }
                 }
                 else
                 {

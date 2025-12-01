@@ -32,6 +32,15 @@ namespace digioz.Portal.Dal.Services
                 .ToList();
         }
 
+        public List<Poll> GetLatestFeatured(int count)
+        {
+            return _context.Polls
+                .Where(p => p.Featured)
+                .OrderByDescending(p => p.DateCreated)
+                .Take(count)
+                .ToList();
+        }
+
         public List<Poll> GetByUserId(string userId)
         {
             if (string.IsNullOrEmpty(userId))
