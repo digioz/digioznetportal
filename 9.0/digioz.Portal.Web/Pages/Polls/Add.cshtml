@@ -1,7 +1,11 @@
 @page
 @model digioz.Portal.Pages.Polls.AddModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-<h2>Add Poll</h2>
+
+@{
+    ViewData["Title"] = "Add Poll";
+}
+
 <form method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="mb-3">

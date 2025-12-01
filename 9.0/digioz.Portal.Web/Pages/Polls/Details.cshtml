@@ -1,7 +1,11 @@
 @page "{id}"
 @model digioz.Portal.Pages.Polls.DetailsModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-<h2>Poll Details</h2>
+
+@{
+    ViewData["Title"] = "Poll Details";
+}
+
 <dl class="row">
     <dt class="col-sm-3">Question</dt>
     <dd class="col-sm-9">@Model.Item.Slug</dd>

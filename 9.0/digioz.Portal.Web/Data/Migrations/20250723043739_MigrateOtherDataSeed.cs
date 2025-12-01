@@ -193,6 +193,7 @@ DELETE FROM Page WHERE UserId = @adminUserId2 AND Url IN ('/Index','/Home/Contac
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "RSSFeed");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "LatestPictures");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "LatestVideos");
+            migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "Polls");
         }
     }
 }

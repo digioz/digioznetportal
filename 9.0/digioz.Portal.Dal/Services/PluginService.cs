@@ -19,6 +19,11 @@ namespace digioz.Portal.Dal.Services
             return _context.Plugins.Find(id);
         }
 
+        public Plugin GetByName(string name)
+        {
+            return _context.Plugins.FirstOrDefault(p => p.Name == name);
+        }
+
         public List<Plugin> GetAll()
         {
             return _context.Plugins.ToList();

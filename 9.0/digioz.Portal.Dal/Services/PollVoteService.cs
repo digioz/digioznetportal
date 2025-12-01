@@ -24,6 +24,21 @@ namespace digioz.Portal.Dal.Services
             return _context.PollVotes.ToList();
         }
 
+        public int CountByAnswerId(string answerId)
+        {
+            return _context.PollVotes.Count(v => v.PollAnswerId == answerId);
+        }
+
+        public void DeleteByAnswerId(string answerId)
+        {
+            var votes = _context.PollVotes.Where(v => v.PollAnswerId == answerId).ToList();
+            if (votes.Count > 0)
+            {
+                _context.PollVotes.RemoveRange(votes);
+                _context.SaveChanges();
+            }
+        }
+
         public void Add(PollVote vote)
         {
             _context.PollVotes.Add(vote);

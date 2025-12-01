@@ -24,6 +24,14 @@ namespace digioz.Portal.Dal.Services
             return _context.Polls.ToList();
         }
 
+        public List<Poll> GetLatest(int count)
+        {
+            return _context.Polls
+                .OrderByDescending(p => p.DateCreated)
+                .Take(count)
+                .ToList();
+        }
+
         public List<Poll> GetByUserId(string userId)
         {
             if (string.IsNullOrEmpty(userId))

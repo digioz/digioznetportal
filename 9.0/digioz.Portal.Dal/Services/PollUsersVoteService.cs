@@ -25,6 +25,16 @@ namespace digioz.Portal.Dal.Services
             return _context.PollUsersVotes.ToList();
         }
 
+        public List<PollUsersVote> GetByUserId(string userId)
+        {
+            return _context.PollUsersVotes.Where(x => x.UserId == userId).ToList();
+        }
+
+        public bool Exists(string pollId, string userId)
+        {
+            return _context.PollUsersVotes.Any(x => x.PollId == pollId && x.UserId == userId);
+        }
+
         public void Add(PollUsersVote usersVote)
         {
             _context.PollUsersVotes.Add(usersVote);

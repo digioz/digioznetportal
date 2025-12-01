@@ -1,4 +1,4 @@
-@model List<digioz.Portal.Web.Pages.Shared.Components.PollMenu.PollMenuViewComponent.PollMenuItem>
+@model List<digioz.Portal.Bo.ViewModels.PollMenuItemViewModel>
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @if (Model == null || Model.Count == 0)
 {
@@ -44,7 +44,7 @@
                             }
                         }
                         <button type="submit" class="btn btn-sm btn-primary mt-2">Vote</button>
-                        <a class="btn btn-sm btn-outline-secondary mt-2" asp-area="Admin" asp-page="/Poll/Details" asp-route-id="@item.Poll.Id">Details</a>
+                        <a class="btn btn-sm btn-outline-secondary mt-2" asp-page="/Polls/Details" asp-route-id="@item.Poll.Id">Details</a>
                     </form>
                 }
                 else
@@ -52,6 +52,11 @@
                     <div class="alert alert-warning p-1 mb-2">Poll closed.</div>
                 }
             </div>
+            @if (!string.IsNullOrEmpty(item.ResultsChartBase64))
+            {
+                <hr />
+                <img class="img-fluid" src="data:image/png;base64,@item.ResultsChartBase64" alt="Poll Results" />
+            }
         </div>
     </div>
 }

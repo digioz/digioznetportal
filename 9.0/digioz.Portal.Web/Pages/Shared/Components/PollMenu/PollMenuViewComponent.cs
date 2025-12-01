@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using digioz.Portal.Dal.Services.Interfaces;
+using ScottPlot;
+using digioz.Portal.Bo.ViewModels;
 
 namespace digioz.Portal.Web.Pages.Shared.Components.PollMenu
 {
@@ -12,47 +14,80 @@ namespace digioz.Portal.Web.Pages.Shared.Components.PollMenu
         private readonly IPollService _pollService;
         private readonly IPollUsersVoteService _usersVoteService;
         private readonly IPollAnswerService _answerService;
+        private readonly IPollVoteService _voteService;
         private readonly IPluginService _pluginService;
 
-        public PollMenuViewComponent(IPollService pollService, IPollUsersVoteService usersVoteService, IPollAnswerService answerService, IPluginService pluginService)
+        public PollMenuViewComponent(IPollService pollService, IPollUsersVoteService usersVoteService, IPollAnswerService answerService, IPollVoteService voteService, IPluginService pluginService)
         {
             _pollService = pollService;
             _usersVoteService = usersVoteService;
             _answerService = answerService;
+            _voteService = voteService;
             _pluginService = pluginService;
         }
 
         public IViewComponentResult Invoke()
         {
-            var pollPlugin = _pluginService.GetAll().FirstOrDefault(p => p.Name == "Poll" && p.IsEnabled);
-            if (pollPlugin == null)
+            var pollPlugin = _pluginService.GetByName("Polls");
+            if (pollPlugin == null || !pollPlugin.IsEnabled)
             {
                 return View("Disabled");
             }
 
-            var polls = _pollService.GetAll().OrderByDescending(p => p.DateCreated).Take(2).ToList();
-            var userId = HttpContext.User.FindFirstValue(ClaimsPrincipal.Current != null ? ClaimTypes.NameIdentifier : ClaimTypes.NameIdentifier) ?? HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var votedPolls = new HashSet<string>();
-            if (!string.IsNullOrEmpty(userId))
-            {
-                votedPolls = _usersVoteService.GetAll().Where(v => v.UserId == userId).Select(v => v.PollId).ToHashSet();
-            }
+            var polls = _pollService.GetLatest(2);
+            var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
-            var model = polls.Select(p => new PollMenuItem
+            var model = new List<PollMenuItemViewModel>();
+            foreach (var p in polls)
             {
-                Poll = p,
-                Answers = _answerService.GetAll().Where(a => a.PollId == p.Id).ToList(),
-                HasVoted = votedPolls.Contains(p.Id)
-            }).ToList();
+                var answers = _answerService.GetByPollId(p.Id);
+                var hasVoted = !string.IsNullOrEmpty(userId) && _usersVoteService.Exists(p.Id, userId);
+                var chart = GenerateResultsChart(answers);
+                model.Add(new PollMenuItemViewModel
+                {
+                    Poll = p,
+                    Answers = answers,
+                    HasVoted = hasVoted,
+                    ResultsChartBase64 = chart
+                });
+            }
 
             return View(model);
         }
 
-        public class PollMenuItem
+        private string GenerateResultsChart(List<digioz.Portal.Bo.PollAnswer> answers)
         {
-            public digioz.Portal.Bo.Poll Poll { get; set; } = new();
-            public List<digioz.Portal.Bo.PollAnswer> Answers { get; set; } = new();
-            public bool HasVoted { get; set; }
+            try
+            {
+                var counts = answers.Select(a => (double)_voteService.CountByAnswerId(a.Id)).ToArray();
+                var labels = answers.Select(a => a.Answer ?? string.Empty).ToArray();
+                if (labels.Length == 0) return string.Empty;
+
+                using var plot = new Plot();
+                var bars = plot.Add.Bars(counts);
+                for (int i = 0; i < bars.Bars.Count; i++)
+                {
+                    bars.Bars[i].FillColor = ScottPlot.Color.FromHex("#0d6efd");
+                    bars.Bars[i].Label = bars.Bars[i].Value.ToString("F0");
+                }
+                bars.ValueLabelStyle.Bold = true;
+                bars.ValueLabelStyle.FontSize = 11;
+                bars.ValueLabelStyle.ForeColor = ScottPlot.Color.FromHex("#212529");
+
+                plot.Axes.Bottom.TickGenerator = new ScottPlot.TickGenerators.NumericManual(
+                    labels.Select((t, i) => new Tick((double)i, t)).ToArray()
+                );
+                plot.Axes.Bottom.Label.Text = "Answers";
+                plot.Axes.Left.Label.Text = "Votes";
+                plot.Title("Results");
+
+                var bytes = plot.GetImage(500, 250).GetImageBytes();
+                return Convert.ToBase64String(bytes);
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }

@@ -25,6 +25,11 @@ namespace digioz.Portal.Dal.Services
             return _context.PollAnswers.ToList();
         }
 
+        public List<PollAnswer> GetByPollId(string pollId)
+        {
+            return _context.PollAnswers.Where(a => a.PollId == pollId).ToList();
+        }
+
         public void Add(PollAnswer answer)
         {
             if (answer == null) return;
