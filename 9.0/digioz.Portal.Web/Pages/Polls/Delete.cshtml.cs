@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Dal.Services.Interfaces;
+using System.Linq;
 
 namespace digioz.Portal.Pages.Polls
 {
@@ -42,19 +43,13 @@ namespace digioz.Portal.Pages.Polls
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (poll.UserId != userId) return Forbid();
 
-            // Cascade delete answers, votes, user votes
-            var answers = _answerService.GetAll().Where(a => a.PollId == id).ToList();
-            foreach (var ans in answers)
-            {
-                var votes = _voteService.GetAll().Where(v => v.PollAnswerId == ans.Id).ToList();
-                foreach (var v in votes) _voteService.Delete(v.Id);
-                _answerService.Delete(ans.Id);
-            }
-            foreach (var uv in _usersVoteService.GetAll().Where(x => x.PollId == id).ToList())
-            {
-                _usersVoteService.Delete(uv.PollId, uv.UserId);
-            }
+            // Targeted cascade delete without loading whole tables
+            var answerIds = _answerService.GetIdsByPollId(id);
+            _voteService.DeleteByPollId(id, answerIds);
+            _answerService.DeleteByPollId(id);
+            _usersVoteService.DeleteByPollId(id);
             _pollService.Delete(id);
+
             return RedirectToPage("/Polls/Index");
         }
     }

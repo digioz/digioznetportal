@@ -12,5 +12,6 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void Add(PollUsersVote usersVote);
         void Update(PollUsersVote usersVote);
         void Delete(string pollId, string userId);
+        void DeleteByPollId(string pollId);
     }
 }

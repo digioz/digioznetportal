@@ -46,6 +46,18 @@ namespace digioz.Portal.Dal.Services
             return _context.PollVotes.Where(v => set.Contains(v.PollAnswerId)).ToList();
         }
 
+        public void DeleteByPollId(string pollId, IEnumerable<string> answerIds)
+        {
+            var set = answerIds?.ToHashSet() ?? new HashSet<string>();
+            if (set.Count == 0) return;
+            var votes = _context.PollVotes.Where(v => set.Contains(v.PollAnswerId)).ToList();
+            if (votes.Count > 0)
+            {
+                _context.PollVotes.RemoveRange(votes);
+                _context.SaveChanges();
+            }
+        }
+
         public void Add(PollVote vote)
         {
             _context.PollVotes.Add(vote);

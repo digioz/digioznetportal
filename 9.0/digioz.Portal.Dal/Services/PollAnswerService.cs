@@ -72,5 +72,15 @@ namespace digioz.Portal.Dal.Services
                 _context.SaveChanges();
             }
         }
+
+        public void DeleteByPollId(string pollId)
+        {
+            var answers = _context.PollAnswers.Where(a => a.PollId == pollId).ToList();
+            if (answers.Count > 0)
+            {
+                _context.PollAnswers.RemoveRange(answers);
+                _context.SaveChanges();
+            }
+        }
     }
 }
