@@ -31,7 +31,7 @@ namespace digioz.Portal.Pages.Polls
             var poll = _pollService.Get(id);
             if (poll == null) return NotFound();
             Item = poll;
-            Answers = _answerService.GetAll().Where(a => a.PollId == id).ToList();
+            Answers = _answerService.GetByPollId(id);
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             HasVoted = !string.IsNullOrEmpty(userId) && _usersVoteService.Get(id, userId) != null;
             return Page();
@@ -45,7 +45,7 @@ namespace digioz.Portal.Pages.Polls
             if (poll == null) return NotFound();
             var prior = _usersVoteService.Get(id, userId);
             if (prior != null) return RedirectToPage(new { id });
-            var validAnswers = _answerService.GetAll().Where(a => a.PollId == id).ToList();
+            var validAnswers = _answerService.GetByPollId(id);
             var selected = (SelectedAnswerIds ?? new System.Collections.Generic.List<string>())
                 .Where(s => validAnswers.Any(a => a.Id == s)).Distinct().ToList();
             if (!selected.Any())

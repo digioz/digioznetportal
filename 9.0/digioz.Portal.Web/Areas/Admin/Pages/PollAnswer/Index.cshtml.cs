@@ -32,20 +32,18 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
 
         public void OnGet()
         {
-            // build poll slug lookup
-            var polls = _pollService.GetAll();
+            // build poll slug lookup (limit to needed)
+            var polls = _pollService.GetLatest(500);
             PollSlugs = polls.ToDictionary(p => p.Id, p => string.IsNullOrWhiteSpace(p.Slug) ? p.Id : p.Slug);
             if (!string.IsNullOrEmpty(PollId))
             {
-                CurrentPoll = polls.FirstOrDefault(p => p.Id == PollId);
+                CurrentPoll = _pollService.Get(PollId);
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
                 HasVoted = !string.IsNullOrEmpty(userId) && _usersVoteService.Get(PollId, userId) != null;
             }
 
-            var all = _service.GetAll();
-            if (!string.IsNullOrEmpty(PollId))
-                all = all.Where(a => a.PollId == PollId).ToList();
-
+            var all = string.IsNullOrEmpty(PollId) ? _service.GetByPollId(PollId) : _service.GetByPollId(PollId);
+            // fallback pagination client-side for now (no paging in service)
             TotalCount = all.Count;
             var skip = (PageNumber - 1) * PageSize;
             Items = all.Skip(skip).Take(PageSize).ToList();
@@ -69,7 +67,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
                 return Page();
             }
 
-            var validAnswers = _service.GetAll().Where(a => a.PollId == PollId).ToList();
+            var validAnswers = _service.GetByPollId(PollId);
             var selected = (SelectedAnswerIds ?? new List<string>()).Where(s => validAnswers.Any(a => a.Id == s)).Distinct().ToList();
 
             if (!selected.Any())

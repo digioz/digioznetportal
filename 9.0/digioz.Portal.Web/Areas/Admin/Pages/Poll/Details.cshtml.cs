@@ -35,7 +35,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
             var poll = _pollService.Get(id);
             if (poll == null) return NotFound();
             Item = poll;
-            Answers = _answerService.GetAll().Where(a => a.PollId == id).ToList();
+            Answers = _answerService.GetByPollId(id);
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             HasVoted = !string.IsNullOrEmpty(userId) && _usersVoteService.Get(id, userId) != null;
@@ -53,7 +53,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             if (string.IsNullOrEmpty(userId)) return Forbid();
 
-            var validAnswers = _answerService.GetAll().Where(a => a.PollId == id).ToList();
+            var validAnswers = _answerService.GetByPollId(id);
 
             // Block re-voting
             var priorVote = _usersVoteService.Get(id, userId);
@@ -107,8 +107,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
         {
             try
             {
-                var answers = _answerService.GetAll().Where(a => a.PollId == pollId).ToList();
-                var counts = answers.Select(a => (double)_voteService.GetAll().Count(v => v.PollAnswerId == a.Id)).ToArray();
+                var answers = _answerService.GetByPollId(pollId);
+                var counts = answers.Select(a => (double)_voteService.CountByAnswerId(a.Id)).ToArray();
                 var labels = answers.Select(a => a.Answer).ToArray();
 
                 using var plot = new Plot();

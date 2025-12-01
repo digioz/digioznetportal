@@ -23,11 +23,11 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
 
         public void OnGet()
         {
-            Polls = _pollService.GetAll().OrderByDescending(p => p.DateCreated).ToList();
+            Polls = _pollService.GetLatest(50);
             if (!string.IsNullOrEmpty(PollId))
             {
                 Item.PollId = PollId;
-                AnswersForPoll = _answerService.GetAll().Where(a => a.PollId == PollId).ToList();
+                AnswersForPoll = _answerService.GetByPollId(PollId);
             }
         }
 
@@ -44,9 +44,9 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
 
             if (!ModelState.IsValid)
             {
-                Polls = _pollService.GetAll().OrderByDescending(p => p.DateCreated).ToList();
+                Polls = _pollService.GetLatest(50);
                 if (!string.IsNullOrEmpty(Item.PollId))
-                    AnswersForPoll = _answerService.GetAll().Where(a => a.PollId == Item.PollId).ToList();
+                    AnswersForPoll = _answerService.GetByPollId(Item.PollId);
                 return Page();
             }
 

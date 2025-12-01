@@ -25,8 +25,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
             var item = _answerService.Get(id);
             if (item == null) return NotFound();
             Item = item;
-            Polls = _pollService.GetAll().OrderByDescending(p => p.DateCreated).ToList();
-            AnswersForPoll = _answerService.GetAll().Where(a => a.PollId == Item.PollId).ToList();
+            Polls = _pollService.GetLatest(50); // limit dropdown size
+            AnswersForPoll = _answerService.GetByPollId(Item.PollId);
             return Page();
         }
 
@@ -34,9 +34,9 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
         {
             if (!ModelState.IsValid)
             {
-                Polls = _pollService.GetAll().OrderByDescending(p => p.DateCreated).ToList();
+                Polls = _pollService.GetLatest(50);
                 if (!string.IsNullOrEmpty(Item.PollId))
-                    AnswersForPoll = _answerService.GetAll().Where(a => a.PollId == Item.PollId).ToList();
+                    AnswersForPoll = _answerService.GetByPollId(Item.PollId);
                 return Page();
             }
             _answerService.Update(Item);

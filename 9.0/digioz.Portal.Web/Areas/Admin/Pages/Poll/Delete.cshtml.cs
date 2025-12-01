@@ -32,24 +32,11 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
         {
             if (string.IsNullOrEmpty(Id)) return BadRequest();
 
-            // delete answers and votes related to this poll
-            var answers = _answerService.GetAll().FindAll(a => a.PollId == Id);
-            foreach (var ans in answers)
-            {
-                // delete poll votes for this answer
-                foreach (var vote in _voteService.GetAll().FindAll(v => v.PollAnswerId == ans.Id))
-                {
-                    _voteService.Delete(vote.Id);
-                }
-                _answerService.Delete(ans.Id);
-            }
-
-            // delete users' votes record for this poll
-            foreach (var uv in _usersVoteService.GetAll().FindAll(x => x.PollId == Id))
-            {
-                _usersVoteService.Delete(uv.PollId, uv.UserId);
-            }
-
+            // targeted cascade delete
+            var answerIds = _answerService.GetIdsByPollId(Id);
+            _voteService.DeleteByPollId(Id, answerIds);
+            _answerService.DeleteByPollId(Id);
+            _usersVoteService.DeleteByPollId(Id);
             _pollService.Delete(Id);
             return RedirectToPage("Index");
         }

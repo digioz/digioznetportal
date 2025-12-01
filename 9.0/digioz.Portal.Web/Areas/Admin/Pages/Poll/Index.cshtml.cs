@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using digioz.Portal.Dal.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,12 +19,10 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
 
         public void OnGet()
         {
-            var all = _service.GetAll().OrderByDescending(p => p.DateCreated).ToList();
-            TotalCount = all.Count;
             if (PageNumber < 1) PageNumber = 1;
             if (PageSize < 1) PageSize = 10;
-            var skip = (PageNumber - 1) * PageSize;
-            Items = all.Skip(skip).Take(PageSize).ToList();
+            Items = _service.GetPaged(PageNumber, PageSize, out var total);
+            TotalCount = total;
         }
     }
 }
