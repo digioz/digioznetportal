@@ -39,6 +39,13 @@ namespace digioz.Portal.Dal.Services
             }
         }
 
+        public List<PollVote> GetByPollAnswerIds(IEnumerable<string> answerIds)
+        {
+            var set = answerIds?.ToHashSet() ?? new HashSet<string>();
+            if (set.Count == 0) return new List<PollVote>();
+            return _context.PollVotes.Where(v => set.Contains(v.PollAnswerId)).ToList();
+        }
+
         public void Add(PollVote vote)
         {
             _context.PollVotes.Add(vote);

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
             var item = _service.Get(id);
             if (item == null) return NotFound();
             Item = item;
-            ExistingAnswers = _answerService.GetAll().Where(a => a.PollId == id).ToList();
+            ExistingAnswers = _answerService.GetByPollId(id);
             return Page();
         }
 
@@ -52,45 +53,64 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-            var existing = _answerService.GetAll().Where(a => a.PollId == Item.Id).ToList();
+            var existing = _answerService.GetByPollId(Item.Id);
 
-            // Collapse duplicates in existing: keep one per normalized text, remove extras
-            var groups = existing
-                .GroupBy(a => Key(a.Answer))
+            // Identify duplicates (keep first per normalized text)
+            var dupIds = new List<string>();
+            foreach (var grp in existing.GroupBy(a => Key(a.Answer)))
+            {
+                var keep = grp.OrderBy(a => a.Id).First();
+                dupIds.AddRange(grp.Where(a => a.Id != keep.Id).Select(a => a.Id));
+            }
+
+            // Identify answers to remove based on requested list (only when requested provided)
+            var toRemoveByRequest = existing
+                .Where(e => requested.Count > 0 && !requested.Contains(Norm(e.Answer), StringComparer.OrdinalIgnoreCase))
+                .Select(e => e.Id)
                 .ToList();
 
-            foreach (var grp in groups)
+            var answersToRemoveIds = dupIds
+                .Concat(toRemoveByRequest)
+                .Distinct()
+                .ToList();
+
+            var answersToKeepIds = existing.Select(a => a.Id).Except(answersToRemoveIds).ToHashSet();
+
+            // Use targeted retrieval for votes in this poll
+            var votesForPoll = _voteService.GetByPollAnswerIds(existing.Select(a => a.Id));
+            var votesToRemovedAnswers = votesForPoll.Where(v => answersToRemoveIds.Contains(v.PollAnswerId)).ToList();
+            var affectedUserIds = votesToRemovedAnswers.Select(v => v.UserId).Distinct().ToList();
+
+            foreach (var uid in affectedUserIds)
             {
-                // keep first (stable by Id)
-                var keep = grp.OrderBy(a => a.Id).FirstOrDefault();
-                foreach (var dup in grp.Where(a => a != keep))
+                bool hasOtherVote = votesForPoll.Any(v => v.UserId == uid && answersToKeepIds.Contains(v.PollAnswerId));
+                if (!hasOtherVote)
                 {
-                    foreach (var vote in _voteService.GetAll().FindAll(v => v.PollAnswerId == dup.Id))
-                        _voteService.Delete(vote.Id);
-                    foreach (var uv in _usersVoteService.GetAll().FindAll(x => x.PollId == Item.Id))
-                        _usersVoteService.Delete(uv.PollId, uv.UserId);
-                    _answerService.Delete(dup.Id);
+                    // Only delete user vote record if the user will have no remaining votes for this poll
+                    _usersVoteService.Delete(Item.Id, uid);
                 }
             }
 
-            // Refresh existing after dedupe
-            existing = _answerService.GetAll().Where(a => a.PollId == Item.Id).ToList();
-            var existingSet = existing.Select(e => Norm(e.Answer)).Where(a => !string.IsNullOrWhiteSpace(a))
-                                      .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-            // Remove answers not requested anymore
-            var toRemove = existing.Where(e => requested.Count > 0 && !requested.Contains(Norm(e.Answer), StringComparer.OrdinalIgnoreCase)).ToList();
-            foreach (var ans in toRemove)
+            // Remove votes and answers marked for deletion
+            foreach (var ansId in answersToRemoveIds)
             {
-                foreach (var vote in _voteService.GetAll().FindAll(v => v.PollAnswerId == ans.Id))
-                    _voteService.Delete(vote.Id);
-                foreach (var uv in _usersVoteService.GetAll().FindAll(x => x.PollId == Item.Id))
-                    _usersVoteService.Delete(uv.PollId, uv.UserId);
-                _answerService.Delete(ans.Id);
+                // Prefer bulk deletion if available
+                try { _voteService.DeleteByAnswerId(ansId); } catch { /* fallback below if method not implemented */ }
+                foreach (var v in _voteService.GetAll().Where(v => v.PollAnswerId == ansId).ToList())
+                {
+                    _voteService.Delete(v.Id);
+                }
+                _answerService.Delete(ansId);
             }
 
-            // Add new answers
-            foreach (var text in requested.Where(r => !existingSet.Contains(r)))
+            // Add new answers (avoid duplicates by normalized text against kept answers)
+            var keptNormalized = existing
+                .Where(a => answersToKeepIds.Contains(a.Id))
+                .Select(a => Norm(a.Answer))
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var text in requested.Where(r => !keptNormalized.Contains(r)))
             {
                 _answerService.Add(new digioz.Portal.Bo.PollAnswer
                 {

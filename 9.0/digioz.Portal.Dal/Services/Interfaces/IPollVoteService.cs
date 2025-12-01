@@ -9,6 +9,7 @@ namespace digioz.Portal.Dal.Services.Interfaces
         List<PollVote> GetAll();
         int CountByAnswerId(string answerId);
         void DeleteByAnswerId(string answerId);
+        List<PollVote> GetByPollAnswerIds(IEnumerable<string> answerIds);
         void Add(PollVote vote);
         void Update(PollVote vote);
         void Delete(string id);
