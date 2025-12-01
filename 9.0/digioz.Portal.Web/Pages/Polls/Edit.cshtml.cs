@@ -30,7 +30,7 @@ namespace digioz.Portal.Pages.Polls
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (poll.UserId != userId) return Forbid();
             Item = poll;
-            var existingAnswers = _answerService.GetAll().Where(a => a.PollId == id).Select(a => a.Answer).ToList();
+            var existingAnswers = _answerService.GetByPollId(id).Select(a => a.Answer).ToList();
             NewAnswersCsv = string.Join(", ", existingAnswers);
             return Page();
         }
@@ -57,7 +57,7 @@ namespace digioz.Portal.Pages.Polls
                 .Where(a => !string.IsNullOrWhiteSpace(a))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
-            var existing = _answerService.GetAll().Where(a => a.PollId == poll.Id).Select(a => a.Answer).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var existing = _answerService.GetByPollId(poll.Id).Select(a => a.Answer).ToHashSet(StringComparer.OrdinalIgnoreCase);
             foreach (var ans in requested.Where(r => !existing.Contains(r)))
             {
                 _answerService.Add(new digioz.Portal.Bo.PollAnswer { Id = Guid.NewGuid().ToString(), PollId = poll.Id, Answer = ans });
