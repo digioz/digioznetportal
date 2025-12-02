@@ -6,13 +6,25 @@
         <div class="card-header">Online</div>
         <div class="card-body">
             <div>
-                <span>Visitors: </span>@Model.VisitorCount<br />
+                <span>Visitors: </span>@Model.TotalOnlineCount<br />
                 @if (Model.RegisteredVisitors.Count > 0)
                 {
                     <span>Logged In: </span>
                     @foreach (var visitor in Model.RegisteredVisitors)
                     {
                         <a asp-page="/Profile/Details" asp-route-userId="@(visitor.Profile?.DisplayName ?? visitor.Username)">@(visitor.Profile?.DisplayName ?? visitor.Username)</a>@(visitor != Model.RegisteredVisitors.Last() ? ", " : "")
+                    }
+                    @if (Model.Bots.Count > 0)
+                    {
+                        <br />
+                    }
+                }
+                @if (Model.Bots.Count > 0)
+                {
+                    <span>Bots: </span>
+                    @foreach (var bot in Model.Bots)
+                    {
+                        <span title="@bot.UserAgent">@bot.BotName</span>@(bot != Model.Bots.Last() ? ", " : "")
                     }
                 }
             </div>
