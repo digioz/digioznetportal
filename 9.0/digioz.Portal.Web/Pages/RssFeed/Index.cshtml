@@ -1,0 +1,52 @@
+@page
+@model digioz.Portal.Web.Pages.RssFeed.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "RSS Feeds";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+@if (!Model.Enabled)
+{
+    <div class="alert alert-info">RSS Feed plugin is disabled.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-header">RSS Feeds</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>URL</th>
+                            <th>Max</th>
+                            <th class="text-end" style="width:150px">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Items.Any())
+                        {
+                            foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@item.Name</td>
+                                    <td class="text-truncate" style="max-width:350px"><a href="@item.Url" target="_blank" rel="noopener noreferrer">@item.Url</a></td>
+                                    <td>@item.MaxCount</td>
+                                    <td class="text-end">
+                                        <a class="btn btn-sm btn-outline-secondary" asp-page="/RssFeed/Details" asp-route-id="@item.Id">Details</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-4">No RSS feeds found.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
