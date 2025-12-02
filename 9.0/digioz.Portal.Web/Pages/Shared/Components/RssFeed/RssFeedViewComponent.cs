@@ -33,9 +33,8 @@ namespace digioz.Portal.Web.Pages.Shared.Components.RssFeed
             {
                 var feeds = _rssService.GetAll() ?? new List<digioz.Portal.Bo.Rss>();
                 model = new List<RssFeedPreviewViewModel>();
-                foreach (var feed in feeds)
+                foreach (var feed in feeds.Where(feed => !string.IsNullOrWhiteSpace(feed.Url)))
                 {
-                    if (string.IsNullOrWhiteSpace(feed.Url)) continue;
                     var items = LoadTopItems(feed.Url, Math.Min(5, Math.Max(1, feed.MaxCount)));
                     model.Add(new RssFeedPreviewViewModel { Rss = feed, Items = items });
                 }
