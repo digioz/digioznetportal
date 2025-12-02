@@ -45,7 +45,6 @@ VALUES (@systemUserId, 'System', 'System', NULL, 'User', 'system@domain.com', NU
                     { Guid.NewGuid().ToString(), "PaymentLoginID", "[Enter ID]", false },
                     { Guid.NewGuid().ToString(), "PaymentTransactionKey", "[Enter Key]", false },
                     { Guid.NewGuid().ToString(), "PaymentTestMode", "true", false },
-                    { Guid.NewGuid().ToString(), "XSocialNetworkHandle", "[Enter Handle]", false },
                     { Guid.NewGuid().ToString(), "PaymentTransactionFee", "0", false },
                     { Guid.NewGuid().ToString(), "NumberOfAnnouncements", "2", false },
                     { Guid.NewGuid().ToString(), "ShowContactForm", "false", false },
@@ -137,7 +136,6 @@ INSERT INTO Page (UserId, Title, Url, Body, Keywords, Description, Visible, Time
                 {
                     { "Chat", null, true },
                     { "Store", null, false },
-                    { "XSocialNetwork", null, false },
                     { "WhoIsOnline", null, true },
                     { "SlideShow", null, false },
                     { "Comments", null, false },
@@ -163,7 +161,7 @@ WHERE UserId = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'system@domain
             migrationBuilder.Sql(@"
 DELETE FROM Config WHERE ConfigKey IN (
     'SMTPServer','SMTPPort','SMTPUsername','SMTPPassword','SiteURL','SiteName','SiteEncryptionKey','WebmasterEmail',
-    'PaymentLoginID','PaymentTransactionKey','PaymentTestMode','XSocialNetworkHandle','PaymentTransactionFee','NumberOfAnnouncements',
+    'PaymentLoginID','PaymentTransactionKey','PaymentTestMode','PaymentTransactionFee','NumberOfAnnouncements',
     'ShowContactForm','VisitorSessionPurgePeriod','PaypalMode','PaypalClientId','PaypalClientSecret','PaypalConnectionTimeout',
     'EnableCommentsOnAllPages','TinyMCEApiKey','RecaptchaEnabled','RecaptchaPublicKey','RecaptchaPrivateKey'
 );
@@ -185,7 +183,6 @@ DELETE FROM Page WHERE UserId = @adminUserId2 AND Url IN ('/Index','/Home/Contac
             // Remove Plugin Seed
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "Chat");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "Store");
-            migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "XSocialNetwork");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "WhoIsOnline");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "SlideShow");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "Comments");
