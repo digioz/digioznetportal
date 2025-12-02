@@ -8,6 +8,7 @@
         <ul>
             @{
                 var showPolls = PluginService.GetByName("Polls")?.IsEnabled ?? false;
+                var showRss = PluginService.GetByName("RSSFeed")?.IsEnabled ?? false;
             }
             @if (Model != null)
             {
@@ -34,6 +35,10 @@
                 {
                     <li><a href="/Polls/Index">Polls</a></li>
                 }
+                if (showRss)
+                {
+                    <li><a href="/RssFeed/Index">RSS Feed</a></li>
+                }
             }
             else
             {
@@ -41,6 +46,10 @@
                 if (showPolls)
                 {
                     <li><a href="/Polls/Index">Polls</a></li>
+                }
+                if (showRss)
+                {
+                    <li><a href="/RssFeed/Index">RSS Feed</a></li>
                 }
             }
         </ul>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
@@ -9,11 +10,12 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
-
+using Microsoft.AspNetCore.Http;
+//using Microsoft.Security.Application;
 
 namespace digioz.Portal.Utilities
 {
-    public static class StringUtils
+    public static partial class StringUtils
     {
 
         #region Extension Methods

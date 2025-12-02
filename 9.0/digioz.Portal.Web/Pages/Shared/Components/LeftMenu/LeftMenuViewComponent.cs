@@ -6,11 +6,12 @@ using System.Linq;
 
 namespace digioz.Portal.Web.Pages.Shared.Components.LeftMenu
 {
-    public class LeftMenuViewComponent(IMenuService menuService, IMemoryCache cache) : ViewComponent
+    public class LeftMenuViewComponent(IMenuService menuService, IMemoryCache cache, IPluginService pluginService) : ViewComponent
     {
         private const string CacheKey = "LeftMenu";
         private readonly IMenuService _menuService = menuService;
         private readonly IMemoryCache _cache = cache;
+        private readonly IPluginService _pluginService = pluginService;
 
         public Task<IViewComponentResult> InvokeAsync()
         {
@@ -22,6 +23,10 @@ namespace digioz.Portal.Web.Pages.Shared.Components.LeftMenu
                     .ToList();
                 _cache.Set(CacheKey, leftMenu, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15)));
             }
+
+            var rssPlugin = _pluginService.GetByName("RSSFeed");
+            ViewData["ShowRssFeed"] = rssPlugin != null && rssPlugin.IsEnabled;
+
             return Task.FromResult<IViewComponentResult>(View(leftMenu));
         }
     }
