@@ -70,10 +70,10 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
                 var recentVisitorInfo = _visitorInfoService.GetAllGreaterThan(DateTime.Now.AddMinutes(-10));
                 var botVisitors = recentVisitorInfo
                     .Where(v => BotHelper.IsBot(v.UserAgent))
-                    .GroupBy(v => v.IpAddress)
+                    .GroupBy(v => v.IpAddress ?? "Unknown")
                     .Select(g => new BotVisitorViewModel
                     {
-                        IpAddress = g.Key ?? "Unknown",
+                        IpAddress = g.Key,
                         UserAgent = g.First().UserAgent ?? string.Empty,
                         BotName = BotHelper.ExtractBotName(g.First().UserAgent ?? string.Empty)
                     })
