@@ -10,6 +10,7 @@ namespace digioz.Portal.Bo.ViewModels
     {
         public int VisitorCount { get; set; }
         public List<VisitorSession> RegisteredVisitors { get; set; } = new List<VisitorSession>();
+        public List<BotVisitorViewModel> Bots { get; set; } = new List<BotVisitorViewModel>();
         public bool WhoIsOnlineEnabled { get; set; } = false;
     }
 }

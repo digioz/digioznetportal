@@ -14,6 +14,15 @@
                     {
                         <a asp-page="/Profile/Details" asp-route-userId="@(visitor.Profile?.DisplayName ?? visitor.Username)">@(visitor.Profile?.DisplayName ?? visitor.Username)</a>@(visitor != Model.RegisteredVisitors.Last() ? ", " : "")
                     }
+                    <br />
+                }
+                @if (Model.Bots.Count > 0)
+                {
+                    <span>Bots: </span>
+                    @foreach (var bot in Model.Bots)
+                    {
+                        <span title="@bot.UserAgent">@bot.BotName</span>@(bot != Model.Bots.Last() ? ", " : "")
+                    }
                 }
             </div>
         </div>

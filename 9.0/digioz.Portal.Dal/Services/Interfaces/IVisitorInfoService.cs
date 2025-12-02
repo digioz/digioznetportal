@@ -8,6 +8,7 @@ namespace digioz.Portal.Dal.Services.Interfaces
     {
         VisitorInfo Get(int id);
         List<VisitorInfo> GetAll();
+        List<VisitorInfo> GetAllGreaterThan(DateTime timestamp);
         List<VisitorInfo> GetLastN(int n, string sortOrder);
         void Add(VisitorInfo info);
         void AddRange(IEnumerable<VisitorInfo> infos);

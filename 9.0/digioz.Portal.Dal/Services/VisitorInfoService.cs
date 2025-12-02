@@ -26,6 +26,14 @@ namespace digioz.Portal.Dal.Services
             return _context.VisitorInfos.ToList();
         }
 
+        public List<VisitorInfo> GetAllGreaterThan(DateTime timestamp)
+        {
+            return _context.VisitorInfos
+                .Where(v => v.Timestamp.HasValue && v.Timestamp.Value >= timestamp)
+                .AsNoTracking()
+                .ToList();
+        }
+
         public List<VisitorInfo> GetLastN(int n, string sortOrder)
         {
             var query = _context.VisitorInfos.AsQueryable();

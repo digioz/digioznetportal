@@ -7,6 +7,7 @@ using System.Linq;
 using System.Collections.Generic;
 using digioz.Portal.Bo;
 using digioz.Portal.Bo.ViewModels;
+using digioz.Portal.Utilities;
 
 namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
 {
@@ -14,17 +15,20 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
     {
         private readonly IPluginService _pluginService;
         private readonly IVisitorSessionService _visitorSessionService;
+        private readonly IVisitorInfoService _visitorInfoService;
         private readonly IProfileService _profileService;
         private readonly IMemoryCache _cache;
         private const string CacheKey = "WhoIsOnlineMenu";
 
         public WhoIsOnlineMenuViewComponent(IPluginService pluginService, 
                                             IVisitorSessionService visitorSessionService,
+                                            IVisitorInfoService visitorInfoService,
                                             IProfileService profileService,
                                             IMemoryCache cache)
         {
             _pluginService = pluginService;
             _visitorSessionService = visitorSessionService;
+            _visitorInfoService = visitorInfoService;
             _profileService = profileService;
             _cache = cache;
         }
@@ -38,7 +42,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
                 var configWhoIsOnline = _pluginService.GetAll().Where(x => x.Name == "WhoIsOnline").SingleOrDefault();
                 var latestVisitors = _visitorSessionService.GetAllGreaterThan(DateTime.Now.AddMinutes(-10)).ToList();
                 var visitorRegistered = latestVisitors.Where(x => x.Username != null).ToList();
-                visitorRegistered = visitorRegistered.DistinctBy(x => x.Username).ToList();
+                visitorRegistered = System.Linq.Enumerable.DistinctBy(visitorRegistered, x => x.Username).ToList();
 
                 // Load profile DisplayName for each visitor and create a new list with enriched data
                 var enrichedVisitors = new List<VisitorSession>();
@@ -62,8 +66,22 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
                     enrichedVisitors.Add(enrichedVisitor);
                 }
 
+                // Get bot visitors from VisitorInfo table
+                var recentVisitorInfo = _visitorInfoService.GetAllGreaterThan(DateTime.Now.AddMinutes(-10));
+                var botVisitors = recentVisitorInfo
+                    .Where(v => !string.IsNullOrEmpty(v.UserAgent) && BotHelper.IsBot(v.UserAgent))
+                    .GroupBy(v => v.IpAddress)
+                    .Select(g => new BotVisitorViewModel
+                    {
+                        IpAddress = g.Key ?? "Unknown",
+                        UserAgent = g.First().UserAgent ?? string.Empty,
+                        BotName = BotHelper.ExtractBotName(g.First().UserAgent ?? string.Empty)
+                    })
+                    .ToList();
+
                 whoisOnline.VisitorCount = latestVisitors.Count;
                 whoisOnline.RegisteredVisitors = enrichedVisitors;
+                whoisOnline.Bots = botVisitors;
 
                 whoisOnline.WhoIsOnlineEnabled = configWhoIsOnline != null && configWhoIsOnline.IsEnabled;
 
