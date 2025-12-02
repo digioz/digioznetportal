@@ -1,15 +1,9 @@
 @model List<digioz.Portal.Bo.Menu>
-@using digioz.Portal.Dal.Services.Interfaces
-@inject IPluginService PluginService
 
 <div class="card bg-light mb-3">
     <div class="card-header">Menu</div>
     <div class="card-body">
         <ul>
-            @{
-                var showPolls = PluginService.GetByName("Polls")?.IsEnabled ?? false;
-                var showRss = PluginService.GetByName("RSSFeed")?.IsEnabled ?? false;
-            }
             @if (Model != null)
             {
                 foreach (var item in Model)
@@ -31,11 +25,11 @@
                     }
                 }
 
-                if (showPolls)
+                if ((bool)(ViewData["ShowPolls"] ?? false))
                 {
                     <li><a href="/Polls/Index">Polls</a></li>
                 }
-                if (showRss)
+                if ((bool)(ViewData["ShowRssFeed"] ?? false))
                 {
                     <li><a href="/RssFeed/Index">RSS Feed</a></li>
                 }
@@ -43,11 +37,11 @@
             else
             {
                 <li><a href="/Index">Home</a></li>
-                if (showPolls)
+                if ((bool)(ViewData["ShowPolls"] ?? false))
                 {
                     <li><a href="/Polls/Index">Polls</a></li>
                 }
-                if (showRss)
+                if ((bool)(ViewData["ShowRssFeed"] ?? false))
                 {
                     <li><a href="/RssFeed/Index">RSS Feed</a></li>
                 }

@@ -24,8 +24,11 @@ namespace digioz.Portal.Web.Pages.Shared.Components.LeftMenu
                 _cache.Set(CacheKey, leftMenu, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15)));
             }
 
+            // Single source of truth for plugin enablement flags
             var rssPlugin = _pluginService.GetByName("RSSFeed");
-            ViewData["ShowRssFeed"] = rssPlugin != null && rssPlugin.IsEnabled;
+            var pollsPlugin = _pluginService.GetByName("Polls");
+            ViewData["ShowRssFeed"] = rssPlugin?.IsEnabled == true;
+            ViewData["ShowPolls"] = pollsPlugin?.IsEnabled == true;
 
             return Task.FromResult<IViewComponentResult>(View(leftMenu));
         }
