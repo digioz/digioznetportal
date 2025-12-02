@@ -57,12 +57,9 @@ namespace digioz.Portal.Utilities
 
             var lowerUserAgent = userAgent.ToLowerInvariant();
 
-            foreach (var pattern in BotPatterns)
+            foreach (var pattern in BotPatterns.Where(p => lowerUserAgent.Contains(p.Key)))
             {
-                if (lowerUserAgent.Contains(pattern.Key))
-                {
-                    return pattern.Value;
-                }
+                return pattern.Value;
             }
 
             return "Unknown Bot";
