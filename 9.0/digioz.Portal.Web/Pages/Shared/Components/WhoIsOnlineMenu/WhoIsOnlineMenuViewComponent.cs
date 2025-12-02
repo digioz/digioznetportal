@@ -80,6 +80,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
                     .ToList();
 
                 whoisOnline.VisitorCount = latestVisitors.Count;
+                whoisOnline.TotalOnlineCount = latestVisitors.Count + botVisitors.Count;
                 whoisOnline.RegisteredVisitors = enrichedVisitors;
                 whoisOnline.Bots = botVisitors;
 
