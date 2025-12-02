@@ -1,0 +1,13 @@
+@page "{id}"
+@model digioz.Portal.Pages.Polls.DeleteModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Delete Poll";
+}
+
+<p>Are you sure you want to delete this poll and all related answers and votes?</p>
+<form method="post" asp-route-id="@Model.Item.Id">
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a class="btn btn-secondary" asp-page="/Polls/Index">Cancel</a>
+</form>

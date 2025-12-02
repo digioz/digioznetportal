@@ -1,42 +1,42 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using System.Security.Claims;
+using digioz.Portal.Dal.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using digioz.Portal.Dal.Services.Interfaces;
 using ScottPlot;
 
-namespace digioz.Portal.Pages.Polls
+namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
 {
     public class DetailsModel : PageModel
     {
         private readonly IPollService _pollService;
         private readonly IPollAnswerService _answerService;
-        private readonly IPollUsersVoteService _usersVoteService;
         private readonly IPollVoteService _voteService;
+        private readonly IPollUsersVoteService _usersVoteService;
         private readonly ILogger<DetailsModel> _logger;
         
         public DetailsModel(
             IPollService pollService, 
             IPollAnswerService answerService, 
-            IPollUsersVoteService usersVoteService, 
-            IPollVoteService voteService,
+            IPollVoteService voteService, 
+            IPollUsersVoteService usersVoteService,
             ILogger<DetailsModel> logger)
         {
             _pollService = pollService;
             _answerService = answerService;
-            _usersVoteService = usersVoteService;
             _voteService = voteService;
+            _usersVoteService = usersVoteService;
             _logger = logger;
         }
 
         public digioz.Portal.Bo.Poll Item { get; private set; } = new();
-        public System.Collections.Generic.List<digioz.Portal.Bo.PollAnswer> Answers { get; private set; } = new();
-        public bool HasVoted { get; private set; }
         public string ResultsChartBase64 { get; private set; } = string.Empty;
-        [BindProperty] public System.Collections.Generic.List<string> SelectedAnswerIds { get; set; } = new();
+        public List<digioz.Portal.Bo.PollAnswer> Answers { get; private set; } = new();
+        [BindProperty] public List<string> SelectedAnswerIds { get; set; } = new();
+        public bool HasVoted { get; private set; }
 
         public IActionResult OnGet(string id)
         {
@@ -45,54 +45,80 @@ namespace digioz.Portal.Pages.Polls
             if (poll == null) return NotFound();
             Item = poll;
             Answers = _answerService.GetByPollId(id);
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             HasVoted = !string.IsNullOrEmpty(userId) && _usersVoteService.Get(id, userId) != null;
 
-            // Generate poll results chart if user has voted
-            if (HasVoted)
-            {
-                ResultsChartBase64 = GenerateResultsChart(Answers);
-            }
-
+            ResultsChartBase64 = GenerateResultsChart(id);
             return Page();
         }
 
         public IActionResult OnPostVote(string id)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
-            if (string.IsNullOrEmpty(userId)) return Forbid();
+            if (string.IsNullOrEmpty(id)) return BadRequest();
             var poll = _pollService.Get(id);
             if (poll == null) return NotFound();
-            var prior = _usersVoteService.Get(id, userId);
-            if (prior != null) return RedirectToPage(new { id });
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+            if (string.IsNullOrEmpty(userId)) return Forbid();
+
             var validAnswers = _answerService.GetByPollId(id);
-            var selected = (SelectedAnswerIds ?? new System.Collections.Generic.List<string>())
-                .Where(s => validAnswers.Any(a => a.Id == s)).Distinct().ToList();
-            if (!selected.Any())
+
+            // Block re-voting
+            var priorVote = _usersVoteService.Get(id, userId);
+            if (priorVote != null)
             {
-                ModelState.AddModelError(string.Empty, "Select at least one answer.");
+                ModelState.AddModelError(string.Empty, "You have already voted for this poll.");
                 Item = poll;
                 Answers = validAnswers;
-                HasVoted = false;
+                HasVoted = true;
+                ResultsChartBase64 = GenerateResultsChart(id);
+                return Page();
+            }
+
+            var selected = (SelectedAnswerIds ?? new List<string>()).Where(s => validAnswers.Any(a => a.Id == s)).Distinct().ToList();
+            if (!selected.Any())
+            {
+                ModelState.AddModelError(string.Empty, "Please select at least one answer.");
+                Item = poll;
+                Answers = validAnswers;
+                ResultsChartBase64 = GenerateResultsChart(id);
                 return Page();
             }
             if (!poll.AllowMultipleOptionsVote && selected.Count > 1)
-                selected = selected.Take(1).ToList();
-            _usersVoteService.Add(new digioz.Portal.Bo.PollUsersVote { PollId = id, UserId = userId, DateVoted = System.DateTime.UtcNow.ToString("o") });
-            foreach (var ans in selected)
             {
-                _voteService.Add(new digioz.Portal.Bo.PollVote { Id = System.Guid.NewGuid().ToString(), UserId = userId, PollAnswerId = ans });
+                selected = selected.Take(1).ToList();
             }
+
+            // Record user vote first
+            _usersVoteService.Add(new digioz.Portal.Bo.PollUsersVote
+            {
+                PollId = id,
+                UserId = userId,
+                DateVoted = DateTime.UtcNow.ToString("o")
+            });
+
+            // Add votes
+            foreach (var ansId in selected)
+            {
+                _voteService.Add(new digioz.Portal.Bo.PollVote
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    UserId = userId,
+                    PollAnswerId = ansId
+                });
+            }
+
             return RedirectToPage(new { id });
         }
 
-        private string GenerateResultsChart(List<digioz.Portal.Bo.PollAnswer> answers)
+        private string GenerateResultsChart(string pollId)
         {
             try
             {
+                var answers = _answerService.GetByPollId(pollId);
                 var counts = answers.Select(a => (double)_voteService.CountByAnswerId(a.Id)).ToArray();
-                var labels = answers.Select(a => a.Answer ?? string.Empty).ToArray();
-                if (labels.Length == 0) return string.Empty;
+                var labels = answers.Select(a => a.Answer).ToArray();
 
                 using var plot = new Plot();
                 var bars = plot.Add.Bars(counts);
@@ -102,7 +128,7 @@ namespace digioz.Portal.Pages.Polls
                     bars.Bars[i].Label = bars.Bars[i].Value.ToString("F0");
                 }
                 bars.ValueLabelStyle.Bold = true;
-                bars.ValueLabelStyle.FontSize = 11;
+                bars.ValueLabelStyle.FontSize = 12;
                 bars.ValueLabelStyle.ForeColor = ScottPlot.Color.FromHex("#212529");
 
                 plot.Axes.Bottom.TickGenerator = new ScottPlot.TickGenerators.NumericManual(
@@ -110,15 +136,15 @@ namespace digioz.Portal.Pages.Polls
                 );
                 plot.Axes.Bottom.Label.Text = "Answers";
                 plot.Axes.Left.Label.Text = "Votes";
-                plot.Title("Results");
+                plot.Title("Poll Results");
 
-                var bytes = plot.GetImage(500, 250).GetImageBytes();
+                var bytes = plot.GetImage(800, 400).GetImageBytes();
                 return Convert.ToBase64String(bytes);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to generate poll results chart for poll with {AnswerCount} answers. Error: {ErrorMessage}", 
-                    answers?.Count ?? 0, ex.Message);
+                _logger.LogError(ex, "Failed to generate poll results chart for poll {PollId} in Admin Details page. Error: {ErrorMessage}", 
+                    pollId, ex.Message);
                 return string.Empty;
             }
         }

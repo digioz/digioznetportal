@@ -1,31 +1,39 @@
-@page
-@model digioz.Portal.Pages.Polls.AddModel
+@page "{id}"
+@model digioz.Portal.Web.Areas.Admin.Pages.Poll.EditModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-
 @{
-    ViewData["Title"] = "Add Poll";
+    ViewBag.Title = "Edit Poll";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
-<h1>Add Poll</h1>
+<h1 class="mt-4">Edit Poll</h1>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item">Admin</li>
+    <li class="breadcrumb-item"><a asp-page="Index">Poll</a></li>
+    <li class="breadcrumb-item active">Edit</li>
+</ol>
 
 <form method="post" id="pollForm">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Item.Id" />
     <div class="mb-3">
         <label class="form-label">Poll Question</label>
-        <input asp-for="Item.Slug" class="form-control" maxlength="500" />
+        <input asp-for="Item.Slug" class="form-control" />
         <span asp-validation-for="Item.Slug" class="text-danger"></span>
     </div>
 
-    <div class="mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <label class="form-label mb-0">Answers</label>
-            <button type="button" class="btn btn-sm btn-outline-primary" id="addAnswerBtn">Add Answer</button>
+    <div class="card mb-3">
+        <div class="card-header">Existing Answers</div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label mb-0">Manage Answers</label>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="addAnswerBtn">Add Answers</button>
+            </div>
+            <div id="answersContainer"></div>
+            <input type="hidden" asp-for="NewAnswersCsv" id="answersCsv" />
+            <small class="form-text text-muted">Ensure at least 2 answers. Remove or add as needed.</small>
+            <div class="text-danger d-none" id="answersError">Please provide at least 2 answers.</div>
         </div>
-        <div id="answersContainer"></div>
-        <input type="hidden" asp-for="NewAnswersCsv" id="answersCsv" />
-        <span asp-validation-for="NewAnswersCsv" class="text-danger"></span>
-        <small class="form-text text-muted">Add at least 2 answers (max 50). Each answer limited to 200 characters.</small>
-        <div class="text-danger d-none" id="answersError">Please provide at least 2 answers.</div>
     </div>
 
     <div class="form-check mb-2">
@@ -40,8 +48,8 @@
         <input class="form-check-input" asp-for="Item.AllowMultipleOptionsVote" />
         <label class="form-check-label" asp-for="Item.AllowMultipleOptionsVote"></label>
     </div>
-    <button type="submit" class="btn btn-primary">Create</button>
-    <a class="btn btn-secondary" asp-page="/Polls/Index">Cancel</a>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a class="btn btn-secondary" asp-page="Index">Cancel</a>
 </form>
 
 <script>
@@ -61,7 +69,6 @@
         input.className = 'form-control';
         input.placeholder = 'Answer option';
         input.value = value;
-        input.maxLength = 200;
 
         const btnGroup = document.createElement('div');
         btnGroup.className = 'input-group-append';
@@ -71,11 +78,7 @@
         removeBtn.className = 'btn btn-outline-danger';
         removeBtn.textContent = 'Remove';
         removeBtn.addEventListener('click', function() {
-            if (container.children.length > 2) {
-                container.removeChild(wrapper);
-            } else {
-                alert('You must have at least 2 answers.');
-            }
+            container.removeChild(wrapper);
         });
 
         btnGroup.appendChild(removeBtn);
@@ -85,10 +88,6 @@
     }
 
     function addAnswer(value = '') {
-        if (container.children.length >= 50) {
-            alert('Maximum 50 answers allowed.');
-            return;
-        }
         container.appendChild(createAnswerInput(value));
     }
 
@@ -96,9 +95,15 @@
         addAnswer('');
     });
 
-    // Seed two empty inputs by default
-    addAnswer('');
-    addAnswer('');
+    // Prefill existing answers from server-side model
+    const existing = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ExistingAnswers.Select(a => a.Answer)));
+    if (existing.length > 0) {
+        existing.forEach(v => addAnswer(v));
+    } else {
+        // ensure at least two empty inputs
+        addAnswer('');
+        addAnswer('');
+    }
 
     form.addEventListener('submit', function(e) {
         const values = Array.from(container.querySelectorAll('input.form-control'))
@@ -109,13 +114,6 @@
             e.preventDefault();
             errorEl.classList.remove('d-none');
             errorEl.textContent = 'Please provide at least 2 answers.';
-            return;
-        }
-
-        if (values.length > 50) {
-            e.preventDefault();
-            errorEl.classList.remove('d-none');
-            errorEl.textContent = 'Maximum 50 answers allowed.';
             return;
         }
 

@@ -16,12 +16,23 @@ namespace digioz.Portal.Dal.Services
 
         public PollUsersVote Get(string pollId, string userId)
         {
-            return _context.PollUsersVotes.Find(pollId, userId);
+            return _context.PollUsersVotes
+                .FirstOrDefault(x => x.PollId == pollId && x.UserId == userId);
         }
 
         public List<PollUsersVote> GetAll()
         {
             return _context.PollUsersVotes.ToList();
+        }
+
+        public List<PollUsersVote> GetByUserId(string userId)
+        {
+            return _context.PollUsersVotes.Where(x => x.UserId == userId).ToList();
+        }
+
+        public bool Exists(string pollId, string userId)
+        {
+            return _context.PollUsersVotes.Any(x => x.PollId == pollId && x.UserId == userId);
         }
 
         public void Add(PollUsersVote usersVote)
@@ -38,10 +49,21 @@ namespace digioz.Portal.Dal.Services
 
         public void Delete(string pollId, string userId)
         {
-            var usersVote = _context.PollUsersVotes.Find(pollId, userId);
+            var usersVote = _context.PollUsersVotes
+                .FirstOrDefault(x => x.PollId == pollId && x.UserId == userId);
             if (usersVote != null)
             {
                 _context.PollUsersVotes.Remove(usersVote);
+                _context.SaveChanges();
+            }
+        }
+
+        public void DeleteByPollId(string pollId)
+        {
+            var items = _context.PollUsersVotes.Where(x => x.PollId == pollId).ToList();
+            if (items.Count > 0)
+            {
+                _context.PollUsersVotes.RemoveRange(items);
                 _context.SaveChanges();
             }
         }

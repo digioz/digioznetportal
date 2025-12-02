@@ -24,12 +24,44 @@ namespace digioz.Portal.Dal.Services
             return _context.Polls.ToList();
         }
 
+        public List<Poll> GetLatest(int count)
+        {
+            return _context.Polls
+                .OrderByDescending(p => p.DateCreated)
+                .Take(count)
+                .ToList();
+        }
+
+        public List<Poll> GetLatestFeatured(int count)
+        {
+            return _context.Polls
+                .Where(p => p.Featured)
+                .OrderByDescending(p => p.DateCreated)
+                .Take(count)
+                .ToList();
+        }
+
+        public List<Poll> GetByIds(IEnumerable<string> ids)
+        {
+            var set = ids?.ToHashSet() ?? new HashSet<string>();
+            if (set.Count == 0) return new List<Poll>();
+            return _context.Polls.Where(p => set.Contains(p.Id)).ToList();
+        }
+
         public List<Poll> GetByUserId(string userId)
         {
             if (string.IsNullOrEmpty(userId))
                 return new List<Poll>();
 
             return _context.Polls.Where(p => !string.IsNullOrEmpty(p.UserId) && p.UserId == userId).ToList();
+        }
+
+        public List<Poll> GetPaged(int pageNumber, int pageSize, out int totalCount)
+        {
+            var query = _context.Polls.OrderByDescending(p => p.DateCreated);
+            totalCount = query.Count();
+            var skip = (pageNumber - 1) * pageSize;
+            return query.Skip(skip).Take(pageSize).ToList();
         }
 
         public int CountByUserId(string userId)

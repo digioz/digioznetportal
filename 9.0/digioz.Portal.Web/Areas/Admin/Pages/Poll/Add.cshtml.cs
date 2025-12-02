@@ -1,26 +1,24 @@
 using System;
 using System.Linq;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace digioz.Portal.Pages.Polls
+namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
 {
-    [Authorize]
     public class AddModel : PageModel
     {
-        private readonly IPollService _pollService;
+        private readonly IPollService _service;
         private readonly IPollAnswerService _answerService;
-        public AddModel(IPollService pollService, IPollAnswerService answerService)
+        public AddModel(IPollService service, IPollAnswerService answerService)
         {
-            _pollService = pollService;
+            _service = service;
             _answerService = answerService;
         }
 
-        [BindProperty] public digioz.Portal.Bo.Poll Item { get; set; } = new digioz.Portal.Bo.Poll { Id = Guid.NewGuid().ToString(), DateCreated = DateTime.UtcNow };        
+        [BindProperty] public digioz.Portal.Bo.Poll Item { get; set; } = new digioz.Portal.Bo.Poll { Id = Guid.NewGuid().ToString(), DateCreated = DateTime.UtcNow };
         [BindProperty] public string NewAnswersCsv { get; set; } = string.Empty;
 
         public void OnGet() { }
@@ -33,8 +31,9 @@ namespace digioz.Portal.Pages.Polls
             // Sanitize poll question
             Item.Slug = InputSanitizer.SanitizePollQuestion(Item.Slug);
             
+            // Validate the model after sanitization
             if (!ModelState.IsValid) return Page();
-
+            
             // Parse and sanitize answers
             var rawAnswers = NewAnswersCsv
                 .Split(',', StringSplitOptions.RemoveEmptyEntries)
@@ -50,24 +49,24 @@ namespace digioz.Portal.Pages.Polls
                 ModelState.AddModelError(nameof(NewAnswersCsv), answerValidation);
                 return Page();
             }
-
-            Item.Id = string.IsNullOrEmpty(Item.Id) ? Guid.NewGuid().ToString() : Item.Id;
+            
+            if (string.IsNullOrEmpty(Item.Id)) Item.Id = Guid.NewGuid().ToString();
             Item.DateCreated = DateTime.UtcNow;
             Item.UserId = userId;
-            _pollService.Add(Item);
+            _service.Add(Item);
 
             // Add sanitized answers
             foreach (var ans in sanitizedAnswers)
             {
-                _answerService.Add(new digioz.Portal.Bo.PollAnswer 
-                { 
-                    Id = Guid.NewGuid().ToString(), 
-                    PollId = Item.Id, 
-                    Answer = ans 
+                _answerService.Add(new digioz.Portal.Bo.PollAnswer
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    PollId = Item.Id,
+                    Answer = ans
                 });
             }
 
-            return RedirectToPage("/Polls/Index");
+            return RedirectToPage("Index");
         }
     }
 }

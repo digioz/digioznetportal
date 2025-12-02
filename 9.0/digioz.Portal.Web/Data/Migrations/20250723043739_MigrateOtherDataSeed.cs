@@ -144,7 +144,8 @@ INSERT INTO Page (UserId, Title, Url, Body, Keywords, Description, Visible, Time
                     { "Comments", null, false },
                     { "RSSFeed", null, false },
                     { "LatestPictures", null, false },
-                    { "LatestVideos", null, false }
+                    { "LatestVideos", null, false },
+                    { "Polls", null, false }
                 });
         }
 
@@ -192,6 +193,7 @@ DELETE FROM Page WHERE UserId = @adminUserId2 AND Url IN ('/Index','/Home/Contac
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "RSSFeed");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "LatestPictures");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "LatestVideos");
+            migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "Polls");
         }
     }
 }

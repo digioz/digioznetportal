@@ -89,11 +89,8 @@
 				@await Component.InvokeAsync("UserMenu")
 				@await Component.InvokeAsync("WhoIsOnlineMenu")
 				@await Component.InvokeAsync("StoreMenu")
-				
-				
-
-				@*  @Html.RenderAction("PollMenu", "Menu", new { area = "" })
-					@Html.RenderAction("TwitterMenu", "Menu", new { area = "" }) *@
+				@await Component.InvokeAsync("PollMenu")
+				@*  @Html.RenderAction("TwitterMenu", "Menu", new { area = "" }) *@
 
 				@await Component.InvokeAsync("ZoneMenu", new { location = "Left" })
 				@await Component.InvokeAsync("ZoneMenu", new { location = "LeftMenu" })
@@ -103,8 +100,7 @@
 
 				@await Component.InvokeAsync("ZoneMenu", new { location = "BodyTop" })
 				
-				@* 	@RenderSection("LatestVideos", required: false)
-					@RenderSection("RSSFeed", required: false) *@
+				@* 	@RenderSection("RSSFeed", required: false) *@
 
 				<div class="card bg-light mb-5">
 					<div class="card-header bg-primary text-white">@ViewBag.Title</div>
