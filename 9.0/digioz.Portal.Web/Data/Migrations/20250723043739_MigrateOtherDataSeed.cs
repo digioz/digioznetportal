@@ -45,7 +45,7 @@ VALUES (@systemUserId, 'System', 'System', NULL, 'User', 'system@domain.com', NU
                     { Guid.NewGuid().ToString(), "PaymentLoginID", "[Enter ID]", false },
                     { Guid.NewGuid().ToString(), "PaymentTransactionKey", "[Enter Key]", false },
                     { Guid.NewGuid().ToString(), "PaymentTestMode", "true", false },
-                    { Guid.NewGuid().ToString(), "TwitterHandle", "[Enter Handle]", false },
+                    { Guid.NewGuid().ToString(), "XSocialNetworkHandle", "[Enter Handle]", false },
                     { Guid.NewGuid().ToString(), "PaymentTransactionFee", "0", false },
                     { Guid.NewGuid().ToString(), "NumberOfAnnouncements", "2", false },
                     { Guid.NewGuid().ToString(), "ShowContactForm", "false", false },
@@ -73,7 +73,6 @@ INSERT INTO Menu (UserId, Name, Location, Controller, Action, Url, Target, Visib
 (@adminUserId, 'Links', 'TopMenu', 'Links', 'Index', NULL, NULL, 1, 5, GETDATE()),
 (@adminUserId, 'Chat', 'TopMenu', 'Chat', 'Index', NULL, NULL, 1, 6, GETDATE()),
 (@adminUserId, 'Store', 'TopMenu', 'Store', 'Index', NULL, NULL, 0, 7, GETDATE()),
-(@adminUserId, 'Twitter', 'TopMenu', 'Twitter', 'Index', NULL, NULL, 0, 8, GETDATE()),
 (@adminUserId, 'Home', 'LeftMenu', 'Index', '', NULL, NULL, 1, 9, GETDATE()),
 (@adminUserId, 'Pictures', 'LeftMenu', 'Pictures', 'Index', NULL, NULL, 1, 10, GETDATE()),
 (@adminUserId, 'Videos', 'LeftMenu', 'Videos', 'Index', NULL, NULL, 1, 11, GETDATE()),
@@ -138,7 +137,7 @@ INSERT INTO Page (UserId, Title, Url, Body, Keywords, Description, Visible, Time
                 {
                     { "Chat", null, true },
                     { "Store", null, false },
-                    { "Twitter", null, false },
+                    { "XSocialNetwork", null, false },
                     { "WhoIsOnline", null, true },
                     { "SlideShow", null, false },
                     { "Comments", null, false },
@@ -164,7 +163,7 @@ WHERE UserId = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'system@domain
             migrationBuilder.Sql(@"
 DELETE FROM Config WHERE ConfigKey IN (
     'SMTPServer','SMTPPort','SMTPUsername','SMTPPassword','SiteURL','SiteName','SiteEncryptionKey','WebmasterEmail',
-    'PaymentLoginID','PaymentTransactionKey','PaymentTestMode','TwitterHandle','PaymentTransactionFee','NumberOfAnnouncements',
+    'PaymentLoginID','PaymentTransactionKey','PaymentTestMode','XSocialNetworkHandle','PaymentTransactionFee','NumberOfAnnouncements',
     'ShowContactForm','VisitorSessionPurgePeriod','PaypalMode','PaypalClientId','PaypalClientSecret','PaypalConnectionTimeout',
     'EnableCommentsOnAllPages','TinyMCEApiKey','RecaptchaEnabled','RecaptchaPublicKey','RecaptchaPrivateKey'
 );
@@ -173,7 +172,7 @@ DELETE FROM Config WHERE ConfigKey IN (
             // Remove Menu Seed (resolve admin user and delete seeded items)
             migrationBuilder.Sql(@"
 DECLARE @adminUserId nvarchar(128) = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'admin@domain.com');
-DELETE FROM Menu WHERE UserId = @adminUserId AND (Location = 'TopMenu' AND Name IN ('Home','About','Contact','Forum','Links','Chat','Store','Twitter'));
+DELETE FROM Menu WHERE UserId = @adminUserId AND (Location = 'TopMenu' AND Name IN ('Home','About','Contact','Forum','Links','Chat','Store'));
 DELETE FROM Menu WHERE UserId = @adminUserId AND (Location = 'LeftMenu' AND Name IN ('Home','Pictures','Videos'));
 ");
 
@@ -186,7 +185,7 @@ DELETE FROM Page WHERE UserId = @adminUserId2 AND Url IN ('/Index','/Home/Contac
             // Remove Plugin Seed
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "Chat");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "Store");
-            migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "Twitter");
+            migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "XSocialNetwork");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "WhoIsOnline");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "SlideShow");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "Comments");

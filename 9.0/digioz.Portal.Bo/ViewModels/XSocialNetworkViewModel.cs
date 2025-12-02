@@ -5,18 +5,18 @@ using System.Threading.Tasks;
 
 namespace digioz.Portal.Bo.ViewModels
 {
-    public class Twitter
+    public class XSocialNetworkViewModel
     {
-        public Twitter(string twitterHandle, bool enabled)
+        public XSocialNetworkViewModel(string twitterHandle, bool enabled)
         {
             Id = Guid.NewGuid();
-            TwitterHandle = twitterHandle;
-            TwitterUser = TwitterHandle.Replace("@", "");
+            XHandle = twitterHandle;
+            XUser = XHandle.Replace("@", "");
             Enabled = enabled;
         }
         public Guid Id { get; set; }
-        public string TwitterHandle { get; set; }
-        public string TwitterUser { get; set; }
+        public string XHandle { get; set; }
+        public string XUser { get; set; }
         public bool Enabled { get; set; }
     }
 }
