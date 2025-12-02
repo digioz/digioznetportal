@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using System.Security.Claims;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -23,30 +25,45 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
 
         public IActionResult OnPost()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return Forbid();
+            
+            // Sanitize poll question
+            Item.Slug = InputSanitizer.SanitizePollQuestion(Item.Slug);
+            
+            // Validate the model after sanitization
             if (!ModelState.IsValid) return Page();
+            
+            // Parse and sanitize answers
+            var rawAnswers = NewAnswersCsv
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(a => a.Trim())
+                .ToList();
+            
+            var sanitizedAnswers = InputSanitizer.SanitizePollAnswers(rawAnswers);
+            
+            // Validate minimum answer count
+            var answerValidation = InputSanitizer.ValidateList(sanitizedAnswers, "answers", minCount: 2, maxCount: 50);
+            if (answerValidation != null)
+            {
+                ModelState.AddModelError(nameof(NewAnswersCsv), answerValidation);
+                return Page();
+            }
+            
             if (string.IsNullOrEmpty(Item.Id)) Item.Id = Guid.NewGuid().ToString();
             Item.DateCreated = DateTime.UtcNow;
+            Item.UserId = userId;
             _service.Add(Item);
 
-            // Add initial answers if provided (comma-separated)
-            if (!string.IsNullOrWhiteSpace(NewAnswersCsv))
+            // Add sanitized answers
+            foreach (var ans in sanitizedAnswers)
             {
-                var answers = NewAnswersCsv
-                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(a => a.Trim())
-                    .Where(a => !string.IsNullOrWhiteSpace(a))
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList();
-
-                foreach (var ans in answers)
+                _answerService.Add(new digioz.Portal.Bo.PollAnswer
                 {
-                    _answerService.Add(new digioz.Portal.Bo.PollAnswer
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        PollId = Item.Id,
-                        Answer = ans
-                    });
-                }
+                    Id = Guid.NewGuid().ToString(),
+                    PollId = Item.Id,
+                    Answer = ans
+                });
             }
 
             return RedirectToPage("Index");

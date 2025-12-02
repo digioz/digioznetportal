@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 
 namespace digioz.Portal.Pages.Polls
 {
@@ -42,6 +43,10 @@ namespace digioz.Portal.Pages.Polls
             var poll = _pollService.Get(Item.Id);
             if (poll == null) return NotFound();
             if (poll.UserId != userId) return Forbid();
+            
+            // Sanitize poll question
+            Item.Slug = InputSanitizer.SanitizePollQuestion(Item.Slug);
+            
             if (!ModelState.IsValid) return Page();
 
             poll.Slug = Item.Slug;
@@ -50,13 +55,23 @@ namespace digioz.Portal.Pages.Polls
             poll.AllowMultipleOptionsVote = Item.AllowMultipleOptionsVote;
             _pollService.Update(poll);
 
-            // Sync answers (simple add-only avoiding duplicates; removal handled separately if needed)
-            var requested = (NewAnswersCsv ?? string.Empty)
+            // Parse and sanitize answers
+            var rawAnswers = (NewAnswersCsv ?? string.Empty)
                 .Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .Select(a => a.Trim())
-                .Where(a => !string.IsNullOrWhiteSpace(a))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
+            
+            var requested = InputSanitizer.SanitizePollAnswers(rawAnswers);
+            
+            // Validate minimum answer count
+            var answerValidation = InputSanitizer.ValidateList(requested, "answers", minCount: 2, maxCount: 50);
+            if (answerValidation != null)
+            {
+                ModelState.AddModelError(nameof(NewAnswersCsv), answerValidation);
+                return Page();
+            }
+            
+            // Sync answers (simple add-only avoiding duplicates; removal handled separately if needed)
             var existing = _answerService.GetByPollId(poll.Id).Select(a => a.Answer).ToHashSet(StringComparer.OrdinalIgnoreCase);
             foreach (var ans in requested.Where(r => !existing.Contains(r)))
             {

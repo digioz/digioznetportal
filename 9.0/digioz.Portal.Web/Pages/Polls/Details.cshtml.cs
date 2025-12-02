@@ -1,8 +1,11 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Dal.Services.Interfaces;
+using ScottPlot;
 
 namespace digioz.Portal.Pages.Polls
 {
@@ -23,6 +26,7 @@ namespace digioz.Portal.Pages.Polls
         public digioz.Portal.Bo.Poll Item { get; private set; } = new();
         public System.Collections.Generic.List<digioz.Portal.Bo.PollAnswer> Answers { get; private set; } = new();
         public bool HasVoted { get; private set; }
+        public string ResultsChartBase64 { get; private set; } = string.Empty;
         [BindProperty] public System.Collections.Generic.List<string> SelectedAnswerIds { get; set; } = new();
 
         public IActionResult OnGet(string id)
@@ -34,6 +38,13 @@ namespace digioz.Portal.Pages.Polls
             Answers = _answerService.GetByPollId(id);
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             HasVoted = !string.IsNullOrEmpty(userId) && _usersVoteService.Get(id, userId) != null;
+
+            // Generate poll results chart if user has voted
+            if (HasVoted)
+            {
+                ResultsChartBase64 = GenerateResultsChart(Answers);
+            }
+
             return Page();
         }
 
@@ -64,6 +75,41 @@ namespace digioz.Portal.Pages.Polls
                 _voteService.Add(new digioz.Portal.Bo.PollVote { Id = System.Guid.NewGuid().ToString(), UserId = userId, PollAnswerId = ans });
             }
             return RedirectToPage(new { id });
+        }
+
+        private string GenerateResultsChart(List<digioz.Portal.Bo.PollAnswer> answers)
+        {
+            try
+            {
+                var counts = answers.Select(a => (double)_voteService.CountByAnswerId(a.Id)).ToArray();
+                var labels = answers.Select(a => a.Answer ?? string.Empty).ToArray();
+                if (labels.Length == 0) return string.Empty;
+
+                using var plot = new Plot();
+                var bars = plot.Add.Bars(counts);
+                for (int i = 0; i < bars.Bars.Count; i++)
+                {
+                    bars.Bars[i].FillColor = ScottPlot.Color.FromHex("#0d6efd");
+                    bars.Bars[i].Label = bars.Bars[i].Value.ToString("F0");
+                }
+                bars.ValueLabelStyle.Bold = true;
+                bars.ValueLabelStyle.FontSize = 11;
+                bars.ValueLabelStyle.ForeColor = ScottPlot.Color.FromHex("#212529");
+
+                plot.Axes.Bottom.TickGenerator = new ScottPlot.TickGenerators.NumericManual(
+                    labels.Select((t, i) => new Tick((double)i, t)).ToArray()
+                );
+                plot.Axes.Bottom.Label.Text = "Answers";
+                plot.Axes.Left.Label.Text = "Votes";
+                plot.Title("Results");
+
+                var bytes = plot.GetImage(500, 250).GetImageBytes();
+                return Convert.ToBase64String(bytes);
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }

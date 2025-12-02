@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -38,20 +39,33 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
 
         public IActionResult OnPost()
         {
+            // Sanitize poll question
+            Item.Slug = InputSanitizer.SanitizePollQuestion(Item.Slug);
+            
             if (!ModelState.IsValid) return Page();
+            
             _service.Update(Item);
 
             // Normalize helper
             string Norm(string s) => (s ?? string.Empty).Trim();
             string Key(string s) => Norm(s).ToLowerInvariant();
 
-            // Parse requested answers from CSV
-            var requested = (NewAnswersCsv ?? string.Empty)
+            // Parse and sanitize requested answers from CSV
+            var rawAnswers = (NewAnswersCsv ?? string.Empty)
                 .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(a => Norm(a))
-                .Where(a => !string.IsNullOrWhiteSpace(a))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Select(a => a.Trim())
                 .ToList();
+            
+            var requested = InputSanitizer.SanitizePollAnswers(rawAnswers);
+            
+            // Validate minimum answer count
+            var answerValidation = InputSanitizer.ValidateList(requested, "answers", minCount: 2, maxCount: 50);
+            if (answerValidation != null)
+            {
+                ModelState.AddModelError(nameof(NewAnswersCsv), answerValidation);
+                ExistingAnswers = _answerService.GetByPollId(Item.Id);
+                return Page();
+            }
 
             var existing = _answerService.GetByPollId(Item.Id);
 

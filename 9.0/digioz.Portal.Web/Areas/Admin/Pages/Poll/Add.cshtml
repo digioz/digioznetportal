@@ -17,18 +17,19 @@
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="mb-3">
         <label class="form-label">Poll Question</label>
-        <input asp-for="Item.Slug" class="form-control" />
+        <input asp-for="Item.Slug" class="form-control" maxlength="500" />
         <span asp-validation-for="Item.Slug" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <label class="form-label mb-0">Answers</label>
-            <button type="button" class="btn btn-sm btn-outline-primary" id="addAnswerBtn">Add Answers</button>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="addAnswerBtn">Add Answer</button>
         </div>
         <div id="answersContainer"></div>
         <input type="hidden" asp-for="NewAnswersCsv" id="answersCsv" />
-        <small class="form-text text-muted">Add at least 2 answers. You can add and remove inputs dynamically.</small>
+        <span asp-validation-for="NewAnswersCsv" class="text-danger"></span>
+        <small class="form-text text-muted">Add at least 2 answers (max 50). Each answer limited to 200 characters.</small>
         <div class="text-danger d-none" id="answersError">Please provide at least 2 answers.</div>
     </div>
 
@@ -65,6 +66,7 @@
         input.className = 'form-control';
         input.placeholder = 'Answer option';
         input.value = value;
+        input.maxLength = 200;
 
         const btnGroup = document.createElement('div');
         btnGroup.className = 'input-group-append';
@@ -74,7 +76,11 @@
         removeBtn.className = 'btn btn-outline-danger';
         removeBtn.textContent = 'Remove';
         removeBtn.addEventListener('click', function() {
-            container.removeChild(wrapper);
+            if (container.children.length > 2) {
+                container.removeChild(wrapper);
+            } else {
+                alert('You must have at least 2 answers.');
+            }
         });
 
         btnGroup.appendChild(removeBtn);
@@ -84,6 +90,10 @@
     }
 
     function addAnswer(value = '') {
+        if (container.children.length >= 50) {
+            alert('Maximum 50 answers allowed.');
+            return;
+        }
         container.appendChild(createAnswerInput(value));
     }
 
@@ -104,6 +114,13 @@
             e.preventDefault();
             errorEl.classList.remove('d-none');
             errorEl.textContent = 'Please provide at least 2 answers.';
+            return;
+        }
+
+        if (values.length > 50) {
+            e.preventDefault();
+            errorEl.classList.remove('d-none');
+            errorEl.textContent = 'Maximum 50 answers allowed.';
             return;
         }
 
