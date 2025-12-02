@@ -9,14 +9,16 @@ using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace digioz.Portal.Web.Pages.Shared.Components.RssFeed
 {
-    public class RssFeedViewComponent(IRssService rssService, IPluginService pluginService, IMemoryCache cache) : ViewComponent
+    public class RssFeedViewComponent(IRssService rssService, IPluginService pluginService, IMemoryCache cache, ILogger<RssFeedViewComponent> logger) : ViewComponent
     {
         private readonly IRssService _rssService = rssService;
         private readonly IPluginService _pluginService = pluginService;
         private readonly IMemoryCache _cache = cache;
+        private readonly ILogger<RssFeedViewComponent> _logger = logger;
         private const string CacheKey = "VC_RssFeed";
 
         public Task<IViewComponentResult> InvokeAsync()
@@ -45,7 +47,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.RssFeed
             return Task.FromResult<IViewComponentResult>(View("Default", model));
         }
 
-        private static List<RssItemViewModel> LoadTopItems(string url, int max)
+        private List<RssItemViewModel> LoadTopItems(string url, int max)
         {
             var list = new List<RssItemViewModel>();
             try
@@ -91,9 +93,9 @@ namespace digioz.Portal.Web.Pages.Shared.Components.RssFeed
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // ignore
+                _logger.LogError(ex, "Failed to load RSS/Atom items from {Url}", url);
             }
             return list;
         }

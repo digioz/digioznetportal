@@ -28,11 +28,10 @@
                     <a class="list-group-item list-group-item-action" href="@it.Link" target="_blank" rel="noopener noreferrer">
                         <div class="d-flex w-100 justify-content-between">
                             <h6 class="mb-1">@it.Title</h6>
-                            <small class="text-muted">@it.PublishDate.LocalDateTime</small>
                         </div>
                         @if (!string.IsNullOrWhiteSpace(it.Summary))
                         {
-                            <p class="mb-1 text-muted small">@Html.Raw(it.Summary)</p>
+                            <p class="mb-1 text-muted small">@it.Summary</p>
                         }
                     </a>
                 }
