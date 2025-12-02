@@ -27,7 +27,7 @@ namespace digioz.Portal.Utilities
         /// <param name="input">The input string to sanitize</param>
         /// <param name="maxLength">Optional maximum length (0 = no limit)</param>
         /// <returns>Sanitized string</returns>
-        public static string SanitizeText(string? input, int maxLength = 0)
+        public static string SanitizeText(string input, int maxLength = 0)
         {
             if (string.IsNullOrWhiteSpace(input))
                 return string.Empty;
@@ -52,7 +52,7 @@ namespace digioz.Portal.Utilities
         /// <param name="minCount">Minimum number of valid items required</param>
         /// <param name="maxCount">Maximum number of items allowed</param>
         /// <returns>Sanitized list of strings</returns>
-        public static List<string> SanitizeList(IEnumerable<string>? inputs, int maxLength = 0, int minCount = 0, int maxCount = 0)
+        public static List<string> SanitizeList(IEnumerable<string> inputs, int maxLength = 0, int minCount = 0, int maxCount = 0)
         {
             if (inputs == null)
                 return new List<string>();
@@ -80,7 +80,7 @@ namespace digioz.Portal.Utilities
         /// <param name="minLength">Minimum required length</param>
         /// <param name="maxLength">Maximum allowed length</param>
         /// <returns>Error message if invalid, null if valid</returns>
-        public static string? ValidateString(string? input, string fieldName, int minLength = 1, int maxLength = 500)
+        public static string ValidateString(string input, string fieldName, int minLength = 1, int maxLength = 500)
         {
             if (string.IsNullOrWhiteSpace(input))
                 return $"{fieldName} is required.";
@@ -104,7 +104,7 @@ namespace digioz.Portal.Utilities
         /// <param name="minCount">Minimum number of items required</param>
         /// <param name="maxCount">Maximum number of items allowed</param>
         /// <returns>Error message if invalid, null if valid</returns>
-        public static string? ValidateList(IEnumerable<string>? items, string fieldName, int minCount = 2, int maxCount = 50)
+        public static string ValidateList(IEnumerable<string> items, string fieldName, int minCount = 2, int maxCount = 50)
         {
             if (items == null || !items.Any())
                 return $"At least {minCount} {fieldName} are required.";
@@ -123,7 +123,7 @@ namespace digioz.Portal.Utilities
         /// <summary>
         /// Sanitizes poll question text
         /// </summary>
-        public static string SanitizePollQuestion(string? question)
+        public static string SanitizePollQuestion(string question)
         {
             return SanitizeText(question, maxLength: 500);
         }
@@ -131,7 +131,7 @@ namespace digioz.Portal.Utilities
         /// <summary>
         /// Sanitizes poll answer text
         /// </summary>
-        public static string SanitizePollAnswer(string? answer)
+        public static string SanitizePollAnswer(string answer)
         {
             return SanitizeText(answer, maxLength: 200);
         }
@@ -139,7 +139,7 @@ namespace digioz.Portal.Utilities
         /// <summary>
         /// Sanitizes a collection of poll answers
         /// </summary>
-        public static List<string> SanitizePollAnswers(IEnumerable<string>? answers)
+        public static List<string> SanitizePollAnswers(IEnumerable<string> answers)
         {
             return SanitizeList(answers, maxLength: 200, minCount: 2, maxCount: 50);
         }

@@ -53,16 +53,16 @@
     </table>
 </div>
 <div class="d-flex justify-content-between align-items-center mt-2">
-    <small class="text-muted">Page @Model.pageNumber of @Model.TotalPages (@Model.TotalCount total)</small>
+    <small class="text-muted">Page @Model.PageNumber of @Model.TotalPages (@Model.TotalCount total)</small>
     <paging total-records="@Model.TotalCount"
-            page-no="@Model.pageNumber"
-            page-size="@Model.pageSize"
+            page-no="@Model.PageNumber"
+            page-size="@Model.PageSize"
             show-prev-next="true"
             show-first-last="true"
-            query-string-key-page-no="pageNumber"
+            query-string-key-page-no="PageNumber"
             class="pagination mb-0">
         <route-values>
-            <rv key="pageSize" value="@Model.pageSize"></rv>
+            <rv key="PageSize" value="@Model.PageSize"></rv>
         </route-values>
     </paging>
 </div>

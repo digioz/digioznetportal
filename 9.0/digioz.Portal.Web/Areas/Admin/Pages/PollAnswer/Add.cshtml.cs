@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -19,7 +20,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
         [BindProperty] public digioz.Portal.Bo.PollAnswer Item { get; set; } = new digioz.Portal.Bo.PollAnswer { Id = System.Guid.NewGuid().ToString() };
         [BindProperty(SupportsGet = true)] public string PollId { get; set; } = string.Empty;
         public System.Collections.Generic.List<digioz.Portal.Bo.Poll> Polls { get; private set; } = new();
-        public System.Collections.Generic.List<digioz.Portal.Bo.PollAnswer> AnswersForPoll { get; private set; } = new();
 
         public void OnGet()
         {
@@ -27,26 +27,27 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
             if (!string.IsNullOrEmpty(PollId))
             {
                 Item.PollId = PollId;
-                AnswersForPoll = _answerService.GetByPollId(PollId);
             }
         }
 
         public IActionResult OnPost()
         {
+            // Sanitize the answer text
+            Item.Answer = InputSanitizer.SanitizePollAnswer(Item.Answer);
+            
             if (string.IsNullOrEmpty(Item.PollId))
             {
-                ModelState.AddModelError(string.Empty, "Please select a poll.");
+                ModelState.AddModelError(nameof(Item.PollId), "Please select a poll.");
             }
+            
             if (string.IsNullOrWhiteSpace(Item.Answer))
             {
-                ModelState.AddModelError(string.Empty, "Please enter an answer.");
+                ModelState.AddModelError(nameof(Item.Answer), "Please enter an answer.");
             }
 
             if (!ModelState.IsValid)
             {
                 Polls = _pollService.GetLatest(50);
-                if (!string.IsNullOrEmpty(Item.PollId))
-                    AnswersForPoll = _answerService.GetByPollId(Item.PollId);
                 return Page();
             }
 

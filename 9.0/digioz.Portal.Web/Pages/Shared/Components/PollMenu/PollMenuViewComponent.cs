@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using digioz.Portal.Dal.Services.Interfaces;
 using ScottPlot;
 using digioz.Portal.Bo.ViewModels;
@@ -16,14 +17,22 @@ namespace digioz.Portal.Web.Pages.Shared.Components.PollMenu
         private readonly IPollAnswerService _answerService;
         private readonly IPollVoteService _voteService;
         private readonly IPluginService _pluginService;
+        private readonly ILogger<PollMenuViewComponent> _logger;
 
-        public PollMenuViewComponent(IPollService pollService, IPollUsersVoteService usersVoteService, IPollAnswerService answerService, IPollVoteService voteService, IPluginService pluginService)
+        public PollMenuViewComponent(
+            IPollService pollService, 
+            IPollUsersVoteService usersVoteService, 
+            IPollAnswerService answerService, 
+            IPollVoteService voteService, 
+            IPluginService pluginService,
+            ILogger<PollMenuViewComponent> logger)
         {
             _pollService = pollService;
             _usersVoteService = usersVoteService;
             _answerService = answerService;
             _voteService = voteService;
             _pluginService = pluginService;
+            _logger = logger;
         }
 
         public IViewComponentResult Invoke()
@@ -42,7 +51,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.PollMenu
             {
                 var answers = _answerService.GetByPollId(p.Id);
                 var hasVoted = !string.IsNullOrEmpty(userId) && _usersVoteService.Exists(p.Id, userId);
-                var chart = GenerateResultsChart(answers);
+                var chart = GenerateResultsChart(p.Id, answers);
                 model.Add(new PollMenuItemViewModel
                 {
                     Poll = p,
@@ -55,7 +64,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.PollMenu
             return View(model);
         }
 
-        private string GenerateResultsChart(List<digioz.Portal.Bo.PollAnswer> answers)
+        private string GenerateResultsChart(string pollId, List<digioz.Portal.Bo.PollAnswer> answers)
         {
             try
             {
@@ -84,8 +93,10 @@ namespace digioz.Portal.Web.Pages.Shared.Components.PollMenu
                 var bytes = plot.GetImage(500, 250).GetImageBytes();
                 return Convert.ToBase64String(bytes);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Failed to generate poll results chart for poll {PollId} with {AnswerCount} answers. Error: {ErrorMessage}", 
+                    pollId, answers?.Count ?? 0, ex.Message);
                 return string.Empty;
             }
         }

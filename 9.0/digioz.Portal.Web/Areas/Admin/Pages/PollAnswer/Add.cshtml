@@ -18,26 +18,19 @@
 
     <div class="mb-3">
         <label class="form-label">Poll</label>
-        <select class="form-select" asp-for="Item.PollId" asp-items="@(new SelectList(Model.Polls, nameof(digioz.Portal.Bo.Poll.Id), nameof(digioz.Portal.Bo.Poll.Slug), Model.Item.PollId))"></select>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Choose Existing Answer</label>
-        <select class="form-select">
-            @foreach (var a in Model.AnswersForPoll)
-            {
-                <option value="@a.Id">@a.Answer</option>
-            }
+        <select class="form-select" asp-for="Item.PollId" asp-items="@(new SelectList(Model.Polls, nameof(digioz.Portal.Bo.Poll.Id), nameof(digioz.Portal.Bo.Poll.Slug), Model.Item.PollId))">
+            <option value="">-- Select a Poll --</option>
         </select>
-        <small class="form-text text-muted">Or enter a new answer below.</small>
+        <span asp-validation-for="Item.PollId" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Item.Answer" class="form-label"></label>
-        <input asp-for="Item.Answer" class="form-control" />
+        <input asp-for="Item.Answer" class="form-control" maxlength="200" />
         <span asp-validation-for="Item.Answer" class="text-danger"></span>
+        <small class="form-text text-muted">Maximum 200 characters.</small>
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary">Add Answer</button>
     <a class="btn btn-secondary" asp-page="Index" asp-route-PollId="@Model.Item.PollId">Cancel</a>
 </form>

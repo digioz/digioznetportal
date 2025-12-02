@@ -5,6 +5,7 @@ using System.Security.Claims;
 using digioz.Portal.Dal.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 using ScottPlot;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
@@ -15,12 +16,20 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
         private readonly IPollAnswerService _answerService;
         private readonly IPollVoteService _voteService;
         private readonly IPollUsersVoteService _usersVoteService;
-        public DetailsModel(IPollService pollService, IPollAnswerService answerService, IPollVoteService voteService, IPollUsersVoteService usersVoteService)
+        private readonly ILogger<DetailsModel> _logger;
+        
+        public DetailsModel(
+            IPollService pollService, 
+            IPollAnswerService answerService, 
+            IPollVoteService voteService, 
+            IPollUsersVoteService usersVoteService,
+            ILogger<DetailsModel> logger)
         {
             _pollService = pollService;
             _answerService = answerService;
             _voteService = voteService;
             _usersVoteService = usersVoteService;
+            _logger = logger;
         }
 
         public digioz.Portal.Bo.Poll Item { get; private set; } = new();
@@ -132,8 +141,10 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
                 var bytes = plot.GetImage(800, 400).GetImageBytes();
                 return Convert.ToBase64String(bytes);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Failed to generate poll results chart for poll {PollId} in Admin Details page. Error: {ErrorMessage}", 
+                    pollId, ex.Message);
                 return string.Empty;
             }
         }

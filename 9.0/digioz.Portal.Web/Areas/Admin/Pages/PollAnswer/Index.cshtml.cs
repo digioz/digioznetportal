@@ -42,7 +42,9 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
                 HasVoted = !string.IsNullOrEmpty(userId) && _usersVoteService.Get(PollId, userId) != null;
             }
 
-            var all = string.IsNullOrEmpty(PollId) ? _service.GetByPollId(PollId) : _service.GetByPollId(PollId);
+            // Fixed: Get all answers when PollId is empty, or answers for specific poll when PollId is provided
+            var all = string.IsNullOrEmpty(PollId) ? _service.GetAll() : _service.GetByPollId(PollId);
+            
             // fallback pagination client-side for now (no paging in service)
             TotalCount = all.Count;
             var skip = (PageNumber - 1) * PageSize;

@@ -108,12 +108,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
             // Remove votes and answers marked for deletion
             foreach (var ansId in answersToRemoveIds)
             {
-                // Prefer bulk deletion if available
-                try { _voteService.DeleteByAnswerId(ansId); } catch { /* fallback below if method not implemented */ }
-                foreach (var v in _voteService.GetAll().Where(v => v.PollAnswerId == ansId).ToList())
-                {
-                    _voteService.Delete(v.Id);
-                }
+                // Use efficient bulk deletion at database level
+                _voteService.DeleteByAnswerId(ansId);
                 _answerService.Delete(ansId);
             }
 

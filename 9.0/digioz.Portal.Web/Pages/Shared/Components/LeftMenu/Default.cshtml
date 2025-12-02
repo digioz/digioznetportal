@@ -7,7 +7,7 @@
     <div class="card-body">
         <ul>
             @{
-                var showPolls = PluginService.GetAll().Any(p => p.Name == "Polls" && p.IsEnabled);
+                var showPolls = PluginService.GetByName("Polls")?.IsEnabled ?? false;
             }
             @if (Model != null)
             {

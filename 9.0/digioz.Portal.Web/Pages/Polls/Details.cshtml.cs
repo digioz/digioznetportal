@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 using digioz.Portal.Dal.Services.Interfaces;
 using ScottPlot;
 
@@ -15,12 +16,20 @@ namespace digioz.Portal.Pages.Polls
         private readonly IPollAnswerService _answerService;
         private readonly IPollUsersVoteService _usersVoteService;
         private readonly IPollVoteService _voteService;
-        public DetailsModel(IPollService pollService, IPollAnswerService answerService, IPollUsersVoteService usersVoteService, IPollVoteService voteService)
+        private readonly ILogger<DetailsModel> _logger;
+        
+        public DetailsModel(
+            IPollService pollService, 
+            IPollAnswerService answerService, 
+            IPollUsersVoteService usersVoteService, 
+            IPollVoteService voteService,
+            ILogger<DetailsModel> logger)
         {
             _pollService = pollService;
             _answerService = answerService;
             _usersVoteService = usersVoteService;
             _voteService = voteService;
+            _logger = logger;
         }
 
         public digioz.Portal.Bo.Poll Item { get; private set; } = new();
@@ -106,8 +115,10 @@ namespace digioz.Portal.Pages.Polls
                 var bytes = plot.GetImage(500, 250).GetImageBytes();
                 return Convert.ToBase64String(bytes);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Failed to generate poll results chart for poll with {AnswerCount} answers. Error: {ErrorMessage}", 
+                    answers?.Count ?? 0, ex.Message);
                 return string.Empty;
             }
         }
