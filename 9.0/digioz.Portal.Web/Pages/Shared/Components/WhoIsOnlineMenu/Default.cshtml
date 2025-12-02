@@ -6,25 +6,24 @@
         <div class="card-header">Online</div>
         <div class="card-body">
             <div>
-                <span>Visitors: </span>@Model.TotalOnlineCount<br />
+                <span><b>Visitors: </b></span>@Model.TotalOnlineCount<br />
                 @if (Model.RegisteredVisitors.Count > 0)
                 {
-                    <span>Logged In: </span>
-                    @foreach (var visitor in Model.RegisteredVisitors)
+                    <span><b>Logged In: </b></span>
+                    @for (int i = 0; i < Model.RegisteredVisitors.Count; i++)
                     {
-                        <a asp-page="/Profile/Details" asp-route-userId="@(visitor.Profile?.DisplayName ?? visitor.Username)">@(visitor.Profile?.DisplayName ?? visitor.Username)</a>@(visitor != Model.RegisteredVisitors.Last() ? ", " : "")
+                        var visitor = Model.RegisteredVisitors[i];
+                        <a asp-page="/Profile/Details" asp-route-userId="@(visitor.Profile?.DisplayName ?? visitor.Username)">@(visitor.Profile?.DisplayName ?? visitor.Username)</a>@(i < Model.RegisteredVisitors.Count - 1 ? ", " : "")
                     }
-                    @if (Model.Bots.Count > 0)
-                    {
-                        <br />
-                    }
+                    <br />
                 }
                 @if (Model.Bots.Count > 0)
                 {
-                    <span>Bots: </span>
-                    @foreach (var bot in Model.Bots)
+                    <span><b>Bots: </b></span>
+                    @for (int i = 0; i < Model.Bots.Count; i++)
                     {
-                        <span title="@bot.UserAgent">@bot.BotName</span>@(bot != Model.Bots.Last() ? ", " : "")
+                        var bot = Model.Bots[i];
+                        <span title="@bot.UserAgent (@bot.IpAddress)">@bot.BotName</span>@(i < Model.Bots.Count - 1 ? ", " : "")
                     }
                 }
             </div>
