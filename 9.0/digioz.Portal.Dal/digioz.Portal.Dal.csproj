@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\digioz.Portal.Bo\digioz.Portal.Bo.csproj" />
     <ProjectReference Include="..\digioz.Portal.Utilities\digioz.Portal.Utilities.csproj" />
+    <ProjectReference Include="..\digioz.Portal.EmailProviders\digioz.Portal.EmailProviders.csproj" />
   </ItemGroup>
 
 </Project>

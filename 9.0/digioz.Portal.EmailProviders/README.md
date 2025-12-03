@@ -320,6 +320,7 @@ var message = new EmailMessage
 - ? SSL/TLS encryption
 - ? Alternative views for multipart emails
 - ? Inline images (via ContentId)
+- ? **RFC 5322 compliant Message-ID header** (required by Gmail and other providers)
 
 ### SendGrid Features
 

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using digioz.Portal.Web.Hubs;
+using digioz.Portal.EmailProviders.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,21 +19,21 @@ builder.Logging.AddDbLogger();
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
- options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(
- options =>
- {
- options.SignIn.RequireConfirmedAccount = false;
- options.SignIn.RequireConfirmedEmail = false;
- options.User.RequireUniqueEmail = true;
- options.Lockout.AllowedForNewUsers = true;
- options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(120);
- options.Lockout.MaxFailedAccessAttempts = 5;
- })
- .AddRoles<IdentityRole>() // Add this line to enable roles
- .AddEntityFrameworkStores<ApplicationDbContext>();
+    options =>
+    {
+        options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedEmail = false;
+        options.User.RequireUniqueEmail = true;
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(120);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+    })
+    .AddRoles<IdentityRole>() // Add this line to enable roles
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
 // Configure application cookie with security stamp validation
 builder.Services.ConfigureApplicationCookie(options =>
@@ -48,34 +49,30 @@ builder.Services.ConfigureApplicationCookie(options =>
 // Configure security stamp validator
 builder.Services.Configure<SecurityStampValidatorOptions>(options =>
 {
-    // Validate security stamp every 30 seconds for quick logout
-    // When a user is deleted, their security stamp is updated
-    // and they'll be signed out within this interval on their next request
-    // Balance: Lower = faster logout but more DB queries, Higher = slower logout but less DB load
-    options.ValidationInterval = TimeSpan.FromSeconds(30);
-    
-    // OnRefreshingPrincipal can be used for custom logic
-    // options.OnRefreshingPrincipal = context => Task.CompletedTask;
+    // Validate security stamp every 30 minutes
+    options.ValidationInterval = TimeSpan.FromMinutes(30);
 });
 
-// Authorization policy to restrict Admin area to Administrator role
+// Admin authorization policy
 builder.Services.AddAuthorization(options =>
 {
- options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Administrator"));
 });
 
-builder.Services.AddDbContext<digiozPortalContext>(
- options => options.UseSqlServer(connectionString),
- optionsLifetime: ServiceLifetime.Scoped);
-builder.Services.AddDbContextFactory<digiozPortalContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
-builder.Services.AddScoped<IMenuService, MenuService>();
+// Data context for Portal tables
+builder.Services.AddDbContext<digiozPortalContext>(options =>
+    options.UseSqlServer(connectionString));
+
+// Register Portal Services (scoped lifetime)
 builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
-builder.Services.AddScoped<IModuleService, ModuleService>();
-builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IChatService, ChatService>();
-builder.Services.AddScoped<IMailingListSubscriberRelationService, MailingListSubscriberRelationService>();
-builder.Services.AddScoped<IPictureAlbumService, PictureAlbumService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IMailingListCampaignService, MailingListCampaignService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped<IModuleService, ModuleService>();
+builder.Services.AddScoped<IPictureAlbumService, PictureAlbumService>();
+builder.Services.AddScoped<IMailingListSubscriberRelationService, MailingListSubscriberRelationService>();
 builder.Services.AddScoped<IMailingListSubscriberService, MailingListSubscriberService>();
 builder.Services.AddScoped<IAspNetRoleService, AspNetRoleService>();
 builder.Services.AddScoped<IAspNetRoleClaimService, AspNetRoleClaimService>();
@@ -115,6 +112,10 @@ builder.Services.AddScoped<IZoneService, ZoneService>();
 builder.Services.AddScoped<IPrivateMessageService, PrivateMessageService>();
 builder.Services.AddScoped<IThemeService, ThemeService>();
 
+// Register Email Provider Services
+builder.Services.AddEmailProviders();
+builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>();
+
 builder.Services.AddMemoryCache();
 
 // Recaptcha verification needs HttpClient
@@ -142,24 +143,24 @@ builder.Services.AddSession(options =>
 // Helpers: wire CommentsHelper with delegates to avoid Utilities->Dal reference
 builder.Services.AddScoped<ICommentsHelper>(sp =>
 {
- var configSvc = sp.GetRequiredService<IConfigService>();
- var commentConfigSvc = sp.GetRequiredService<ICommentConfigService>();
- return new CommentsHelper(
- () => configSvc.GetAll(),
- () => commentConfigSvc.GetAll());
+    var configSvc = sp.GetRequiredService<IConfigService>();
+    var commentConfigSvc = sp.GetRequiredService<ICommentConfigService>();
+    return new CommentsHelper(
+        () => configSvc.GetAll(),
+        () => commentConfigSvc.GetAll());
 });
 
 // UserHelper registration (delegate pulls from IAspNetUserService)
 builder.Services.AddScoped<IUserHelper>(sp =>
 {
- var userSvc = sp.GetRequiredService<IAspNetUserService>();
- return new UserHelper(() => userSvc.GetAll());
+    var userSvc = sp.GetRequiredService<IAspNetUserService>();
+    return new UserHelper(() => userSvc.GetAll());
 });
 
 // Razor Pages with convention to authorize entire Admin area
 builder.Services.AddRazorPages(options =>
 {
- options.Conventions.AuthorizeAreaFolder("Admin", "/", "AdminOnly");
+    options.Conventions.AuthorizeAreaFolder("Admin", "/", "AdminOnly");
 });
 
 // Visitor logging for all Razor Pages
@@ -173,11 +174,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
- app.UseMigrationsEndPoint();
+    app.UseMigrationsEndPoint();
 }
 else
 {
- app.UseExceptionHandler("/Error");
+    app.UseExceptionHandler("/Error");
 }
 
 // Ensure databases are created and migrations are applied

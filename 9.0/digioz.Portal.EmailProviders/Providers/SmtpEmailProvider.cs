@@ -191,6 +191,12 @@ public class SmtpEmailProvider : IEmailProvider
             mailMessage.Headers.Add(header.Key, header.Value);
         }
 
+        // Generate and add Message-ID header (RFC 5322 compliant)
+        // Format: <unique-id@domain>
+        var fromDomain = mailMessage.From.Host;
+        var messageId = $"<{Guid.NewGuid():N}.{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}@{fromDomain}>";
+        mailMessage.Headers.Add("Message-ID", messageId);
+
         return mailMessage;
     }
 
