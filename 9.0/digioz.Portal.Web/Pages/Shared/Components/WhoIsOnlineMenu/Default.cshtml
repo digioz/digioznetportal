@@ -23,7 +23,7 @@
                     @for (int i = 0; i < Model.Bots.Count; i++)
                     {
                         var bot = Model.Bots[i];
-                        <span title="@bot.UserAgent (@bot.IpAddress)">@bot.BotName</span>@(i < Model.Bots.Count - 1 ? ", " : "")
+                        <span class="badge bg-secondary text-white" style="font-size: 0.75rem;" title="@bot.UserAgent (@bot.IpAddress)">@bot.BotName</span>@(i < Model.Bots.Count - 1 ? " " : "")
                     }
                 }
             </div>
