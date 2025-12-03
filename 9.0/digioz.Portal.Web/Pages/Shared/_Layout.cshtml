@@ -90,23 +90,13 @@
 				@await Component.InvokeAsync("WhoIsOnlineMenu")
 				@await Component.InvokeAsync("StoreMenu")
 				@await Component.InvokeAsync("PollMenu")
-				@*  @Html.RenderAction("TwitterMenu", "Menu", new { area = "" }) *@
-
 				@await Component.InvokeAsync("ZoneMenu", new { location = "Left" })
 				@await Component.InvokeAsync("ZoneMenu", new { location = "LeftMenu" })
 
             </div>
 			<div class="col-md-9">
-
 				@await Component.InvokeAsync("ZoneMenu", new { location = "BodyTop" })
-				
-				<div class="card bg-light mb-5">
-					<div class="card-header bg-primary text-white">@ViewBag.Title</div>
-					<div class="card-body">
-						@RenderBody()
-					</div>
-				</div>
-
+				@RenderBody()
 				@await Component.InvokeAsync("ZoneMenu", new { location = "BodyBottom" })
 			</div>
 		</div>

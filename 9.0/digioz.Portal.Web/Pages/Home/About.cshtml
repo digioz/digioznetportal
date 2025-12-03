@@ -19,15 +19,20 @@
     }
 }
 
-@{
-    if (Model?.PageContent != null)
-    {
-        @Html.Raw(Model.PageContent.Body)
-    }
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+            @{
+                if (Model?.PageContent != null)
+                {
+                    @Html.Raw(Model.PageContent.Body)
+                }
 
-    // Display comments if enabled for this page
-    if (Model?.AllowComments == true)
-    {
-        @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent?.Id.ToString(), referenceType = "/Home/About" })
-    }
-}
+                // Display comments if enabled for this page
+                if (Model?.AllowComments == true)
+                {
+                    @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent?.Id.ToString(), referenceType = "/Home/About" })
+                }
+            }
+    </div>
+</div>

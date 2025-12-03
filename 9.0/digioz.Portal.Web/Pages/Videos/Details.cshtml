@@ -6,184 +6,190 @@
     ViewData["Title"] = "Video Details";
 }
 
-<div class="container-fluid my-5">
-    <div class="row">
-        <div class="col-12">
-            @if (Model.Item != null)
-            {
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h1 class="card-title mb-4">Video Details</h1>
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="container-fluid my-5">
+            <div class="row">
+                <div class="col-12">
+                    @if (Model.Item != null)
+                    {
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h1 class="card-title mb-4">Video Details</h1>
 
-                        @if (!string.IsNullOrEmpty(Model.StatusMessage))
-                        {
-                            <div class="alert alert-@(Model.IsSuccess ? "success" : "danger") alert-dismissible fade show" role="alert">
-                                @Model.StatusMessage
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        }
+                                @if (!string.IsNullOrEmpty(Model.StatusMessage))
+                                {
+                                    <div class="alert alert-@(Model.IsSuccess ? "success" : "danger") alert-dismissible fade show" role="alert">
+                                        @Model.StatusMessage
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                }
 
-                        <div class="mb-4">
-                            <div class="border rounded p-3 bg-light text-center position-relative" style="overflow: hidden; width: 100%;">
-                                <video width="100%" height="auto" style="width: 100%; height: auto;" controls>
-                                    <source src="/img/Videos/Full/@Model.Item.Filename" type="video/mp4">
-                                    Your browser does not support the video tag.
-                                </video>
-                            </div>
-                            
-                            <!-- Navigation Buttons -->
-                            <div class="d-flex justify-content-between mt-3">
-                                @if (Model.PreviousId.HasValue)
-                                {
-                                    @if (Model.IsAlbumSource)
-                                    {
-                                        <a href="/Videos/Details?id=@Model.PreviousId&source=album&albumId=@Model.AlbumId" class="btn btn-outline-primary">
-                                            <i class="bi bi-chevron-left"></i> Previous
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <a href="/Videos/Details?id=@Model.PreviousId&source=list" class="btn btn-outline-primary">
-                                            <i class="bi bi-chevron-left"></i> Previous
-                                        </a>
-                                    }
-                                }
-                                else
-                                {
-                                    <span></span>
-                                }
-                                
-                                @if (Model.NextId.HasValue)
-                                {
-                                    @if (Model.IsAlbumSource)
-                                    {
-                                        <a href="/Videos/Details?id=@Model.NextId&source=album&albumId=@Model.AlbumId" class="btn btn-outline-primary">
-                                            Next <i class="bi bi-chevron-right"></i>
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <a href="/Videos/Details?id=@Model.NextId&source=list" class="btn btn-outline-primary">
-                                            Next <i class="bi bi-chevron-right"></i>
-                                        </a>
-                                    }
-                                }
-                                else
-                                {
-                                    <span></span>
-                                }
-                            </div>
-                        </div>
+                                <div class="mb-4">
+                                    <div class="border rounded p-3 bg-light text-center position-relative" style="overflow: hidden; width: 100%;">
+                                        <video width="100%" height="auto" style="width: 100%; height: auto;" controls>
+                                            <source src="/img/Videos/Full/@Model.Item.Filename" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
 
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <h6 class="text-muted">Description</h6>
-                                <p class="lead">@Model.Item.Description</p>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="text-muted">Album</h6>
-                                @if (Model.Album != null)
-                                {
-                                    <p class="lead">
-                                        <a href="/Videos/Album?id=@Model.Item.AlbumId">@Model.Album.Name</a>
-                                    </p>
-                                }
-                                else
-                                {
-                                    <p class="lead">-</p>
-                                }
-                            </div>
-                        </div>
-
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <h6 class="text-muted">Uploaded By</h6>
-                                @if (Model.UploaderProfile != null)
-                                {
-                                    <p class="lead">
-                                        <i class="bi bi-person-circle"></i> 
-                                        @if (!string.IsNullOrEmpty(Model.UploaderProfile.DisplayName))
+                                    <!-- Navigation Buttons -->
+                                    <div class="d-flex justify-content-between mt-3">
+                                        @if (Model.PreviousId.HasValue)
                                         {
-                                            <a href="/Profile/Details?userId=@Model.UploaderProfile.DisplayName">@Model.UploaderProfile.DisplayName</a>
-                                        }
-                                        else if (!string.IsNullOrEmpty(Model.UploaderProfile.FirstName) || !string.IsNullOrEmpty(Model.UploaderProfile.LastName))
-                                        {
-                                            <a href="/Profile/Details?userId=@($"{Model.UploaderProfile.FirstName} {Model.UploaderProfile.LastName}".Trim())">
-                                                @($"{Model.UploaderProfile.FirstName} {Model.UploaderProfile.LastName}".Trim())
-                                            </a>
+                                            @if (Model.IsAlbumSource)
+                                            {
+                                                <a href="/Videos/Details?id=@Model.PreviousId&source=album&albumId=@Model.AlbumId" class="btn btn-outline-primary">
+                                                    <i class="bi bi-chevron-left"></i> Previous
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a href="/Videos/Details?id=@Model.PreviousId&source=list" class="btn btn-outline-primary">
+                                                    <i class="bi bi-chevron-left"></i> Previous
+                                                </a>
+                                            }
                                         }
                                         else
                                         {
-                                            <text>Anonymous User</text>
+                                            <span></span>
                                         }
-                                    </p>
-                                }
-                                else
-                                {
-                                    <p class="lead"><i class="bi bi-person-circle"></i> Anonymous User</p>
-                                }
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="text-muted">Date Uploaded</h6>
-                                <p class="lead">@Model.Item.Timestamp?.ToLocalTime().ToString("MMMM dd, yyyy HH:mm")</p>
-                            </div>
-                        </div>
 
-                        <div class="row mb-4">
-                            <div class="col-md-12">
-                                <h6 class="text-muted">Status</h6>
-                                <p class="lead">
-                                    @if (Model.Item.Approved)
+                                        @if (Model.NextId.HasValue)
+                                        {
+                                            @if (Model.IsAlbumSource)
+                                            {
+                                                <a href="/Videos/Details?id=@Model.NextId&source=album&albumId=@Model.AlbumId" class="btn btn-outline-primary">
+                                                    Next <i class="bi bi-chevron-right"></i>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a href="/Videos/Details?id=@Model.NextId&source=list" class="btn btn-outline-primary">
+                                                    Next <i class="bi bi-chevron-right"></i>
+                                                </a>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span></span>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Description</h6>
+                                        <p class="lead">@Model.Item.Description</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Album</h6>
+                                        @if (Model.Album != null)
+                                        {
+                                            <p class="lead">
+                                                <a href="/Videos/Album?id=@Model.Item.AlbumId">@Model.Album.Name</a>
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <p class="lead">-</p>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Uploaded By</h6>
+                                        @if (Model.UploaderProfile != null)
+                                        {
+                                            <p class="lead">
+                                                <i class="bi bi-person-circle"></i>
+                                                @if (!string.IsNullOrEmpty(Model.UploaderProfile.DisplayName))
+                                                {
+                                                    <a href="/Profile/Details?userId=@Model.UploaderProfile.DisplayName">@Model.UploaderProfile.DisplayName</a>
+                                                }
+                                                else if (!string.IsNullOrEmpty(Model.UploaderProfile.FirstName) || !string.IsNullOrEmpty(Model.UploaderProfile.LastName))
+                                                {
+                                                    <a href="/Profile/Details?userId=@($"{Model.UploaderProfile.FirstName} {Model.UploaderProfile.LastName}".Trim())">
+                                                        @($"{Model.UploaderProfile.FirstName} {Model.UploaderProfile.LastName}".Trim())
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <text>Anonymous User</text>
+                                                }
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <p class="lead"><i class="bi bi-person-circle"></i> Anonymous User</p>
+                                        }
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Date Uploaded</h6>
+                                        <p class="lead">@Model.Item.Timestamp?.ToLocalTime().ToString("MMMM dd, yyyy HH:mm")</p>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <h6 class="text-muted">Status</h6>
+                                        <p class="lead">
+                                            @if (Model.Item.Approved)
+                                            {
+                                                <span class="badge bg-success">Approved</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">Pending Approval</span>
+                                            }
+                                            @if (Model.Item.Visible)
+                                            {
+                                                <span class="badge bg-info">Visible</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Hidden</span>
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    @if (Model.IsAlbumSource)
                                     {
-                                        <span class="badge bg-success">Approved</span>
+                                        <a href="/Videos/Album?id=@Model.AlbumId" class="btn btn-secondary">Back to Album</a>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-warning">Pending Approval</span>
+                                        <a href="/Videos/List" class="btn btn-secondary">Back to Gallery</a>
                                     }
-                                    @if (Model.Item.Visible)
+                                    @if (Model.IsOwner || User?.IsInRole("Admin") == true)
                                     {
-                                        <span class="badge bg-info">Visible</span>
+                                        <a asp-page="Edit" asp-route-id="@Model.Item.Id" class="btn btn-primary">Edit</a>
+                                        <form method="post" asp-page-handler="Delete" asp-route-id="@Model.Item.Id" style="display: inline;">
+                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this video?');">Delete</button>
+                                        </form>
                                     }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary">Hidden</span>
-                                    }
-                                </p>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="d-flex gap-2">
-                            @if (Model.IsAlbumSource)
-                            {
-                                <a href="/Videos/Album?id=@Model.AlbumId" class="btn btn-secondary">Back to Album</a>
-                            }
-                            else
-                            {
-                                <a href="/Videos/List" class="btn btn-secondary">Back to Gallery</a>
-                            }
-                            @if (Model.IsOwner || User?.IsInRole("Admin") == true)
-                            {
-                                <a asp-page="Edit" asp-route-id="@Model.Item.Id" class="btn btn-primary">Edit</a>
-                                <form method="post" asp-page-handler="Delete" asp-route-id="@Model.Item.Id" style="display: inline;">
-                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this video?');">Delete</button>
-                                </form>
-                            }
-                        </div>
-                    </div>
+                        @if (Model.AllowComments)
+                        {
+                            <div class="mt-4">
+                                @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.Item.Id.ToString(), referenceType = "/Videos/Details" })
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">Video not found.</div>
+                    }
                 </div>
-
-                @if (Model.AllowComments)
-                {
-                    <div class="mt-4">
-                        @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.Item.Id.ToString(), referenceType = "/Videos/Details" })
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="alert alert-warning">Video not found.</div>
-            }
+            </div>
         </div>
     </div>
 </div>
+

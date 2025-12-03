@@ -6,64 +6,69 @@
     ViewData["Title"] = "Edit Picture";
 }
 
-<div class="container my-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <h1 class="mb-4">Edit Picture</h1>
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="container my-5">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <h1 class="mb-4">Edit Picture</h1>
 
-            @if (!string.IsNullOrEmpty(Model.StatusMessage))
-            {
-                <div class="alert alert-@(Model.IsSuccess ? "success" : "danger") alert-dismissible fade show" role="alert">
-                    @Model.StatusMessage
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-
-            @if (Model.Item != null)
-            {
-                <form method="post" asp-route-id="@Model.Item.Id" enctype="multipart/form-data" class="needs-validation">
-                    <div class="mb-3">
-                        <label class="form-label">Current Image</label>
-                        <div class="border rounded p-3 bg-light">
-                            <img src="/img/Pictures/Full/@Model.Item.Filename" 
-                                 alt="@Model.Item.Description" 
-                                 class="img-fluid" 
-                                 style="max-width: 100%; max-height: 300px; object-fit: contain;" />
+                    @if (!string.IsNullOrEmpty(Model.StatusMessage))
+                    {
+                        <div class="alert alert-@(Model.IsSuccess ? "success" : "danger") alert-dismissible fade show" role="alert">
+                            @Model.StatusMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                    </div>
+                    }
 
-                    <div class="mb-3">
-                        <label for="File" class="form-label">Replace Image (Optional)</label>
-                        <input type="file" id="File" name="File" class="form-control" accept="image/*" />
-                        <small class="text-muted">Leave empty to keep current image. Supported formats: JPG, PNG, GIF, BMP, TIF, TIFF</small>
-                    </div>
+                    @if (Model.Item != null)
+                    {
+                        <form method="post" asp-route-id="@Model.Item.Id" enctype="multipart/form-data" class="needs-validation">
+                            <div class="mb-3">
+                                <label class="form-label">Current Image</label>
+                                <div class="border rounded p-3 bg-light">
+                                    <img src="/img/Pictures/Full/@Model.Item.Filename"
+                                         alt="@Model.Item.Description"
+                                         class="img-fluid"
+                                         style="max-width: 100%; max-height: 300px; object-fit: contain;" />
+                                </div>
+                            </div>
 
-                    <div class="mb-3">
-                        <label for="Description" class="form-label">Description *</label>
-                        <textarea id="Description" name="Description" class="form-control" rows="3" required>@Model.Description</textarea>
-                    </div>
+                            <div class="mb-3">
+                                <label for="File" class="form-label">Replace Image (Optional)</label>
+                                <input type="file" id="File" name="File" class="form-control" accept="image/*" />
+                                <small class="text-muted">Leave empty to keep current image. Supported formats: JPG, PNG, GIF, BMP, TIF, TIFF</small>
+                            </div>
 
-                    <div class="mb-3">
-                        <label for="AlbumId" class="form-label">Album *</label>
-                        <select id="AlbumId" name="AlbumId" class="form-select" required>
-                            <option value="">-- Select an Album --</option>
-                            @foreach (var album in Model.Albums)
-                            {
-                                <option value="@album.Id" selected="@(album.Id == Model.AlbumId ? "selected" : "")">@album.Name</option>
-                            }
-                        </select>
-                    </div>
+                            <div class="mb-3">
+                                <label for="Description" class="form-label">Description *</label>
+                                <textarea id="Description" name="Description" class="form-control" rows="3" required>@Model.Description</textarea>
+                            </div>
 
-                    <div class="d-grid gap-2 d-md-flex">
-                        <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
-                        <a href="javascript:history.back()" class="btn btn-secondary btn-lg">Cancel</a>
-                    </div>
-                </form>
-            }
-            else
-            {
-                <div class="alert alert-warning">Picture not found.</div>
-            }
+                            <div class="mb-3">
+                                <label for="AlbumId" class="form-label">Album *</label>
+                                <select id="AlbumId" name="AlbumId" class="form-select" required>
+                                    <option value="">-- Select an Album --</option>
+                                    @foreach (var album in Model.Albums)
+                                    {
+                                        <option value="@album.Id" selected="@(album.Id == Model.AlbumId ? "selected" : "")">@album.Name</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex">
+                                <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+                                <a href="javascript:history.back()" class="btn btn-secondary btn-lg">Cancel</a>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">Picture not found.</div>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </div>

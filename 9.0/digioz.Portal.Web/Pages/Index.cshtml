@@ -23,17 +23,22 @@
 
 @await Component.InvokeAsync("Announcements")
 
-@{
-    if (Model.PageContent != null)
-    {
-        @Html.Raw(Model.PageContent.Body)
-    }
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        @{
+            if (Model.PageContent != null)
+            {
+                @Html.Raw(Model.PageContent.Body)
+            }
 
-    if (Model.AllowComments)
-    {
-        @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent?.Id.ToString() })
-    }
-}
+            if (Model.AllowComments)
+            {
+                @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent?.Id.ToString() })
+            }
+        }
+    </div>
+</div>
 
 @await Component.InvokeAsync("LatestPictures")
 @await Component.InvokeAsync("LatestVideos")

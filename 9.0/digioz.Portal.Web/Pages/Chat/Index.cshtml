@@ -7,55 +7,59 @@
     var enc = HtmlEncoder.Default;
 }
 
-<h2>Chat</h2>
-<div class="mb-2 small text-muted">Signed in as: <strong>@Model.CurrentDisplayName</strong></div>
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="mb-2 small text-muted">Signed in as: <strong>@Model.CurrentDisplayName</strong></div>
 
-<div class="row">
-    <div class="col-lg-9 col-md-8">
-        <div class="card mb-3">
-            <div class="card-body p-2" style="max-height:350px; overflow-y:auto;" id="chatContainer">
-                <ul id="messagesList" class="list-unstyled mb-0">
-                    @foreach (var m in Model.History)
-                    {
-                        var ts = m.Timestamp.HasValue ? m.Timestamp.Value.ToLocalTime().ToString("h:mm:ss tt") : "--";
-                        string displayName = "Anonymous";
-                        if (Model.DisplayNames.TryGetValue(m.UserId, out var name) && name != null)
-                        {
-                            displayName = name;
-                        }
-                        var encodedDisplayName = System.Net.WebUtility.UrlEncode(displayName);
-                        var decodedMessage = System.Net.WebUtility.HtmlDecode(m.Message);
-                        var messageWithBreaks = StringUtils.ConvertLineBreaksToHtml(enc.Encode(decodedMessage));
-                        <li class="mb-2">
-                            <span class="text-secondary" style="font-size:.7rem">@ts</span>
-                            <a href="/Profile/Details?userId=@encodedDisplayName" class="fw-bold text-decoration-none">@displayName</a>: 
-                            <span>@Html.Raw(messageWithBreaks)</span>
-                        </li>
-                    }
-                </ul>
-            </div>
-        </div>
+        <div class="row">
+            <div class="col-lg-9 col-md-8">
+                <div class="card mb-3">
+                    <div class="card-body p-2" style="max-height:350px; overflow-y:auto;" id="chatContainer">
+                        <ul id="messagesList" class="list-unstyled mb-0">
+                            @foreach (var m in Model.History)
+                            {
+                                var ts = m.Timestamp.HasValue ? m.Timestamp.Value.ToLocalTime().ToString("h:mm:ss tt") : "--";
+                                string displayName = "Anonymous";
+                                if (Model.DisplayNames.TryGetValue(m.UserId, out var name) && name != null)
+                                {
+                                    displayName = name;
+                                }
+                                var encodedDisplayName = System.Net.WebUtility.UrlEncode(displayName);
+                                var decodedMessage = System.Net.WebUtility.HtmlDecode(m.Message);
+                                var messageWithBreaks = StringUtils.ConvertLineBreaksToHtml(enc.Encode(decodedMessage));
+                                <li class="mb-2">
+                                    <span class="text-secondary" style="font-size:.7rem">@ts</span>
+                                    <a href="/Profile/Details?userId=@encodedDisplayName" class="fw-bold text-decoration-none">@displayName</a>:
+                                    <span>@Html.Raw(messageWithBreaks)</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
 
-        <form id="chatForm" class="d-flex flex-column gap-2" autocomplete="off">
-            <textarea id="messageInput" class="form-control" placeholder="Type message... (Shift+Enter for new line, Enter to send)" rows="3" style="resize: vertical;"></textarea>
-            <div class="d-flex gap-2">
-                <button id="sendButton" type="submit" class="btn btn-primary" disabled>Send</button>
-                <small class="text-muted align-self-center">Press Enter to send, Shift+Enter for new line</small>
+                <form id="chatForm" class="d-flex flex-column gap-2" autocomplete="off">
+                    <textarea id="messageInput" class="form-control" placeholder="Type message... (Shift+Enter for new line, Enter to send)" rows="3" style="resize: vertical;"></textarea>
+                    <div class="d-flex gap-2">
+                        <button id="sendButton" type="submit" class="btn btn-primary" disabled>Send</button>
+                        <small class="text-muted align-self-center">Press Enter to send, Shift+Enter for new line</small>
+                    </div>
+                </form>
             </div>
-        </form>
-    </div>
 
-    <div class="col-lg-3 col-md-4">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h6 class="mb-0">
-                    <i class="fas fa-users"></i> Online Users (<span id="userCount">0</span>)
-                </h6>
-            </div>
-            <div class="card-body p-2" style="max-height:350px; overflow-y:auto;">
-                <ul id="userList" class="list-unstyled mb-0">
-                    <li class="text-muted text-center py-2">Loading...</li>
-                </ul>
+            <div class="col-lg-3 col-md-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-users"></i> Online Users (<span id="userCount">0</span>)
+                        </h6>
+                    </div>
+                    <div class="card-body p-2" style="max-height:350px; overflow-y:auto;">
+                        <ul id="userList" class="list-unstyled mb-0">
+                            <li class="text-muted text-center py-2">Loading...</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

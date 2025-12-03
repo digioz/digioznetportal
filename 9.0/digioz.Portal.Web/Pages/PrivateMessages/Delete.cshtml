@@ -3,23 +3,31 @@
 @{
     ViewData["Title"] = "Delete Message";
 }
-<h1>Delete Message</h1>
-@if (Model.Message != null)
-{
-    <div class="alert alert-warning">
-        Are you sure you want to delete this message?
+
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        @if (Model.Message != null)
+        {
+            <div class="alert alert-warning">
+                Are you sure you want to delete this message?
+            </div>
+            <dl class="row">
+                <dt class="col-sm-2">From</dt>
+                <dd class="col-sm-10">@Model.FromDisplayName</dd>
+                <dt class="col-sm-2">Subject</dt>
+                <dd class="col-sm-10">@Model.Message.Subject</dd>
+                <dt class="col-sm-2">Sent</dt>
+                <dd class="col-sm-10">@Model.Message.SentDate?.ToLocalTime().ToString("g")</dd>
+            </dl>
+            <form method="post">
+                <button type="submit" class="btn btn-danger">Delete</button>
+                <a asp-page="/PrivateMessages/Index" class="btn btn-secondary">Cancel</a>
+            </form>
+        }
+        else
+        {
+            <p>Message not found.</p>
+        }
     </div>
-    <dl class="row">
-        <dt class="col-sm-2">From</dt><dd class="col-sm-10">@Model.FromDisplayName</dd>
-        <dt class="col-sm-2">Subject</dt><dd class="col-sm-10">@Model.Message.Subject</dd>
-        <dt class="col-sm-2">Sent</dt><dd class="col-sm-10">@Model.Message.SentDate?.ToLocalTime().ToString("g")</dd>
-    </dl>
-    <form method="post">
-        <button type="submit" class="btn btn-danger">Delete</button>
-        <a asp-page="/PrivateMessages/Index" class="btn btn-secondary">Cancel</a>
-    </form>
-}
-else
-{
-    <p>Message not found.</p>
-}
+</div>

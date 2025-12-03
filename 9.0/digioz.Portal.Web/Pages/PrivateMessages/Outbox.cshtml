@@ -3,26 +3,31 @@
 @{
     ViewData["Title"] = "Outbox";
 }
-<h1>Outbox (Waiting for recipient to read)</h1>
-<partial name="_PrivateMessagesNavigation" model='"Outbox"' />
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>To</th>
-            <th>Subject</th>
-            <th>Date</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var msg in Model.Messages)
-    {
-        <tr>
-            <td>@msg.ToDisplayName</td>
-            <td>@msg.Subject</td>
-            <td>@msg.SentDate?.ToLocalTime().ToString("g")</td>
-            <td><a asp-page="/PrivateMessages/Details" asp-route-id="@msg.Id" class="btn btn-sm btn-primary">Read</a></td>
-        </tr>
-    }
-    </tbody>
-</table>
+
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title - Outbox</div>
+    <div class="card-body">
+        <partial name="_PrivateMessagesNavigation" model='"Outbox"' />
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>To</th>
+                    <th>Subject</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var msg in Model.Messages)
+                {
+                    <tr>
+                        <td>@msg.ToDisplayName</td>
+                        <td>@msg.Subject</td>
+                        <td>@msg.SentDate?.ToLocalTime().ToString("g")</td>
+                        <td><a asp-page="/PrivateMessages/Details" asp-route-id="@msg.Id" class="btn btn-sm btn-primary">Read</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

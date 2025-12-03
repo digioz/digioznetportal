@@ -20,18 +20,23 @@
 	}
 }
 
-<div class="container">
-	@if (!string.IsNullOrWhiteSpace(Model.BodyHtml))
-	{
-		@Html.Raw(Model.BodyHtml)
-	}
-	else
-	{
-		<div class="alert alert-warning">Page not found.</div>
-	}
+<div class="card bg-light mb-5">
+	<div class="card-header bg-primary text-white">@ViewBag.Title</div>
+	<div class="card-body">
+        <div class="container">
+            @if (!string.IsNullOrWhiteSpace(Model.BodyHtml))
+            {
+                @Html.Raw(Model.BodyHtml)
+            }
+            else
+            {
+                <div class="alert alert-warning">Page not found.</div>
+            }
 
-	@if (Model.AllowComments && Model.PageContent != null)
-	{
-		@await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent.Id.ToString(), referenceType = "/Page" })
-	}
+            @if (Model.AllowComments && Model.PageContent != null)
+            {
+                @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent.Id.ToString(), referenceType = "/Page" })
+            }
+        </div>
+	</div>
 </div>

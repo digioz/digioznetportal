@@ -6,47 +6,50 @@
     ViewData["Title"] = "Edit Poll";
 }
 
-<h1>Edit Poll</h1>
-
-<form method="post" id="pollForm">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="Item.Id" />
-    <div class="mb-3">
-        <label class="form-label">Poll Question</label>
-        <input asp-for="Item.Slug" class="form-control" maxlength="500" />
-        <span asp-validation-for="Item.Slug" class="text-danger"></span>
-    </div>
-
-    <div class="card mb-3">
-        <div class="card-header">Existing Answers</div>
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <label class="form-label mb-0">Manage Answers</label>
-                <button type="button" class="btn btn-sm btn-outline-primary" id="addAnswerBtn">Add Answer</button>
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        <form method="post" id="pollForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Item.Id" />
+            <div class="mb-3">
+                <label class="form-label">Poll Question</label>
+                <input asp-for="Item.Slug" class="form-control" maxlength="500" />
+                <span asp-validation-for="Item.Slug" class="text-danger"></span>
             </div>
-            <div id="answersContainer"></div>
-            <input type="hidden" asp-for="NewAnswersCsv" id="answersCsv" />
-            <span asp-validation-for="NewAnswersCsv" class="text-danger"></span>
-            <small class="form-text text-muted">Ensure at least 2 answers (max 50). Each answer limited to 200 characters.</small>
-            <div class="text-danger d-none" id="answersError">Please provide at least 2 answers.</div>
-        </div>
-    </div>
 
-    <div class="form-check mb-2">
-        <input class="form-check-input" asp-for="Item.Featured" />
-        <label class="form-check-label" asp-for="Item.Featured"></label>
+            <div class="card mb-3">
+                <div class="card-header">Existing Answers</div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label mb-0">Manage Answers</label>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="addAnswerBtn">Add Answer</button>
+                    </div>
+                    <div id="answersContainer"></div>
+                    <input type="hidden" asp-for="NewAnswersCsv" id="answersCsv" />
+                    <span asp-validation-for="NewAnswersCsv" class="text-danger"></span>
+                    <small class="form-text text-muted">Ensure at least 2 answers (max 50). Each answer limited to 200 characters.</small>
+                    <div class="text-danger d-none" id="answersError">Please provide at least 2 answers.</div>
+                </div>
+            </div>
+
+            <div class="form-check mb-2">
+                <input class="form-check-input" asp-for="Item.Featured" />
+                <label class="form-check-label" asp-for="Item.Featured"></label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" asp-for="Item.IsClosed" />
+                <label class="form-check-label" asp-for="Item.IsClosed"></label>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" asp-for="Item.AllowMultipleOptionsVote" />
+                <label class="form-check-label" asp-for="Item.AllowMultipleOptionsVote"></label>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a class="btn btn-secondary" asp-page="/Polls/Index">Cancel</a>
+        </form>
     </div>
-    <div class="form-check mb-2">
-        <input class="form-check-input" asp-for="Item.IsClosed" />
-        <label class="form-check-label" asp-for="Item.IsClosed"></label>
-    </div>
-    <div class="form-check mb-3">
-        <input class="form-check-input" asp-for="Item.AllowMultipleOptionsVote" />
-        <label class="form-check-label" asp-for="Item.AllowMultipleOptionsVote"></label>
-    </div>
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a class="btn btn-secondary" asp-page="/Polls/Index">Cancel</a>
-</form>
+</div>
 
 <script>
 (function() {
