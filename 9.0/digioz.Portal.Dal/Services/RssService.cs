@@ -24,6 +24,17 @@ namespace digioz.Portal.Dal.Services
             return _context.Rsses.ToList();
         }
 
+        public List<Rss> GetPage(int pageNumber, int pageSize, out int totalCount)
+        {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            var query = _context.Rsses.OrderByDescending(x => x.Id);
+            totalCount = query.Count();
+            var skip = (pageNumber - 1) * pageSize;
+            return query.Skip(skip).Take(pageSize).ToList();
+        }
+
         public void Add(Rss rss)
         {
             _context.Rsses.Add(rss);
