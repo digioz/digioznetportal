@@ -6,102 +6,105 @@
     var encodedDisplayName = System.Net.WebUtility.UrlEncode(Model.Input.DisplayName ?? string.Empty);
 }
 
-<h1>Edit Profile</h1>
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        @if (Model.StatusMessage != null)
+        {
+            <div class="alert alert-info">@Model.StatusMessage</div>
+        }
 
-@if (Model.StatusMessage != null)
-{
-    <div class="alert alert-info">@Model.StatusMessage</div>
-}
+        <form method="post" enctype="multipart/form-data" class="mb-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Input.Id" />
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="Input.DisplayName" class="form-label"></label>
+                    <input asp-for="Input.DisplayName" class="form-control" />
+                    <span asp-validation-for="Input.DisplayName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Input.Email" class="form-label"></label>
+                    <input asp-for="Input.Email" class="form-control" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Input.FirstName" class="form-label"></label>
+                    <input asp-for="Input.FirstName" class="form-control" />
+                    <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Input.MiddleName" class="form-label"></label>
+                    <input asp-for="Input.MiddleName" class="form-control" />
+                    <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Input.LastName" class="form-label"></label>
+                    <input asp-for="Input.LastName" class="form-control" />
+                    <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Input.Address" class="form-label"></label>
+                    <input asp-for="Input.Address" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Input.Address2" class="form-label"></label>
+                    <input asp-for="Input.Address2" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Input.City" class="form-label"></label>
+                    <input asp-for="Input.City" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Input.State" class="form-label"></label>
+                    <input asp-for="Input.State" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="Input.Zip" class="form-label"></label>
+                    <input asp-for="Input.Zip" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="Input.Country" class="form-label"></label>
+                    <input asp-for="Input.Country" class="form-control" />
+                </div>
 
-<form method="post" enctype="multipart/form-data" class="mb-4">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="Input.Id" />
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label asp-for="Input.DisplayName" class="form-label"></label>
-            <input asp-for="Input.DisplayName" class="form-control" />
-            <span asp-validation-for="Input.DisplayName" class="text-danger"></span>
-        </div>
-        <div class="col-md-6">
-            <label asp-for="Input.Email" class="form-label"></label>
-            <input asp-for="Input.Email" class="form-control" />
-            <span asp-validation-for="Input.Email" class="text-danger"></span>
-        </div>
-        <div class="col-md-4">
-            <label asp-for="Input.FirstName" class="form-label"></label>
-            <input asp-for="Input.FirstName" class="form-control" />
-            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
-        </div>
-        <div class="col-md-4">
-            <label asp-for="Input.MiddleName" class="form-label"></label>
-            <input asp-for="Input.MiddleName" class="form-control" />
-            <span asp-validation-for="Input.MiddleName" class="text-danger"></span>
-        </div>
-        <div class="col-md-4">
-            <label asp-for="Input.LastName" class="form-label"></label>
-            <input asp-for="Input.LastName" class="form-control" />
-            <span asp-validation-for="Input.LastName" class="text-danger"></span>
-        </div>
-        <div class="col-md-6">
-            <label asp-for="Input.Address" class="form-label"></label>
-            <input asp-for="Input.Address" class="form-control" />
-        </div>
-        <div class="col-md-6">
-            <label asp-for="Input.Address2" class="form-label"></label>
-            <input asp-for="Input.Address2" class="form-control" />
-        </div>
-        <div class="col-md-4">
-            <label asp-for="Input.City" class="form-label"></label>
-            <input asp-for="Input.City" class="form-control" />
-        </div>
-        <div class="col-md-4">
-            <label asp-for="Input.State" class="form-label"></label>
-            <input asp-for="Input.State" class="form-control" />
-        </div>
-        <div class="col-md-2">
-            <label asp-for="Input.Zip" class="form-label"></label>
-            <input asp-for="Input.Zip" class="form-control" />
-        </div>
-        <div class="col-md-2">
-            <label asp-for="Input.Country" class="form-label"></label>
-            <input asp-for="Input.Country" class="form-control" />
-        </div>
-        
-        <!-- Theme Selection -->
-        <div class="col-md-12">
-            <label asp-for="Input.ThemeId" class="form-label"></label>
-            <select asp-for="Input.ThemeId" asp-items="Model.Themes" class="form-select">
-                <option value="">-- Use Default Theme --</option>
-            </select>
-            <small class="form-text text-muted">
-                Select a custom theme for your profile. If none is selected, the site's default theme will be used.
-            </small>
-            <span asp-validation-for="Input.ThemeId" class="text-danger"></span>
-        </div>
-        
-        <div class="col-md-12">
-            <label asp-for="Input.Signature" class="form-label"></label>
-            <textarea asp-for="Input.Signature" rows="3" class="form-control"></textarea>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Avatar (jpg/png/gif)</label>
-            <input type="file" asp-for="AvatarFile" class="form-control" />
-            <small class="text-muted">Thumbnail will be cropped to 100x100.</small>
-        </div>
-        <div class="col-md-6">
-            @if (!string.IsNullOrEmpty(Model.Input.Avatar))
-            {
-                <div>Current Avatar:</div>
-                <img src="/img/Avatar/Thumb/@Model.Input.Avatar" alt="avatar" class="img-thumbnail"
-                    style="width:100px;height:100px;object-fit:cover;" />
-            }
-        </div>
+                <!-- Theme Selection -->
+                <div class="col-md-12">
+                    <label asp-for="Input.ThemeId" class="form-label"></label>
+                    <select asp-for="Input.ThemeId" asp-items="Model.Themes" class="form-select">
+                        <option value="">-- Use Default Theme --</option>
+                    </select>
+                    <small class="form-text text-muted">
+                        Select a custom theme for your profile. If none is selected, the site's default theme will be used.
+                    </small>
+                    <span asp-validation-for="Input.ThemeId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12">
+                    <label asp-for="Input.Signature" class="form-label"></label>
+                    <textarea asp-for="Input.Signature" rows="3" class="form-control"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Avatar (jpg/png/gif)</label>
+                    <input type="file" asp-for="AvatarFile" class="form-control" />
+                    <small class="text-muted">Thumbnail will be cropped to 100x100.</small>
+                </div>
+                <div class="col-md-6">
+                    @if (!string.IsNullOrEmpty(Model.Input.Avatar))
+                    {
+                        <div>Current Avatar:</div>
+                        <img src="/img/Avatar/Thumb/@Model.Input.Avatar" alt="avatar" class="img-thumbnail"
+                             style="width:100px;height:100px;object-fit:cover;" />
+                    }
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a class="btn btn-secondary" href="/Profile/Details?userid=@encodedDisplayName">Cancel</a>
+            </div>
+        </form>
     </div>
-    <div class="mt-4">
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a class="btn btn-secondary" href="/Profile/Details?userid=@encodedDisplayName">Cancel</a>
-    </div>
-</form>
+</div>
 
 @section Scripts {
 <partial name="_ValidationScriptsPartial" />

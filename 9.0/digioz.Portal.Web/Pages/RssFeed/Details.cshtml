@@ -6,37 +6,42 @@
     Layout = "/Pages/Shared/_Layout.cshtml";
 }
 
-@if (!Model.Enabled)
-{
-    <div class="alert alert-info">RSS Feed plugin is disabled.</div>
-}
-else
-{
-    <div class="card shadow-sm">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span>@Model.FeedName</span>
-            <a class="btn btn-sm btn-outline-secondary" asp-page="/RssFeed/Index">Back</a>
-        </div>
-        <div class="card-body">
-            @if (Model.Items.Any())
-            {
-                <ul class="list-group list-group-flush">
-                    @foreach (var item in Model.Items)
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        @if (!Model.Enabled)
+        {
+            <div class="alert alert-info">RSS Feed plugin is disabled.</div>
+        }
+        else
+        {
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>@Model.FeedName</span>
+                    <a class="btn btn-sm btn-outline-secondary" asp-page="/RssFeed/Index">Back</a>
+                </div>
+                <div class="card-body">
+                    @if (Model.Items.Any())
                     {
-                        <li class="list-group-item">
-                            <a href="@item.Link" target="_blank" rel="noopener noreferrer">@item.Title</a>
-                            @if (!string.IsNullOrWhiteSpace(item.Summary))
+                        <ul class="list-group list-group-flush">
+                            @foreach (var item in Model.Items)
                             {
-                                <div class="text-muted small">@item.Summary</div>
+                                <li class="list-group-item">
+                                    <a href="@item.Link" target="_blank" rel="noopener noreferrer">@item.Title</a>
+                                    @if (!string.IsNullOrWhiteSpace(item.Summary))
+                                    {
+                                        <div class="text-muted small">@item.Summary</div>
+                                    }
+                                </li>
                             }
-                        </li>
+                        </ul>
                     }
-                </ul>
-            }
-            else
-            {
-                <div class="text-muted">No items.</div>
-            }
-        </div>
+                    else
+                    {
+                        <div class="text-muted">No items.</div>
+                    }
+                </div>
+            </div>
+        }
     </div>
-}
+</div>

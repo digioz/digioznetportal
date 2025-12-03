@@ -9,20 +9,26 @@
     }
 }
 
-<h1>Manage your account</h1>
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        <h1>Manage your account</h1>
 
-<div>
-    <h2>Change your account settings</h2>
-    <hr />
-    <div class="row">
-        <div class="col-md-3">
-            <partial name="_ManageNav" />
-        </div>
-        <div class="col-md-9">
-            @RenderBody()
+        <div>
+            <h2>Change your account settings</h2>
+            <hr />
+            <div class="row">
+                <div class="col-md-3">
+                    <partial name="_ManageNav" />
+                </div>
+                <div class="col-md-9">
+                    @RenderBody()
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
 
 @section Scripts {
     @RenderSection("Scripts", required: false)

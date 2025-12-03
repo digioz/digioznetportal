@@ -6,86 +6,89 @@
     var encodedSearch = System.Net.WebUtility.UrlEncode(Model.SearchTerm ?? string.Empty);
 }
 
-<h1>User Profiles</h1>
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        <form method="get" class="mb-3" role="search">
+            <div class="input-group">
+                <input type="text" name="search" value="@Model.SearchTerm" class="form-control"
+                       placeholder="Search by Display Name" />
+                <button type="submit" class="btn btn-outline-secondary">Search</button>
+                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                {
+                    <a class="btn btn-outline-danger" href="/Profile/Index">Clear</a>
+                }
+            </div>
+        </form>
 
-<form method="get" class="mb-3" role="search">
-    <div class="input-group">
-        <input type="text" name="search" value="@Model.SearchTerm" class="form-control"
-               placeholder="Search by Display Name" />
-        <button type="submit" class="btn btn-outline-secondary">Search</button>
-        @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+        @if (Model.Profiles == null || !Model.Profiles.Any())
         {
-            <a class="btn btn-outline-danger" href="/Profile/Index">Clear</a>
+            <p>No profiles found.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:90px;">Avatar</th>
+                            <th>Display Name</th>
+                            <th>City</th>
+                            <th>State</th>
+                            <th>Zip</th>
+                            <th>Country</th>
+                            <th style="width:120px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.Profiles)
+                        {
+                            var avatar = string.IsNullOrEmpty(p.Avatar) ? "default.png" : p.Avatar;
+                            var userId = System.Net.WebUtility.UrlEncode(p.DisplayName ?? string.Empty);
+                            <tr>
+                                <td>
+                                    <a href="/Profile/Details?userId=@userId" title="View @p.DisplayName's profile">
+                                        <img src="/img/avatar/thumb/@avatar" alt="@p.DisplayName" class="img-thumbnail"
+                                             style="width:75px;height:75px;object-fit:cover;" />
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="/Profile/Details?userId=@userId" title="View @p.DisplayName's profile">@p.DisplayName</a>
+                                </td>
+                                <td>@p.City</td>
+                                <td>@p.State</td>
+                                <td>@p.Zip</td>
+                                <td>@p.Country</td>
+                                <td>
+                                    <a class="btn btn-sm btn-primary" title="Send Private Message"
+                                       href="/PrivateMessages/Index?id=@System.Net.WebUtility.UrlEncode(p.DisplayName ?? string.Empty)">
+                                        <i class="fas fa-envelope"></i> PM
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <paging total-records="@Model.TotalRecords"
+                        page-no="@Model.PageNumber"
+                        page-size="@Model.PageSize"
+                        show-first-last="true"
+                        show-prev-next="true"
+                        show-total-pages="true"
+                        show-total-records="false"
+                        query-string-key-page-no="pageNumber"
+                        text-first="<<"
+                        text-last=">>"
+                        text-prev="<"
+                        text-next=">">
+                    <route-values>
+                        <rv key="search" value="@Model.SearchTerm"></rv>
+                    </route-values>
+                </paging>
+            </div>
         }
     </div>
-</form>
-
-@if (Model.Profiles == null || !Model.Profiles.Any())
-{
-    <p>No profiles found.</p>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-light">
-            <tr>
-                <th style="width:90px;">Avatar</th>
-                <th>Display Name</th>
-                <th>City</th>
-                <th>State</th>
-                <th>Zip</th>
-                <th>Country</th>
-                <th style="width:120px;">Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var p in Model.Profiles)
-            {
-                var avatar = string.IsNullOrEmpty(p.Avatar) ? "default.png" : p.Avatar;
-                var userId = System.Net.WebUtility.UrlEncode(p.DisplayName ?? string.Empty);
-                <tr>
-                    <td>
-                        <a href="/Profile/Details?userId=@userId" title="View @p.DisplayName's profile">
-                            <img src="/img/avatar/thumb/@avatar" alt="@p.DisplayName" class="img-thumbnail"
-                                 style="width:75px;height:75px;object-fit:cover;" />
-                        </a>
-                    </td>
-                    <td>
-                        <a href="/Profile/Details?userId=@userId" title="View @p.DisplayName's profile">@p.DisplayName</a>
-                    </td>
-                    <td>@p.City</td>
-                    <td>@p.State</td>
-                    <td>@p.Zip</td>
-                    <td>@p.Country</td>
-                    <td>
-                        <a class="btn btn-sm btn-primary" title="Send Private Message"
-                           href="/PrivateMessages/Index?id=@System.Net.WebUtility.UrlEncode(p.DisplayName ?? string.Empty)">
-                            <i class="fas fa-envelope"></i> PM
-                        </a>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </div>
-
-    <div class="d-flex justify-content-center">
-        <paging total-records="@Model.TotalRecords"
-                page-no="@Model.PageNumber"
-                page-size="@Model.PageSize"
-                show-first-last="true"
-                show-prev-next="true"
-                show-total-pages="true"
-                show-total-records="false"
-                query-string-key-page-no="pageNumber"
-                text-first="<<"
-                text-last=">>"
-                text-prev="<"
-                text-next=">">
-            <route-values>
-                <rv key="search" value="@Model.SearchTerm"></rv>
-            </route-values>
-        </paging>
-    </div>
-}
+</div>

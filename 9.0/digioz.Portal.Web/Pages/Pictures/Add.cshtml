@@ -6,60 +6,65 @@
     ViewData["Title"] = "Add Pictures";
 }
 
-<div class="container my-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <h1 class="mb-4">Add Pictures</h1>
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="container my-5">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <h1 class="mb-4">Add Pictures</h1>
 
-            @if (!string.IsNullOrEmpty(Model.StatusMessage))
-            {
-                <div class="alert alert-@(Model.IsSuccess ? "success" : "danger") alert-dismissible fade show" role="alert">
-                    @Model.StatusMessage
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-
-            <form method="post" enctype="multipart/form-data" id="uploadForm" class="needs-validation">
-                <div class="mb-3">
-                    <label for="AlbumId" class="form-label">Select Album *</label>
-                    <select id="AlbumId" name="AlbumId" class="form-select" required>
-                        <option value="">-- Select an Album --</option>
-                        @foreach (var album in Model.Albums)
-                        {
-                            <option value="@album.Id">@album.Name</option>
-                        }
-                    </select>
-                    <div class="invalid-feedback">
-                        Please select an album.
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label">Upload Images * (Maximum 5 images)</label>
-                    <div id="dropZone" class="border border-2 border-dashed rounded p-5 text-center" style="min-height: 200px; background-color: #f8f9fa; cursor: pointer;">
-                        <div id="dropText">
-                            <i class="bi bi-cloud-arrow-up" style="font-size: 2rem; color: #0d6efd;"></i>
-                            <p class="mt-2 mb-1"><strong>Drag and drop images here</strong></p>
-                            <p class="text-muted small">or click to select files</p>
-                            <p class="text-muted small">Supported formats: JPG, PNG, GIF, BMP, TIF, TIFF</p>
-                            <p class="text-muted small fw-bold">Maximum: 5 images at a time</p>
+                    @if (!string.IsNullOrEmpty(Model.StatusMessage))
+                    {
+                        <div class="alert alert-@(Model.IsSuccess ? "success" : "danger") alert-dismissible fade show" role="alert">
+                            @Model.StatusMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                        <div id="fileList" style="display: none;">
-                            <ul id="fileItems" class="list-unstyled"></ul>
+                    }
+
+                    <form method="post" enctype="multipart/form-data" id="uploadForm" class="needs-validation">
+                        <div class="mb-3">
+                            <label for="AlbumId" class="form-label">Select Album *</label>
+                            <select id="AlbumId" name="AlbumId" class="form-select" required>
+                                <option value="">-- Select an Album --</option>
+                                @foreach (var album in Model.Albums)
+                                {
+                                    <option value="@album.Id">@album.Name</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select an album.
+                            </div>
                         </div>
-                    </div>
-                    <input type="file" id="fileInput" name="Files" multiple accept="image/*" style="display: none;" />
-                </div>
 
-                <div id="descriptionContainer" style="display: none;" class="mb-4">
-                    <label class="form-label">Add Descriptions (Optional)</label>
-                    <div id="descriptions"></div>
-                </div>
+                        <div class="mb-4">
+                            <label class="form-label">Upload Images * (Maximum 5 images)</label>
+                            <div id="dropZone" class="border border-2 border-dashed rounded p-5 text-center" style="min-height: 200px; background-color: #f8f9fa; cursor: pointer;">
+                                <div id="dropText">
+                                    <i class="bi bi-cloud-arrow-up" style="font-size: 2rem; color: #0d6efd;"></i>
+                                    <p class="mt-2 mb-1"><strong>Drag and drop images here</strong></p>
+                                    <p class="text-muted small">or click to select files</p>
+                                    <p class="text-muted small">Supported formats: JPG, PNG, GIF, BMP, TIF, TIFF</p>
+                                    <p class="text-muted small fw-bold">Maximum: 5 images at a time</p>
+                                </div>
+                                <div id="fileList" style="display: none;">
+                                    <ul id="fileItems" class="list-unstyled"></ul>
+                                </div>
+                            </div>
+                            <input type="file" id="fileInput" name="Files" multiple accept="image/*" style="display: none;" />
+                        </div>
 
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>Upload Pictures</button>
+                        <div id="descriptionContainer" style="display: none;" class="mb-4">
+                            <label class="form-label">Add Descriptions (Optional)</label>
+                            <div id="descriptions"></div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>Upload Pictures</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>

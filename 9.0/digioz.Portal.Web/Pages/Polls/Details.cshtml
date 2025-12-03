@@ -6,107 +6,110 @@
     ViewData["Title"] = "Poll Details";
 }
 
-<h1>Poll Details</h1>
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Question</dt>
+            <dd class="col-sm-9">@Model.Item.Slug</dd>
+            <dt class="col-sm-3">Featured</dt>
+            <dd class="col-sm-9">@(Model.Item.Featured ? "Yes" : "No")</dd>
+            <dt class="col-sm-3">Closed</dt>
+            <dd class="col-sm-9">@(Model.Item.IsClosed ? "Yes" : "No")</dd>
+            <dt class="col-sm-3">Allow Multiple</dt>
+            <dd class="col-sm-9">@(Model.Item.AllowMultipleOptionsVote ? "Yes" : "No")</dd>
+        </dl>
 
-<dl class="row">
-    <dt class="col-sm-3">Question</dt>
-    <dd class="col-sm-9">@Model.Item.Slug</dd>
-    <dt class="col-sm-3">Featured</dt>
-    <dd class="col-sm-9">@(Model.Item.Featured ? "Yes" : "No")</dd>
-    <dt class="col-sm-3">Closed</dt>
-    <dd class="col-sm-9">@(Model.Item.IsClosed ? "Yes" : "No")</dd>
-    <dt class="col-sm-3">Allow Multiple</dt>
-    <dd class="col-sm-9">@(Model.Item.AllowMultipleOptionsVote ? "Yes" : "No")</dd>
-</dl>
+        @if (Model.HasVoted)
+        {
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">Poll Results</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-check-circle"></i> You have already voted in this poll.
+                    </div>
 
-@if (Model.HasVoted)
-{
-    <div class="card mb-3">
-        <div class="card-header">
-            <h5 class="mb-0">Poll Results</h5>
-        </div>
-        <div class="card-body">
-            <div class="alert alert-info">
-                <i class="fas fa-check-circle"></i> You have already voted in this poll.
-            </div>
-            
-            @if (!string.IsNullOrEmpty(Model.ResultsChartBase64))
-            {
-                <img class="img-fluid" src="data:image/png;base64,@Model.ResultsChartBase64" alt="Poll Results" />
-            }
-            else
-            {
-                <p class="text-muted">No votes have been cast yet.</p>
-            }
-        </div>
-    </div>
-}
-else
-{
-    <div class="card mb-3">
-        <div class="card-header">Answers</div>
-        <div class="card-body">
-            @if (Model.Answers.Count > 0)
-            {
-                <ul class="list-group">
-                    @foreach (var a in Model.Answers)
+                    @if (!string.IsNullOrEmpty(Model.ResultsChartBase64))
                     {
-                        <li class="list-group-item">@a.Answer</li>
+                        <img class="img-fluid" src="data:image/png;base64,@Model.ResultsChartBase64" alt="Poll Results" />
                     }
-                </ul>
-            }
-            else
-            {
-                <em>No answers defined.</em>
-            }
-        </div>
-    </div>
-}
-
-@if (User.Identity?.IsAuthenticated ?? false)
-{
-    @if (!Model.HasVoted)
-    {
-        <div class="card mb-3">
-            <div class="card-header">Vote</div>
-            <div class="card-body">
-            @if (Model.Item.IsClosed)
-            {
-                <div class="alert alert-warning">Poll closed.</div>
-            }
-            else
-            {
-                <form method="post" asp-page-handler="Vote" asp-route-id="@Model.Item.Id">
-                    <div class="mb-2">
-                        @if (Model.Item.AllowMultipleOptionsVote)
-                        {
-                            <p class="text-muted small mb-2">You can select multiple options.</p>
-                            foreach (var a in Model.Answers)
+                    else
+                    {
+                        <p class="text-muted">No votes have been cast yet.</p>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card mb-3">
+                <div class="card-header">Answers</div>
+                <div class="card-body">
+                    @if (Model.Answers.Count > 0)
+                    {
+                        <ul class="list-group">
+                            @foreach (var a in Model.Answers)
                             {
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="SelectedAnswerIds" value="@a.Id" id="ans_@a.Id" />
-                                    <label class="form-check-label" for="ans_@a.Id">@a.Answer</label>
-                                </div>
+                                <li class="list-group-item">@a.Answer</li>
                             }
+                        </ul>
+                    }
+                    else
+                    {
+                        <em>No answers defined.</em>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (User.Identity?.IsAuthenticated ?? false)
+        {
+            @if (!Model.HasVoted)
+            {
+                <div class="card mb-3">
+                    <div class="card-header">Vote</div>
+                    <div class="card-body">
+                        @if (Model.Item.IsClosed)
+                        {
+                            <div class="alert alert-warning">Poll closed.</div>
                         }
                         else
                         {
-                            <p class="text-muted small mb-2">Select one option.</p>
-                            foreach (var a in Model.Answers)
-                            {
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="SelectedAnswerIds" value="@a.Id" id="ans_@a.Id" />
-                                    <label class="form-check-label" for="ans_@a.Id">@a.Answer</label>
+                            <form method="post" asp-page-handler="Vote" asp-route-id="@Model.Item.Id">
+                                <div class="mb-2">
+                                    @if (Model.Item.AllowMultipleOptionsVote)
+                                    {
+                                        <p class="text-muted small mb-2">You can select multiple options.</p>
+                                        foreach (var a in Model.Answers)
+                                        {
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="SelectedAnswerIds" value="@a.Id" id="ans_@a.Id" />
+                                                <label class="form-check-label" for="ans_@a.Id">@a.Answer</label>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted small mb-2">Select one option.</p>
+                                        foreach (var a in Model.Answers)
+                                        {
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="SelectedAnswerIds" value="@a.Id" id="ans_@a.Id" />
+                                                <label class="form-check-label" for="ans_@a.Id">@a.Answer</label>
+                                            </div>
+                                        }
+                                    }
                                 </div>
-                            }
+                                <button type="submit" class="btn btn-primary">Submit Vote</button>
+                            </form>
                         }
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit Vote</button>
-                </form>
+                </div>
             }
-            </div>
-        </div>
-    }
-}
+        }
 
-<a class="btn btn-secondary" asp-page="/Polls/Index">Back</a>
+        <a class="btn btn-secondary" asp-page="/Polls/Index">Back</a>
+    </div>
+</div>
