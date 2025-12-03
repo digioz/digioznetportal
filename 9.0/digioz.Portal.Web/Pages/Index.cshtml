@@ -26,7 +26,12 @@
 @{
     if (Model.PageContent != null)
     {
-        @Html.Raw(Model.PageContent.Body)
+        <div class="card bg-light mb-5">
+            <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+            <div class="card-body">
+                @Html.Raw(Model.PageContent.Body)
+            </div>
+        </div>
     }
 
     if (Model.AllowComments)

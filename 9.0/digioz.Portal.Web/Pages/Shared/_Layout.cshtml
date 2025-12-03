@@ -102,12 +102,12 @@
 				
 				@* 	@RenderSection("RSSFeed", required: false) *@
 
-				<div class="card bg-light mb-5">
+				@* <div class="card bg-light mb-5">
 					<div class="card-header bg-primary text-white">@ViewBag.Title</div>
-					<div class="card-body">
+					<div class="card-body"> *@
 						@RenderBody()
-					</div>
-				</div>
+					@* </div>
+				</div> *@
 
 				@await Component.InvokeAsync("ZoneMenu", new { location = "BodyBottom" })
 			</div>
