@@ -101,17 +101,39 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.MailingListCampaign
                 int successCount = 0;
                 int failCount = 0;
 
+                // Build view in browser link
+                string emailDisplayUrl = $"{siteUrl}/MailingList/EmailDisplay/{id}";
+                string unsubscribeUrl = $"{siteUrl}/MailingList/Unsubscribe";
+
                 // Send to each subscriber
                 foreach (var subscriber in activeSubscribers)
                 {
                     try
                     {
+                        // Prepare campaign body with view in browser link
+                        string campaignBodyWithLinks = Campaign.Body;
+                        
+                        // Add "View in Browser" link at the top if not already present
+                        if (!campaignBodyWithLinks.Contains("View in browser", StringComparison.OrdinalIgnoreCase))
+                        {
+                            campaignBodyWithLinks = $"<p style='text-align: center; margin-bottom: 20px;'>" +
+                                                   $"<a href='{emailDisplayUrl}' style='color: #0d6efd; text-decoration: none;'>?? View this email in your browser</a>" +
+                                                   $"</p>" + campaignBodyWithLinks;
+                        }
+
+                        // Add unsubscribe link at the bottom
+                        campaignBodyWithLinks += $"<hr style='margin: 30px 0; border: none; border-top: 1px solid #dee2e6;' />" +
+                                                $"<p style='text-align: center; font-size: 12px; color: #6c757d;'>" +
+                                                $"Don't want to receive these emails? " +
+                                                $"<a href='{unsubscribeUrl}' style='color: #0d6efd;'>Unsubscribe</a>" +
+                                                $"</p>";
+
                         // Prepare email body
                         string emailBody = emailTemplate
                             .Replace("#SITENAME#", siteName)
                             .Replace("#SITEURL#", siteUrl)
                             .Replace("#TO#", $"Dear {subscriber.FirstName} {subscriber.LastName},")
-                            .Replace("#CONTENT#", Campaign.Body);
+                            .Replace("#CONTENT#", campaignBodyWithLinks);
 
                         // Determine From address
                         string fromEmail = !string.IsNullOrEmpty(Campaign.FromEmail) 

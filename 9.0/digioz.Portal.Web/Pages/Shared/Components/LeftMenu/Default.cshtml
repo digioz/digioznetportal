@@ -33,6 +33,10 @@
                 {
                     <li><a href="/RssFeed/Index">RSS Feed</a></li>
                 }
+                if ((bool)(ViewData["ShowMailingList"] ?? false))
+                {
+                    <li><a href="/MailingList/Index">Mailing Lists</a></li>
+                }
             }
             else
             {
@@ -44,6 +48,10 @@
                 if ((bool)(ViewData["ShowRssFeed"] ?? false))
                 {
                     <li><a href="/RssFeed/Index">RSS Feed</a></li>
+                }
+                if ((bool)(ViewData["ShowMailingList"] ?? false))
+                {
+                    <li><a href="/MailingList/Index">Mailing Lists</a></li>
                 }
             }
         </ul>
