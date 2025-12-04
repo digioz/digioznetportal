@@ -150,29 +150,20 @@ public class MailgunEmailProvider : IEmailProvider
             content.Add(new StringContent(toAddress), "to");
         }
 
-        foreach (var toAddress in message.ToAddresses.Where(a => !string.IsNullOrWhiteSpace(a.Email)))
+        foreach (var address in FormatEmailAddresses(message.ToAddresses))
         {
-            var address = !string.IsNullOrWhiteSpace(toAddress.Name)
-                ? $"{toAddress.Name} <{toAddress.Email}>"
-                : toAddress.Email;
             content.Add(new StringContent(address), "to");
         }
 
         // Add CC recipients
-        foreach (var ccAddress in message.CcAddresses.Where(a => !string.IsNullOrWhiteSpace(a.Email)))
+        foreach (var address in FormatEmailAddresses(message.CcAddresses))
         {
-            var address = !string.IsNullOrWhiteSpace(ccAddress.Name)
-                ? $"{ccAddress.Name} <{ccAddress.Email}>"
-                : ccAddress.Email;
             content.Add(new StringContent(address), "cc");
         }
 
         // Add BCC recipients
-        foreach (var bccAddress in message.BccAddresses.Where(a => !string.IsNullOrWhiteSpace(a.Email)))
+        foreach (var address in FormatEmailAddresses(message.BccAddresses))
         {
-            var address = !string.IsNullOrWhiteSpace(bccAddress.Name)
-                ? $"{bccAddress.Name} <{bccAddress.Email}>"
-                : bccAddress.Email;
             content.Add(new StringContent(address), "bcc");
         }
 
@@ -213,10 +204,10 @@ public class MailgunEmailProvider : IEmailProvider
             content.Add(new StringContent(header.Value), $"h:{header.Key}");
         }
 
-        // Add tags
-        foreach (var tag in message.Tags.Take(3)) // Mailgun allows max 3 tags
+        // Add tags (Mailgun allows max 3 tags)
+        foreach (var tagValue in message.Tags.Take(3).Select(tag => tag.Value))
         {
-            content.Add(new StringContent(tag.Value), "o:tag");
+            content.Add(new StringContent(tagValue), "o:tag");
         }
 
         // Set tracking options
@@ -251,6 +242,18 @@ public class MailgunEmailProvider : IEmailProvider
         }
 
         return content;
+    }
+
+    /// <summary>
+    /// Formats a collection of email addresses into RFC 2822 format
+    /// </summary>
+    private static IEnumerable<string> FormatEmailAddresses(IEnumerable<EmailAddress> addresses)
+    {
+        return addresses
+            .Where(a => !string.IsNullOrWhiteSpace(a.Email))
+            .Select(a => !string.IsNullOrWhiteSpace(a.Name)
+                ? $"{a.Name} <{a.Email}>"
+                : a.Email);
     }
 
     private void ValidateSettings()
