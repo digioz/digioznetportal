@@ -36,7 +36,6 @@ VALUES (@systemUserId, 'System', 'System', NULL, 'User', 'system@domain.com', NU
                 values: new object[,]
                 {
                     // Email General Configuration
-                    { Guid.NewGuid().ToString(), "Email:DefaultProvider", "SMTP", false },
                     { Guid.NewGuid().ToString(), "Email:ProviderType", "SMTP", false },
                     { Guid.NewGuid().ToString(), "Email:FromEmail", "noreply@domain.com", false },
                     { Guid.NewGuid().ToString(), "Email:FromName", "DigiOz .NET Portal", false },
@@ -68,12 +67,6 @@ VALUES (@systemUserId, 'System', 'System', NULL, 'User', 'system@domain.com', NU
                     // Azure Communication Services Email Configuration
                     { Guid.NewGuid().ToString(), "Email:Azure:ConnectionString", "[Enter Azure Communication Services Connection String]", true },
                     { Guid.NewGuid().ToString(), "Email:Azure:EnableTracking", "true", false },
-                    
-                    // Legacy SMTP Configuration (for backward compatibility - can be removed if not needed)
-                    { Guid.NewGuid().ToString(), "SMTPServer", "mail.domain.com", false },
-                    { Guid.NewGuid().ToString(), "SMTPPort", "587", false },
-                    { Guid.NewGuid().ToString(), "SMTPUsername", "webmaster@domain.com", false },
-                    { Guid.NewGuid().ToString(), "SMTPPassword", "[Enter Password]", true },
                     
                     // Site Configuration
                     { Guid.NewGuid().ToString(), "SiteURL", "https://localhost:5048/", false },
@@ -206,7 +199,7 @@ WHERE UserId = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'system@domain
             migrationBuilder.Sql(@"
 DELETE FROM Config WHERE ConfigKey IN (
     -- Email General Configuration
-    'Email:DefaultProvider','Email:ProviderType','Email:FromEmail','Email:FromName','Email:IsEnabled','Email:TimeoutSeconds',
+    'Email:ProviderType','Email:FromEmail','Email:FromName','Email:IsEnabled','Email:TimeoutSeconds',
     -- SMTP Configuration
     'Email:Smtp:Host','Email:Smtp:Port','Email:Smtp:Username','Email:Smtp:Password','Email:Smtp:EnableSsl','Email:Smtp:UseDefaultCredentials',
     -- SendGrid Configuration
@@ -215,8 +208,6 @@ DELETE FROM Config WHERE ConfigKey IN (
     'Email:Mailgun:ApiKey','Email:Mailgun:Domain','Email:Mailgun:ApiBaseUrl','Email:Mailgun:EnableTracking','Email:Mailgun:EnableDkim',
     -- Azure Email Configuration
     'Email:Azure:ConnectionString','Email:Azure:EnableTracking',
-    -- Legacy SMTP Configuration
-    'SMTPServer','SMTPPort','SMTPUsername','SMTPPassword',
     -- Site Configuration
     'SiteURL','SiteName','SiteEncryptionKey','WebmasterEmail',
     -- Payment Configuration
