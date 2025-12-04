@@ -5,14 +5,14 @@ using digioz.Portal.Dal.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace digioz.Portal.Web.Areas.Admin.Pages.MailingListSubscriber
+namespace digioz.Portal.Web.Areas.Admin.Pages.MailingListCampaign
 {
     public class IndexModel : PageModel
     {
-        private readonly IMailingListSubscriberService _service;
-        public IndexModel(IMailingListSubscriberService service) { _service = service; }
+        private readonly IMailingListCampaignService _service;
+        public IndexModel(IMailingListCampaignService service) { _service = service; }
 
-        public IReadOnlyList<digioz.Portal.Bo.MailingListSubscriber> Items { get; private set; } = Array.Empty<digioz.Portal.Bo.MailingListSubscriber>();
+        public IReadOnlyList<digioz.Portal.Bo.MailingListCampaign> Items { get; private set; } = Array.Empty<digioz.Portal.Bo.MailingListCampaign>();
         [BindProperty(SupportsGet = true)] public int PageNumber { get; set; } = 1;
         [BindProperty(SupportsGet = true)] public int PageSize { get; set; } = 10;
         public int TotalCount { get; private set; }

@@ -1,0 +1,99 @@
+@page "{id}"
+@model digioz.Portal.Web.Areas.Admin.Pages.MailingList.ManageSubscribersModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Manage Subscribers";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<partial name="_MailingListNav" />
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Manage Subscribers - @Model.MailingListName</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/MailingList/Index">Back</a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Available Subscribers -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <strong>Available Subscribers</strong>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.AvailableSubscribers.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var subscriber in Model.AvailableSubscribers)
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold">@subscriber.Email</div>
+                                    <small class="text-muted">@subscriber.FirstName @subscriber.LastName</small>
+                                </div>
+                                <form method="post" asp-page-handler="AddSubscriber">
+                                    <input type="hidden" name="mailingListId" value="@Model.MailingListId" />
+                                    <input type="hidden" name="subscriberId" value="@subscriber.Id" />
+                                    <button type="submit" class="btn btn-sm btn-success" title="Add to list">
+                                        <i class="bi bi-plus-circle"></i> Add
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 text-center text-muted">
+                        No available subscribers
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscribed Members -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <strong>Subscribed Members</strong>
+                <span class="badge bg-primary">@Model.SubscribedMembers.Count()</span>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.SubscribedMembers.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var subscriber in Model.SubscribedMembers)
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold">@subscriber.Email</div>
+                                    <small class="text-muted">@subscriber.FirstName @subscriber.LastName</small>
+                                    @if (!subscriber.Status)
+                                    {
+                                        <span class="badge bg-warning text-dark ms-2">Inactive</span>
+                                    }
+                                </div>
+                                <form method="post" asp-page-handler="RemoveSubscriber">
+                                    <input type="hidden" name="mailingListId" value="@Model.MailingListId" />
+                                    <input type="hidden" name="subscriberId" value="@subscriber.Id" />
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Remove from list">
+                                        <i class="bi bi-x-circle"></i> Remove
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 text-center text-muted">
+                        No subscribers in this list
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

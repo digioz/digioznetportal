@@ -61,7 +61,7 @@ public class SendGridEmailProvider : IEmailProvider
             else
             {
                 var errorBody = await response.Body.ReadAsStringAsync();
-                var errorMessage = $"SendGrid API error: {response.StatusCode} - {errorBody}";
+                var errorMessage = $"SendGrid API error: {response.StatusCode} - {errorBody}"; 
                 _logger.LogError(errorMessage);
                 return EmailResult.Failure(errorMessage, ProviderName);
             }
