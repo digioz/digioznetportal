@@ -1,0 +1,87 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.MailingListCampaign.AddModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Add Campaign";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<partial name="../MailingList/_MailingListNav" />
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Add Campaign</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/MailingListCampaign/Index">Back</a>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="Item.Name" class="form-label">Name</label>
+                    <input asp-for="Item.Name" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="SelectedMailingListId" class="form-label">Mailing List</label>
+                    <select asp-for="SelectedMailingListId" asp-items="@Model.MailingLists" class="form-select" required>
+                        <option value="">-- Select Mailing List --</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Item.Subject" class="form-label">Subject</label>
+                    <input asp-for="Item.Subject" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Item.FromName" class="form-label">From Name</label>
+                    <input asp-for="Item.FromName" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Item.FromEmail" class="form-label">From Email</label>
+                    <input asp-for="Item.FromEmail" class="form-control" type="email" />
+                </div>
+                <div class="col-12">
+                    <label asp-for="Item.Summary" class="form-label">Summary</label>
+                    <textarea asp-for="Item.Summary" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Item.Banner" class="form-label">Banner URL</label>
+                    <input asp-for="Item.Banner" class="form-control" />
+                </div>
+                <div class="col-12">
+                    <label asp-for="Item.Body" class="form-label">Body</label>
+                    <textarea asp-for="Item.Body" class="form-control" id="editor" rows="30"></textarea>
+                </div>
+            </div>
+            <div class="mt-3 d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/lib/ckeditor/build/ckeditor.js" asp-append-version="true"></script>
+    <script>
+        if (!document.getElementById('ck-minheight-style')) {
+            var st = document.createElement('style');
+            st.id = 'ck-minheight-style';
+            st.innerHTML = '.ck-editor__editable_inline { min-height:30em !important; }';
+            document.head.appendChild(st);
+        }
+
+        (function waitForCK() {
+            if (!window.ClassicEditor) return setTimeout(waitForCK, 50);
+            ClassicEditor
+                .create(document.querySelector('#editor'))
+                .then(editor => {
+                    window.__ck = editor;
+                    try { editor.ui.view.editable.element.style.minHeight = '30em'; } catch (e) { }
+                    const form = document.querySelector('form');
+                    form.addEventListener('submit', function () {
+                        const html = editor.getData();
+                        document.getElementById('editor').value = html;
+                    });
+                });
+        })();
+    </script>
+}

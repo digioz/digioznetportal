@@ -40,7 +40,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
                 whoisOnline = new WhoIsOnlineViewModel();
 
                 var configWhoIsOnline = _pluginService.GetAll().Where(x => x.Name == "WhoIsOnline").SingleOrDefault();
-                var latestVisitors = _visitorSessionService.GetAllGreaterThan(DateTime.Now.AddMinutes(-10)).ToList();
+                var latestVisitors = _visitorSessionService.GetAllGreaterThan(DateTime.Now.AddMinutes(-15)).ToList();
                 var visitorRegistered = latestVisitors.Where(x => x.Username != null).ToList();
                 visitorRegistered = System.Linq.Enumerable.DistinctBy(visitorRegistered, x => x.Username).ToList();
 
@@ -67,7 +67,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
                 }
 
                 // Get bot visitors from VisitorInfo table
-                var recentVisitorInfo = _visitorInfoService.GetAllGreaterThan(DateTime.Now.AddMinutes(-10));
+                var recentVisitorInfo = _visitorInfoService.GetAllGreaterThan(DateTime.Now.AddMinutes(-15));
                 var botVisitors = recentVisitorInfo
                     .Where(v => !string.IsNullOrEmpty(v.UserAgent) && BotHelper.IsBot(v.UserAgent))
                     .Select(v => new

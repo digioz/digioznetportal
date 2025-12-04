@@ -1,14 +1,84 @@
 @page
 @model digioz.Portal.Web.Areas.Admin.Pages.MailingListSubscriber.IndexModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
 @{
-    ViewBag.Title = "Mailing List";
+    ViewBag.Title = "Subscribers";
     Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
+<partial name="../MailingList/_MailingListNav" />
+
 <div class="card shadow-sm">
-    <div class="card-header">Mailing List</div>
-    <div class="card-body">
-        <p class="text-muted">Build your admin UI for mailing list here.</p>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Subscribers</span>
+        <a class="btn btn-sm btn-primary" asp-area="Admin" asp-page="/MailingListSubscriber/Add">Add Subscriber</a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Email</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th class="text-center">Status</th>
+                        <th>Date Created</th>
+                        <th style="width:250px" class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items.Any())
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@item.Email</td>
+                                <td>@item.FirstName</td>
+                                <td>@item.LastName</td>
+                                <td class="text-center">
+                                    @if (item.Status)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td>@item.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-secondary px-1 py-0 fs-6" asp-area="Admin" asp-page="/MailingListSubscriber/Details" asp-route-id="@item.Id" title="Details" aria-label="Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-primary px-1 py-0 fs-6" asp-area="Admin" asp-page="/MailingListSubscriber/Edit" asp-route-id="@item.Id" title="Edit" aria-label="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-danger px-1 py-0 fs-6" asp-area="Admin" asp-page="/MailingListSubscriber/Delete" asp-route-id="@item.Id" title="Delete" aria-label="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No subscribers found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <small class="text-muted">Page @Model.PageNumber of @Model.TotalPages (@Model.TotalCount total)</small>
+        <paging total-records="@Model.TotalCount"
+                page-no="@Model.PageNumber"
+                page-size="@Model.PageSize"
+                show-prev-next="true"
+                show-first-last="true"
+                query-string-key-page-no="pageNumber"
+                class="pagination mb-0"></paging>
     </div>
 </div>

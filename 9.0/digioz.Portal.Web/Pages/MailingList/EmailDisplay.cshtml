@@ -1,3 +1,145 @@
-@page
-@model EmailDisplayModel
-<h2>Email Display</h2>
+@page "{id}"
+@model digioz.Portal.Web.Pages.MailingList.EmailDisplayModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = Model.Campaign?.Name ?? "Email Campaign";
+    Layout = null; // Use no layout for clean email display
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .email-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .email-header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .email-content {
+            padding: 30px;
+        }
+        .email-footer {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .banner-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    @if (Model.Campaign != null)
+    {
+        <div class="email-container">
+            <!-- Email Header -->
+            <div class="email-header">
+                <h1 style="margin: 0; font-size: 24px; color: #333;">@Model.Campaign.Name</h1>
+                @if (!string.IsNullOrEmpty(Model.Campaign.Subject))
+                {
+                    <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">
+                        <strong>Subject:</strong> @Model.Campaign.Subject
+                    </p>
+                }
+                @if (Model.Campaign.DateCreated != null && Model.Campaign.DateCreated != DateTime.MinValue)
+                {
+                    <p style="margin: 5px 0 0 0; color: #999; font-size: 12px;">
+                        @Model.Campaign.DateCreated.ToString("MMMM dd, yyyy")
+                    </p>
+                }
+            </div>
+
+            <!-- Banner (if present) -->
+            @if (!string.IsNullOrEmpty(Model.Campaign.Banner))
+            {
+                <div style="padding: 0;">
+                    <img src="@Model.Campaign.Banner" alt="Campaign Banner" class="banner-image" />
+                </div>
+            }
+
+            <!-- Summary (if present) -->
+            @if (!string.IsNullOrEmpty(Model.Campaign.Summary))
+            {
+                <div style="padding: 20px 30px; background-color: #e9ecef; border-left: 4px solid #0d6efd;">
+                    <p style="margin: 0; font-style: italic; color: #495057;">
+                        @Model.Campaign.Summary
+                    </p>
+                </div>
+            }
+
+            <!-- Email Content -->
+            <div class="email-content">
+                @Html.Raw(Model.Campaign.Body)
+            </div>
+
+            <!-- Email Footer -->
+            <div class="email-footer">
+                <p style="margin: 0 0 10px 0;">
+                    This email was sent from <strong>@Model.SiteName</strong>
+                </p>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <p style="margin: 0;">
+                        <a href="@Url.Page("/MailingList/Unsubscribe")" style="color: #0d6efd; text-decoration: none;">
+                            Manage your email preferences
+                        </a>
+                    </p>
+                }
+                else
+                {
+                    <p style="margin: 0; color: #999;">
+                        You received this email because you subscribed to our mailing list.
+                    </p>
+                }
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div style="max-width: 800px; margin: 20px auto; text-align: center;">
+            <a href="@Url.Page("/Index")" class="btn btn-outline-primary">
+                <i class="bi bi-house"></i> Return to Home
+            </a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a href="@Url.Page("/MailingList/Index")" class="btn btn-outline-secondary ms-2">
+                    <i class="bi bi-envelope"></i> View Mailing Lists
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="email-container">
+            <div class="email-content text-center">
+                <div class="alert alert-warning">
+                    <h4><i class="bi bi-exclamation-triangle"></i> Campaign Not Found</h4>
+                    <p>The email campaign you're looking for could not be found or may have been removed.</p>
+                    <a href="@Url.Page("/Index")" class="btn btn-primary mt-3">
+                        Return to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

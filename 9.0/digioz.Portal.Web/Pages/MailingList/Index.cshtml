@@ -1,3 +1,129 @@
 @page
-@model IndexModel
-<h2>Mailing List Index</h2>
+@model digioz.Portal.Web.Pages.MailingList.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Mailing Lists";
+}
+
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="container">
+            <div class="container my-5">
+                <div class="row">
+                    <div class="col-12">
+                        <h1 class="mb-4">
+                            <i class="bi bi-envelope-fill"></i> Available Mailing Lists
+                        </h1>
+                        <p class="lead text-muted">
+                            Subscribe to receive updates and newsletters from our mailing lists.
+                        </p>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.StatusMessage))
+                {
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger") alert-dismissible fade show" role="alert">
+                                @Model.StatusMessage
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="row g-4">
+                    @if (Model.MailingLists.Any())
+                    {
+                        foreach (var mailingList in Model.MailingLists)
+                        {
+                            var isSubscribed = Model.UserSubscriptions.Contains(mailingList.Id);
+
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card h-100 shadow-sm @(isSubscribed ? "border-success" : "")">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            @mailingList.Name
+                                            @if (isSubscribed)
+                                            {
+                                                <span class="badge bg-success float-end">Subscribed</span>
+                                            }
+                                        </h5>
+                                        @if (!string.IsNullOrEmpty(mailingList.Description))
+                                        {
+                                            <p class="card-text text-muted">@mailingList.Description</p>
+                                        }
+                                        @if (!string.IsNullOrEmpty(mailingList.Address))
+                                        {
+                                            <p class="card-text">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-geo-alt"></i> @mailingList.Address
+                                                </small>
+                                            </p>
+                                        }
+                                    </div>
+                                    <div class="card-footer bg-transparent">
+                                        @if (User.Identity?.IsAuthenticated == true)
+                                        {
+                                            if (!isSubscribed)
+                                            {
+                                                <form method="post" asp-page-handler="Subscribe">
+                                                    <input type="hidden" name="mailingListId" value="@mailingList.Id" />
+                                                    <button type="submit" class="btn btn-primary w-100">
+                                                        <i class="bi bi-plus-circle"></i> Subscribe
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form method="post" asp-page-handler="Unsubscribe">
+                                                    <input type="hidden" name="mailingListId" value="@mailingList.Id" />
+                                                    <button type="submit" class="btn btn-outline-secondary w-100">
+                                                        <i class="bi bi-x-circle"></i> Unsubscribe
+                                                    </button>
+                                                </form>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/MailingList/Index" class="btn btn-primary w-100">
+                                                <i class="bi bi-box-arrow-in-right"></i> Login to Subscribe
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> No mailing lists are currently available.
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (User.Identity?.IsAuthenticated == true && Model.UserSubscriptions.Any())
+                {
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Manage Your Subscriptions</h5>
+                                    <p class="card-text text-muted">You are currently subscribed to @Model.UserSubscriptions.Count mailing list(s).</p>
+                                    <a asp-page="/MailingList/Unsubscribe" class="btn btn-outline-primary">
+                                        <i class="bi bi-gear"></i> Manage Subscriptions
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

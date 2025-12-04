@@ -35,25 +35,63 @@ VALUES (@systemUserId, 'System', 'System', NULL, 'User', 'system@domain.com', NU
                 columnTypes: new[] { "nvarchar(128)", "nvarchar(max)", "nvarchar(max)", "bit" },
                 values: new object[,]
                 {
-                    { Guid.NewGuid().ToString(), "SMTPServer", "mail.domain.com", false },
-                    { Guid.NewGuid().ToString(), "SMTPPort", "587", false },
-                    { Guid.NewGuid().ToString(), "SMTPUsername", "webmaster@domain.com", false },
-                    { Guid.NewGuid().ToString(), "SMTPPassword", "[Enter Password]", true },
+                    // Email General Configuration
+                    { Guid.NewGuid().ToString(), "Email:ProviderType", "SMTP", false },
+                    { Guid.NewGuid().ToString(), "Email:FromEmail", "noreply@domain.com", false },
+                    { Guid.NewGuid().ToString(), "Email:FromName", "DigiOz .NET Portal", false },
+                    { Guid.NewGuid().ToString(), "Email:IsEnabled", "true", false },
+                    { Guid.NewGuid().ToString(), "Email:TimeoutSeconds", "30", false },
+                    
+                    // SMTP Configuration
+                    { Guid.NewGuid().ToString(), "Email:Smtp:Host", "mail.domain.com", false },
+                    { Guid.NewGuid().ToString(), "Email:Smtp:Port", "587", false },
+                    { Guid.NewGuid().ToString(), "Email:Smtp:Username", "webmaster@domain.com", false },
+                    { Guid.NewGuid().ToString(), "Email:Smtp:Password", "[Enter Password]", true },
+                    { Guid.NewGuid().ToString(), "Email:Smtp:EnableSsl", "true", false },
+                    { Guid.NewGuid().ToString(), "Email:Smtp:UseDefaultCredentials", "false", false },
+                    
+                    // SendGrid Configuration
+                    { Guid.NewGuid().ToString(), "Email:SendGrid:ApiKey", "[Enter SendGrid API Key]", true },
+                    { Guid.NewGuid().ToString(), "Email:SendGrid:SandboxMode", "false", false },
+                    { Guid.NewGuid().ToString(), "Email:SendGrid:EnableClickTracking", "true", false },
+                    { Guid.NewGuid().ToString(), "Email:SendGrid:EnableOpenTracking", "true", false },
+                    { Guid.NewGuid().ToString(), "Email:SendGrid:TemplateId", "", false },
+                    
+                    // Mailgun Configuration
+                    { Guid.NewGuid().ToString(), "Email:Mailgun:ApiKey", "[Enter Mailgun API Key]", true },
+                    { Guid.NewGuid().ToString(), "Email:Mailgun:Domain", "[Enter Mailgun Domain]", false },
+                    { Guid.NewGuid().ToString(), "Email:Mailgun:ApiBaseUrl", "https://api.mailgun.net/v3", false },
+                    { Guid.NewGuid().ToString(), "Email:Mailgun:EnableTracking", "true", false },
+                    { Guid.NewGuid().ToString(), "Email:Mailgun:EnableDkim", "true", false },
+                    
+                    // Azure Communication Services Email Configuration
+                    { Guid.NewGuid().ToString(), "Email:Azure:ConnectionString", "[Enter Azure Communication Services Connection String]", true },
+                    { Guid.NewGuid().ToString(), "Email:Azure:EnableTracking", "true", false },
+                    
+                    // Site Configuration
                     { Guid.NewGuid().ToString(), "SiteURL", "https://localhost:5048/", false },
                     { Guid.NewGuid().ToString(), "SiteName", "DigiOz .NET Portal", false },
                     { Guid.NewGuid().ToString(), "WebmasterEmail", "webmaster@domain.com", false },
+                    
+                    // Payment Configuration
                     { Guid.NewGuid().ToString(), "PaymentLoginID", "[Enter ID]", false },
                     { Guid.NewGuid().ToString(), "PaymentTransactionKey", "[Enter Key]", false },
                     { Guid.NewGuid().ToString(), "PaymentTestMode", "true", false },
                     { Guid.NewGuid().ToString(), "PaymentTransactionFee", "0", false },
-                    { Guid.NewGuid().ToString(), "NumberOfAnnouncements", "2", false },
-                    { Guid.NewGuid().ToString(), "ShowContactForm", "false", false },
-                    { Guid.NewGuid().ToString(), "VisitorSessionPurgePeriod", "30", false },
+                    
+                    // PayPal Configuration
                     { Guid.NewGuid().ToString(), "PaypalMode", "sandbox", false },
                     { Guid.NewGuid().ToString(), "PaypalClientId", "[Enter ID]", false },
                     { Guid.NewGuid().ToString(), "PaypalClientSecret", "[Enter Key]", false },
                     { Guid.NewGuid().ToString(), "PaypalConnectionTimeout", "360000", false },
+                    
+                    // Site Features Configuration
+                    { Guid.NewGuid().ToString(), "NumberOfAnnouncements", "2", false },
+                    { Guid.NewGuid().ToString(), "ShowContactForm", "false", false },
+                    { Guid.NewGuid().ToString(), "VisitorSessionPurgePeriod", "30", false },
                     { Guid.NewGuid().ToString(), "EnableCommentsOnAllPages", "true", false },
+                    
+                    // Third-Party Services
                     { Guid.NewGuid().ToString(), "TinyMCEApiKey", "[Enter Key]", false },
                     { Guid.NewGuid().ToString(), "RecaptchaEnabled", "false", false },
                     { Guid.NewGuid().ToString(), "RecaptchaPublicKey", "[Enter Key]", false },
@@ -142,7 +180,8 @@ INSERT INTO Page (UserId, Title, Url, Body, Keywords, Description, Visible, Time
                     { "RSSFeed", null, false },
                     { "LatestPictures", null, false },
                     { "LatestVideos", null, false },
-                    { "Polls", null, false }
+                    { "Polls", null, false },
+                    { "MailingList", null, false }
                 });
         }
 
@@ -160,10 +199,26 @@ WHERE UserId = (SELECT TOP 1 Id FROM AspNetUsers WHERE UserName = 'system@domain
             // Remove Config Seed (IDs generated at runtime -> delete by keys)
             migrationBuilder.Sql(@"
 DELETE FROM Config WHERE ConfigKey IN (
-    'SMTPServer','SMTPPort','SMTPUsername','SMTPPassword','SiteURL','SiteName','SiteEncryptionKey','WebmasterEmail',
-    'PaymentLoginID','PaymentTransactionKey','PaymentTestMode','PaymentTransactionFee','NumberOfAnnouncements',
-    'ShowContactForm','VisitorSessionPurgePeriod','PaypalMode','PaypalClientId','PaypalClientSecret','PaypalConnectionTimeout',
-    'EnableCommentsOnAllPages','TinyMCEApiKey','RecaptchaEnabled','RecaptchaPublicKey','RecaptchaPrivateKey'
+    -- Email General Configuration
+    'Email:ProviderType','Email:FromEmail','Email:FromName','Email:IsEnabled','Email:TimeoutSeconds',
+    -- SMTP Configuration
+    'Email:Smtp:Host','Email:Smtp:Port','Email:Smtp:Username','Email:Smtp:Password','Email:Smtp:EnableSsl','Email:Smtp:UseDefaultCredentials',
+    -- SendGrid Configuration
+    'Email:SendGrid:ApiKey','Email:SendGrid:SandboxMode','Email:SendGrid:EnableClickTracking','Email:SendGrid:EnableOpenTracking','Email:SendGrid:TemplateId',
+    -- Mailgun Configuration
+    'Email:Mailgun:ApiKey','Email:Mailgun:Domain','Email:Mailgun:ApiBaseUrl','Email:Mailgun:EnableTracking','Email:Mailgun:EnableDkim',
+    -- Azure Email Configuration
+    'Email:Azure:ConnectionString','Email:Azure:EnableTracking',
+    -- Site Configuration
+    'SiteURL','SiteName','SiteEncryptionKey','WebmasterEmail',
+    -- Payment Configuration
+    'PaymentLoginID','PaymentTransactionKey','PaymentTestMode','PaymentTransactionFee',
+    -- PayPal Configuration
+    'PaypalMode','PaypalClientId','PaypalClientSecret','PaypalConnectionTimeout',
+    -- Site Features
+    'NumberOfAnnouncements','ShowContactForm','VisitorSessionPurgePeriod','EnableCommentsOnAllPages',
+    -- Third-Party Services
+    'TinyMCEApiKey','RecaptchaEnabled','RecaptchaPublicKey','RecaptchaPrivateKey'
 );
 ");
 
@@ -190,6 +245,7 @@ DELETE FROM Page WHERE UserId = @adminUserId2 AND Url IN ('/Index','/Home/Contac
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "LatestPictures");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "LatestVideos");
             migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "Polls");
+            migrationBuilder.DeleteData(table: "Plugin", keyColumn: "Name", keyValue: "MailingList");
         }
     }
 }

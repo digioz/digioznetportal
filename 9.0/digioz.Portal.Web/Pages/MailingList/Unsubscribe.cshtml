@@ -1,3 +1,124 @@
 @page
-@model UnsubscribeModel
-<h2>Unsubscribe</h2>
+@model digioz.Portal.Web.Pages.MailingList.UnsubscribeModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Manage Subscriptions";
+}
+
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="container">
+            <div class="container my-5">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <div class="card shadow">
+                            <div class="card-header bg-primary text-white">
+                                <h2 class="mb-0">
+                                    <i class="bi bi-gear-fill"></i> Manage Your Subscriptions
+                                </h2>
+                            </div>
+                            <div class="card-body">
+                                @if (!string.IsNullOrEmpty(Model.StatusMessage))
+                                {
+                                    <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger") alert-dismissible fade show" role="alert">
+                                        @Model.StatusMessage
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                }
+
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    @if (Model.UserSubscriptions.Any())
+                                    {
+                                        <p class="text-muted mb-4">
+                                            You are currently subscribed to the following mailing lists.
+                                            Click "Unsubscribe" to stop receiving emails from a specific list.
+                                        </p>
+
+                                        <div class="list-group">
+                                            @foreach (var subscription in Model.UserSubscriptions)
+                                            {
+                                                <div class="list-group-item">
+                                                    <div class="d-flex w-100 justify-content-between align-items-center">
+                                                        <div>
+                                                            <h5 class="mb-1">@subscription.MailingList.Name</h5>
+                                                            @if (!string.IsNullOrEmpty(subscription.MailingList.Description))
+                                                            {
+                                                                <p class="mb-1 text-muted">@subscription.MailingList.Description</p>
+                                                            }
+                                                            @if (!string.IsNullOrEmpty(subscription.MailingList.Address))
+                                                            {
+                                                                <small class="text-muted">
+                                                                    <i class="bi bi-geo-alt"></i> @subscription.MailingList.Address
+                                                                </small>
+                                                            }
+                                                        </div>
+                                                        <div>
+                                                            <form method="post" asp-page-handler="Unsubscribe" class="d-inline">
+                                                                <input type="hidden" name="mailingListId" value="@subscription.MailingList.Id" />
+                                                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to unsubscribe from @subscription.MailingList.Name?');">
+                                                                    <i class="bi bi-x-circle"></i> Unsubscribe
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+
+                                        <div class="alert alert-info mt-4 mb-0">
+                                            <i class="bi bi-info-circle"></i>
+                                            <strong>Note:</strong> After unsubscribing, you will no longer receive emails from that mailing list.
+                                            You can always re-subscribe from the <a asp-page="/MailingList/Index" class="alert-link">Mailing Lists page</a>.
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-center py-5">
+                                            <i class="bi bi-envelope-x" style="font-size: 4rem; color: #6c757d;"></i>
+                                            <h4 class="mt-3">No Active Subscriptions</h4>
+                                            <p class="text-muted">You are not currently subscribed to any mailing lists.</p>
+                                            <a asp-page="/MailingList/Index" class="btn btn-primary mt-3">
+                                                <i class="bi bi-search"></i> Browse Available Mailing Lists
+                                            </a>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-center py-5">
+                                        <i class="bi bi-shield-lock" style="font-size: 4rem; color: #6c757d;"></i>
+                                        <h4 class="mt-3">Authentication Required</h4>
+                                        <p class="text-muted">Please log in to manage your mailing list subscriptions.</p>
+                                        <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/MailingList/Unsubscribe" class="btn btn-primary mt-3">
+                                            <i class="bi bi-box-arrow-in-right"></i> Login
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                            <div class="card-footer text-center bg-light">
+                                <a asp-page="/MailingList/Index" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Back to Mailing Lists
+                                </a>
+                                <a asp-page="/Index" class="btn btn-outline-primary ms-2">
+                                    <i class="bi bi-house"></i> Home
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Privacy Notice -->
+                        <div class="mt-4 text-center text-muted">
+                            <small>
+                                <i class="bi bi-shield-check"></i>
+                                We respect your privacy. Your email address will never be shared with third parties.
+                                <br />
+                                For questions, please contact us at <strong>@Model.WebmasterEmail</strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

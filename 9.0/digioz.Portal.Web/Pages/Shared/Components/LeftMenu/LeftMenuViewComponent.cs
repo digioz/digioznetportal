@@ -27,8 +27,10 @@ namespace digioz.Portal.Web.Pages.Shared.Components.LeftMenu
             // Single source of truth for plugin enablement flags
             var rssPlugin = _pluginService.GetByName("RSSFeed");
             var pollsPlugin = _pluginService.GetByName("Polls");
+            var mailingListPlugin = _pluginService.GetByName("MailingList");
             ViewData["ShowRssFeed"] = rssPlugin?.IsEnabled == true;
             ViewData["ShowPolls"] = pollsPlugin?.IsEnabled == true;
+            ViewData["ShowMailingList"] = mailingListPlugin?.IsEnabled == true;
 
             return Task.FromResult<IViewComponentResult>(View(leftMenu));
         }
