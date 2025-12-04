@@ -9,7 +9,7 @@
 <div class="card shadow-sm">
  <div class="card-header">Add Video</div>
  <div class="card-body">
- <form method="post" enctype="multipart/form-data">
+ <form id="video-add-form" method="post" enctype="multipart/form-data">
  <div class="mb-3">
  <label class="form-label">Album</label>
  <select asp-for="Item.AlbumId" class="form-select">
@@ -33,18 +33,37 @@
  </div>
  <div class="mb-3">
  <label class="form-label">Thumbnail image</label>
- <input type="file" class="form-control" asp-for="ThumbnailFile" />
+ <input type="file" id="ThumbnailFileInput" class="form-control" asp-for="ThumbnailFile" />
  <span class="text-muted">Allowed image types: jpg, jpeg, png, gif, bmp, tif, tiff</span>
  <span asp-validation-for="ThumbnailFile" class="text-danger"></span>
  </div>
  <div class="mb-3">
  <label class="form-label">Video file</label>
- <input type="file" class="form-control" asp-for="VideoFile" />
- <span class="text-muted">Allowed video types: mp4, mov, avi, wmv, mkv, mpg, mpeg</span>
+ <input type="file" id="VideoFileInput" class="form-control" asp-for="VideoFile" />
+ <span class="text-muted d-block">Allowed video types: mp4, mov, avi, wmv, mkv, mpg, mpeg</span>
+ <span class="text-muted d-block">Large files will be uploaded in chunks to work with Cloudflare limits</span>
  <span asp-validation-for="VideoFile" class="text-danger"></span>
  </div>
- <button class="btn btn-primary" type="submit">Save</button>
+ <button id="submit-btn" class="btn btn-primary" type="submit">Save</button>
  <a class="btn btn-secondary" asp-area="Admin" asp-page="/Video/VideoIndex">Cancel</a>
  </form>
  </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/chunked-upload.js"></script>
+    <script src="~/js/video-upload-helper.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chunkSizeInMB = @Model.ChunkSizeInMB;
+            
+            new VideoUploadHelper({
+                formId: 'video-add-form',
+                videoInputId: 'VideoFileInput',
+                thumbnailInputId: 'ThumbnailFileInput',
+                submitButtonId: 'submit-btn',
+                chunkSizeInMB: chunkSizeInMB
+            });
+        });
+    </script>
+}

@@ -9,7 +9,7 @@
 <div class="card shadow-sm">
   <div class="card-header">Edit Video</div>
     <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
+        <form id="video-edit-form" method="post" enctype="multipart/form-data">
 <input type="hidden" asp-for="Item.Id" />
       <div class="mb-3">
   <label class="form-label">Album</label>
@@ -34,18 +34,37 @@
        </div>
       <div class="mb-3">
         <label class="form-label">Replace thumbnail (optional)</label>
-    <input type="file" class="form-control" asp-for="NewThumbnail" />
+    <input type="file" id="ThumbnailFileInput" class="form-control" asp-for="NewThumbnail" />
          <span class="text-muted">Allowed: jpg, jpeg, png, gif, bmp, tif, tiff</span>
         <span asp-validation-for="NewThumbnail" class="text-danger"></span>
   </div>
      <div class="mb-3">
     <label class="form-label">Replace video (optional)</label>
-  <input type="file" class="form-control" asp-for="NewVideo" />
- <span class="text-muted">Allowed: mp4, mov, avi, wmv, mkv, mpg, mpeg</span>
+  <input type="file" id="VideoFileInput" class="form-control" asp-for="NewVideo" />
+ <span class="text-muted d-block">Allowed: mp4, mov, avi, wmv, mkv, mpg, mpeg</span>
+ <span class="text-muted d-block">Large files will be uploaded in chunks to work with Cloudflare limits</span>
        <span asp-validation-for="NewVideo" class="text-danger"></span>
       </div>
-      <button class="btn btn-primary" type="submit">Save</button>
+      <button id="submit-btn" class="btn btn-primary" type="submit">Save</button>
     <a class="btn btn-secondary" asp-area="Admin" asp-page="/Video/VideoIndex">Cancel</a>
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/chunked-upload.js"></script>
+    <script src="~/js/video-upload-helper.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chunkSizeInMB = @Model.ChunkSizeInMB;
+            
+            new VideoUploadHelper({
+                formId: 'video-edit-form',
+                videoInputId: 'VideoFileInput',
+                thumbnailInputId: 'ThumbnailFileInput',
+                submitButtonId: 'submit-btn',
+                chunkSizeInMB: chunkSizeInMB
+            });
+        });
+    </script>
+}

@@ -22,7 +22,7 @@
                         </div>
                     }
 
-                    <form method="post" enctype="multipart/form-data" class="needs-validation">
+                    <form id="video-upload-form" method="post" enctype="multipart/form-data" class="needs-validation">
                         <div class="mb-3">
                             <label for="AlbumId" class="form-label">Select Album *</label>
                             <select id="AlbumId" name="AlbumId" class="form-select" required>
@@ -47,6 +47,7 @@
                             <label for="VideoFile" class="form-label">Upload Video File *</label>
                             <input type="file" id="VideoFile" name="VideoFile" class="form-control" accept="video/*" required />
                             <small class="text-muted">Supported formats: MP4, WebM, Ogg, MOV, AVI, MKV</small>
+                            <small class="text-muted d-block mt-1">Large files will be uploaded in chunks to work with Cloudflare limits</small>
                         </div>
 
                         <div class="mb-3">
@@ -55,7 +56,7 @@
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">Upload Video</button>
+                            <button type="submit" id="submit-button" class="btn btn-primary btn-lg">Upload Video</button>
                         </div>
                     </form>
                 </div>
@@ -63,3 +64,22 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/chunked-upload.js"></script>
+    <script src="~/js/video-upload-helper.js"></script>
+    <script>
+        // Initialize chunked upload for video file
+        document.addEventListener('DOMContentLoaded', function() {
+            const chunkSizeInMB = @Model.ChunkSizeInMB;
+            
+            new VideoUploadHelper({
+                formId: 'video-upload-form',
+                videoInputId: 'VideoFile',
+                thumbnailInputId: 'ThumbnailFile',
+                submitButtonId: 'submit-button',
+                chunkSizeInMB: chunkSizeInMB
+            });
+        });
+    </script>
+}

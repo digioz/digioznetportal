@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Video
 {
@@ -18,31 +19,38 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
         private readonly IVideoAlbumService _albumService;
         private readonly digioz.Portal.Utilities.IUserHelper _userHelper;
         private readonly IWebHostEnvironment _env;
+        private readonly IConfiguration _configuration;
 
-        public VideoEditModel(IVideoService videoService, IVideoAlbumService albumService, digioz.Portal.Utilities.IUserHelper userHelper, IWebHostEnvironment env)
+        public VideoEditModel(IVideoService videoService, IVideoAlbumService albumService, digioz.Portal.Utilities.IUserHelper userHelper, IWebHostEnvironment env, IConfiguration configuration)
         {
             _videoService = videoService;
             _albumService = albumService;
             _userHelper = userHelper;
             _env = env;
+            _configuration = configuration;
         }
 
         [BindProperty] public digioz.Portal.Bo.Video? Item { get; set; }
         [BindProperty] public IFormFile? NewThumbnail { get; set; }
         [BindProperty] public IFormFile? NewVideo { get; set; }
+        [BindProperty] public string? AssembledVideoPath { get; set; }
         public List<digioz.Portal.Bo.VideoAlbum> Albums { get; private set; } = new();
+        public int ChunkSizeInMB { get; private set; }
 
         public IActionResult OnGet(int id)
         {
             Item = _videoService.Get(id);
             if (Item == null) return RedirectToPage("/Video/VideoIndex", new { area = "Admin" });
             Albums = _albumService.GetAll().OrderBy(a => a.Name).ToList();
+            ChunkSizeInMB = _configuration.GetValue<int>("ChunkedUpload:ChunkSizeInMB", 20);
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
             Albums = _albumService.GetAll().OrderBy(a => a.Name).ToList();
+            ChunkSizeInMB = _configuration.GetValue<int>("ChunkedUpload:ChunkSizeInMB", 20);
+            
             if (!ModelState.IsValid) return Page(); 
             if (Item == null) return RedirectToPage("/Video/VideoIndex", new { area = "Admin" }); 
             var existing = _videoService.Get(Item.Id);
@@ -94,6 +102,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
 
             if (NewVideo != null && NewVideo.Length > 0)
             {
+                // Standard upload for small files
                 var ext = Path.GetExtension(NewVideo.FileName).ToLowerInvariant();
                 var allowed = new[] { ".mp4", ".mov", ".avi", ".wmv", ".mkv", ".mpg", ".mpeg" };
                 if (!allowed.Contains(ext))
@@ -109,6 +118,31 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
                 }
                 TryDeleteFileIfExists(Path.Combine(fullDir, existing.Filename ?? string.Empty));
                 existing.Filename = newVid;
+            }
+            else if (!string.IsNullOrEmpty(AssembledVideoPath))
+            {
+                // Video was uploaded via chunked upload
+                var assembledPath = Path.Combine(webroot, "img", AssembledVideoPath.Replace("/", Path.DirectorySeparatorChar.ToString()));
+                
+                if (System.IO.File.Exists(assembledPath))
+                {
+                    var ext = Path.GetExtension(assembledPath);
+                    var newVid = Guid.NewGuid().ToString("N") + ext;
+                    var fullPath = Path.Combine(fullDir, newVid);
+                    
+                    TryDeleteFileIfExists(Path.Combine(fullDir, existing.Filename ?? string.Empty));
+                    
+                    System.IO.File.Move(assembledPath, fullPath);
+                    
+                    // Cleanup upload directory
+                    var uploadDir = Path.GetDirectoryName(assembledPath);
+                    if (Directory.Exists(uploadDir))
+                    {
+                        try { Directory.Delete(uploadDir, true); } catch { }
+                    }
+                    
+                    existing.Filename = newVid;
+                }
             }
 
             // Do not update Timestamp or UserId - preserve original uploader information

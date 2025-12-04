@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Utilities;
+using Microsoft.Extensions.Configuration;
 
 namespace digioz.Portal.Pages.Videos
 {
@@ -20,13 +21,15 @@ namespace digioz.Portal.Pages.Videos
         private readonly IVideoAlbumService _albumService;
         private readonly IUserHelper _userHelper;
         private readonly IWebHostEnvironment _env;
+        private readonly IConfiguration _configuration;
 
-        public AddModel(IVideoService videoService, IVideoAlbumService albumService, IUserHelper userHelper, IWebHostEnvironment env)
+        public AddModel(IVideoService videoService, IVideoAlbumService albumService, IUserHelper userHelper, IWebHostEnvironment env, IConfiguration configuration)
         {
             _videoService = videoService;
             _albumService = albumService;
             _userHelper = userHelper;
             _env = env;
+            _configuration = configuration;
         }
 
         [BindProperty]
@@ -41,13 +44,18 @@ namespace digioz.Portal.Pages.Videos
         [BindProperty]
         public string? Description { get; set; }
 
+        [BindProperty]
+        public string? AssembledVideoPath { get; set; }
+
         public List<VideoAlbum> Albums { get; private set; } = new();
         public string? StatusMessage { get; set; }
         public bool IsSuccess { get; set; }
+        public int ChunkSizeInMB { get; private set; }
 
         public void OnGet()
         {
             Albums = _albumService.GetAll().OrderBy(a => a.Name).ToList();
+            ChunkSizeInMB = _configuration.GetValue<int>("ChunkedUpload:ChunkSizeInMB", 20);
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -70,7 +78,33 @@ namespace digioz.Portal.Pages.Videos
                 return Page();
             }
 
-            if (VideoFile == null || VideoFile.Length == 0)
+            // Check if video was uploaded via chunked upload
+            string videoPath;
+            string videoExt;
+            
+            if (!string.IsNullOrEmpty(AssembledVideoPath))
+            {
+                // Video was uploaded via chunked upload, use the assembled file
+                var webroot = _env.WebRootPath;
+                videoPath = Path.Combine(webroot, "img", AssembledVideoPath.Replace("/", Path.DirectorySeparatorChar.ToString()));
+                
+                if (!System.IO.File.Exists(videoPath))
+                {
+                    ModelState.AddModelError("VideoFile", "Assembled video file not found.");
+                    StatusMessage = "Assembled video file not found.";
+                    IsSuccess = false;
+                    return Page();
+                }
+                
+                videoExt = Path.GetExtension(videoPath).ToLowerInvariant();
+            }
+            else if (VideoFile != null && VideoFile.Length > 0)
+            {
+                // Standard upload for small files
+                videoExt = Path.GetExtension(VideoFile.FileName).ToLowerInvariant();
+                videoPath = null;
+            }
+            else
             {
                 ModelState.AddModelError("VideoFile", "Please select a video file.");
                 StatusMessage = "Please select a video file.";
@@ -93,7 +127,6 @@ namespace digioz.Portal.Pages.Videos
                 }
 
                 // Validate video
-                var videoExt = Path.GetExtension(VideoFile.FileName).ToLowerInvariant();
                 var allowedVideoExt = new[] { ".mp4", ".webm", ".ogg", ".mov", ".avi", ".mkv" };
                 
                 if (!allowedVideoExt.Contains(videoExt))
@@ -116,7 +149,7 @@ namespace digioz.Portal.Pages.Videos
                 var videoFileName = fileName + videoExt;
 
                 var thumbPath = Path.Combine(thumbDir, thumbFileName);
-                var videoPath = Path.Combine(videoDir, videoFileName);
+                var finalVideoPath = Path.Combine(videoDir, videoFileName);
 
                 // Save thumbnail
                 using (var fs = System.IO.File.Create(thumbPath))
@@ -131,9 +164,52 @@ namespace digioz.Portal.Pages.Videos
                 }
 
                 // Save video file
-                using (var fs = System.IO.File.Create(videoPath))
+                if (!string.IsNullOrEmpty(AssembledVideoPath))
                 {
-                    await VideoFile.CopyToAsync(fs);
+                    // Move assembled video to final location
+                    Console.WriteLine($"DEBUG: AssembledVideoPath = {AssembledVideoPath}");
+                    Console.WriteLine($"DEBUG: videoPath = {videoPath}");
+                    Console.WriteLine($"DEBUG: File exists = {System.IO.File.Exists(videoPath)}");
+                    
+                    if (System.IO.File.Exists(videoPath))
+                    {
+                        Console.WriteLine($"DEBUG: Moving file to {finalVideoPath}");
+                        System.IO.File.Move(videoPath, finalVideoPath);
+                        Console.WriteLine($"DEBUG: File moved successfully");
+                        
+                        // Clean up the upload directory
+                        var uploadDir = Path.GetDirectoryName(videoPath);
+                        Console.WriteLine($"DEBUG: Cleaning up directory {uploadDir}");
+                        if (Directory.Exists(uploadDir))
+                        {
+                            try
+                            {
+                                Directory.Delete(uploadDir, true);
+                                Console.WriteLine($"DEBUG: Directory deleted successfully");
+                            }
+                            catch (Exception ex)
+                            {
+                                // Log but don't fail if cleanup fails
+                                Console.WriteLine($"Failed to cleanup upload directory: {ex.Message}");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"ERROR: Assembled video file not found at {videoPath}");
+                        ModelState.AddModelError("VideoFile", $"Assembled video file not found at expected location.");
+                        StatusMessage = $"Assembled video file not found. Path: {AssembledVideoPath}";
+                        IsSuccess = false;
+                        return Page();
+                    }
+                }
+                else
+                {
+                    // Standard upload for small files
+                    using (var fs = System.IO.File.Create(finalVideoPath))
+                    {
+                        await VideoFile.CopyToAsync(fs);
+                    }
                 }
 
                 var video = new Video

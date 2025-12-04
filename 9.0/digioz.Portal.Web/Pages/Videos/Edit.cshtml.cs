@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 
 namespace digioz.Portal.Pages.Videos
 {
@@ -20,13 +21,15 @@ namespace digioz.Portal.Pages.Videos
         private readonly IVideoAlbumService _albumService;
         private readonly IUserHelper _userHelper;
         private readonly IWebHostEnvironment _env;
+        private readonly IConfiguration _configuration;
 
-        public EditModel(IVideoService videoService, IVideoAlbumService albumService, IUserHelper userHelper, IWebHostEnvironment env)
+        public EditModel(IVideoService videoService, IVideoAlbumService albumService, IUserHelper userHelper, IWebHostEnvironment env, IConfiguration configuration)
         {
             _videoService = videoService;
             _albumService = albumService;
             _userHelper = userHelper;
             _env = env;
+            _configuration = configuration;
         }
 
         public Video? Item { get; private set; }
@@ -45,8 +48,12 @@ namespace digioz.Portal.Pages.Videos
         [BindProperty]
         public string? Description { get; set; }
 
+        [BindProperty]
+        public string? AssembledVideoPath { get; set; }
+
         public string? StatusMessage { get; set; }
         public bool IsSuccess { get; set; }
+        public int ChunkSizeInMB { get; private set; }
 
         public IActionResult OnGet(int id)
         {
@@ -65,6 +72,7 @@ namespace digioz.Portal.Pages.Videos
             Albums = _albumService.GetAll().OrderBy(a => a.Name).ToList();
             AlbumId = Item.AlbumId;
             Description = Item.Description;
+            ChunkSizeInMB = _configuration.GetValue<int>("ChunkedUpload:ChunkSizeInMB", 20);
 
             return Page();
         }
@@ -171,6 +179,46 @@ namespace digioz.Portal.Pages.Videos
                         }
 
                         Item.Filename = videoFileName;
+                    }
+                    else if (!string.IsNullOrEmpty(AssembledVideoPath))
+                    {
+                        // Video was uploaded via chunked upload
+                        var webroot = _env.WebRootPath;
+                        var assembledPath = Path.Combine(webroot, "img", AssembledVideoPath.Replace("/", Path.DirectorySeparatorChar.ToString()));
+                        
+                        if (System.IO.File.Exists(assembledPath))
+                        {
+                            var videoDir = Path.Combine(webroot, "img", "Videos", "Full");
+                            Directory.CreateDirectory(videoDir);
+                            
+                            var videoExt = Path.GetExtension(assembledPath);
+                            var fileName = Guid.NewGuid().ToString("N");
+                            var videoFileName = fileName + videoExt;
+                            var finalVideoPath = Path.Combine(videoDir, videoFileName);
+                            
+                            // Delete old video
+                            var oldVideoPath = Path.Combine(videoDir, Item.Filename);
+                            if (System.IO.File.Exists(oldVideoPath))
+                            {
+                                System.IO.File.Delete(oldVideoPath);
+                            }
+                            
+                            // Move assembled video to final location
+                            System.IO.File.Move(assembledPath, finalVideoPath);
+                            
+                            // Clean up the upload directory
+                            var uploadDir = Path.GetDirectoryName(assembledPath);
+                            if (Directory.Exists(uploadDir))
+                            {
+                                try
+                                {
+                                    Directory.Delete(uploadDir, true);
+                                }
+                                catch { }
+                            }
+                            
+                            Item.Filename = videoFileName;
+                        }
                     }
 
                     _videoService.Update(Item);

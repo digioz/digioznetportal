@@ -24,7 +24,7 @@
                             </div>
                         }
 
-                        <form method="post" enctype="multipart/form-data">
+                        <form id="video-edit-form" method="post" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="AlbumId" class="form-label">Select Album *</label>
                                 <select id="AlbumId" name="AlbumId" class="form-select" required>
@@ -68,7 +68,8 @@
                                     <div class="mb-3">
                                         <label for="VideoFile" class="form-label">Replace Video (Optional)</label>
                                         <input type="file" id="VideoFile" name="VideoFile" class="form-control" accept="video/*" />
-                                        <small class="text-muted">Leave blank to keep current video</small>
+                                        <small class="text-muted d-block">Leave blank to keep current video</small>
+                                        <small class="text-muted d-block">Large files will be uploaded in chunks</small>
                                     </div>
                                 </div>
                             </div>
@@ -79,7 +80,7 @@
                             </div>
 
                             <div class="d-grid gap-2 d-sm-flex justify-content-sm-start">
-                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <button type="submit" id="submit-button" class="btn btn-primary">Save Changes</button>
                                 <a href="/Videos/Details?id=@Model.Item.Id" class="btn btn-secondary">Cancel</a>
                             </div>
                         </form>
@@ -93,3 +94,21 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/chunked-upload.js"></script>
+    <script src="~/js/video-upload-helper.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chunkSizeInMB = @Model.ChunkSizeInMB;
+            
+            new VideoUploadHelper({
+                formId: 'video-edit-form',
+                videoInputId: 'VideoFile',
+                thumbnailInputId: 'ThumbnailFile',
+                submitButtonId: 'submit-button',
+                chunkSizeInMB: chunkSizeInMB
+            });
+        });
+    </script>
+}
