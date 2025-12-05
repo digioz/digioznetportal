@@ -1,0 +1,84 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.VisitorSession.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+@{
+    ViewBag.Title = "Visitor Sessions";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Visitor Sessions</span>
+        <div>
+            <a class="btn btn-sm btn-outline-secondary me-2" asp-area="Admin" asp-page="/VisitorSession/Export">Export</a>
+            <a class="btn btn-sm btn-danger me-2" asp-area="Admin" asp-page="/VisitorSession/Purge">Purge</a>
+            <a asp-area="Admin" asp-page="/Index" class="btn btn-sm btn-outline-secondary">Back</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-center mb-3">
+            <div class="col-12 col-md-6">
+                <input asp-for="q" class="form-control" placeholder="Search session id, page url, username, or IP..." />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+            <div class="col-auto">
+                <a class="btn btn-outline-secondary" asp-area="Admin" asp-page="/VisitorSession/Index">Clear</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th style="width:70px;">Id</th>
+                        <th style="width:170px;">Date Modified</th>
+                        <th style="width:150px;">IP</th>
+                        <th>SessionId</th>
+                        <th>Username</th>
+                        <th>PageUrl</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Count > 0)
+                    {
+                        foreach (var v in Model.Items)
+                        {
+                            var time = v.DateModified.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+                            var pageUrl = v.PageUrl ?? string.Empty;
+                            var username = v.Username ?? string.Empty;
+                            <tr>
+                                <td>@v.Id</td>
+                                <td>@time</td>
+                                <td>@v.IpAddress</td>
+                                <td class="text-truncate" style="max-width:240px" title="@v.SessionId">@v.SessionId</td>
+                                <td class="text-truncate" style="max-width:160px" title="@username">@username</td>
+                                <td class="text-truncate" style="max-width:280px" title="@pageUrl">@pageUrl</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" class="text-muted">No visitor sessions found.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <paging total-records="@Model.TotalCount"
+                page-no="@Model.pageNumber"
+                page-size="@Model.pageSize"
+                page-no-parameter-name="pageNumber"
+                query-string-key-page-no="pageNumber"
+                show-prev-next="true"
+                show-first-last="true"
+                class="pagination mb-0 mt-3">
+            <route-values>
+                <rv key="q" value="@Model.q"></rv>
+                <rv key="pageSize" value="@Model.pageSize"></rv>
+            </route-values>
+        </paging>
+    </div>
+</div>
