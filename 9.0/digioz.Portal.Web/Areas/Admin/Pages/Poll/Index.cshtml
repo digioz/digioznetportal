@@ -49,12 +49,12 @@
 
 <nav>
     <ul class="pagination">
-        <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-PageNumber="@(Model.PageNumber - 1)" asp-route-PageSize="@Model.PageSize">Previous</a>
+        <li class="page-item @(Model.pageNumber <= 1 ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageNumber="@(Model.pageNumber - 1)" asp-route-pageSize="@Model.pageSize">Previous</a>
         </li>
-        <li class="page-item disabled"><span class="page-link">Page @Model.PageNumber of @Model.TotalPages</span></li>
-        <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-PageNumber="@(Model.PageNumber + 1)" asp-route-PageSize="@Model.PageSize">Next</a>
+        <li class="page-item disabled"><span class="page-link">Page @Model.pageNumber of @Model.TotalPages</span></li>
+        <li class="page-item @(Model.pageNumber >= Model.TotalPages ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageNumber="@(Model.pageNumber + 1)" asp-route-pageSize="@Model.pageSize">Next</a>
         </li>
     </ul>
 </nav>

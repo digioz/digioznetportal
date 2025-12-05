@@ -44,7 +44,7 @@ namespace digioz.Portal.Web.Pages.MailingList
 
             try
             {
-                var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity.Name;
+                var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity!.Name ?? string.Empty;
                 if (string.IsNullOrEmpty(userEmail))
                 {
                     StatusMessage = "Unable to determine your email address.";
@@ -118,7 +118,7 @@ namespace digioz.Portal.Web.Pages.MailingList
 
             try
             {
-                var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity.Name;
+                var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity!.Name ?? string.Empty;
                 if (string.IsNullOrEmpty(userEmail))
                 {
                     StatusMessage = "Unable to determine your email address.";

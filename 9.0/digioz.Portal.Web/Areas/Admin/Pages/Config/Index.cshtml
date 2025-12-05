@@ -63,10 +63,10 @@
 		</div>
 	</div>
 	<div class="card-footer d-flex justify-content-between align-items-center">
-		<small class="text-muted">Page @Model.PageNumber of @Model.TotalPages (@Model.TotalCount total)</small>
+		<small class="text-muted">Page @Model.pageNumber of @Model.TotalPages (@Model.TotalCount total)</small>
 		<paging total-records="@Model.TotalCount"
-				page-no="@Model.PageNumber"
-				page-size="@Model.PageSize"
+				page-no="@Model.pageNumber"
+				page-size="@Model.pageSize"
 				show-prev-next="true"
 				show-first-last="true"
 				query-string-key-page-no="pageNumber"
