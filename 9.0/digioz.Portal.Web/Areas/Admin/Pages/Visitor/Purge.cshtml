@@ -1,0 +1,31 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.Visitor.PurgeModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Purge Visitors";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Purge Visitor Records</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/Visitor/Index">Back</a>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="StartDate">Start Date (optional)</label>
+                    <input type="date" class="form-control" id="StartDate" asp-for="StartDate" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="EndDate">End Date (required if Start Date provided)</label>
+                    <input type="date" class="form-control" id="EndDate" asp-for="EndDate" />
+                </div>
+            </div>
+            <div class="mt-3 d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-danger">Purge</button>
+            </div>
+        </form>
+    </div>
+</div>

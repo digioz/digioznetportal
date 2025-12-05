@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using digioz.Portal.Bo;
@@ -124,6 +125,30 @@ namespace digioz.Portal.Dal.Services
                 _context.Logs.Remove(log);
                 _context.SaveChanges();
             }
+        }
+
+        // New: filtered retrieval for bulk export/purge operations
+        public List<Log> GetByDateRange(DateTime? start, DateTime? end)
+        {
+            var query = _context.Logs.AsQueryable();
+
+            // Only consider records that have a timestamp
+            query = query.Where(l => l.Timestamp.HasValue);
+
+            if (start.HasValue)
+            {
+                var s = start.Value.Date;
+                query = query.Where(l => l.Timestamp.Value >= s);
+            }
+
+            if (end.HasValue)
+            {
+                // normalize end to end of day
+                var e = end.Value.Date.AddDays(1).AddTicks(-1);
+                query = query.Where(l => l.Timestamp.Value <= e);
+            }
+
+            return query.OrderBy(l => l.Timestamp ?? DateTime.MinValue).ThenBy(l => l.Id).AsNoTracking().ToList();
         }
     }
 }

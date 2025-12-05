@@ -10,7 +10,11 @@
 <div class="card shadow-sm mb-3">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span class="fw-semibold">Visitors</span>
-        <a asp-area="Admin" asp-page="/Index" class="btn btn-sm btn-outline-secondary">Back</a>
+        <div>
+            <a class="btn btn-sm btn-outline-secondary me-2" asp-area="Admin" asp-page="/Visitor/Export">Export</a>
+            <a class="btn btn-sm btn-danger me-2" asp-area="Admin" asp-page="/Visitor/Purge">Purge</a>
+            <a asp-area="Admin" asp-page="/Index" class="btn btn-sm btn-outline-secondary">Back</a>
+        </div>
     </div>
     <div class="card-body">
         <form method="get" class="row g-2 align-items-center mb-3">
