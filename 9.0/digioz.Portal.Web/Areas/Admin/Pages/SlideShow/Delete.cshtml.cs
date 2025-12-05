@@ -32,18 +32,26 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.SlideShow
             var item = _service.Get(Id);
             if (item != null)
             {
-                // Delete image files if they exist
-                if (!string.IsNullOrEmpty(item.Image))
-                {
-                    var webroot = _env.WebRootPath;
-                    var fullPath = Path.Combine(webroot, "img", "Slides", "Full", item.Image);
-                    var thumbPath = Path.Combine(webroot, "img", "Slides", "Thumb", item.Image);
-                    if (System.IO.File.Exists(fullPath)) System.IO.File.Delete(fullPath);
-                    if (System.IO.File.Exists(thumbPath)) System.IO.File.Delete(thumbPath);
-                }
+                TryDeleteExistingFiles(item);
                 _service.Delete(Id);
             }
             return RedirectToPage("/SlideShow/Index", new { area = "Admin" });
+        }
+
+        private void TryDeleteExistingFiles(Bo.SlideShow slide)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(slide.Image))
+                {
+                    var webroot = _env.WebRootPath;
+                    var fullPath = Path.Combine(webroot, "img", "Slides", "Full", slide.Image);
+                    var thumbPath = Path.Combine(webroot, "img", "Slides", "Thumb", slide.Image);
+                    if (System.IO.File.Exists(fullPath)) System.IO.File.Delete(fullPath);
+                    if (System.IO.File.Exists(thumbPath)) System.IO.File.Delete(thumbPath);
+                }
+            }
+            catch { }
         }
     }
 }

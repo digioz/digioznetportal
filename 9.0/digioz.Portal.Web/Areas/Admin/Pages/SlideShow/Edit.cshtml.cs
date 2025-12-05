@@ -85,19 +85,29 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.SlideShow
                 }
 
                 // Delete old image files if they exist
-                if (!string.IsNullOrEmpty(existingItem.Image))
-                {
-                    var oldFullPath = Path.Combine(fullDir, existingItem.Image);
-                    var oldThumbPath = Path.Combine(thumbDir, existingItem.Image);
-                    if (System.IO.File.Exists(oldFullPath)) System.IO.File.Delete(oldFullPath);
-                    if (System.IO.File.Exists(oldThumbPath)) System.IO.File.Delete(oldThumbPath);
-                }
+                TryDeleteExistingFiles(existingItem);
 
                 existingItem.Image = fileName;
             }
 
             _service.Update(existingItem);
             return RedirectToPage("/SlideShow/Index", new { area = "Admin" });
+        }
+
+        private void TryDeleteExistingFiles(Bo.SlideShow slide)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(slide.Image))
+                {
+                    var webroot = _env.WebRootPath;
+                    var fullPath = Path.Combine(webroot, "img", "Slides", "Full", slide.Image);
+                    var thumbPath = Path.Combine(webroot, "img", "Slides", "Thumb", slide.Image);
+                    if (System.IO.File.Exists(fullPath)) System.IO.File.Delete(fullPath);
+                    if (System.IO.File.Exists(thumbPath)) System.IO.File.Delete(thumbPath);
+                }
+            }
+            catch { }
         }
     }
 }
