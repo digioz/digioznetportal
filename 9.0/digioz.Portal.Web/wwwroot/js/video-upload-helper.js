@@ -83,6 +83,9 @@ class VideoUploadHelper {
                 fileInput: this.videoInput,
                 uploadUrl: '/API/ChunkedUpload',
                 chunkSize: chunkSizeBytes,
+                maxRetries: 5,        // Retry failed chunks up to 5 times
+                retryDelay: 2000,     // 2 second initial retry delay
+                chunkDelay: 1500,     // 1.5 second delay between chunks to prevent connection issues
                 onProgress: (percent, current, total) => this.updateProgress(percent, current, total),
                 onComplete: (result) => this.handleUploadComplete(result),
                 onError: (error) => this.handleUploadError(error)

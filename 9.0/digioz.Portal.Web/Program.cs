@@ -9,6 +9,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using digioz.Portal.Web.Hubs;
 using digioz.Portal.EmailProviders.Extensions;
+using digioz.Portal.Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -163,6 +164,24 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeAreaFolder("Admin", "/", "AdminOnly");
 });
 
+// Configure form options for large file uploads
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 2147483648; // 2GB
+    options.ValueLengthLimit = int.MaxValue;
+    options.MultipartHeadersLengthLimit = int.MaxValue;
+    options.MemoryBufferThreshold = int.MaxValue;
+});
+
+// Configure Kestrel for large uploads (applies to both IIS in-process and standalone Kestrel)
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 2147483648; // 2GB
+    options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(5);
+    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
+    options.Limits.MinRequestBodyDataRate = null; // Disable minimum data rate to allow slow uploads
+});
+
 // Visitor logging for all Razor Pages
 builder.Services.AddVisitorInfoLogging();
 
@@ -228,6 +247,9 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseSession();
+
+// Add chunked upload middleware BEFORE static files
+app.UseChunkedUploadMiddleware();
 
 // Use traditional static files middleware without fingerprinting
 // This allows direct file replacement on the server without cache-busting hashes
