@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using digioz.Portal.Bo.ViewModels;
@@ -8,23 +6,17 @@ using digioz.Portal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Link
 {
     [Authorize(Roles = "Administrator")]
     public class CheckLinksModel : PageModel
     {
-        private readonly IServiceScopeFactory _scopeFactory;
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ILoggerFactory _loggerFactory;
+        private readonly LinkCheckerService _linkChecker;
 
-        public CheckLinksModel(IServiceScopeFactory scopeFactory, IHttpClientFactory httpClientFactory, ILoggerFactory loggerFactory)
+        public CheckLinksModel(LinkCheckerService linkChecker)
         {
-            _scopeFactory = scopeFactory;
-            _httpClientFactory = httpClientFactory;
-            _loggerFactory = loggerFactory;
+            _linkChecker = linkChecker;
         }
 
         public List<LinkCheckResult> Results { get; set; }
@@ -48,9 +40,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
             
             try
             {
-                var logger = _loggerFactory.CreateLogger<LinkCheckerService>();
-                using var checker = new LinkCheckerService(_scopeFactory, _httpClientFactory, logger);
-                Results = await checker.CheckAllLinksAsync(batchSize: 10, CancellationToken.None);
+                Results = await _linkChecker.CheckAllLinksAsync(batchSize: 10, CancellationToken.None);
 
                 // Calculate statistics
                 TotalLinks = Results.Count;
@@ -64,8 +54,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
             }
             catch (System.Exception ex)
             {
-                var logger = _loggerFactory.CreateLogger<CheckLinksModel>();
-                logger.LogError(ex, "Error during link check operation");
                 ModelState.AddModelError(string.Empty, $"An error occurred during link checking: {ex.Message}");
             }
             finally

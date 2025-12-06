@@ -4,6 +4,7 @@ using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
 using digioz.Portal.Web.Data;
 using digioz.Portal.Web.Logging;
+using digioz.Portal.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -112,6 +113,9 @@ builder.Services.AddScoped<IVisitorSessionService, VisitorSessionService>();
 builder.Services.AddScoped<IZoneService, ZoneService>();
 builder.Services.AddScoped<IPrivateMessageService, PrivateMessageService>();
 builder.Services.AddScoped<IThemeService, ThemeService>();
+
+// Register Web-specific services
+builder.Services.AddScoped<LinkCheckerService>();
 
 // Register Email Provider Services
 builder.Services.AddEmailProviders();

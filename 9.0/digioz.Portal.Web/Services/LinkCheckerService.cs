@@ -80,19 +80,33 @@ namespace digioz.Portal.Web.Services
             var results = new List<LinkCheckResult>();
             
             // Check all links in the batch concurrently (HTTP operations are thread-safe)
+            // Each task works with its own LinkUpdateInfo to avoid race conditions
             var checkTasks = links.Select(async link =>
             {
                 var result = await CheckLinkStatusAsync(link, cancellationToken);
-                return (link, result);
+                
+                // Create update info with the changes to be applied
+                LinkUpdateInfo updateInfo = null;
+                if (result.WasUpdated)
+                {
+                    updateInfo = new LinkUpdateInfo
+                    {
+                        LinkId = link.Id,
+                        Visible = link.Visible,
+                        Description = link.Description
+                    };
+                }
+                
+                return (result, updateInfo);
             });
             
             var checkResults = await Task.WhenAll(checkTasks);
 
             // Update database sequentially with a fresh scope for each update
             // This ensures each update has its own DbContext instance
-            foreach (var (link, result) in checkResults)
+            foreach (var (result, updateInfo) in checkResults)
             {
-                if (result.WasUpdated)
+                if (updateInfo != null)
                 {
                     await _dbSemaphore.WaitAsync(cancellationToken);
                     try
@@ -102,18 +116,18 @@ namespace digioz.Portal.Web.Services
                         var linkService = scope.ServiceProvider.GetRequiredService<ILinkService>();
                         
                         // Get fresh entity from database to avoid detached entity issues
-                        var freshLink = linkService.Get(link.Id);
+                        var freshLink = linkService.Get(updateInfo.LinkId);
                         if (freshLink != null)
                         {
                             // Apply the changes to the fresh entity
-                            freshLink.Visible = link.Visible;
-                            freshLink.Description = link.Description;
+                            freshLink.Visible = updateInfo.Visible;
+                            freshLink.Description = updateInfo.Description;
                             linkService.Update(freshLink);
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, $"Failed to update link {link.Id} ({link.Name}) in database");
+                        _logger.LogError(ex, $"Failed to update link {updateInfo.LinkId} in database");
                         result.Message += " (DB update failed)";
                     }
                     finally
@@ -150,26 +164,40 @@ namespace digioz.Portal.Web.Services
                     return result;
                 }
 
+                // Validate URL to prevent SSRF attacks
+                if (!IsValidAndSafeUrl(link.Url, out string validationError))
+                {
+                    result.Status = LinkCheckStatus.DeadLink;
+                    result.Message = $"Invalid URL: {validationError}";
+                    _logger.LogWarning($"Rejected unsafe URL during link check: {link.Url} - {validationError}");
+                    return result;
+                }
+
                 // Create HttpClient from factory (properly managed lifecycle)
                 using var httpClient = _httpClientFactory.CreateClient("LinkChecker");
 
-                // Make HEAD request first (faster)
-                using var headRequest = new HttpRequestMessage(HttpMethod.Head, link.Url);
                 HttpResponseMessage response = null;
 
+                // Try HEAD request first (faster), then fall back to GET if needed
                 try
                 {
+                    using var headRequest = new HttpRequestMessage(HttpMethod.Head, link.Url);
                     response = await httpClient.SendAsync(headRequest, cancellationToken);
                 }
                 catch (HttpRequestException)
                 {
                     // Some servers don't support HEAD, try GET
-                    // Dispose the failed response if it exists
                     response?.Dispose();
                     response = null;
                     
                     using var getRequest = new HttpRequestMessage(HttpMethod.Get, link.Url);
                     response = await httpClient.SendAsync(getRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                }
+                catch
+                {
+                    // Ensure response is disposed on any other exception (timeout, cancellation, etc.)
+                    response?.Dispose();
+                    throw;
                 }
 
                 // Use using statement to ensure response is disposed
@@ -231,28 +259,19 @@ namespace digioz.Portal.Web.Services
                     }
                 }
             }
-            catch (OperationCanceledException ex) when (ex is TaskCanceledException)
-            {
-                // Check if cancellation was user-initiated or due to timeout
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    // User-initiated cancellation - propagate it
-                    _logger.LogInformation($"Link check cancelled by user for: {link.Url}");
-                    throw;
-                }
-                else
-                {
-                    // Timeout from HttpClient (15 second timeout configured)
-                    result.Status = LinkCheckStatus.Timeout;
-                    result.Message = "Request timed out (15s timeout exceeded)";
-                    _logger.LogWarning($"Timeout checking link: {link.Url}");
-                }
-            }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 // User-initiated cancellation - propagate it
                 _logger.LogInformation($"Link check cancelled by user for: {link.Url}");
                 throw;
+            }
+            catch (OperationCanceledException)
+            {
+                // Timeout from HttpClient (15 second timeout configured)
+                // This catches both OperationCanceledException and TaskCanceledException
+                result.Status = LinkCheckStatus.Timeout;
+                result.Message = "Request timed out (15s timeout exceeded)";
+                _logger.LogWarning($"Timeout checking link: {link.Url}");
             }
             catch (HttpRequestException ex)
             {
@@ -272,6 +291,121 @@ namespace digioz.Portal.Web.Services
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Validates URL to prevent SSRF attacks and ensure only safe HTTP/HTTPS URLs are checked
+        /// </summary>
+        private bool IsValidAndSafeUrl(string url, out string error)
+        {
+            error = null;
+
+            // Try to parse the URL
+            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
+            {
+                error = "Invalid URL format";
+                return false;
+            }
+
+            // Only allow HTTP and HTTPS schemes
+            if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
+            {
+                error = $"Unsupported URL scheme '{uri.Scheme}'. Only HTTP and HTTPS are allowed";
+                return false;
+            }
+
+            // Check for localhost and loopback addresses
+            if (IsLocalOrLoopbackHost(uri.Host))
+            {
+                error = "Localhost and loopback addresses are not allowed";
+                return false;
+            }
+
+            // Check for private IP ranges (RFC 1918)
+            if (IsPrivateIpAddress(uri.Host))
+            {
+                error = "Private IP addresses are not allowed";
+                return false;
+            }
+
+            // Check for link-local addresses (169.254.x.x)
+            if (IsLinkLocalAddress(uri.Host))
+            {
+                error = "Link-local addresses are not allowed";
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if the host is localhost or a loopback address
+        /// </summary>
+        private bool IsLocalOrLoopbackHost(string host)
+        {
+            if (string.IsNullOrWhiteSpace(host))
+                return false;
+
+            // Check for common localhost names
+            var localhostNames = new[] { "localhost", "localhost.localdomain" };
+            if (localhostNames.Contains(host.ToLowerInvariant()))
+                return true;
+
+            // Check if it's an IP address
+            if (System.Net.IPAddress.TryParse(host, out var ipAddress))
+            {
+                // Check for loopback (127.0.0.0/8 for IPv4, ::1 for IPv6)
+                return System.Net.IPAddress.IsLoopback(ipAddress);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the host is a private IP address (RFC 1918)
+        /// </summary>
+        private bool IsPrivateIpAddress(string host)
+        {
+            if (!System.Net.IPAddress.TryParse(host, out var ipAddress))
+                return false;
+
+            // Only check IPv4 addresses
+            if (ipAddress.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
+                return false;
+
+            var bytes = ipAddress.GetAddressBytes();
+
+            // 10.0.0.0/8
+            if (bytes[0] == 10)
+                return true;
+
+            // 172.16.0.0/12
+            if (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31)
+                return true;
+
+            // 192.168.0.0/16
+            if (bytes[0] == 192 && bytes[1] == 168)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the host is a link-local address (169.254.0.0/16)
+        /// </summary>
+        private bool IsLinkLocalAddress(string host)
+        {
+            if (!System.Net.IPAddress.TryParse(host, out var ipAddress))
+                return false;
+
+            // Only check IPv4 addresses
+            if (ipAddress.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
+                return false;
+
+            var bytes = ipAddress.GetAddressBytes();
+
+            // 169.254.0.0/16 (APIPA - Automatic Private IP Addressing)
+            return bytes[0] == 169 && bytes[1] == 254;
         }
 
         /// <summary>
@@ -408,21 +542,7 @@ namespace digioz.Portal.Web.Services
         /// </summary>
         private int IndexOf(ReadOnlySpan<byte> span, byte[] pattern)
         {
-            for (int i = 0; i <= span.Length - pattern.Length; i++)
-            {
-                bool found = true;
-                for (int j = 0; j < pattern.Length; j++)
-                {
-                    if (span[i + j] != pattern[j])
-                    {
-                        found = false;
-                        break;
-                    }
-                }
-                if (found)
-                    return i;
-            }
-            return -1;
+            return span.IndexOf(pattern);
         }
 
         /// <summary>
