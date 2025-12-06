@@ -18,8 +18,4 @@
     <ProjectReference Include="..\digioz.Portal.Bo\digioz.Portal.Bo.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
-
 </Project>

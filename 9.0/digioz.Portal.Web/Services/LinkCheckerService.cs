@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text.RegularExpressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using digioz.Portal.Bo;
 using digioz.Portal.Bo.ViewModels;
 using digioz.Portal.Dal.Services.Interfaces;
+using HtmlAgilityPack;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace digioz.Portal.Web.Services
@@ -16,30 +19,23 @@ namespace digioz.Portal.Web.Services
     /// <summary>
     /// Service for checking link validity and updating link metadata
     /// </summary>
-    public class LinkCheckerService
+    public class LinkCheckerService : IDisposable
     {
-        private readonly ILinkService _linkService;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<LinkCheckerService> _logger;
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly SemaphoreSlim _dbSemaphore = new SemaphoreSlim(1, 1);
+        private bool _disposed = false;
 
-        public LinkCheckerService(ILinkService linkService, ILogger<LinkCheckerService> logger)
+        // Constants for optimized description extraction
+        private const int MaxHtmlBytesToRead = 51200; // 50KB - sufficient for most <head> sections
+        private static readonly byte[] HeadCloseTagBytes = Encoding.UTF8.GetBytes("</head>");
+
+        public LinkCheckerService(IServiceScopeFactory scopeFactory, IHttpClientFactory httpClientFactory, ILogger<LinkCheckerService> logger)
         {
-            _linkService = linkService;
+            _scopeFactory = scopeFactory;
+            _httpClientFactory = httpClientFactory;
             _logger = logger;
-            
-            // Configure HttpClient with reasonable timeouts
-            _httpClient = new HttpClient(new HttpClientHandler
-            {
-                AllowAutoRedirect = false, // Don't follow redirects automatically
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-            })
-            {
-                Timeout = TimeSpan.FromSeconds(15)
-            };
-            
-            // Set a common user agent to avoid being blocked
-            _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
         }
 
         /// <summary>
@@ -48,7 +44,14 @@ namespace digioz.Portal.Web.Services
         public async Task<List<LinkCheckResult>> CheckAllLinksAsync(int batchSize = 10, CancellationToken cancellationToken = default)
         {
             var results = new List<LinkCheckResult>();
-            var allLinks = _linkService.GetAll();
+            List<Link> allLinks;
+
+            // Get all links using a dedicated scope
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var linkService = scope.ServiceProvider.GetRequiredService<ILinkService>();
+                allLinks = linkService.GetAll();
+            }
             
             _logger.LogInformation($"Starting link check for {allLinks.Count} links");
 
@@ -85,7 +88,8 @@ namespace digioz.Portal.Web.Services
             
             var checkResults = await Task.WhenAll(checkTasks);
 
-            // Update database sequentially (DbContext is not thread-safe)
+            // Update database sequentially with a fresh scope for each update
+            // This ensures each update has its own DbContext instance
             foreach (var (link, result) in checkResults)
             {
                 if (result.WasUpdated)
@@ -93,7 +97,24 @@ namespace digioz.Portal.Web.Services
                     await _dbSemaphore.WaitAsync(cancellationToken);
                     try
                     {
-                        _linkService.Update(link);
+                        // Create a new scope for each database update to ensure DbContext isolation
+                        using var scope = _scopeFactory.CreateScope();
+                        var linkService = scope.ServiceProvider.GetRequiredService<ILinkService>();
+                        
+                        // Get fresh entity from database to avoid detached entity issues
+                        var freshLink = linkService.Get(link.Id);
+                        if (freshLink != null)
+                        {
+                            // Apply the changes to the fresh entity
+                            freshLink.Visible = link.Visible;
+                            freshLink.Description = link.Description;
+                            linkService.Update(freshLink);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Failed to update link {link.Id} ({link.Name}) in database");
+                        result.Message += " (DB update failed)";
                     }
                     finally
                     {
@@ -129,81 +150,109 @@ namespace digioz.Portal.Web.Services
                     return result;
                 }
 
+                // Create HttpClient from factory (properly managed lifecycle)
+                using var httpClient = _httpClientFactory.CreateClient("LinkChecker");
+
                 // Make HEAD request first (faster)
-                var request = new HttpRequestMessage(HttpMethod.Head, link.Url);
-                HttpResponseMessage response;
+                using var headRequest = new HttpRequestMessage(HttpMethod.Head, link.Url);
+                HttpResponseMessage response = null;
 
                 try
                 {
-                    response = await _httpClient.SendAsync(request, cancellationToken);
+                    response = await httpClient.SendAsync(headRequest, cancellationToken);
                 }
                 catch (HttpRequestException)
                 {
                     // Some servers don't support HEAD, try GET
-                    request = new HttpRequestMessage(HttpMethod.Get, link.Url);
-                    response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                    // Dispose the failed response if it exists
+                    response?.Dispose();
+                    response = null;
+                    
+                    using var getRequest = new HttpRequestMessage(HttpMethod.Get, link.Url);
+                    response = await httpClient.SendAsync(getRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                 }
 
-                result.HttpStatusCode = (int)response.StatusCode;
-
-                // Check response status and update link object (but don't save to DB yet)
-                if (response.IsSuccessStatusCode)
+                // Use using statement to ensure response is disposed
+                using (response)
                 {
-                    // 2xx - Success
-                    result.Status = LinkCheckStatus.Success;
-                    result.Message = $"Link is valid ({response.StatusCode})";
+                    result.HttpStatusCode = (int)response.StatusCode;
 
-                    // Check if we need to update description
-                    if (string.IsNullOrWhiteSpace(link.Description))
+                    // Check response status and update link object (but don't save to DB yet)
+                    if (response.IsSuccessStatusCode)
                     {
-                        var description = await ExtractDescriptionAsync(link.Url, cancellationToken);
-                        if (!string.IsNullOrWhiteSpace(description))
+                        // 2xx - Success
+                        result.Status = LinkCheckStatus.Success;
+                        result.Message = $"Link is valid ({response.StatusCode})";
+
+                        // Check if we need to update description
+                        if (string.IsNullOrWhiteSpace(link.Description))
                         {
-                            link.Description = $"[DESCRIPTION UPDATED] {description}";
-                            result.Status = LinkCheckStatus.DescriptionUpdated;
-                            result.Message = "Description extracted and updated";
-                            result.WasUpdated = true;
+                            var description = await ExtractDescriptionAsync(link.Url, httpClient, cancellationToken);
+                            if (!string.IsNullOrWhiteSpace(description))
+                            {
+                                link.Description = $"[DESCRIPTION UPDATED] {description}";
+                                result.Status = LinkCheckStatus.DescriptionUpdated;
+                                result.Message = "Description extracted and updated";
+                                result.WasUpdated = true;
+                            }
                         }
                     }
+                    else if (IsRedirectStatus(response.StatusCode))
+                    {
+                        // 301, 302, 307, 308 - Redirects
+                        link.Visible = false;
+                        link.Description = PrependTag("[REDIRECT LINK]", link.Description);
+                        result.Status = LinkCheckStatus.RedirectLink;
+                        result.Message = $"Redirect detected ({response.StatusCode})";
+                        result.WasUpdated = true;
+                    }
+                    else if (IsServerError(response.StatusCode))
+                    {
+                        // 500, 503 - Server errors
+                        link.Visible = false;
+                        link.Description = PrependTag("[ERROR LINK]", link.Description);
+                        result.Status = LinkCheckStatus.ErrorLink;
+                        result.Message = $"Server error ({response.StatusCode})";
+                        result.WasUpdated = true;
+                    }
+                    else if (IsClientError(response.StatusCode))
+                    {
+                        // 400, 403, 404 - Client errors
+                        link.Visible = false;
+                        link.Description = PrependTag("[DEAD LINK]", link.Description);
+                        result.Status = LinkCheckStatus.DeadLink;
+                        result.Message = $"Dead link ({response.StatusCode})";
+                        result.WasUpdated = true;
+                    }
+                    else
+                    {
+                        result.Status = LinkCheckStatus.Success;
+                        result.Message = $"Unknown status ({response.StatusCode})";
+                    }
                 }
-                else if (IsRedirectStatus(response.StatusCode))
+            }
+            catch (OperationCanceledException ex) when (ex is TaskCanceledException)
+            {
+                // Check if cancellation was user-initiated or due to timeout
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    // 301, 302, 307, 308 - Redirects
-                    link.Visible = false;
-                    link.Description = PrependTag("[REDIRECT LINK]", link.Description);
-                    result.Status = LinkCheckStatus.RedirectLink;
-                    result.Message = $"Redirect detected ({response.StatusCode})";
-                    result.WasUpdated = true;
-                }
-                else if (IsServerError(response.StatusCode))
-                {
-                    // 500, 503 - Server errors
-                    link.Visible = false;
-                    link.Description = PrependTag("[ERROR LINK]", link.Description);
-                    result.Status = LinkCheckStatus.ErrorLink;
-                    result.Message = $"Server error ({response.StatusCode})";
-                    result.WasUpdated = true;
-                }
-                else if (IsClientError(response.StatusCode))
-                {
-                    // 400, 403, 404 - Client errors
-                    link.Visible = false;
-                    link.Description = PrependTag("[DEAD LINK]", link.Description);
-                    result.Status = LinkCheckStatus.DeadLink;
-                    result.Message = $"Dead link ({response.StatusCode})";
-                    result.WasUpdated = true;
+                    // User-initiated cancellation - propagate it
+                    _logger.LogInformation($"Link check cancelled by user for: {link.Url}");
+                    throw;
                 }
                 else
                 {
-                    result.Status = LinkCheckStatus.Success;
-                    result.Message = $"Unknown status ({response.StatusCode})";
+                    // Timeout from HttpClient (15 second timeout configured)
+                    result.Status = LinkCheckStatus.Timeout;
+                    result.Message = "Request timed out (15s timeout exceeded)";
+                    _logger.LogWarning($"Timeout checking link: {link.Url}");
                 }
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
-                result.Status = LinkCheckStatus.Timeout;
-                result.Message = "Request timed out";
-                _logger.LogWarning($"Timeout checking link: {link.Url}");
+                // User-initiated cancellation - propagate it
+                _logger.LogInformation($"Link check cancelled by user for: {link.Url}");
+                throw;
             }
             catch (HttpRequestException ex)
             {
@@ -226,37 +275,64 @@ namespace digioz.Portal.Web.Services
         }
 
         /// <summary>
-        /// Extracts description from website HTML
+        /// Extracts description from website HTML using HtmlAgilityPack (optimized to read only head section)
         /// </summary>
-        private async Task<string> ExtractDescriptionAsync(string url, CancellationToken cancellationToken)
+        private async Task<string> ExtractDescriptionAsync(string url, HttpClient httpClient, CancellationToken cancellationToken)
         {
             try
             {
-                var response = await _httpClient.GetAsync(url, cancellationToken);
+                // Use ResponseHeadersRead to avoid buffering entire response
+                using var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                 if (!response.IsSuccessStatusCode)
                     return null;
 
-                var html = await response.Content.ReadAsStringAsync(cancellationToken);
+                // Read only the portion we need (up to 50KB or </head> tag)
+                var htmlChunk = await ReadHtmlHeadSectionAsync(response, cancellationToken);
+                if (string.IsNullOrEmpty(htmlChunk))
+                    return null;
 
-                // Try to extract meta description
-                var metaDescMatch = Regex.Match(html, @"<meta\s+name=[""']description[""']\s+content=[""']([^""']+)[""']", RegexOptions.IgnoreCase);
-                if (metaDescMatch.Success)
+                // Parse HTML using HtmlAgilityPack (handles malformed HTML and attribute order)
+                var htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(htmlChunk);
+
+                // Try to extract meta description (handles any attribute order)
+                var metaDesc = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='description' or @name='Description']");
+                if (metaDesc != null)
                 {
-                    return CleanDescription(metaDescMatch.Groups[1].Value);
+                    var content = metaDesc.GetAttributeValue("content", null);
+                    if (!string.IsNullOrWhiteSpace(content))
+                    {
+                        return CleanDescription(content);
+                    }
                 }
 
-                // Try og:description
-                var ogDescMatch = Regex.Match(html, @"<meta\s+property=[""']og:description[""']\s+content=[""']([^""']+)[""']", RegexOptions.IgnoreCase);
-                if (ogDescMatch.Success)
+                // Try og:description (Open Graph protocol)
+                var ogDesc = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:description']");
+                if (ogDesc != null)
                 {
-                    return CleanDescription(ogDescMatch.Groups[1].Value);
+                    var content = ogDesc.GetAttributeValue("content", null);
+                    if (!string.IsNullOrWhiteSpace(content))
+                    {
+                        return CleanDescription(content);
+                    }
+                }
+
+                // Try Twitter description
+                var twitterDesc = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='twitter:description']");
+                if (twitterDesc != null)
+                {
+                    var content = twitterDesc.GetAttributeValue("content", null);
+                    if (!string.IsNullOrWhiteSpace(content))
+                    {
+                        return CleanDescription(content);
+                    }
                 }
 
                 // Try title as fallback
-                var titleMatch = Regex.Match(html, @"<title>([^<]+)</title>", RegexOptions.IgnoreCase);
-                if (titleMatch.Success)
+                var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//title");
+                if (titleNode != null && !string.IsNullOrWhiteSpace(titleNode.InnerText))
                 {
-                    return CleanDescription(titleMatch.Groups[1].Value);
+                    return CleanDescription(titleNode.InnerText);
                 }
             }
             catch (Exception ex)
@@ -268,6 +344,88 @@ namespace digioz.Portal.Web.Services
         }
 
         /// <summary>
+        /// Reads HTML content up to the closing head tag or max bytes limit
+        /// </summary>
+        private async Task<string> ReadHtmlHeadSectionAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+        {
+            using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            using var memoryStream = new MemoryStream();
+            
+            var buffer = new byte[4096]; // 4KB buffer for reading
+            var totalBytesRead = 0;
+            int bytesRead;
+
+            while (totalBytesRead < MaxHtmlBytesToRead && 
+                   (bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
+            {
+                await memoryStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
+                totalBytesRead += bytesRead;
+
+                // Check if we've reached the </head> tag
+                if (totalBytesRead >= HeadCloseTagBytes.Length)
+                {
+                    var recentBytes = memoryStream.GetBuffer().AsSpan(
+                        Math.Max(0, totalBytesRead - 512), 
+                        Math.Min(512, totalBytesRead)
+                    );
+
+                    if (IndexOf(recentBytes, HeadCloseTagBytes) >= 0)
+                    {
+                        // Found closing head tag, stop reading
+                        break;
+                    }
+                }
+            }
+
+            // Convert the bytes we read to string
+            var encoding = GetEncodingFromResponse(response) ?? Encoding.UTF8;
+            return encoding.GetString(memoryStream.GetBuffer(), 0, totalBytesRead);
+        }
+
+        /// <summary>
+        /// Gets the encoding from response headers, defaults to UTF-8
+        /// </summary>
+        private Encoding GetEncodingFromResponse(HttpResponseMessage response)
+        {
+            try
+            {
+                var charset = response.Content.Headers.ContentType?.CharSet;
+                if (!string.IsNullOrEmpty(charset))
+                {
+                    return Encoding.GetEncoding(charset);
+                }
+            }
+            catch
+            {
+                // If encoding is invalid, fall back to UTF-8
+            }
+
+            return Encoding.UTF8;
+        }
+
+        /// <summary>
+        /// Helper method to find byte sequence in a span
+        /// </summary>
+        private int IndexOf(ReadOnlySpan<byte> span, byte[] pattern)
+        {
+            for (int i = 0; i <= span.Length - pattern.Length; i++)
+            {
+                bool found = true;
+                for (int j = 0; j < pattern.Length; j++)
+                {
+                    if (span[i + j] != pattern[j])
+                    {
+                        found = false;
+                        break;
+                    }
+                }
+                if (found)
+                    return i;
+            }
+            return -1;
+        }
+
+        /// <summary>
         /// Cleans and truncates description
         /// </summary>
         private string CleanDescription(string description)
@@ -275,7 +433,7 @@ namespace digioz.Portal.Web.Services
             if (string.IsNullOrWhiteSpace(description))
                 return null;
 
-            // Decode HTML entities and clean up
+            // Decode HTML entities (HtmlAgilityPack already handles most, but double-check)
             description = WebUtility.HtmlDecode(description);
             description = description.Trim();
 
@@ -320,6 +478,31 @@ namespace digioz.Portal.Web.Services
             return status == HttpStatusCode.BadRequest ||           // 400
                    status == HttpStatusCode.Forbidden ||            // 403
                    status == HttpStatusCode.NotFound;               // 404
+        }
+
+        /// <summary>
+        /// Disposes resources used by the service
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes resources used by the service
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    // HttpClient is now managed by IHttpClientFactory, no need to dispose
+                    _dbSemaphore?.Dispose();
+                }
+                _disposed = true;
+            }
         }
     }
 }

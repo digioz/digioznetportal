@@ -9,6 +9,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using digioz.Portal.Web.Hubs;
 using digioz.Portal.EmailProviders.Extensions;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -120,6 +121,18 @@ builder.Services.AddMemoryCache();
 
 // Recaptcha verification needs HttpClient
 builder.Services.AddHttpClient();
+
+// Configure named HttpClient for LinkChecker with proper settings
+builder.Services.AddHttpClient("LinkChecker", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(15);
+    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36");
+})
+.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    AllowAutoRedirect = false, // Don't follow redirects automatically
+    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+});
 
 // Add HttpContextAccessor for accessing HttpContext in view components
 builder.Services.AddHttpContextAccessor();

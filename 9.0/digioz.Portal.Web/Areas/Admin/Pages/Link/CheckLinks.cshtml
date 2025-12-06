@@ -21,7 +21,7 @@
             </div>
         }
 
-        @if (!Model.IsChecking && Model.Results == null || !Model.Results.Any())
+        @if (!Model.IsChecking && (Model.Results == null || !Model.Results.Any()))
         {
             <div class="alert alert-info">
                 <i class="bi bi-info-circle-fill"></i>
@@ -143,7 +143,7 @@
                             <tr class="@rowClass">
                                 <td>@result.LinkName</td>
                                 <td>
-                                    <a href="@result.Url" target="_blank" class="text-truncate d-inline-block" style="max-width: 300px;">
+                                    <a href="@result.Url" target="_blank" rel="noopener noreferrer" class="text-truncate d-inline-block" style="max-width: 300px;">
                                         @result.Url
                                     </a>
                                 </td>

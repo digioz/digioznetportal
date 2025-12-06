@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using digioz.Portal.Bo.ViewModels;
-using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Link
@@ -15,12 +16,14 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
     [Authorize(Roles = "Administrator")]
     public class CheckLinksModel : PageModel
     {
-        private readonly ILinkService _linkService;
+        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILoggerFactory _loggerFactory;
 
-        public CheckLinksModel(ILinkService linkService, ILoggerFactory loggerFactory)
+        public CheckLinksModel(IServiceScopeFactory scopeFactory, IHttpClientFactory httpClientFactory, ILoggerFactory loggerFactory)
         {
-            _linkService = linkService;
+            _scopeFactory = scopeFactory;
+            _httpClientFactory = httpClientFactory;
             _loggerFactory = loggerFactory;
         }
 
@@ -46,7 +49,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
             try
             {
                 var logger = _loggerFactory.CreateLogger<LinkCheckerService>();
-                var checker = new LinkCheckerService(_linkService, logger);
+                using var checker = new LinkCheckerService(_scopeFactory, _httpClientFactory, logger);
                 Results = await checker.CheckAllLinksAsync(batchSize: 10, CancellationToken.None);
 
                 // Calculate statistics
