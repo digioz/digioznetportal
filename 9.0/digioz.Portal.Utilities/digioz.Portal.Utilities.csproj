@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\digioz.Portal.Bo\digioz.Portal.Bo.csproj" />
   </ItemGroup>
 

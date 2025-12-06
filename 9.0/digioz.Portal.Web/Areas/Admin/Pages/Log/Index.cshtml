@@ -10,9 +10,21 @@
 <div class="card shadow-sm mb-3">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span class="fw-semibold">Logs</span>
-        <a asp-area="Admin" asp-page="/Index" class="btn btn-sm btn-outline-secondary">Back</a>
+        <div>
+            <a class="btn btn-sm btn-outline-secondary me-2" asp-area="Admin" asp-page="/Log/Export">Export</a>
+            <a class="btn btn-sm btn-danger me-2" asp-area="Admin" asp-page="/Log/Purge">Purge</a>
+            <a asp-area="Admin" asp-page="/Index" class="btn btn-sm btn-outline-secondary">Back</a>
+        </div>
     </div>
     <div class="card-body">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
         <form method="get" class="row g-2 align-items-center mb-3">
             <div class="col-12 col-md-8">
                 <input asp-for="q" class="form-control" placeholder="Search message, level, or event..." />

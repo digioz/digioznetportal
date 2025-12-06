@@ -16,7 +16,7 @@ namespace digioz.Portal.Dal.Services
             _context = context;
         }
 
-        public VisitorInfo Get(int id)
+        public VisitorInfo Get(long id)
         {
             return _context.VisitorInfos.Find(id);
         }
@@ -140,7 +140,7 @@ namespace digioz.Portal.Dal.Services
             _context.SaveChanges();
         }
 
-        public void Delete(int id)
+        public void Delete(long id)
         {
             var info = _context.VisitorInfos.Find(id);
             if (info != null)
@@ -148,6 +148,46 @@ namespace digioz.Portal.Dal.Services
                 _context.VisitorInfos.Remove(info);
                 _context.SaveChanges();
             }
+        }
+
+        // New: filtered retrieval for bulk export/purge operations
+        public List<VisitorInfo> GetByDateRange(DateTime? start, DateTime? end)
+        {
+            var query = _context.VisitorInfos.AsQueryable();
+
+            // Only consider records that have a timestamp
+            query = query.Where(v => v.Timestamp.HasValue);
+
+            if (start.HasValue)
+            {
+                var s = start.Value.Date;
+                query = query.Where(v => v.Timestamp.Value >= s);
+            }
+
+            if (end.HasValue)
+            {
+                // normalize end to end of day
+                var e = end.Value.Date.AddDays(1).AddTicks(-1);
+                query = query.Where(v => v.Timestamp.Value <= e);
+            }
+
+            return query.OrderBy(v => v.Timestamp ?? DateTime.MinValue).ThenBy(v => v.Id).AsNoTracking().ToList();
+        }
+
+        // New: bulk delete for performance
+        public int DeleteRange(IEnumerable<long> ids)
+        {
+            if (ids == null || !ids.Any()) return 0;
+
+            var idList = ids.ToHashSet();
+            var records = _context.VisitorInfos.Where(v => idList.Contains(v.Id)).ToList();
+            
+            if (records.Count == 0) return 0;
+
+            _context.VisitorInfos.RemoveRange(records);
+            _context.SaveChanges();
+            
+            return records.Count;
         }
     }
 }

@@ -34,6 +34,56 @@ namespace digioz.Portal.Dal.Services
                 .ToList();
         }
 
+        public int CountAll() => _context.VisitorSessions.Count();
+
+        public int CountSearch(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term)) return CountAll();
+            var like = $"%{term.Trim()}%";
+            return _context.VisitorSessions
+                .Where(v => EF.Functions.Like(v.SessionId, like)
+                         || EF.Functions.Like(v.PageUrl, like)
+                         || EF.Functions.Like(v.Username, like)
+                         || EF.Functions.Like(v.IpAddress, like))
+                .Count();
+        }
+
+        public List<VisitorSession> GetPaged(int page, int pageSize)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+            var skip = (page - 1) * pageSize;
+            return _context.VisitorSessions
+                .Include(x => x.Profile)
+                .OrderByDescending(v => v.DateModified)
+                .ThenByDescending(v => v.Id)
+                .Skip(skip)
+                .Take(pageSize)
+                .AsNoTracking()
+                .ToList();
+        }
+
+        public List<VisitorSession> SearchPaged(string term, int page, int pageSize)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+            var skip = (page - 1) * pageSize;
+            if (string.IsNullOrWhiteSpace(term)) return GetPaged(page, pageSize);
+            var like = $"%{term.Trim()}%";
+            return _context.VisitorSessions
+                .Include(x => x.Profile)
+                .Where(v => EF.Functions.Like(v.SessionId, like)
+                         || EF.Functions.Like(v.PageUrl, like)
+                         || EF.Functions.Like(v.Username, like)
+                         || EF.Functions.Like(v.IpAddress, like))
+                .OrderByDescending(v => v.DateModified)
+                .ThenByDescending(v => v.Id)
+                .Skip(skip)
+                .Take(pageSize)
+                .AsNoTracking()
+                .ToList();
+        }
+
         public void Add(VisitorSession session)
         {
             _context.VisitorSessions.Add(session);
@@ -54,6 +104,45 @@ namespace digioz.Portal.Dal.Services
                 _context.VisitorSessions.Remove(session);
                 _context.SaveChanges();
             }
+        }
+
+        // New: filtered retrieval for bulk export/purge operations
+        public List<VisitorSession> GetByDateRange(DateTime? start, DateTime? end)
+        {
+            var query = _context.VisitorSessions.AsQueryable();
+
+            // Only consider records that have a DateModified
+            query = query.Where(v => v.DateModified != default);
+
+            if (start.HasValue)
+            {
+                var s = start.Value.Date;
+                query = query.Where(v => v.DateModified >= s);
+            }
+
+            if (end.HasValue)
+            {
+                var e = end.Value.Date.AddDays(1).AddTicks(-1);
+                query = query.Where(v => v.DateModified <= e);
+            }
+
+            return query.OrderBy(v => v.DateModified).ThenBy(v => v.Id).AsNoTracking().ToList();
+        }
+
+        // New: bulk delete for performance
+        public int DeleteRange(IEnumerable<int> ids)
+        {
+            if (ids == null || !ids.Any()) return 0;
+
+            var idList = ids.ToHashSet();
+            var records = _context.VisitorSessions.Where(v => idList.Contains(v.Id)).ToList();
+            
+            if (records.Count == 0) return 0;
+
+            _context.VisitorSessions.RemoveRange(records);
+            _context.SaveChanges();
+            
+            return records.Count;
         }
     }
 }

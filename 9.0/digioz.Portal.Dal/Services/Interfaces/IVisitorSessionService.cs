@@ -12,5 +12,11 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void Add(VisitorSession session);
         void Update(VisitorSession session);
         void Delete(int id);
+        List<VisitorSession> GetPaged(int page, int pageSize);
+        List<VisitorSession> SearchPaged(string term, int page, int pageSize);
+        int CountAll();
+        int CountSearch(string term);
+        List<VisitorSession> GetByDateRange(DateTime? start, DateTime? end);
+        int DeleteRange(IEnumerable<int> ids);
     }
 }
