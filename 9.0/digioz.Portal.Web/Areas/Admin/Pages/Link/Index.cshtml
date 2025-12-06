@@ -10,7 +10,12 @@
 <div class="card shadow-sm">
 	<div class="card-header d-flex justify-content-between align-items-center">
 		<span>Links</span>
-		<a class="btn btn-sm btn-primary" asp-area="Admin" asp-page="/Link/Add">Add Link</a>
+		<div>
+			<a class="btn btn-sm btn-outline-secondary me-2" asp-area="Admin" asp-page="/Link/CheckLinks">
+				<i class="bi bi-search"></i> Check Links
+			</a>
+			<a class="btn btn-sm btn-primary" asp-area="Admin" asp-page="/Link/Add">Add Link</a>
+		</div>
 	</div>
 	<div class="card-body p-0">
 		<div class="table-responsive">
