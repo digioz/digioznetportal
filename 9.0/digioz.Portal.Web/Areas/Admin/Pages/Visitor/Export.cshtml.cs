@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -51,20 +52,12 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Visitor
             {
                 var id = r.Id.ToString();
                 var timestamp = (r.Timestamp?.ToString("yyyy-MM-dd HH:mm:ss")) ?? string.Empty;
-                sb.AppendLine($"{id},{Escape(timestamp)},{Escape(r.IpAddress)},{Escape(r.Host)},{Escape(r.HostName)},{Escape(r.Platform)},{Escape(r.Referrer)},{Escape(r.Href)},{Escape(r.UserAgent)},{Escape(r.UserLanguage)},{Escape(r.SessionId)}");
+                sb.AppendLine($"{id},{CsvHelper.Escape(timestamp)},{CsvHelper.Escape(r.IpAddress)},{CsvHelper.Escape(r.Host)},{CsvHelper.Escape(r.HostName)},{CsvHelper.Escape(r.Platform)},{CsvHelper.Escape(r.Referrer)},{CsvHelper.Escape(r.Href)},{CsvHelper.Escape(r.UserAgent)},{CsvHelper.Escape(r.UserLanguage)},{CsvHelper.Escape(r.SessionId)}");
             }
 
             var bytes = Encoding.UTF8.GetBytes(sb.ToString());
             var fileName = $"visitor_export_{(StartDate.HasValue ? StartDate.Value: DateTime.MinValue):yyyyMMdd}_{(EndDate.HasValue ? EndDate.Value: DateTime.Now):yyyyMMdd}.csv";
             return File(bytes, "text/csv", fileName);
-        }
-
-        private static string Escape(string? input)
-        {
-            if (string.IsNullOrEmpty(input)) return string.Empty;
-            var needsQuotes = input.Contains(',') || input.Contains('"') || input.Contains('\n') || input.Contains('\r');
-            var value = input.Replace("\"", "\"\"");
-            return needsQuotes ? $"\"{value}\"" : value;
         }
     }
 }
