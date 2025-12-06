@@ -12,7 +12,11 @@
         <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/Visitor/Index">Back</a>
     </div>
     <div class="card-body">
-        <form method="post">
+        <div class="alert alert-warning" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <strong>Warning:</strong> This action will permanently delete visitor records and cannot be undone.
+        </div>
+        <form method="post" id="purgeForm">
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label" for="StartDate">Start Date (optional)</label>
@@ -23,9 +27,47 @@
                     <input type="date" class="form-control" id="EndDate" asp-for="EndDate" />
                 </div>
             </div>
+            <div class="form-check mt-3">
+                <input class="form-check-input" type="checkbox" id="confirmPurge" required>
+                <label class="form-check-label" for="confirmPurge">
+                    I understand this action is irreversible and will permanently delete the selected records.
+                </label>
+            </div>
             <div class="mt-3 d-flex justify-content-end gap-2">
                 <button type="submit" class="btn btn-danger">Purge</button>
             </div>
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.getElementById('purgeForm').addEventListener('submit', function(e) {
+            if (!document.getElementById('confirmPurge').checked) {
+                e.preventDefault();
+                alert('Please confirm that you understand this action is irreversible.');
+                return false;
+            }
+            
+            const startDate = document.getElementById('StartDate').value;
+            const endDate = document.getElementById('EndDate').value;
+            
+            let message = 'Are you sure you want to permanently delete ';
+            if (startDate && endDate) {
+                message += `all visitor records between ${startDate} and ${endDate}?`;
+            } else if (endDate) {
+                message += `all visitor records before ${endDate}?`;
+            } else {
+                message += 'the selected visitor records?';
+            }
+            
+            if (!confirm(message)) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Allow form submission
+            return true;
+        });
+    </script>
+}

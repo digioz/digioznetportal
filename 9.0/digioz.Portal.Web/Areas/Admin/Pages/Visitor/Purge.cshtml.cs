@@ -43,11 +43,13 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Visitor
                 return Page();
             }
 
+            var count = toDelete.Count;
             foreach (var r in toDelete)
             {
-                _service.Delete(r.Id);
+                _service.Delete((int)r.Id);
             }
 
+            TempData["SuccessMessage"] = $"Successfully purged {count} visitor record(s).";
             return RedirectToPage("/Visitor/Index", new { area = "Admin" });
         }
     }

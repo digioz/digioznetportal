@@ -25,44 +25,20 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Log
         {
             if (StartDate == null && EndDate == null)
             {
-                ModelState.AddModelError(string.Empty, "Please select a date (either an end date to export all records before that date, or both start and end dates for a range).);");
+                ModelState.AddModelError(string.Empty, "Please select a date (either an end date to export all records before that date, or both start and end dates for a range).");
                 return Page();
             }
 
-            DateTime? start = StartDate?.Date;
-            DateTime? end = EndDate?.Date;
-
-            if (start.HasValue && end.HasValue && end < start)
+            if (StartDate.HasValue && EndDate.HasValue && EndDate < StartDate)
             {
                 ModelState.AddModelError(string.Empty, "Please select a valid date range.");
                 return Page();
             }
 
-            // Normalize end to inclusive end of day when present
-            if (end.HasValue)
-            {
-                end = end.Value.Date.AddDays(1).AddTicks(-1);
-            }
+            // Use service layer method for consistent date filtering
+            var records = _service.GetByDateRange(StartDate, EndDate);
 
-            var records = _service.GetAll();
-
-            var filtered = records.Where(r => (r.Timestamp ?? DateTime.MinValue) != DateTime.MinValue);
-
-            if (start.HasValue && end.HasValue)
-            {
-                var s = start.Value;
-                var e = end.Value;
-                filtered = filtered.Where(r => (r.Timestamp ?? DateTime.MinValue) >= s && (r.Timestamp ?? DateTime.MinValue) <= e);
-            }
-            else if (!start.HasValue && end.HasValue)
-            {
-                var e = end.Value;
-                filtered = filtered.Where(r => (r.Timestamp ?? DateTime.MinValue) <= e);
-            }
-
-            var list = filtered.OrderBy(r => r.Timestamp ?? DateTime.MinValue).ThenBy(r => r.Id).ToList();
-
-            if (!list.Any())
+            if (records == null || !records.Any())
             {
                 ModelState.AddModelError(string.Empty, "No records found for the selected date criteria.");
                 return Page();
@@ -71,7 +47,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Log
             var sb = new StringBuilder();
             sb.AppendLine("Id,Timestamp,Level,Message,Exception,LogEvent");
 
-            foreach (var r in list)
+            foreach (var r in records)
             {
                 var id = r.Id.ToString();
                 var timestamp = (r.Timestamp?.ToString("yyyy-MM-dd HH:mm:ss")) ?? string.Empty;

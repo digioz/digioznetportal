@@ -42,11 +42,13 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.VisitorSession
                 return Page();
             }
 
+            var count = toDelete.Count;
             foreach (var r in toDelete)
             {
                 _service.Delete(r.Id);
             }
 
+            TempData["SuccessMessage"] = $"Successfully purged {count} visitor session record(s).";
             return RedirectToPage("/VisitorSession/Index", new { area = "Admin" });
         }
     }
