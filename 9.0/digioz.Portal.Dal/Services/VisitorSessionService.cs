@@ -106,6 +106,7 @@ namespace digioz.Portal.Dal.Services
             }
         }
 
+        // New: filtered retrieval for bulk export/purge operations
         public List<VisitorSession> GetByDateRange(DateTime? start, DateTime? end)
         {
             var query = _context.VisitorSessions.AsQueryable();
@@ -126,6 +127,22 @@ namespace digioz.Portal.Dal.Services
             }
 
             return query.OrderBy(v => v.DateModified).ThenBy(v => v.Id).AsNoTracking().ToList();
+        }
+
+        // New: bulk delete for performance
+        public int DeleteRange(IEnumerable<int> ids)
+        {
+            if (ids == null || !ids.Any()) return 0;
+
+            var idList = ids.ToHashSet();
+            var records = _context.VisitorSessions.Where(v => idList.Contains(v.Id)).ToList();
+            
+            if (records.Count == 0) return 0;
+
+            _context.VisitorSessions.RemoveRange(records);
+            _context.SaveChanges();
+            
+            return records.Count;
         }
     }
 }

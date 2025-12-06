@@ -42,11 +42,9 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Log
                 return Page();
             }
 
-            var count = toDelete.Count;
-            foreach (var r in toDelete)
-            {
-                _service.Delete(r.Id);
-            }
+            // Bulk delete for better performance
+            var ids = toDelete.Select(r => r.Id).ToList();
+            var count = _service.DeleteRange(ids);
 
             TempData["SuccessMessage"] = $"Successfully purged {count} log record(s).";
             return RedirectToPage("/Log/Index", new { area = "Admin" });

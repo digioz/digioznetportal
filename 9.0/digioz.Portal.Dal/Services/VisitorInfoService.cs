@@ -173,5 +173,21 @@ namespace digioz.Portal.Dal.Services
 
             return query.OrderBy(v => v.Timestamp ?? DateTime.MinValue).ThenBy(v => v.Id).AsNoTracking().ToList();
         }
+
+        // New: bulk delete for performance
+        public int DeleteRange(IEnumerable<long> ids)
+        {
+            if (ids == null || !ids.Any()) return 0;
+
+            var idList = ids.ToHashSet();
+            var records = _context.VisitorInfos.Where(v => idList.Contains(v.Id)).ToList();
+            
+            if (records.Count == 0) return 0;
+
+            _context.VisitorInfos.RemoveRange(records);
+            _context.SaveChanges();
+            
+            return records.Count;
+        }
     }
 }

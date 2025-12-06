@@ -23,5 +23,8 @@ namespace digioz.Portal.Dal.Services.Interfaces
 
         // New: filtered retrieval for bulk export/purge operations
         List<VisitorInfo> GetByDateRange(DateTime? start, DateTime? end);
+
+        // New: bulk delete for performance
+        int DeleteRange(IEnumerable<long> ids);
     }
 }

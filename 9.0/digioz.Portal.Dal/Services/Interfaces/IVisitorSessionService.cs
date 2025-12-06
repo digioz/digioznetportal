@@ -17,5 +17,6 @@ namespace digioz.Portal.Dal.Services.Interfaces
         int CountAll();
         int CountSearch(string term);
         List<VisitorSession> GetByDateRange(DateTime? start, DateTime? end);
+        int DeleteRange(IEnumerable<int> ids);
     }
 }
