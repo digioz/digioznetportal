@@ -36,5 +36,17 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
             // Preload categories dictionary for display
             CategoryNames = _categoryService.GetAll().ToDictionary(c => c.Id, c => c.Name);
         }
+
+        public IActionResult OnPostToggleVisibility(int id, int pageNumber)
+        {
+            var link = _service.Get(id);
+            if (link != null)
+            {
+                link.Visible = !link.Visible;
+                _service.Update(link);
+            }
+
+            return RedirectToPage(new { pageNumber });
+        }
     }
 }

@@ -36,8 +36,20 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
                 LoadCategories();
                 return Page();
             }
-            Item.Timestamp = DateTime.UtcNow;
-            _service.Update(Item);
+
+            // Get fresh entity from database to avoid detached entity issues
+            var existingLink = _service.Get(Item.Id);
+            if (existingLink == null) return RedirectToPage("/Link/Index", new { area = "Admin" });
+
+            // Update properties on the tracked entity
+            existingLink.Name = Item.Name;
+            existingLink.Url = Item.Url;
+            existingLink.Description = Item.Description;
+            existingLink.LinkCategory = Item.LinkCategory;
+            existingLink.Visible = Item.Visible;
+            existingLink.Timestamp = DateTime.UtcNow;
+
+            _service.Update(existingLink);
             return RedirectToPage("/Link/Index", new { area = "Admin" });
         }
 

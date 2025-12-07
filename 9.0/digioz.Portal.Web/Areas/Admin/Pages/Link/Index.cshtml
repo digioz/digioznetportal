@@ -37,17 +37,31 @@
 							<tr>
 								<td>@item.Name</td>
 								<td>@(Model.CategoryNames.TryGetValue(item.LinkCategory, out var cn) ? cn : "-")</td>
-								<td><a href="@item.Url" target="_blank">@item.Url</a></td>
+								<td>
+									<a href="@item.Url" 
+									   target="_blank" 
+									   rel="noopener noreferrer"
+									   title="@(string.IsNullOrWhiteSpace(item.Description) ? item.Url : item.Description)">
+										@item.Url
+									</a>
+								</td>
 								<td class="text-center">
-									@if (item.Visible)
-									{
-										<span class="badge bg-success">Yes</span>
-									}
-									else
-									{
-
-										<span class="badge bg-secondary">No</span>
-									}
+									<form method="post" asp-page-handler="ToggleVisibility" class="d-inline">
+										<input type="hidden" name="id" value="@item.Id" />
+										<input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+										<button type="submit" 
+												class="btn btn-link p-0 text-decoration-none"
+												title="Click to toggle visibility">
+											@if (item.Visible)
+											{
+												<span class="badge bg-success" style="cursor: pointer;">Yes</span>
+											}
+											else
+											{
+												<span class="badge bg-secondary" style="cursor: pointer;">No</span>
+											}
+										</button>
+									</form>
 								</td>
 								<td class="text-end">
 									<a class="btn btn-sm btn-outline-secondary px-1 py-0 fs-6" asp-area="Admin" asp-page="/Link/Detail" asp-route-id="@item.Id" title="Detail" aria-label="Detail"><i class="bi bi-eye"></i></a>
