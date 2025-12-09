@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
@@ -5,16 +6,18 @@ using digioz.Portal.Dal.Services.Interfaces;
 
 namespace digioz.Portal.Web.Pages.Shared.Components.UserMenu
 {
-    public class UserMenuViewComponent(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IProfileService profileService) : ViewComponent
+    public class UserMenuViewComponent(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IProfileService profileService, IPrivateMessageService privateMessageService) : ViewComponent
     {
         private readonly SignInManager<IdentityUser> _signInManager = signInManager;
         private readonly UserManager<IdentityUser> _userManager = userManager;
         private readonly IProfileService _profileService = profileService;
+        private readonly IPrivateMessageService _privateMessageService = privateMessageService;
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
             ViewBag.SignInManager = _signInManager;
             ViewBag.UserManager = _userManager;
+            ViewBag.UnreadMessageCount = 0;
 
             if (_signInManager.IsSignedIn(UserClaimsPrincipal))
             {
@@ -41,6 +44,12 @@ namespace digioz.Portal.Web.Pages.Shared.Components.UserMenu
                     if (profile != null && !string.IsNullOrWhiteSpace(profile.DisplayName))
                     {
                         ViewBag.ProfileDisplayName = profile.DisplayName;
+                    }
+
+                    // Get unread private message count
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        ViewBag.UnreadMessageCount = _privateMessageService.GetUnreadCount(userId);
                     }
                 }
             }

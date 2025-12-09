@@ -10,6 +10,7 @@ namespace digioz.Portal.Dal.Services.Interfaces
         List<PrivateMessage> GetOutbox(string userId); // messages user sent not read yet
         List<PrivateMessage> GetSent(string userId); // messages user sent and have been read
         List<PrivateMessage> GetThread(int rootOrReplyId); // ordered newest first
+        int GetUnreadCount(string userId); // count of unread messages for user
         void Add(PrivateMessage message);
         void MarkRead(int id);
         void MarkReadIfUnread(int id);
