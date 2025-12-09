@@ -49,6 +49,12 @@
                                 <tr><th>State</th><td>@Model.UserProfile.State</td></tr>
                                 <tr><th>Zip</th><td>@Model.UserProfile.Zip</td></tr>
                                 <tr><th>Country</th><td>@Model.UserProfile.Country</td></tr>
+                                <tr>
+                                    <th>Profile Views</th>
+                                    <td>
+                                        <i class="bi bi-eye"></i> @Model.UserProfile.Views.ToString("N0")
+                                    </td>
+                                </tr>
                                 @if (!string.IsNullOrEmpty(Model.ThemeName))
                                 {
                                     <tr><th>Theme</th><td>@Model.ThemeName</td></tr>

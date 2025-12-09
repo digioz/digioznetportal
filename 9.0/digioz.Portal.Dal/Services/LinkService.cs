@@ -65,6 +65,16 @@ namespace digioz.Portal.Dal.Services
             }
         }
 
+        public void IncrementViews(int id)
+        {
+            var link = _context.Links.Find(id);
+            if (link != null)
+            {
+                link.Views++;
+                _context.SaveChanges();
+            }
+        }
+
         public List<Link> Search(string term, int skip, int take, out int totalCount)
         {
             term = term ?? string.Empty;

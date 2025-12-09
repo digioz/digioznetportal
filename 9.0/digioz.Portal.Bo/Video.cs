@@ -16,5 +16,6 @@ namespace digioz.Portal.Bo
         public bool Visible { get; set; }
         public string Thumbnail { get; set; }
         public DateTime? Timestamp { get; set; }
+        public int Views { get; set; }
     }
 }

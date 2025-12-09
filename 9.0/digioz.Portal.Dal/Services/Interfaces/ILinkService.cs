@@ -11,6 +11,7 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void Add(Link link);
         void Update(Link link);
         void Delete(int id);
+        void IncrementViews(int id);
         
         /// <summary>
         /// Searches links by term in name, url, and description fields.

@@ -34,6 +34,11 @@ namespace digioz.Portal.Pages.Links {
                     // Don't show non-visible links
                     SelectedLink = null;
                 }
+                else if (SelectedLink != null)
+                {
+                    // Increment view count for the selected link
+                    _linkService.IncrementViews(id.Value);
+                }
                 return;
             }
 

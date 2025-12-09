@@ -25,6 +25,7 @@ namespace digioz.Portal.Bo
         public string Signature { get; set; }
         public string Avatar { get; set; }
         public int? ThemeId { get; set; }
+        public int Views { get; set; }
         
         // Navigation property
         public virtual Theme Theme { get; set; }

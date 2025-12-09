@@ -78,6 +78,9 @@ namespace digioz.Portal.Pages.Pictures
                     return Forbid();
             }
 
+            // Increment view count
+            _pictureService.IncrementViews(Id.Value);
+
             Album = _albumService.Get(Item.AlbumId);
             
             // Get uploader profile

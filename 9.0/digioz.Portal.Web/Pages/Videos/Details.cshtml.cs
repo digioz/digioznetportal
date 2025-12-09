@@ -78,6 +78,9 @@ namespace digioz.Portal.Pages.Videos
                     return Forbid();
             }
 
+            // Increment view count
+            _videoService.IncrementViews(Id.Value);
+
             Album = _albumService.Get(Item.AlbumId);
             
             // Get uploader profile

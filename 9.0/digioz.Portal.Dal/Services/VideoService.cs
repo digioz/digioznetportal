@@ -103,6 +103,16 @@ namespace digioz.Portal.Dal.Services
             }
         }
 
+        public void IncrementViews(int id)
+        {
+            var video = _context.Videos.Find(id);
+            if (video != null)
+            {
+                video.Views++;
+                _context.SaveChanges();
+            }
+        }
+
         public int DeleteByUserId(string userId)
         {
             if (string.IsNullOrEmpty(userId))

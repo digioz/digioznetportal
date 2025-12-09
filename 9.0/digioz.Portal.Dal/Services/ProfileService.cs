@@ -64,5 +64,15 @@ namespace digioz.Portal.Dal.Services
                 _context.SaveChanges();
             }
         }
+
+        public void IncrementViews(int id)
+        {
+            var profile = _context.Profiles.Find(id);
+            if (profile != null)
+            {
+                profile.Views++;
+                _context.SaveChanges();
+            }
+        }
     }
 }

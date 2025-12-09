@@ -103,6 +103,16 @@ namespace digioz.Portal.Dal.Services
             }
         }
 
+        public void IncrementViews(int id)
+        {
+            var picture = _context.Pictures.Find(id);
+            if (picture != null)
+            {
+                picture.Views++;
+                _context.SaveChanges();
+            }
+        }
+
         public int DeleteByUserId(string userId)
         {
             if (string.IsNullOrEmpty(userId))

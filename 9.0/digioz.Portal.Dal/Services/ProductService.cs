@@ -45,5 +45,15 @@ namespace digioz.Portal.Dal.Services
                 _context.SaveChanges();
             }
         }
+
+        public void IncrementViews(string id)
+        {
+            var product = _context.Products.Find(id);
+            if (product != null)
+            {
+                product.Views++;
+                _context.SaveChanges();
+            }
+        }
     }
 }
