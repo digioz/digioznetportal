@@ -15,7 +15,7 @@ namespace digioz.Portal.Utilities.Helpers
         /// </summary>
         /// <param name="input">The string to escape</param>
         /// <returns>Escaped string safe for CSV inclusion</returns>
-        public static string Escape(string? input)
+        public static string Escape(string input)
         {
             if (string.IsNullOrEmpty(input))
                 return string.Empty;

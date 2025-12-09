@@ -18,6 +18,6 @@ namespace digioz.Portal.Bo.ViewModels
         /// <summary>
         /// The updated description for the link
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
     }
 }

@@ -25,6 +25,11 @@ namespace digioz.Portal.Dal.Services
             return _context.Links.ToList();
         }
 
+        public List<Link> GetAllVisible()
+        {
+            return _context.Links.Where(l => l.Visible).ToList();
+        }
+
         public void Add(Link link)
         {
             _context.Links.Add(link);
