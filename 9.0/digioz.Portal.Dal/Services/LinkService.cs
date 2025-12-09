@@ -67,12 +67,9 @@ namespace digioz.Portal.Dal.Services
 
         public void IncrementViews(int id)
         {
-            var link = _context.Links.Find(id);
-            if (link != null)
-            {
-                link.Views++;
-                _context.SaveChanges();
-            }
+            _context.Links
+                .Where(l => l.Id == id)
+                .ExecuteUpdate(setters => setters.SetProperty(l => l.Views, l => l.Views + 1));
         }
 
         public List<Link> Search(string term, int skip, int take, out int totalCount)

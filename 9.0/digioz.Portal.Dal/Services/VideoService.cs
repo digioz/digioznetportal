@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace digioz.Portal.Dal.Services
 {
@@ -105,12 +106,9 @@ namespace digioz.Portal.Dal.Services
 
         public void IncrementViews(int id)
         {
-            var video = _context.Videos.Find(id);
-            if (video != null)
-            {
-                video.Views++;
-                _context.SaveChanges();
-            }
+            _context.Videos
+                .Where(v => v.Id == id)
+                .ExecuteUpdate(setters => setters.SetProperty(v => v.Views, v => v.Views + 1));
         }
 
         public int DeleteByUserId(string userId)

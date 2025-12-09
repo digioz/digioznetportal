@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace digioz.Portal.Dal.Services
 {
@@ -48,12 +49,9 @@ namespace digioz.Portal.Dal.Services
 
         public void IncrementViews(string id)
         {
-            var product = _context.Products.Find(id);
-            if (product != null)
-            {
-                product.Views++;
-                _context.SaveChanges();
-            }
+            _context.Products
+                .Where(p => p.Id == id)
+                .ExecuteUpdate(setters => setters.SetProperty(p => p.Views, p => p.Views + 1));
         }
     }
 }
