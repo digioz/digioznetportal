@@ -32,5 +32,6 @@ namespace digioz.Portal.Bo
         public bool Visible { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateModified { get; set; }
+        public int Views { get; set; }
     }
 }

@@ -13,18 +13,22 @@
     </div>
     <div class="card-body">
         <form method="post">
+            <input type="hidden" asp-for="Item.Id" />
             <div class="row g-3">
                 <div class="col-md-6">
                     <label asp-for="Item.Name" class="form-label">Name</label>
                     <input asp-for="Item.Name" class="form-control" />
+                    <span asp-validation-for="Item.Name" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="Item.Url" class="form-label">Url</label>
                     <input asp-for="Item.Url" class="form-control" />
+                    <span asp-validation-for="Item.Url" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="Item.LinkCategory" class="form-label">Category</label>
                     <select asp-for="Item.LinkCategory" class="form-select" asp-items="Model.CategoryList"></select>
+                    <span asp-validation-for="Item.LinkCategory" class="text-danger"></span>
                 </div>
                 <div class="col-12">
                     <label asp-for="Item.Description" class="form-label">Description</label>

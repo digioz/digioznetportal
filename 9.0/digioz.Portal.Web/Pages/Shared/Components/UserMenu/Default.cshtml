@@ -3,6 +3,7 @@
     var SignInManager = (SignInManager<IdentityUser>)ViewBag.SignInManager;
     var UserManager = (UserManager<IdentityUser>)ViewBag.UserManager;
     var displayName = (string)ViewBag.ProfileDisplayName;
+    var unreadCount = (int)ViewBag.UnreadMessageCount;
 }
 
 <div class="card bg-light mb-3">
@@ -21,7 +22,13 @@
                 <li><a href="/Profile/Edit">My Profile</a></li>
                 <li><a href="/Profile/Pictures">My Pictures</a></li>
                 <li><a href="/Profile/Videos">My Videos</a></li>
-                <li><a href="/PrivateMessages/Index">Private Messages</a></li>
+                <li>
+                    <a href="/PrivateMessages/Index">Private Messages</a>
+                    @if (unreadCount > 0)
+                    {
+                        <text>&nbsp;</text><span class="badge bg-danger">@unreadCount</span>
+                    }
+                </li> 
                 @if (User.IsInRole("Administrator"))
                 {
                     <li><a href="/Admin/Index">Admin Dashboard</a></li>
@@ -39,7 +46,7 @@
                 <li>
                     <a href="/Identity/Account/Login">Login</a>
                 </li>
-                @* <li><a href="/Identity/Account/ForgotPassword">Forgot Password</a></li> *@
+                <li><a href="/Identity/Account/ForgotPassword">Forgot Password</a></li>
             </ul>
         }
     </div>

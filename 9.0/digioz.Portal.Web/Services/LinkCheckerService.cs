@@ -46,14 +46,14 @@ namespace digioz.Portal.Web.Services
             var results = new List<LinkCheckResult>();
             List<Link> allLinks;
 
-            // Get all links using a dedicated scope
+            // Get all visible links using a dedicated scope
             using (var scope = _scopeFactory.CreateScope())
             {
                 var linkService = scope.ServiceProvider.GetRequiredService<ILinkService>();
-                allLinks = linkService.GetAll();
+                allLinks = linkService.GetAllVisible();
             }
             
-            _logger.LogInformation($"Starting link check for {allLinks.Count} links");
+            _logger.LogInformation($"Starting link check for {allLinks.Count} visible links");
 
             // Process in batches sequentially to avoid DbContext threading issues
             for (int i = 0; i < allLinks.Count; i += batchSize)
@@ -86,14 +86,14 @@ namespace digioz.Portal.Web.Services
                 var result = await CheckLinkStatusAsync(link, cancellationToken);
                 
                 // Create update info with the changes to be applied
-                LinkUpdateInfo updateInfo = null;
+                LinkUpdateInfo? updateInfo = null;
                 if (result.WasUpdated)
                 {
                     updateInfo = new LinkUpdateInfo
                     {
                         LinkId = link.Id,
                         Visible = link.Visible,
-                        Description = link.Description
+                        Description = link.Description ?? string.Empty
                     };
                 }
                 
@@ -176,7 +176,7 @@ namespace digioz.Portal.Web.Services
                 // Create HttpClient from factory (properly managed lifecycle)
                 using var httpClient = _httpClientFactory.CreateClient("LinkChecker");
 
-                HttpResponseMessage response = null;
+                HttpResponseMessage? response = null;
 
                 // Try HEAD request first (faster), then fall back to GET if needed
                 try
@@ -188,16 +188,22 @@ namespace digioz.Portal.Web.Services
                 {
                     // Some servers don't support HEAD, try GET
                     response?.Dispose();
-                    response = null;
-                    
                     using var getRequest = new HttpRequestMessage(HttpMethod.Get, link.Url);
                     response = await httpClient.SendAsync(getRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                 }
                 catch
                 {
-                    // Ensure response is disposed on any other exception (timeout, cancellation, etc.)
+                    // Ensure response is disposed on any other exception (timeout, cancellationToken, etc.)
                     response?.Dispose();
                     throw;
+                }
+
+                // Ensure we have a response before using it
+                if (response == null)
+                {
+                    result.Status = LinkCheckStatus.NetworkError;
+                    result.Message = "No response received";
+                    return result;
                 }
 
                 // Use using statement to ensure response is disposed
@@ -298,10 +304,10 @@ namespace digioz.Portal.Web.Services
         /// </summary>
         private bool IsValidAndSafeUrl(string url, out string error)
         {
-            error = null;
+            error = string.Empty;
 
             // Try to parse the URL
-            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
+            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri) || uri == null)
             {
                 error = "Invalid URL format";
                 return false;
@@ -411,19 +417,19 @@ namespace digioz.Portal.Web.Services
         /// <summary>
         /// Extracts description from website HTML using HtmlAgilityPack (optimized to read only head section)
         /// </summary>
-        private async Task<string> ExtractDescriptionAsync(string url, HttpClient httpClient, CancellationToken cancellationToken)
+        private async Task<string?> ExtractDescriptionAsync(string url, HttpClient httpClient, CancellationToken cancellationToken)
         {
             try
             {
                 // Use ResponseHeadersRead to avoid buffering entire response
                 using var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                 if (!response.IsSuccessStatusCode)
-                    return null;
+                    return string.Empty;
 
                 // Read only the portion we need (up to 50KB or </head> tag)
                 var htmlChunk = await ReadHtmlHeadSectionAsync(response, cancellationToken);
                 if (string.IsNullOrEmpty(htmlChunk))
-                    return null;
+                    return string.Empty;
 
                 // Parse HTML using HtmlAgilityPack (handles malformed HTML and attribute order)
                 var htmlDoc = new HtmlDocument();
@@ -433,7 +439,7 @@ namespace digioz.Portal.Web.Services
                 var metaDesc = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='description' or @name='Description']");
                 if (metaDesc != null)
                 {
-                    var content = metaDesc.GetAttributeValue("content", null);
+                    var content = metaDesc.GetAttributeValue("content", string.Empty) ?? string.Empty;
                     if (!string.IsNullOrWhiteSpace(content))
                     {
                         return CleanDescription(content);
@@ -444,7 +450,7 @@ namespace digioz.Portal.Web.Services
                 var ogDesc = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:description']");
                 if (ogDesc != null)
                 {
-                    var content = ogDesc.GetAttributeValue("content", null);
+                    var content = ogDesc.GetAttributeValue("content", string.Empty) ?? string.Empty;
                     if (!string.IsNullOrWhiteSpace(content))
                     {
                         return CleanDescription(content);
@@ -455,7 +461,7 @@ namespace digioz.Portal.Web.Services
                 var twitterDesc = htmlDoc.DocumentNode.SelectSingleNode("//meta[@name='twitter:description']");
                 if (twitterDesc != null)
                 {
-                    var content = twitterDesc.GetAttributeValue("content", null);
+                    var content = twitterDesc.GetAttributeValue("content", string.Empty) ?? string.Empty;
                     if (!string.IsNullOrWhiteSpace(content))
                     {
                         return CleanDescription(content);
@@ -474,7 +480,7 @@ namespace digioz.Portal.Web.Services
                 _logger.LogWarning($"Failed to extract description from {url}: {ex.Message}");
             }
 
-            return null;
+            return string.Empty;
         }
 
         /// <summary>
@@ -551,17 +557,17 @@ namespace digioz.Portal.Web.Services
         private string CleanDescription(string description)
         {
             if (string.IsNullOrWhiteSpace(description))
-                return null;
+                return string.Empty;
 
             // Decode HTML entities (HtmlAgilityPack already handles most, but double-check)
-            description = WebUtility.HtmlDecode(description);
-            description = description.Trim();
+            var decodedDescription = WebUtility.HtmlDecode(description) ?? string.Empty;
+            decodedDescription = decodedDescription.Trim();
 
             // Truncate if too long
-            if (description.Length > 500)
-                description = description.Substring(0, 497) + "...";
+            if (decodedDescription.Length > 500)
+                decodedDescription = decodedDescription.Substring(0, 497) + "...";
 
-            return description;
+            return decodedDescription;
         }
 
         /// <summary>

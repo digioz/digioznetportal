@@ -104,6 +104,12 @@ namespace digioz.Portal.Dal.Services
             return allMessages.OrderBy(m => m.SentDate).ToList();
         }
 
+        public int GetUnreadCount(string userId)
+        {
+            return _context.PrivateMessages
+                .AsNoTracking()
+                .Count(pm => pm.ToId == userId && !pm.IsRead);
+        }
 
         public void Add(PrivateMessage message)
         {

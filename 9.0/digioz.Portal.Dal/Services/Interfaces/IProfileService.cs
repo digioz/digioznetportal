@@ -13,5 +13,6 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void Add(Profile profile);
         void Update(Profile profile);
         void Delete(int id);
+        void IncrementViews(int id);
     }
 }

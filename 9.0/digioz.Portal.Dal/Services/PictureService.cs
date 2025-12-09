@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace digioz.Portal.Dal.Services
 {
@@ -101,6 +102,13 @@ namespace digioz.Portal.Dal.Services
                 _context.Pictures.Remove(picture);
                 _context.SaveChanges();
             }
+        }
+
+        public void IncrementViews(int id)
+        {
+            _context.Pictures
+                .Where(p => p.Id == id)
+                .ExecuteUpdate(setters => setters.SetProperty(p => p.Views, p => p.Views + 1));
         }
 
         public int DeleteByUserId(string userId)

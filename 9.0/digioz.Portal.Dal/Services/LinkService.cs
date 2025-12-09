@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace digioz.Portal.Dal.Services
 {
@@ -24,6 +25,11 @@ namespace digioz.Portal.Dal.Services
             return _context.Links.ToList();
         }
 
+        public List<Link> GetAllVisible()
+        {
+            return _context.Links.Where(l => l.Visible).ToList();
+        }
+
         public void Add(Link link)
         {
             _context.Links.Add(link);
@@ -32,7 +38,20 @@ namespace digioz.Portal.Dal.Services
 
         public void Update(Link link)
         {
-            _context.Links.Update(link);
+            var existingEntity = _context.Links.Local.FirstOrDefault(e => e.Id == link.Id);
+            
+            if (existingEntity != null)
+            {
+                // Entity is already tracked, update its properties
+                _context.Entry(existingEntity).CurrentValues.SetValues(link);
+            }
+            else
+            {
+                // Entity is not tracked, attach and mark as modified
+                _context.Links.Attach(link);
+                _context.Entry(link).State = EntityState.Modified;
+            }
+            
             _context.SaveChanges();
         }
 
@@ -44,6 +63,13 @@ namespace digioz.Portal.Dal.Services
                 _context.Links.Remove(link);
                 _context.SaveChanges();
             }
+        }
+
+        public void IncrementViews(int id)
+        {
+            _context.Links
+                .Where(l => l.Id == id)
+                .ExecuteUpdate(setters => setters.SetProperty(l => l.Views, l => l.Views + 1));
         }
 
         public List<Link> Search(string term, int skip, int take, out int totalCount)

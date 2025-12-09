@@ -52,6 +52,9 @@ namespace digioz.Portal.Pages.Profile
                 .FirstOrDefault(p => p.DisplayName != null && p.DisplayName.Equals(DisplayName, StringComparison.OrdinalIgnoreCase));
             if (UserProfile == null) return NotFound();
 
+            // Increment view count
+            _profileService.IncrementViews(UserProfile.Id);
+
             // Get theme name if user has a theme selected
             if (UserProfile.ThemeId.HasValue)
             {

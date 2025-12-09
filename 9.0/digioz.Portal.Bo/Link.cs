@@ -14,5 +14,6 @@ namespace digioz.Portal.Bo
         public int LinkCategory { get; set; }
         public bool Visible { get; set; }
         public DateTime? Timestamp { get; set; }
+        public int Views { get; set; }
     }
 }

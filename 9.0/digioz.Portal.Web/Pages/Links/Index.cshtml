@@ -19,6 +19,12 @@
                         <p class="mb-3">@Html.Raw(Model.SelectedLink.Description)</p>
                     }
 
+                    <div class="mb-3">
+                        <span class="text-muted">
+                            <i class="bi bi-eye"></i> Views: @Model.SelectedLink.Views.ToString("N0")
+                        </span>
+                    </div>
+
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i>
                         You are about to visit an external website.

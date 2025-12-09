@@ -17,6 +17,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
         public CheckLinksModel(LinkCheckerService linkChecker)
         {
             _linkChecker = linkChecker;
+            Results = new List<LinkCheckResult>();
         }
 
         public List<LinkCheckResult> Results { get; set; }
