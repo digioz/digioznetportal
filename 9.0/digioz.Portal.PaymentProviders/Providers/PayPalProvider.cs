@@ -133,10 +133,10 @@ namespace digioz.Portal.PaymentProviders.Providers
             };
 
             if (amount.HasValue)
+            {
                 payload["REFUNDTYPE"] = "Partial";
-
-            if (amount.HasValue)
                 payload["AMT"] = amount.Value.ToString("F2");
+            }
 
             return payload;
         }

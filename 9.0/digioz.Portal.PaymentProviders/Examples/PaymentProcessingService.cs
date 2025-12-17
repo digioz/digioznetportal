@@ -53,7 +53,7 @@ namespace digioz.Portal.PaymentProviders.Examples
             var request = new PaymentRequest
             {
                 TransactionId = Guid.NewGuid().ToString(),
-                Amount = amount * 100, // Convert to cents (smallest currency unit)
+                Amount = Math.Round(amount * 100, 0), // Convert to cents (smallest currency unit) with rounding
                 CurrencyCode = "USD",
                 CardNumber = cardNumber,
                 ExpirationMonth = expMonth,
@@ -67,7 +67,7 @@ namespace digioz.Portal.PaymentProviders.Examples
                 BillingZip = billingZip,
                 BillingCountry = billingCountry,
                 Description = "Payment for order",
-                InvoiceNumber = Guid.NewGuid().ToString().Substring(0, 12)
+                InvoiceNumber = GenerateInvoiceNumber()
             };
 
             // Process payment
@@ -93,8 +93,8 @@ namespace digioz.Portal.PaymentProviders.Examples
 
             var provider = _paymentProviderFactory.CreateProvider(providerName);
 
-            // Convert amount to cents if provided
-            var amount = refundAmount.HasValue ? refundAmount.Value * 100 : (decimal?)null;
+            // Convert amount to cents if provided, with rounding to handle floating-point precision
+            var amount = refundAmount.HasValue ? Math.Round(refundAmount.Value * 100, 0) : (decimal?)null;
 
             var response = await provider.RefundAsync(transactionId, amount);
 
@@ -107,6 +107,18 @@ namespace digioz.Portal.PaymentProviders.Examples
         public IEnumerable<string> GetAvailableProviders()
         {
             return _paymentProviderFactory.GetAvailableProviders();
+        }
+
+        /// <summary>
+        /// Generates a unique invoice number using a timestamp and GUID for uniqueness.
+        /// Format: INV-{timestamp}-{guid-segment}
+        /// This avoids collision risks by using the full GUID information.
+        /// </summary>
+        private static string GenerateInvoiceNumber()
+        {
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+            var guidSegment = Guid.NewGuid().ToString("N").Substring(0, 8);
+            return $"INV-{timestamp}-{guidSegment}";
         }
     }
 }

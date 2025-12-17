@@ -116,5 +116,25 @@ namespace digioz.Portal.PaymentProviders.Examples
 
             return services;
         }
+
+        /// <summary>
+        /// Configure with a dictionary of key-value pairs.
+        /// Dictionary keys should be provider names (e.g., "AuthorizeNet", "PayPal").
+        /// Dictionary values should be comma-separated settings in the format: "ApiKey=value,ApiSecret=value,MerchantId=value,IsTestMode=true"
+        /// 
+        /// Example usage in Program.cs:
+        /// var providerConfigs = new Dictionary&lt;string, string&gt;
+        /// {
+        ///     { "AuthorizeNet", "ApiKey=LOGIN_ID,ApiSecret=TRANSACTION_KEY,IsTestMode=true" },
+        ///     { "PayPal", "ApiKey=USERNAME,ApiSecret=PASSWORD,MerchantId=SIGNATURE,IsTestMode=true" }
+        /// };
+        /// services.AddPaymentProvidersFromDictionary(providerConfigs);
+        /// </summary>
+        public static IServiceCollection ConfigurePaymentProvidersFromDictionary(
+            this IServiceCollection services,
+            Dictionary<string, string> providerConfigurations)
+        {
+            return services.AddPaymentProvidersFromDictionary(providerConfigurations);
+        }
     }
 }

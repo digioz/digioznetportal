@@ -37,6 +37,30 @@ namespace digioz.Portal.PaymentProviders.DependencyInjection
         }
 
         /// <summary>
+        /// Adds payment provider support to the service collection from a dictionary configuration.
+        /// Dictionary keys should be provider names, values should be comma-separated settings.
+        /// Format: "ApiKey=value,ApiSecret=value,MerchantId=value,IsTestMode=true"
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="providerConfigurations">Dictionary mapping provider names to configuration strings.</param>
+        /// <returns>The service collection for chaining.</returns>
+        public static IServiceCollection AddPaymentProvidersFromDictionary(
+            this IServiceCollection services,
+            Dictionary<string, string> providerConfigurations)
+        {
+            if (providerConfigurations == null)
+                throw new ArgumentNullException(nameof(providerConfigurations));
+
+            return services.AddPaymentProviders(builder =>
+            {
+                foreach (var providerConfig in providerConfigurations)
+                {
+                    builder.ConfigureProviderFromDictionary(providerConfig.Key, providerConfig.Value);
+                }
+            });
+        }
+
+        /// <summary>
         /// Adds a single payment provider without default providers.
         /// </summary>
         /// <typeparam name="T">The payment provider type.</typeparam>
@@ -134,6 +158,61 @@ namespace digioz.Portal.PaymentProviders.DependencyInjection
 
             var config = new PaymentProviderConfig();
             configure(config);
+            _configurations[providerName] = config;
+            _factory.RegisterConfiguration(providerName, config);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Configures a provider from a dictionary or comma-separated configuration string.
+        /// Format: "ApiKey=value,ApiSecret=value,MerchantId=value,IsTestMode=true"
+        /// </summary>
+        /// <param name="providerName">The provider name.</param>
+        /// <param name="configurationString">The configuration string with key=value pairs separated by commas.</param>
+        /// <returns>This builder for chaining.</returns>
+        public PaymentProviderBuilder ConfigureProviderFromDictionary(string providerName, string configurationString)
+        {
+            if (string.IsNullOrWhiteSpace(providerName))
+                throw new ArgumentException("Provider name cannot be empty.", nameof(providerName));
+
+            if (string.IsNullOrWhiteSpace(configurationString))
+                throw new ArgumentException("Configuration string cannot be empty.", nameof(configurationString));
+
+            var config = new PaymentProviderConfig();
+            var settings = configurationString.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var setting in settings)
+            {
+                var keyValue = setting.Split('=', StringSplitOptions.RemoveEmptyEntries);
+                if (keyValue.Length == 2)
+                {
+                    var key = keyValue[0].Trim();
+                    var value = keyValue[1].Trim();
+
+                    switch (key.ToLowerInvariant())
+                    {
+                        case "apikey":
+                            config.ApiKey = value;
+                            break;
+                        case "apisecret":
+                            config.ApiSecret = value;
+                            break;
+                        case "merchantid":
+                            config.MerchantId = value;
+                            break;
+                        case "istestmode":
+                            if (bool.TryParse(value, out var testMode))
+                                config.IsTestMode = testMode;
+                            break;
+                        default:
+                            // Store unknown settings in Options dictionary
+                            config.Options[key] = value;
+                            break;
+                    }
+                }
+            }
+
             _configurations[providerName] = config;
             _factory.RegisterConfiguration(providerName, config);
 
