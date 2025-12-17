@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "digioz.Portal.BulkMediaImpo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "digioz.Portal.EmailProviders", "digioz.Portal.EmailProviders\digioz.Portal.EmailProviders.csproj", "{06422EA8-A8B2-42D9-89CD-8DA4A9C578FC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "digioz.Portal.PaymentProviders", "digioz.Portal.PaymentProviders\digioz.Portal.PaymentProviders.csproj", "{9362248A-B9D3-41A4-A01A-6F15D6DD08D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{06422EA8-A8B2-42D9-89CD-8DA4A9C578FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06422EA8-A8B2-42D9-89CD-8DA4A9C578FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06422EA8-A8B2-42D9-89CD-8DA4A9C578FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9362248A-B9D3-41A4-A01A-6F15D6DD08D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9362248A-B9D3-41A4-A01A-6F15D6DD08D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9362248A-B9D3-41A4-A01A-6F15D6DD08D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9362248A-B9D3-41A4-A01A-6F15D6DD08D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

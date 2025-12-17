@@ -33,6 +33,7 @@
     <ProjectReference Include="..\digioz.Portal.Bo\digioz.Portal.Bo.csproj" />
     <ProjectReference Include="..\digioz.Portal.Dal\digioz.Portal.Dal.csproj" />
     <ProjectReference Include="..\digioz.Portal.EmailProviders\digioz.Portal.EmailProviders.csproj" />
+    <ProjectReference Include="..\digioz.Portal.PaymentProviders\digioz.Portal.PaymentProviders.csproj" />
     <ProjectReference Include="..\digioz.Portal.Utilities\digioz.Portal.Utilities.csproj" />
   </ItemGroup>
 
