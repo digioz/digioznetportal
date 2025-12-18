@@ -20,7 +20,6 @@ namespace digioz.Portal.Web.Pages.Store {
         private readonly IOrderDetailService _orderDetailService;
         private readonly IConfigService _configService;
         private readonly IPaymentProviderFactory _paymentProviderFactory;
-        private readonly IServiceProvider _serviceProvider;
         private readonly ILogService _logService;
         private readonly ILogger<CheckoutModel> _logger;
 
@@ -31,7 +30,6 @@ namespace digioz.Portal.Web.Pages.Store {
             IOrderDetailService orderDetailService,
             IConfigService configService,
             IPaymentProviderFactory paymentProviderFactory,
-            IServiceProvider serviceProvider,
             ILogService logService,
             ILogger<CheckoutModel> logger) {
             _cartService = cartService;
@@ -40,7 +38,6 @@ namespace digioz.Portal.Web.Pages.Store {
             _orderDetailService = orderDetailService;
             _configService = configService;
             _paymentProviderFactory = paymentProviderFactory;
-            _serviceProvider = serviceProvider;
             _logService = logService;
             _logger = logger;
         }
@@ -60,10 +57,24 @@ namespace digioz.Portal.Web.Pages.Store {
 
         public void OnGet() {
             LoadCartItems();
+
+            // Pre-populate email from the authenticated user if available
+            if (string.IsNullOrWhiteSpace(Order.Email))
+            {
+                var emailClaim = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+                Order.Email = emailClaim ?? User.Identity?.Name ?? string.Empty;
+            }
         }
 
         public async Task<IActionResult> OnPostAsync() {
             LoadCartItems();
+
+            // Ensure email is populated on POST from user claims if missing
+            if (string.IsNullOrWhiteSpace(Order.Email))
+            {
+                var emailClaim = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+                Order.Email = emailClaim ?? User.Identity?.Name ?? string.Empty;
+            }
 
             if (!ModelState.IsValid || !CartItems.Any()) {
                 return Page();
@@ -93,6 +104,13 @@ namespace digioz.Portal.Web.Pages.Store {
                 Order.InvoiceNumber = GenerateInvoiceNumber();
                 Order.Total = CartTotal;
                 Order.Ccamount = CartTotal;
+
+                // Ensure required contact fields are populated before saving
+                if (string.IsNullOrWhiteSpace(Order.Email))
+                {
+                    // Fall back to the currently authenticated user's name if email was not bound
+                    Order.Email = User.Identity?.Name ?? string.Empty;
+                }
 
                 // Process payment using administrator-configured payment provider
                 var paymentResponse = await ProcessPaymentAsync();
@@ -214,7 +232,8 @@ namespace digioz.Portal.Web.Pages.Store {
 
                 // Check if payment gateway is available
                 if (!_paymentProviderFactory.IsProviderAvailable(paymentProviderName)) {
-                    _logger.LogError("Payment provider {Provider} is not available", paymentProviderName);
+                    _logger.LogError("Payment provider {Provider} is not available. Available providers: {AvailableProviders}",
+                        paymentProviderName, string.Join(", ", _paymentProviderFactory.GetAvailableProviders()));
                     return new PaymentResponse {
                         IsApproved = false,
                         ErrorMessage = $"Payment provider '{paymentProviderName}' is not configured",
@@ -222,8 +241,9 @@ namespace digioz.Portal.Web.Pages.Store {
                     };
                 }
 
-                // Create provider instance
-                var provider = _paymentProviderFactory.CreateProvider(paymentProviderName, _serviceProvider);
+                // Create provider instance - pass null to use the factory's internal service provider
+                // which was properly configured with HttpClient in Program.cs
+                var provider = _paymentProviderFactory.CreateProvider(paymentProviderName);
 
                 // Parse credit card expiration
                 var expirationParts = Order.Ccexp?.Split('/') ?? new[] { "", "" };
@@ -256,15 +276,18 @@ namespace digioz.Portal.Web.Pages.Store {
                     Description = "Portal Store Purchase"
                 };
 
+                _logger.LogInformation("Processing payment via {Provider} for order {OrderId}: Amount={Amount}", 
+                    paymentProviderName, Order.Id, CartTotal);
+
                 // Process payment
                 var response = await provider.ProcessPaymentAsync(request);
 
-                _logger.LogInformation("Payment processed via {Provider} for order {OrderId}: Approved={IsApproved}",
-                    paymentProviderName, Order.Id, response.IsApproved);
+                _logger.LogInformation("Payment processed via {Provider} for order {OrderId}: Approved={IsApproved}, ResponseCode={ResponseCode}",
+                    paymentProviderName, Order.Id, response.IsApproved, response.ResponseCode);
 
                 return response;
             } catch (Exception ex) {
-                _logger.LogError(ex, "Error processing payment");
+                _logger.LogError(ex, "Error processing payment for order {OrderId}", Order.Id);
                 return new PaymentResponse {
                     IsApproved = false,
                     ErrorMessage = $"An error occurred processing your payment: {ex.Message}",
@@ -291,7 +314,11 @@ namespace digioz.Portal.Web.Pages.Store {
         }
 
         private string GenerateInvoiceNumber() {
-            return $"INV-{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
+            // DB column supports max 20 characters, so keep invoice number short
+            // Format: INV-{yyMMddHHmm}-{8-char GUID segment} (total 3+1+10+1+5 = 20)
+            var timestamp = DateTime.Now.ToString("yyMMddHHmm");
+            var guidSegment = Guid.NewGuid().ToString("N").Substring(0, 5).ToUpperInvariant();
+            return $"INV-{timestamp}-{guidSegment}";
         }
 
         /// <summary>

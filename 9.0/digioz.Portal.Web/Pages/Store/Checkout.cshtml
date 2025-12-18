@@ -60,7 +60,7 @@
                                                 <td>@item.ProductName</td>
                                                 <td>@item.Quantity</td>
                                                 <td>@item.Price.ToString("C")</td>
-                                                <td>@(item.Quantity * item.Price).ToString("C")</td>
+                                                <td>@string.Format("{0:C}", item.Quantity * item.Price)</td>
                                             </tr>
                                         }
                                     </tbody>
@@ -94,6 +94,10 @@
                             <div class="col-md-6">
                                 <label asp-for="Order.LastName" class="form-label">Last Name</label>
                                 <input asp-for="Order.LastName" class="form-control" required />
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Order.Email" class="form-label">Email</label>
+                                <input asp-for="Order.Email" class="form-control" type="email" required />
                             </div>
                             <div class="col-12">
                                 <label asp-for="Order.BillingAddress" class="form-label">Billing Address</label>
@@ -245,5 +249,23 @@
             const shippingFields = document.getElementById('shippingFields');
             shippingFields.style.display = checkbox.checked ? 'none' : 'block';
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Razor generates id="Order_Ccexp" for asp-for="Order.Ccexp"
+            const expInput = document.getElementById('Order_Ccexp');
+
+            if (!expInput) return;
+
+            expInput.addEventListener('input', function (e) {
+                let value = e.target.value.replace(/[^\d]/g, ''); // keep digits only
+
+                // Insert slash after two digits
+                if (value.length > 2) {
+                    value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                }
+
+                e.target.value = value;
+            });
+        });
     </script>
 }

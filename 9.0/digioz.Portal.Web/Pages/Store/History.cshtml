@@ -88,7 +88,7 @@
                                             <td>@item.Description</td>
                                             <td>@item.Quantity</td>
                                             <td>@item.UnitPrice.ToString("C")</td>
-                                            <td>@(item.Quantity * item.UnitPrice).ToString("C")</td>
+                                            <td>@string.Format("{0:C}", item.Quantity * item.UnitPrice)</td>
                                         </tr>
                                     }
                                 </tbody>
