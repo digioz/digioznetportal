@@ -1,3 +1,190 @@
 @page
-@model IndexModel
-<h2>Store Index</h2>
+@model digioz.Portal.Web.Pages.Store.IndexModel
+@using System.Security.Claims
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+@{
+    ViewBag.Title = "Store - All Products";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Our Products</h1>
+        </div>
+    </div>
+
+    @if (Model.Products.Any())
+    {
+        <div class="row g-4">
+            @foreach (var product in Model.Products)
+            {
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 shadow-sm">
+                        <!-- Product Image -->
+                        <div style="height: 250px; overflow: hidden; background-color: #f8f9fa;">
+                            @if (!string.IsNullOrEmpty(product.Image))
+                            {
+                                <img src="/img/Products/Thumb/@product.Image" alt="@product.Name" class="card-img-top" style="height: 100%; object-fit: cover; width: 100%;" />
+                            }
+                            else
+                            {
+                                <div style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                                    <div class="text-center text-muted">
+                                        <i class="bi bi-image" style="font-size: 3rem;"></i>
+                                        <p>No Image</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@product.Name</h5>
+                            @if (!string.IsNullOrEmpty(product.ShortDescription))
+                            {
+                                <p class="card-text text-muted small">@product.ShortDescription</p>
+                            }
+                            <p class="card-text mt-auto">
+                                <strong class="text-primary">@product.Price.ToString("C")</strong>
+                            </p>
+
+                            @if (product.OutOfStock)
+                            {
+                                <div class="alert alert-warning alert-sm mb-2">Out of Stock</div>
+                            }
+
+                            <div class="btn-group gap-2 mt-3" role="group">
+                                <a asp-page="Details" asp-route-id="@product.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                                @if (User.Identity?.IsAuthenticated == true && !product.OutOfStock)
+                                {
+                                    <button type="button" class="btn btn-sm btn-primary add-to-cart" data-product-id="@product.Id" data-product-name="@product.Name">
+                                        <i class="bi bi-cart-plus"></i> Add
+                                    </button>
+                                }
+                                else if (product.OutOfStock)
+                                {
+                                    <button type="button" class="btn btn-sm btn-secondary" disabled>
+                                        <i class="bi bi-cart-plus"></i> Add
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-sm btn-secondary" disabled title="Login to add to cart">
+                                        <i class="bi bi-cart-plus"></i> Add
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        <div class="row mt-5">
+            <div class="col-12 d-flex justify-content-between align-items-center">
+                <small class="text-muted">Page @Model.pageNumber of @Model.TotalPages (@Model.TotalCount total products)</small>
+                <paging total-records="@Model.TotalCount"
+                        page-no="@Model.pageNumber"
+                        page-size="@Model.pageSize"
+                        show-prev-next="true"
+                        show-first-last="true"
+                        query-string-key-page-no="pageNumber"
+                        class="pagination mb-0"></paging>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <p>No products available at this time.</p>
+        </div>
+    }
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <a asp-page="/Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                const productId = this.dataset.productId;
+                const productName = this.dataset.productName;
+                const button = this;
+                const originalText = button.innerHTML;
+
+                // Show loading state
+                button.disabled = true;
+                button.innerHTML = '<i class="bi bi-hourglass-split"></i> Adding...';
+
+                // Use fetch to add to cart
+                fetch('/api/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        quantity: 1
+                    })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            // Success
+                            button.innerHTML = '<i class="bi bi-check-circle"></i> Added!';
+                            setTimeout(() => {
+                                button.innerHTML = originalText;
+                                button.disabled = false;
+                            }, 1500);
+                            
+                            // Show success message
+                            showNotification(`${productName} added to cart!`, 'success');
+                        } else {
+                            // Handle error responses
+                            return response.json().then(data => {
+                                throw new Error(data.message || 'Failed to add item to cart');
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                        showNotification(error.message || 'An error occurred while adding to cart', 'error');
+                    });
+            });
+        });
+
+        // Simple notification function
+        function showNotification(message, type = 'info') {
+            const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+            
+            const alert = document.createElement('div');
+            alert.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alert.innerHTML = `
+                <i class="bi bi-${icon}"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            document.body.appendChild(alert);
+            
+            // Auto-dismiss after 4 seconds
+            setTimeout(() => {
+                alert.remove();
+            }, 4000);
+        }
+    </script>
+}

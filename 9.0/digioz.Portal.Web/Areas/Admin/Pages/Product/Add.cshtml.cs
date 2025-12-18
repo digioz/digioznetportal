@@ -79,6 +79,12 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Product
         {
             try
             {
+                if (ImageFile == null || ImageFile.Length == 0)
+                {
+                    Item.Image = null;
+                    return;
+                }
+
                 string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "Products");
                 string fullFolder = Path.Combine(uploadsFolder, "Full");
                 string thumbFolder = Path.Combine(uploadsFolder, "Thumb");
@@ -88,7 +94,12 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Product
                 Directory.CreateDirectory(thumbFolder);
 
                 // Generate filename - use GUID only (will be under 50 chars)
-                string filename = $"{Guid.NewGuid()}{Path.GetExtension(ImageFile.FileName)}";
+                string extension = ".jpg";
+                if (!string.IsNullOrEmpty(ImageFile.FileName))
+                {
+                    extension = Path.GetExtension(ImageFile.FileName);
+                }
+                string filename = $"{Guid.NewGuid()}{extension}";
 
                 // Save full size image
                 string fullFilePath = Path.Combine(fullFolder, filename);

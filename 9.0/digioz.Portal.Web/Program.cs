@@ -254,6 +254,9 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Map API controllers with attribute routing
+app.MapControllers();
+
 // Remove MapStaticAssets() and use traditional MapRazorPages()
 app.MapRazorPages();
 

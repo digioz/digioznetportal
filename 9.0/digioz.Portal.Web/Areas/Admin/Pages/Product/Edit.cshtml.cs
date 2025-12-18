@@ -98,15 +98,15 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Product
                 // Add or update options
                 foreach (var optionData in OptionsData)
                 {
-                    if (optionData.Id.StartsWith("new_"))
+                    if (optionData == null || string.IsNullOrEmpty(optionData.Id) || optionData.Id.StartsWith("new_"))
                     {
                         // New option
                         var newOption = new Bo.ProductOption
                         {
                             Id = Guid.NewGuid().ToString(),
                             ProductId = Item.Id,
-                            OptionType = optionData.OptionType,
-                            OptionValue = optionData.OptionValue
+                            OptionType = optionData?.OptionType,
+                            OptionValue = optionData?.OptionValue
                         };
                         _optionService.Add(newOption);
                     }
@@ -126,20 +126,29 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Product
             else
             {
                 // Delete all options if none are provided
-                var existingOptions = _optionService.GetAll().Where(o => o.ProductId == Item.Id).ToList();
-                foreach (var option in existingOptions)
+                if (Item != null)
                 {
-                    _optionService.Delete(option.Id);
+                    var existingOptions = _optionService.GetAll().Where(o => o.ProductId == Item.Id).ToList();
+                    foreach (var option in existingOptions)
+                    {
+                        _optionService.Delete(option.Id);
+                    }
                 }
             }
 
             return RedirectToPage("/Product/Index", new { area = "Admin" });
         }
 
+        // In HandleImageUploadAsync, add a null check for Item before assigning to Item.Image
         private async Task HandleImageUploadAsync()
         {
             try
             {
+                if (ImageFile == null)
+                {
+                    return;
+                }
+
                 string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "Products");
                 string fullFolder = Path.Combine(uploadsFolder, "Full");
                 string thumbFolder = Path.Combine(uploadsFolder, "Thumb");
@@ -177,7 +186,10 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Product
                 }
 
                 // Store only the filename, not the full path
-                Item.Image = filename;
+                if (Item != null)
+                {
+                    Item.Image = filename;
+                }
             }
             catch (Exception)
             {

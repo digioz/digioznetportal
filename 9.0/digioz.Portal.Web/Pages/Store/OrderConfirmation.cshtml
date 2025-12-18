@@ -1,0 +1,133 @@
+@page "{orderId}"
+@model digioz.Portal.Web.Pages.Store.OrderConfirmationModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Order Confirmation";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    @if (Model.Order != null)
+    {
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="alert alert-success text-center mb-4">
+                    <h2><i class="bi bi-check-circle"></i> Order Confirmed!</h2>
+                    <p>Thank you for your order. Your transaction has been completed successfully.</p>
+                </div>
+
+                <!-- Order Information -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Order #@Model.Order.InvoiceNumber</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p><strong>Order Date:</strong> @Model.Order.OrderDate.ToString("MMMM d, yyyy")</p>
+                                <p><strong>Order Total:</strong> <span class="fs-5 text-primary">@Model.Order.Total.ToString("C")</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Payment Status:</strong> 
+                                    @if (Model.Order.TrxApproved)
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Pending</span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Information -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Shipping Address</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            @Model.Order.FirstName @Model.Order.LastName<br />
+                            @Model.Order.ShippingAddress<br />
+                            @if (!string.IsNullOrEmpty(Model.Order.ShippingAddress2))
+                            {
+                                <text>@Model.Order.ShippingAddress2<br /></text>
+                            }
+                            @Model.Order.ShippingCity, @Model.Order.ShippingState @Model.Order.ShippingZip<br />
+                            @Model.Order.ShippingCountry
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Order Items</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.OrderDetails.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Quantity</th>
+                                            <th>Unit Price</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.OrderDetails)
+                                        {
+                                            <tr>
+                                                <td>@item.Description</td>
+                                                <td>@item.Quantity</td>
+                                                <td>@item.UnitPrice.ToString("C")</td>
+                                                <td>@(item.Quantity * item.UnitPrice).ToString("C")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="table-light fw-bold">
+                                            <td colspan="3" class="text-end">Order Total:</td>
+                                            <td>@Model.Order.Total.ToString("C")</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a asp-page="Index" class="btn btn-outline-primary">
+                        <i class="bi bi-shop"></i> Continue Shopping
+                    </a>
+                    <a asp-page="History" class="btn btn-primary">
+                        <i class="bi bi-receipt"></i> View All Orders
+                    </a>
+                </div>
+
+                <div class="mt-4 p-3 bg-light border rounded">
+                    <p class="mb-0 text-muted">
+                        <i class="bi bi-info-circle"></i> A confirmation email has been sent to <strong>@Model.Order.Email</strong>. 
+                        Please check your inbox for tracking information.
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <p>Order not found.</p>
+        </div>
+        <a asp-page="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Store
+        </a>
+    }
+</div>
