@@ -4,9 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.PaymentProviders.Abstractions;
+using digioz.Portal.PaymentProviders.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 namespace digioz.Portal.Web.Pages.Store {
     [Authorize]
@@ -16,18 +19,24 @@ namespace digioz.Portal.Web.Pages.Store {
         private readonly IOrderService _orderService;
         private readonly IOrderDetailService _orderDetailService;
         private readonly IConfigService _configService;
+        private readonly IPaymentProviderFactory _paymentProviderFactory;
+        private readonly ILogger<CheckoutModel> _logger;
 
         public CheckoutModel(
             IShoppingCartService cartService,
             IProductService productService,
             IOrderService orderService,
             IOrderDetailService orderDetailService,
-            IConfigService configService) {
+            IConfigService configService,
+            IPaymentProviderFactory paymentProviderFactory,
+            ILogger<CheckoutModel> logger) {
             _cartService = cartService;
             _productService = productService;
             _orderService = orderService;
             _orderDetailService = orderDetailService;
             _configService = configService;
+            _paymentProviderFactory = paymentProviderFactory;
+            _logger = logger;
         }
 
         public class CartItemViewModel {
@@ -78,13 +87,19 @@ namespace digioz.Portal.Web.Pages.Store {
                 Order.Total = CartTotal;
                 Order.Ccamount = CartTotal;
 
-                // Process payment using PaymentProviders
-                bool paymentApproved = await ProcessPaymentAsync();
+                // Process payment using administrator-configured payment provider
+                var paymentResponse = await ProcessPaymentAsync();
 
-                Order.TrxApproved = paymentApproved;
+                Order.TrxApproved = paymentResponse.IsApproved;
+                Order.TrxId = paymentResponse.TransactionId;
+                Order.TrxAuthorizationCode = paymentResponse.AuthorizationCode;
+                Order.TrxMessage = paymentResponse.Message;
+                Order.TrxResponseCode = paymentResponse.ResponseCode;
 
-                if (!paymentApproved) {
-                    ModelState.AddModelError("", "Payment failed. Please check your card information and try again.");
+                if (!paymentResponse.IsApproved) {
+                    ModelState.AddModelError("", $"Payment failed: {paymentResponse.ErrorMessage}");
+                    _logger.LogWarning("Payment declined for user {UserId}: {ErrorCode} - {ErrorMessage}",
+                        userId, paymentResponse.ErrorCode, paymentResponse.ErrorMessage);
                     return Page();
                 }
 
@@ -115,6 +130,7 @@ namespace digioz.Portal.Web.Pages.Store {
 
                 return RedirectToPage("OrderConfirmation", new { orderId = Order.Id });
             } catch (Exception ex) {
+                _logger.LogError(ex, "Error processing checkout");
                 ModelState.AddModelError("", $"An error occurred: {ex.Message}");
                 return Page();
             }
@@ -146,48 +162,96 @@ namespace digioz.Portal.Web.Pages.Store {
             }
         }
 
-        private async Task<bool> ProcessPaymentAsync() {
+        private async Task<PaymentResponse> ProcessPaymentAsync() {
             try {
-                // Get payment provider type from config
-                var configData = _configService.GetByKey("PaymentProviderType");
-                if (configData == null || string.IsNullOrEmpty(configData.ConfigValue)) {
-                    return false;
+                // Get the configured payment provider from settings
+                var paymentProviderName = GetConfiguredPaymentProvider();
+                
+                if (string.IsNullOrEmpty(paymentProviderName)) {
+                    _logger.LogError("No payment provider configured in settings");
+                    return new PaymentResponse {
+                        IsApproved = false,
+                        ErrorMessage = "Payment provider is not configured. Please contact support.",
+                        ErrorCode = "PROVIDER_NOT_CONFIGURED"
+                    };
                 }
 
-                // Determine payment provider and process
-                if (configData.ConfigValue == "Stripe") {
-                    // Implement Stripe payment
-                    return await ProcessStripePaymentAsync();
-                } else if (configData.ConfigValue == "PayPal") {
-                    // Implement PayPal payment
-                    return await ProcessPayPalPaymentAsync();
-                } else if (configData.ConfigValue == "Square") {
-                    // Implement Square payment
-                    return await ProcessSquarePaymentAsync();
+                // Check if payment gateway is available
+                if (!_paymentProviderFactory.IsProviderAvailable(paymentProviderName)) {
+                    _logger.LogError("Payment provider {Provider} is not available", paymentProviderName);
+                    return new PaymentResponse {
+                        IsApproved = false,
+                        ErrorMessage = $"Payment provider '{paymentProviderName}' is not configured",
+                        ErrorCode = "PROVIDER_NOT_AVAILABLE"
+                    };
                 }
 
-                return false;
-            } catch {
-                return false;
+                // Create provider instance
+                var provider = _paymentProviderFactory.CreateProvider(paymentProviderName);
+
+                // Parse credit card expiration
+                var expirationParts = Order.Ccexp?.Split('/') ?? new[] { "", "" };
+                var expMonth = expirationParts.Length > 0 ? expirationParts[0].Trim() : "01";
+                var expYear = expirationParts.Length > 1 ? expirationParts[1].Trim() : "25";
+
+                // Build payment request
+                var request = new PaymentRequest {
+                    TransactionId = Order.Id,
+                    Amount = (long)(CartTotal * 100), // Convert to cents
+                    CurrencyCode = "USD",
+                    CardNumber = Order.Ccnumber,
+                    ExpirationMonth = expMonth,
+                    ExpirationYear = expYear,
+                    CardCode = Order.CccardCode,
+                    CardholderName = $"{Order.FirstName} {Order.LastName}",
+                    CustomerEmail = Order.Email,
+                    CustomerPhone = Order.Phone,
+                    BillingAddress = Order.BillingAddress,
+                    BillingCity = Order.BillingCity,
+                    BillingState = Order.BillingState,
+                    BillingZip = Order.BillingZip,
+                    BillingCountry = Order.BillingCountry,
+                    ShippingAddress = Order.ShippingAddress,
+                    ShippingCity = Order.ShippingCity,
+                    ShippingState = Order.ShippingState,
+                    ShippingZip = Order.ShippingZip,
+                    ShippingCountry = Order.ShippingCountry,
+                    InvoiceNumber = Order.InvoiceNumber,
+                    Description = "Portal Store Purchase"
+                };
+
+                // Process payment
+                var response = await provider.ProcessPaymentAsync(request);
+
+                _logger.LogInformation("Payment processed via {Provider} for order {OrderId}: Approved={IsApproved}",
+                    paymentProviderName, Order.Id, response.IsApproved);
+
+                return response;
+            } catch (Exception ex) {
+                _logger.LogError(ex, "Error processing payment");
+                return new PaymentResponse {
+                    IsApproved = false,
+                    ErrorMessage = $"An error occurred processing your payment: {ex.Message}",
+                    ErrorCode = "PAYMENT_ERROR"
+                };
             }
         }
 
-        private async Task<bool> ProcessStripePaymentAsync() {
-            // TODO: Implement Stripe payment processing
-            // Use digioz.Portal.PaymentProviders library
-            return true; // Placeholder
-        }
+        /// <summary>
+        /// Gets the configured payment provider name from application settings.
+        /// The administrator determines which single payment provider is used for all transactions.
+        /// </summary>
+        /// <returns>The configured payment provider name (e.g., "AuthorizeNet", "PayPal"), or null if not configured</returns>
+        private string GetConfiguredPaymentProvider() {
+            // Check for payment provider configuration in app settings
+            var config = _configService.GetByKey("PaymentProvider");
+            if (config != null && !string.IsNullOrEmpty(config.ConfigValue)) {
+                return config.ConfigValue.Trim();
+            }
 
-        private async Task<bool> ProcessPayPalPaymentAsync() {
-            // TODO: Implement PayPal payment processing
-            // Use digioz.Portal.PaymentProviders library
-            return true; // Placeholder
-        }
-
-        private async Task<bool> ProcessSquarePaymentAsync() {
-            // TODO: Implement Square payment processing
-            // Use digioz.Portal.PaymentProviders library
-            return true; // Placeholder
+            // Log if no configuration found
+            _logger.LogWarning("PaymentProvider configuration key not found in settings");
+            return null;
         }
 
         private string GenerateInvoiceNumber() {
