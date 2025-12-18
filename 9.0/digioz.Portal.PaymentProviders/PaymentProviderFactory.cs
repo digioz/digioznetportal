@@ -2,6 +2,7 @@ namespace digioz.Portal.PaymentProviders
 {
     using digioz.Portal.PaymentProviders.Abstractions;
     using digioz.Portal.PaymentProviders.Models;
+    using Microsoft.Extensions.DependencyInjection;
     using System.Collections.ObjectModel;
 
     /// <summary>
@@ -54,7 +55,7 @@ namespace digioz.Portal.PaymentProviders
             _configurations[name] = config;
         }
 
-        public IPaymentProvider CreateProvider(string providerName)
+        public IPaymentProvider CreateProvider(string providerName, IServiceProvider? scopedServiceProvider = null)
         {
             if (string.IsNullOrWhiteSpace(providerName))
                 throw new ArgumentException("Provider name cannot be empty.", nameof(providerName));
@@ -66,13 +67,19 @@ namespace digioz.Portal.PaymentProviders
 
             try
             {
-                if (_serviceProvider != null)
+                // Use the scoped service provider if provided (from request scope),
+                // otherwise fall back to the root service provider
+                var serviceProvider = scopedServiceProvider ?? _serviceProvider;
+
+                if (serviceProvider != null)
                 {
-                    provider = _serviceProvider.GetService(providerType) as BasePaymentProvider;
+                    // Resolve from the service provider (scoped or root)
+                    provider = serviceProvider.GetService(providerType) as BasePaymentProvider;
                 }
 
                 if (provider == null)
                 {
+                    // Fallback to Activator if DI resolution fails
                     provider = Activator.CreateInstance(providerType) as BasePaymentProvider;
                 }
 

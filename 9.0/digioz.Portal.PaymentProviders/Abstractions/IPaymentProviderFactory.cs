@@ -11,9 +11,10 @@ namespace digioz.Portal.PaymentProviders.Abstractions
         /// Creates a payment provider instance by name.
         /// </summary>
         /// <param name="providerName">The name of the provider (e.g., "AuthorizeNet", "PayPal").</param>
+        /// <param name="scopedServiceProvider">Optional scoped service provider from the current request. If provided, scoped services will be resolved from this provider.</param>
         /// <returns>An instance of the requested payment provider.</returns>
         /// <exception cref="ArgumentException">Thrown if the provider name is not registered.</exception>
-        IPaymentProvider CreateProvider(string providerName);
+        IPaymentProvider CreateProvider(string providerName, IServiceProvider? scopedServiceProvider = null);
 
         /// <summary>
         /// Gets all registered provider names.

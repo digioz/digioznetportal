@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using digioz.Portal.Web.Hubs;
 using digioz.Portal.EmailProviders.Extensions;
 using System.Net;
+using digioz.Portal.PaymentProviders.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -120,6 +121,48 @@ builder.Services.AddScoped<LinkCheckerService>();
 // Register Email Provider Services
 builder.Services.AddEmailProviders();
 builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>();
+
+// Configure HttpClient for payment providers BEFORE registering payment providers
+builder.Services.AddHttpClient<digioz.Portal.PaymentProviders.Providers.AuthorizeNetProvider>()
+    .ConfigureHttpClient(client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(30);
+    });
+
+builder.Services.AddHttpClient<digioz.Portal.PaymentProviders.Providers.PayPalProvider>()
+    .ConfigureHttpClient(client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(30);
+    });
+
+// Add payment providers configuration
+builder.Services.AddPaymentProviders(paymentProviderBuilder =>
+{
+    var configuration = builder.Configuration;
+
+    var authNetConfig = configuration.GetSection("PaymentProviders:AuthorizeNet");
+    if (authNetConfig.Exists())
+    {
+        paymentProviderBuilder.ConfigureProvider("AuthorizeNet", config =>
+        {
+            config.ApiKey = authNetConfig["ApiKey"];
+            config.ApiSecret = authNetConfig["ApiSecret"];
+            config.IsTestMode = authNetConfig.GetValue<bool>("IsTestMode");
+        });
+    }
+
+    var paypalConfig = configuration.GetSection("PaymentProviders:PayPal");
+    if (paypalConfig.Exists())
+    {
+        paymentProviderBuilder.ConfigureProvider("PayPal", config =>
+        {
+            config.ApiKey = paypalConfig["ApiKey"];
+            config.ApiSecret = paypalConfig["ApiSecret"];
+            config.MerchantId = paypalConfig["MerchantId"];
+            config.IsTestMode = paypalConfig.GetValue<bool>("IsTestMode");
+        });
+    }
+});
 
 builder.Services.AddMemoryCache();
 

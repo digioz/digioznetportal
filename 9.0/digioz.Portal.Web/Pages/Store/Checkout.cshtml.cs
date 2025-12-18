@@ -20,6 +20,8 @@ namespace digioz.Portal.Web.Pages.Store {
         private readonly IOrderDetailService _orderDetailService;
         private readonly IConfigService _configService;
         private readonly IPaymentProviderFactory _paymentProviderFactory;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogService _logService;
         private readonly ILogger<CheckoutModel> _logger;
 
         public CheckoutModel(
@@ -29,6 +31,8 @@ namespace digioz.Portal.Web.Pages.Store {
             IOrderDetailService orderDetailService,
             IConfigService configService,
             IPaymentProviderFactory paymentProviderFactory,
+            IServiceProvider serviceProvider,
+            ILogService logService,
             ILogger<CheckoutModel> logger) {
             _cartService = cartService;
             _productService = productService;
@@ -36,6 +40,8 @@ namespace digioz.Portal.Web.Pages.Store {
             _orderDetailService = orderDetailService;
             _configService = configService;
             _paymentProviderFactory = paymentProviderFactory;
+            _serviceProvider = serviceProvider;
+            _logService = logService;
             _logger = logger;
         }
 
@@ -63,8 +69,9 @@ namespace digioz.Portal.Web.Pages.Store {
                 return Page();
             }
 
+            var userId = User.FindFirst("sub")?.Value ?? User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+            
             try {
-                var userId = User.FindFirst("sub")?.Value ?? User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
                 if (string.IsNullOrEmpty(userId)) {
                     return RedirectToPage("/Identity/Account/Login");
                 }
@@ -100,6 +107,13 @@ namespace digioz.Portal.Web.Pages.Store {
                     ModelState.AddModelError("", $"Payment failed: {paymentResponse.ErrorMessage}");
                     _logger.LogWarning("Payment declined for user {UserId}: {ErrorCode} - {ErrorMessage}",
                         userId, paymentResponse.ErrorCode, paymentResponse.ErrorMessage);
+                    
+                    // Get provider name for logging
+                    var providerName = GetConfiguredPaymentProvider();
+                    
+                    // Log payment failure to database
+                    LogPaymentFailure(userId, Order.Id, providerName, paymentResponse);
+                    
                     return Page();
                 }
 
@@ -132,6 +146,28 @@ namespace digioz.Portal.Web.Pages.Store {
             } catch (Exception ex) {
                 _logger.LogError(ex, "Error processing checkout");
                 ModelState.AddModelError("", $"An error occurred: {ex.Message}");
+                
+                // Log checkout error to database
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    var logEntry = new Log
+                    {
+                        Message = $"Error during checkout processing",
+                        Level = "Error",
+                        Exception = ex.ToString(),
+                        LogEvent = "PaymentError",
+                        Timestamp = DateTime.UtcNow
+                    };
+                    try
+                    {
+                        _logService.Add(logEntry);
+                    }
+                    catch (Exception logEx)
+                    {
+                        _logger.LogError(logEx, "Failed to log checkout error to database");
+                    }
+                }
+                
                 return Page();
             }
         }
@@ -187,7 +223,7 @@ namespace digioz.Portal.Web.Pages.Store {
                 }
 
                 // Create provider instance
-                var provider = _paymentProviderFactory.CreateProvider(paymentProviderName);
+                var provider = _paymentProviderFactory.CreateProvider(paymentProviderName, _serviceProvider);
 
                 // Parse credit card expiration
                 var expirationParts = Order.Ccexp?.Split('/') ?? new[] { "", "" };
@@ -251,11 +287,44 @@ namespace digioz.Portal.Web.Pages.Store {
 
             // Log if no configuration found
             _logger.LogWarning("PaymentProvider configuration key not found in settings");
-            return null;
+            return string.Empty;
         }
 
         private string GenerateInvoiceNumber() {
             return $"INV-{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
+        }
+
+        /// <summary>
+        /// Logs payment failure details to the database Log table.
+        /// </summary>
+        private void LogPaymentFailure(string userId, string orderId, string provider, PaymentResponse response)
+        {
+            try
+            {
+                var exceptionDetails = new System.Text.StringBuilder();
+                exceptionDetails.AppendLine($"Order ID: {orderId}");
+                exceptionDetails.AppendLine($"Provider: {provider}");
+                exceptionDetails.AppendLine($"Error Code: {response.ErrorCode}");
+                exceptionDetails.AppendLine($"Error Message: {response.ErrorMessage}");
+                exceptionDetails.AppendLine($"Response Code: {response.ResponseCode}");
+                exceptionDetails.AppendLine($"Response Message: {response.Message}");
+
+                var logEntry = new Log
+                {
+                    Message = $"Payment declined for order {orderId}: {response.ErrorMessage}",
+                    Level = "Warning",
+                    Exception = exceptionDetails.ToString(),
+                    LogEvent = "PaymentDeclined",
+                    Timestamp = DateTime.UtcNow
+                };
+
+                _logService.Add(logEntry);
+            }
+            catch (Exception ex)
+            {
+                // Log the logging failure to ILogger only to avoid infinite recursion
+                _logger.LogError(ex, "Failed to log payment failure to database");
+            }
         }
     }
 }

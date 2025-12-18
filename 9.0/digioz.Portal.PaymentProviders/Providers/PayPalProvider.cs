@@ -16,9 +16,13 @@ namespace digioz.Portal.PaymentProviders.Providers
 
         public override string Name => "PayPal";
 
-        public PayPalProvider(HttpClient? httpClient = null)
+        /// <summary>
+        /// Constructor that accepts HttpClient via dependency injection.
+        /// </summary>
+        /// <param name="httpClient">HttpClient instance managed by the DI container.</param>
+        public PayPalProvider(HttpClient httpClient)
         {
-            _httpClient = httpClient ?? new HttpClient();
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
         public override bool ValidateConfiguration()

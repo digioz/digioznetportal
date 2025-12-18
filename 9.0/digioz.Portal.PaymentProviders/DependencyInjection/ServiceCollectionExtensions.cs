@@ -29,9 +29,9 @@ namespace digioz.Portal.PaymentProviders.DependencyInjection
             // Allow custom configuration
             configure?.Invoke(builder);
 
-            // Register factory
-            services.AddSingleton(sp => builder.Build(sp));
-            services.AddSingleton<IPaymentProviderFactory>(sp => sp.GetRequiredService<PaymentProviderFactory>());
+            // Register factory as singleton (factory itself is stateless)
+            // The factory will create providers on-demand from the scoped service provider
+            services.AddSingleton<IPaymentProviderFactory>(sp => builder.Build(sp));
 
             return services;
         }
@@ -75,14 +75,13 @@ namespace digioz.Portal.PaymentProviders.DependencyInjection
             where T : class, IPaymentProvider
         {
             services.AddScoped<T>();
-            services.AddSingleton(sp =>
+            services.AddSingleton<IPaymentProviderFactory>(sp =>
             {
                 var factory = new PaymentProviderFactory(sp);
                 factory.RegisterProvider(providerName, typeof(T));
                 factory.RegisterConfiguration(providerName, config);
                 return factory;
             });
-            services.AddSingleton<IPaymentProviderFactory>(sp => sp.GetRequiredService<PaymentProviderFactory>());
 
             return services;
         }

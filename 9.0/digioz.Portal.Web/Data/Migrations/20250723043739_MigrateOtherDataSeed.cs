@@ -74,16 +74,7 @@ VALUES (@systemUserId, 'System', 'System', NULL, 'User', 'system@domain.com', NU
                     { Guid.NewGuid().ToString(), "WebmasterEmail", "webmaster@domain.com", false },
                     
                     // Payment Configuration
-                    { Guid.NewGuid().ToString(), "PaymentLoginID", "[Enter ID]", false },
-                    { Guid.NewGuid().ToString(), "PaymentTransactionKey", "[Enter Key]", false },
-                    { Guid.NewGuid().ToString(), "PaymentTestMode", "true", false },
-                    { Guid.NewGuid().ToString(), "PaymentTransactionFee", "0", false },
-                    
-                    // PayPal Configuration
-                    { Guid.NewGuid().ToString(), "PaypalMode", "sandbox", false },
-                    { Guid.NewGuid().ToString(), "PaypalClientId", "[Enter ID]", false },
-                    { Guid.NewGuid().ToString(), "PaypalClientSecret", "[Enter Key]", false },
-                    { Guid.NewGuid().ToString(), "PaypalConnectionTimeout", "360000", false },
+                    { Guid.NewGuid().ToString(), "PaymentProvider", "AuthorizeNet", false },
                     
                     // Site Features Configuration
                     { Guid.NewGuid().ToString(), "NumberOfAnnouncements", "2", false },
@@ -92,7 +83,6 @@ VALUES (@systemUserId, 'System', 'System', NULL, 'User', 'system@domain.com', NU
                     { Guid.NewGuid().ToString(), "EnableCommentsOnAllPages", "true", false },
                     
                     // Third-Party Services
-                    { Guid.NewGuid().ToString(), "TinyMCEApiKey", "[Enter Key]", false },
                     { Guid.NewGuid().ToString(), "RecaptchaEnabled", "false", false },
                     { Guid.NewGuid().ToString(), "RecaptchaPublicKey", "[Enter Key]", false },
                     { Guid.NewGuid().ToString(), "RecaptchaPrivateKey", "[Enter Key]", false }
@@ -212,13 +202,11 @@ DELETE FROM Config WHERE ConfigKey IN (
     -- Site Configuration
     'SiteURL','SiteName','SiteEncryptionKey','WebmasterEmail',
     -- Payment Configuration
-    'PaymentLoginID','PaymentTransactionKey','PaymentTestMode','PaymentTransactionFee',
-    -- PayPal Configuration
-    'PaypalMode','PaypalClientId','PaypalClientSecret','PaypalConnectionTimeout',
+    'PaymentProvider',
     -- Site Features
     'NumberOfAnnouncements','ShowContactForm','VisitorSessionPurgePeriod','EnableCommentsOnAllPages',
     -- Third-Party Services
-    'TinyMCEApiKey','RecaptchaEnabled','RecaptchaPublicKey','RecaptchaPrivateKey'
+    'RecaptchaEnabled','RecaptchaPublicKey','RecaptchaPrivateKey'
 );
 ");
 

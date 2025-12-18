@@ -13,6 +13,28 @@
             <h1 class="mb-4">Checkout</h1>
 
             <form method="post">
+                <!-- Error Messages -->
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Any()))
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <h4 class="alert-heading">
+                            <i class="bi bi-exclamation-circle"></i> Payment Failed
+                        </h4>
+                        @foreach (var modelState in ViewData.ModelState.Values)
+                        {
+                            @foreach (var error in modelState.Errors)
+                            {
+                                <div>@error.ErrorMessage</div>
+                            }
+                        }
+                        <hr>
+                        <p class="mb-0">
+                            <strong>Please check your information and try again.</strong> If the problem persists, please contact support.
+                        </p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
                 <!-- Order Summary -->
                 <div class="card mb-4">
                     <div class="card-header bg-light">
