@@ -1,25 +1,20 @@
 namespace digioz.Portal.PaymentProviders.Providers
 {
     using digioz.Portal.PaymentProviders.Models;
-    using System.Web;
 
     /// <summary>
     /// PayPal payment provider implementation.
-    /// Supports PayPal Direct Payment API (legacy) and can be extended for REST API.
+    /// Uses classic NVP API shape but configuration now expects REST-style ClientId/ClientSecret.
     /// </summary>
     public class PayPalProvider : BasePaymentProvider
     {
         private readonly HttpClient _httpClient;
-        private const string SandboxUrl = "https://api.sandbox.paypal.com/nvp";
-        private const string ProductionUrl = "https://api.paypal.com/nvp";
+        private const string SandboxUrl = "https://api-3t.sandbox.paypal.com/nvp";
+        private const string ProductionUrl = "https://api-3t.paypal.com/nvp";
         private const string ApiVersion = "204.0";
 
         public override string Name => "PayPal";
 
-        /// <summary>
-        /// Constructor that accepts HttpClient via dependency injection.
-        /// </summary>
-        /// <param name="httpClient">HttpClient instance managed by the DI container.</param>
         public PayPalProvider(HttpClient httpClient)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
@@ -27,13 +22,11 @@ namespace digioz.Portal.PaymentProviders.Providers
 
         public override bool ValidateConfiguration()
         {
+            // For REST-style config we use ApiKey = ClientId, ApiSecret = ClientSecret.
             if (string.IsNullOrWhiteSpace(Config?.ApiKey))
                 return false;
 
             if (string.IsNullOrWhiteSpace(Config?.ApiSecret))
-                return false;
-
-            if (string.IsNullOrWhiteSpace(Config?.MerchantId))
                 return false;
 
             return true;
@@ -86,39 +79,42 @@ namespace digioz.Portal.PaymentProviders.Providers
 
         private Dictionary<string, string> BuildChargePayload(PaymentRequest request)
         {
+            // NOTE: This still uses classic NVP DoDirectPayment for card processing.
+            // Config.ApiKey and Config.ApiSecret are treated as API username/password which
+            // must be provisioned for the NVP API even if the naming is REST-style.
             var payload = new Dictionary<string, string>
             {
                 { "METHOD", "DoDirectPayment" },
                 { "VERSION", ApiVersion },
-                { "USER", Config?.ApiKey ?? "" },
-                { "PWD", Config?.ApiSecret ?? "" },
-                { "SIGNATURE", Config?.MerchantId ?? "" },
+                { "USER", Config?.ApiKey ?? string.Empty },
+                { "PWD", Config?.ApiSecret ?? string.Empty },
+                { "SIGNATURE", Config?.Options.GetValueOrDefault("Signature") ?? string.Empty },
                 { "PAYMENTACTION", "Sale" },
-                { "IPADDRESS", "127.0.0.1" }, // Should be actual client IP in production
-                { "CREDITCARDTYPE", "Visa" }, // Could be enhanced to detect from card number
-                { "ACCT", request.CardNumber ?? "" },
+                { "IPADDRESS", "127.0.0.1" },
+                { "CREDITCARDTYPE", "Visa" },
+                { "ACCT", request.CardNumber ?? string.Empty },
                 { "EXPDATE", $"{request.ExpirationMonth}{request.ExpirationYear}" },
-                { "CVV2", request.CardCode ?? "" },
+                { "CVV2", request.CardCode ?? string.Empty },
                 { "FIRSTNAME", ExtractFirstName(request.CardholderName) },
                 { "LASTNAME", ExtractLastName(request.CardholderName) },
-                { "EMAIL", request.CustomerEmail ?? "" },
-                { "PHONENUM", request.CustomerPhone ?? "" },
-                { "STREET", request.BillingAddress ?? "" },
-                { "CITY", request.BillingCity ?? "" },
-                { "STATE", request.BillingState ?? "" },
-                { "ZIP", request.BillingZip ?? "" },
+                { "EMAIL", request.CustomerEmail ?? string.Empty },
+                { "PHONENUM", request.CustomerPhone ?? string.Empty },
+                { "STREET", request.BillingAddress ?? string.Empty },
+                { "CITY", request.BillingCity ?? string.Empty },
+                { "STATE", request.BillingState ?? string.Empty },
+                { "ZIP", request.BillingZip ?? string.Empty },
                 { "COUNTRYCODE", request.BillingCountry ?? "US" },
-                { "SHIPTONAME", request.CardholderName ?? "" },
-                { "SHIPTOSTREET", request.ShippingAddress ?? "" },
-                { "SHIPTOCITY", request.ShippingCity ?? "" },
-                { "SHIPTOSTATE", request.ShippingState ?? "" },
-                { "SHIPTOZIP", request.ShippingZip ?? "" },
+                { "SHIPTONAME", request.CardholderName ?? string.Empty },
+                { "SHIPTOSTREET", request.ShippingAddress ?? string.Empty },
+                { "SHIPTOCITY", request.ShippingCity ?? string.Empty },
+                { "SHIPTOSTATE", request.ShippingState ?? string.Empty },
+                { "SHIPTOZIP", request.ShippingZip ?? string.Empty },
                 { "SHIPTOCOUNTRYCODE", request.ShippingCountry ?? "US" },
                 { "AMT", request.Amount.ToString("F2") },
                 { "CURRENCYCODE", request.CurrencyCode },
-                { "DESC", request.Description ?? "" },
-                { "INVNUM", request.InvoiceNumber ?? "" },
-                { "CUSTOM", request.TransactionId ?? "" },
+                { "DESC", request.Description ?? string.Empty },
+                { "INVNUM", request.InvoiceNumber ?? string.Empty },
+                { "CUSTOM", request.TransactionId ?? string.Empty }
             };
 
             return payload;
@@ -130,10 +126,10 @@ namespace digioz.Portal.PaymentProviders.Providers
             {
                 { "METHOD", "RefundTransaction" },
                 { "VERSION", ApiVersion },
-                { "USER", Config?.ApiKey ?? "" },
-                { "PWD", Config?.ApiSecret ?? "" },
-                { "SIGNATURE", Config?.MerchantId ?? "" },
-                { "TRANSACTIONID", transactionId },
+                { "USER", Config?.ApiKey ?? string.Empty },
+                { "PWD", Config?.ApiSecret ?? string.Empty },
+                { "SIGNATURE", Config?.Options.GetValueOrDefault("Signature") ?? string.Empty },
+                { "TRANSACTIONID", transactionId }
             };
 
             if (amount.HasValue)
@@ -149,81 +145,75 @@ namespace digioz.Portal.PaymentProviders.Providers
         {
             var url = Config?.IsTestMode == true ? SandboxUrl : ProductionUrl;
 
-            var content = new FormUrlEncodedContent(payload);
-            var response = await _httpClient.PostAsync(url, content);
+            using var content = new FormUrlEncodedContent(payload);
+            using var response = await _httpClient.PostAsync(url, content).ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
                 throw new Exception($"HTTP error: {response.StatusCode}");
 
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
 
         private PaymentResponse ParseResponse(string responseContent)
         {
-            var responseDict = ParseNVP(responseContent);
+            var responseDict = ParseNvp(responseContent);
 
             if (!responseDict.TryGetValue("ACK", out var ack))
                 return CreateErrorResponse("Invalid response from PayPal", "INVALID_RESPONSE");
 
             var isApproved = ack == "Success" || ack == "SuccessWithWarning";
 
-            var response = new PaymentResponse
+            return new PaymentResponse
             {
                 IsApproved = isApproved,
                 ResponseCode = ack,
-                AuthorizationCode = responseDict.GetValueOrDefault("AUTHORIZATIONID") ?? 
-                                   responseDict.GetValueOrDefault("TRANSACTIONID") ?? "",
-                TransactionId = responseDict.GetValueOrDefault("TRANSACTIONID") ?? "",
+                AuthorizationCode = responseDict.GetValueOrDefault("AUTHORIZATIONID") ??
+                                   responseDict.GetValueOrDefault("TRANSACTIONID") ?? string.Empty,
+                TransactionId = responseDict.GetValueOrDefault("TRANSACTIONID") ?? string.Empty,
                 Message = responseDict.GetValueOrDefault("L_LONGMESSAGE0") ?? ack,
                 ErrorMessage = !isApproved ? (responseDict.GetValueOrDefault("L_LONGMESSAGE0") ?? ack) : null,
                 ErrorCode = !isApproved ? responseDict.GetValueOrDefault("L_ERRORCODE0") : null,
                 RawResponse = responseDict
             };
-
-            return response;
         }
 
-        private Dictionary<string, string> ParseNVP(string responseContent)
+        private static Dictionary<string, string> ParseNvp(string responseContent)
         {
-            var result = new Dictionary<string, string>();
-            var pairs = responseContent.Split('&');
+            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var pairs = responseContent.Split('&', StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var pair in pairs)
             {
                 var parts = pair.Split('=');
-                if (parts.Length == 2)
-                {
-                    var key = HttpUtility.UrlDecode(parts[0]);
-                    var value = HttpUtility.UrlDecode(parts[1]);
-                    if (key != null && value != null)
-                    {
-                        result[key] = value;
-                    }
-                }
+                if (parts.Length != 2)
+                    continue;
+
+                var key = System.Web.HttpUtility.UrlDecode(parts[0]);
+                var value = System.Web.HttpUtility.UrlDecode(parts[1]);
+
+                if (!string.IsNullOrEmpty(key))
+                    result[key] = value ?? string.Empty;
             }
 
             return result;
         }
 
-        private string ExtractFirstName(string? fullName)
+        private static string ExtractFirstName(string? fullName)
         {
             if (string.IsNullOrWhiteSpace(fullName))
-                return "";
+                return string.Empty;
 
-            var parts = fullName.Split(' ');
-            return parts[0];
+            var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return parts.Length > 0 ? parts[0] : string.Empty;
         }
 
-        private string ExtractLastName(string? fullName)
+        private static string ExtractLastName(string? fullName)
         {
             if (string.IsNullOrWhiteSpace(fullName))
-                return "";
+                return string.Empty;
 
-            var parts = fullName.Split(' ');
-            if (parts.Length > 1)
-                return string.Join(" ", parts.Skip(1));
-
-            return "";
+            var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return parts.Length > 1 ? string.Join(" ", parts.Skip(1)) : string.Empty;
         }
     }
 }

@@ -36,15 +36,23 @@ builder.Services.AddPaymentProviders(builder =>
         });
     }
 
-    // Configure PayPal
+    // Configure PayPal (REST-style naming: ClientId / ClientSecret)
     var paypalConfig = builder.Configuration.GetSection("PaymentProviders:PayPal");
     if (paypalConfig.Exists())
     {
         builder.ConfigureProvider("PayPal", config =>
         {
-            config.ApiKey = paypalConfig["ApiKey"];
-            config.ApiSecret = paypalConfig["ApiSecret"];
-            config.MerchantId = paypalConfig["MerchantId"];
+            // Map to generic fields; provider interprets these as needed
+            config.ApiKey = paypalConfig["ClientId"];      // PayPal REST ClientId
+            config.ApiSecret = paypalConfig["ClientSecret"]; // PayPal REST ClientSecret
+
+            // Optional classic NVP signature can go into Options if still used
+            var signature = paypalConfig["Signature"];
+            if (!string.IsNullOrWhiteSpace(signature))
+            {
+                config.Options["Signature"] = signature;
+            }
+
             config.IsTestMode = !builder.Environment.IsProduction();
         });
     }
@@ -63,9 +71,8 @@ Add to `appsettings.json`:
       "ApiSecret": "YOUR_AUTHORIZE_NET_TRANSACTION_KEY"
     },
     "PayPal": {
-      "ApiKey": "YOUR_PAYPAL_API_USERNAME",
-      "ApiSecret": "YOUR_PAYPAL_API_PASSWORD",
-      "MerchantId": "YOUR_PAYPAL_API_SIGNATURE"
+      "ClientId": "YOUR_PAYPAL_REST_CLIENT_ID",
+      "ClientSecret": "YOUR_PAYPAL_REST_CLIENT_SECRET"
     }
   }
 }
@@ -81,11 +88,20 @@ For development/sandbox, use `appsettings.Development.json`:
       "ApiSecret": "YOUR_SANDBOX_TRANSACTION_KEY"
     },
     "PayPal": {
-      "ApiKey": "YOUR_SANDBOX_USERNAME",
-      "ApiSecret": "YOUR_SANDBOX_PASSWORD",
-      "MerchantId": "YOUR_SANDBOX_SIGNATURE"
+      "ClientId": "YOUR_SANDBOX_PAYPAL_CLIENT_ID",
+      "ClientSecret": "YOUR_SANDBOX_PAYPAL_CLIENT_SECRET"
     }
   }
+}
+```
+
+If you still need classic NVP/SOAP credentials (legacy), you can optionally add:
+
+```json
+"PayPal": {
+  "ClientId": "...",
+  "ClientSecret": "...",
+  "Signature": "YOUR_PAYPAL_API_SIGNATURE"
 }
 ```
 
@@ -160,14 +176,14 @@ Refer to [PayPal Sandbox Documentation](https://developer.paypal.com/docs/classi
 **Symptom**: "Payment provider is not configured" (during payment)  
 **Solution**:
 - Verify the provider name in config matches a registered provider exactly (case-insensitive)
-- Check that API credentials are set in appsettings.json
+- Check that API credentials are set in appsettings.json / environment
 - Verify the provider is registered in Program.cs
 - Check application logs for more details
 
 ### Payment Processing Fails
 **Symptom**: Payments are declined or failing  
 **Solution**:
-- Verify API credentials in appsettings.json are correct
+- Verify API credentials in configuration are correct
 - Check the environment (test vs. production) matches your credentials
 - Verify IsTestMode setting in Program.cs matches your account type
 - Check card details format and validity
@@ -178,8 +194,8 @@ Refer to [PayPal Sandbox Documentation](https://developer.paypal.com/docs/classi
 ### Developer Setup
 - [ ] PaymentProviders project reference added to Web.csproj
 - [ ] Program.cs updated with AddPaymentProviders registration
-- [ ] API credentials added to appsettings.json
-- [ ] API credentials added to appsettings.Development.json (for testing)
+- [ ] API credentials added to configuration source (appsettings, env, Key Vault, etc.)
+- [ ] API credentials added to `appsettings.Development.json` (for testing) or user secrets
 
 ### Administrator Setup
 - [ ] Payment provider selected (Authorize.net or PayPal)
