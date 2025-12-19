@@ -156,9 +156,9 @@ builder.Services.AddPaymentProviders(paymentProviderBuilder =>
     {
         paymentProviderBuilder.ConfigureProvider("PayPal", config =>
         {
-            config.ApiKey = paypalConfig["ApiKey"];
-            config.ApiSecret = paypalConfig["ApiSecret"];
-            config.MerchantId = paypalConfig["MerchantId"];
+            // REST: map ClientId/ClientSecret into generic fields
+            config.ApiKey = paypalConfig["ClientId"];       // ClientId
+            config.ApiSecret = paypalConfig["ClientSecret"]; // ClientSecret
             config.IsTestMode = paypalConfig.GetValue<bool>("IsTestMode");
         });
     }
@@ -228,6 +228,8 @@ builder.Services.AddVisitorInfoLogging();
 
 // SignalR registration
 builder.Services.AddSignalR();
+
+builder.Services.AddScoped<IPayPalRedirectService, PayPalRedirectService>();
 
 var app = builder.Build();
 

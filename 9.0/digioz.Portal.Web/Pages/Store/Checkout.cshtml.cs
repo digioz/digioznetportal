@@ -6,6 +6,7 @@ using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.PaymentProviders.Abstractions;
 using digioz.Portal.PaymentProviders.Models;
+using digioz.Portal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,6 +21,7 @@ namespace digioz.Portal.Web.Pages.Store {
         private readonly IOrderDetailService _orderDetailService;
         private readonly IConfigService _configService;
         private readonly IPaymentProviderFactory _paymentProviderFactory;
+        private readonly IPayPalRedirectService _payPalRedirectService;
         private readonly ILogService _logService;
         private readonly ILogger<CheckoutModel> _logger;
 
@@ -30,6 +32,7 @@ namespace digioz.Portal.Web.Pages.Store {
             IOrderDetailService orderDetailService,
             IConfigService configService,
             IPaymentProviderFactory paymentProviderFactory,
+            IPayPalRedirectService payPalRedirectService,
             ILogService logService,
             ILogger<CheckoutModel> logger) {
             _cartService = cartService;
@@ -38,6 +41,7 @@ namespace digioz.Portal.Web.Pages.Store {
             _orderDetailService = orderDetailService;
             _configService = configService;
             _paymentProviderFactory = paymentProviderFactory;
+            _payPalRedirectService = payPalRedirectService;
             _logService = logService;
             _logger = logger;
         }
@@ -112,8 +116,22 @@ namespace digioz.Portal.Web.Pages.Store {
                     Order.Email = User.Identity?.Name ?? string.Empty;
                 }
 
-                // Process payment using administrator-configured payment provider
-                var paymentResponse = await ProcessPaymentAsync();
+                // Get configured provider
+                var paymentProviderName = GetConfiguredPaymentProvider();
+                
+                if (string.IsNullOrEmpty(paymentProviderName)) {
+                    ModelState.AddModelError("", "Payment provider is not configured. Please contact support.");
+                    return Page();
+                }
+
+                // Check if this is PayPal: use redirect flow
+                if (string.Equals(paymentProviderName, "PayPal", StringComparison.OrdinalIgnoreCase))
+                {
+                    return await ProcessPayPalRedirectAsync(userId);
+                }
+
+                // Otherwise use direct card processing (e.g., Authorize.Net)
+                var paymentResponse = await ProcessPaymentAsync(paymentProviderName);
 
                 Order.TrxApproved = paymentResponse.IsApproved;
                 Order.TrxId = paymentResponse.TransactionId;
@@ -126,11 +144,7 @@ namespace digioz.Portal.Web.Pages.Store {
                     _logger.LogWarning("Payment declined for user {UserId}: {ErrorCode} - {ErrorMessage}",
                         userId, paymentResponse.ErrorCode, paymentResponse.ErrorMessage);
                     
-                    // Get provider name for logging
-                    var providerName = GetConfiguredPaymentProvider();
-                    
-                    // Log payment failure to database
-                    LogPaymentFailure(userId, Order.Id, providerName, paymentResponse);
+                    LogPaymentFailure(userId, Order.Id, paymentProviderName, paymentResponse);
                     
                     return Page();
                 }
@@ -139,54 +153,152 @@ namespace digioz.Portal.Web.Pages.Store {
                 _orderService.Add(Order);
 
                 // Create order details and clear cart
-                var cartItems = _cartService.GetAll()
-                    .Where(c => c.UserId == userId)
-                    .ToList();
-
-                foreach (var cartItem in cartItems) {
-                    var product = _productService.Get(cartItem.ProductId);
-                    if (product != null) {
-                        var detail = new OrderDetail {
-                            Id = Guid.NewGuid().ToString(),
-                            OrderId = Order.Id,
-                            ProductId = cartItem.ProductId,
-                            Quantity = cartItem.Quantity,
-                            UnitPrice = product.Price,
-                            Description = product.Name
-                        };
-                        _orderDetailService.Add(detail);
-                    }
-
-                    _cartService.Delete(cartItem.Id);
-                }
+                await CreateOrderDetailsAndClearCart(userId);
 
                 return RedirectToPage("OrderConfirmation", new { orderId = Order.Id });
             } catch (Exception ex) {
                 _logger.LogError(ex, "Error processing checkout");
                 ModelState.AddModelError("", $"An error occurred: {ex.Message}");
                 
-                // Log checkout error to database
                 if (!string.IsNullOrEmpty(userId))
                 {
-                    var logEntry = new Log
-                    {
-                        Message = $"Error during checkout processing",
-                        Level = "Error",
-                        Exception = ex.ToString(),
-                        LogEvent = "PaymentError",
-                        Timestamp = DateTime.UtcNow
-                    };
-                    try
-                    {
-                        _logService.Add(logEntry);
-                    }
-                    catch (Exception logEx)
-                    {
-                        _logger.LogError(logEx, "Failed to log checkout error to database");
-                    }
+                    LogCheckoutError(ex);
                 }
                 
                 return Page();
+            }
+        }
+
+        private async Task<IActionResult> ProcessPayPalRedirectAsync(string userId)
+        {
+            try
+            {
+                // Save a pending order record in the database BEFORE redirecting to PayPal
+                // This ensures we can retrieve it when PayPal redirects back
+                Order.TrxApproved = false; // Mark as pending
+                Order.TrxMessage = "Pending PayPal approval";
+                Order.TrxResponseCode = "PENDING";
+
+                _orderService.Add(Order);
+
+                // Build payment request for PayPal order creation
+                var request = BuildPaymentRequest();
+
+                _logger.LogInformation("Creating PayPal order for {OrderId}", Order.Id);
+
+                // Get current base URL
+                var returnBaseUrl = $"{Request.Scheme}://{Request.Host}";
+
+                // Create PayPal order and get approval URL
+                var (paypalOrderId, approveUrl) = await _payPalRedirectService.CreateOrderAsync(request, returnBaseUrl);
+
+                _logger.LogInformation("PayPal order created: {PayPalOrderId}, redirecting to approval", paypalOrderId);
+
+                // Store PayPal order ID in the pending order record
+                Order.TrxId = paypalOrderId;
+                _orderService.Update(Order);
+
+                // Redirect to PayPal for approval (order context is now in database)
+                return Redirect(approveUrl);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating PayPal order");
+                ModelState.AddModelError("", "Failed to initiate PayPal payment. Please try again.");
+                return Page();
+            }
+        }
+
+        private async Task<PaymentResponse> ProcessPaymentAsync(string paymentProviderName) {
+            try {
+                // Check if payment gateway is available
+                if (!_paymentProviderFactory.IsProviderAvailable(paymentProviderName)) {
+                    _logger.LogError("Payment provider {Provider} is not available. Available providers: {AvailableProviders}",
+                        paymentProviderName, string.Join(", ", _paymentProviderFactory.GetAvailableProviders()));
+                    return new PaymentResponse {
+                        IsApproved = false,
+                        ErrorMessage = $"Payment provider '{paymentProviderName}' is not configured",
+                        ErrorCode = "PROVIDER_NOT_AVAILABLE"
+                    };
+                }
+
+                var provider = _paymentProviderFactory.CreateProvider(paymentProviderName);
+
+                var request = BuildPaymentRequest();
+
+                _logger.LogInformation("Processing payment via {Provider} for order {OrderId}: Amount={Amount}", 
+                    paymentProviderName, Order.Id, CartTotal);
+
+                var response = await provider.ProcessPaymentAsync(request);
+
+                _logger.LogInformation("Payment processed via {Provider} for order {OrderId}: Approved={IsApproved}, ResponseCode={ResponseCode}",
+                    paymentProviderName, Order.Id, response.IsApproved, response.ResponseCode);
+
+                return response;
+            } catch (Exception ex) {
+                _logger.LogError(ex, "Error processing payment for order {OrderId}", Order.Id);
+                return new PaymentResponse {
+                    IsApproved = false,
+                    ErrorMessage = $"An error occurred processing your payment: {ex.Message}",
+                    ErrorCode = "PAYMENT_ERROR"
+                };
+            }
+        }
+
+        private PaymentRequest BuildPaymentRequest()
+        {
+            // Parse credit card expiration
+            var expirationParts = Order.Ccexp?.Split('/') ?? new[] { "", "" };
+            var expMonth = expirationParts.Length > 0 ? expirationParts[0].Trim() : "01";
+            var expYear = expirationParts.Length > 1 ? expirationParts[1].Trim() : "25";
+
+            return new PaymentRequest {
+                TransactionId = Order.Id,
+                Amount = CartTotal, // For PayPal REST this is decimal dollars, not cents
+                CurrencyCode = "USD",
+                CardNumber = Order.Ccnumber,
+                ExpirationMonth = expMonth,
+                ExpirationYear = expYear,
+                CardCode = Order.CccardCode,
+                CardholderName = $"{Order.FirstName} {Order.LastName}",
+                CustomerEmail = Order.Email,
+                CustomerPhone = Order.Phone,
+                BillingAddress = Order.BillingAddress,
+                BillingCity = Order.BillingCity,
+                BillingState = Order.BillingState,
+                BillingZip = Order.BillingZip,
+                BillingCountry = Order.BillingCountry,
+                ShippingAddress = Order.ShippingAddress,
+                ShippingCity = Order.ShippingCity,
+                ShippingState = Order.ShippingState,
+                ShippingZip = Order.ShippingZip,
+                ShippingCountry = Order.ShippingCountry,
+                InvoiceNumber = Order.InvoiceNumber,
+                Description = "Portal Store Purchase"
+            };
+        }
+
+        private async Task CreateOrderDetailsAndClearCart(string userId)
+        {
+            var cartItems = _cartService.GetAll()
+                .Where(c => c.UserId == userId)
+                .ToList();
+
+            foreach (var cartItem in cartItems) {
+                var product = _productService.Get(cartItem.ProductId);
+                if (product != null) {
+                    var detail = new OrderDetail {
+                        Id = Guid.NewGuid().ToString(),
+                        OrderId = Order.Id,
+                        ProductId = cartItem.ProductId,
+                        Quantity = cartItem.Quantity,
+                        UnitPrice = product.Price,
+                        Description = product.Name
+                    };
+                    _orderDetailService.Add(detail);
+                }
+
+                _cartService.Delete(cartItem.Id);
             }
         }
 
@@ -216,114 +328,22 @@ namespace digioz.Portal.Web.Pages.Store {
             }
         }
 
-        private async Task<PaymentResponse> ProcessPaymentAsync() {
-            try {
-                // Get the configured payment provider from settings
-                var paymentProviderName = GetConfiguredPaymentProvider();
-                
-                if (string.IsNullOrEmpty(paymentProviderName)) {
-                    _logger.LogError("No payment provider configured in settings");
-                    return new PaymentResponse {
-                        IsApproved = false,
-                        ErrorMessage = "Payment provider is not configured. Please contact support.",
-                        ErrorCode = "PROVIDER_NOT_CONFIGURED"
-                    };
-                }
-
-                // Check if payment gateway is available
-                if (!_paymentProviderFactory.IsProviderAvailable(paymentProviderName)) {
-                    _logger.LogError("Payment provider {Provider} is not available. Available providers: {AvailableProviders}",
-                        paymentProviderName, string.Join(", ", _paymentProviderFactory.GetAvailableProviders()));
-                    return new PaymentResponse {
-                        IsApproved = false,
-                        ErrorMessage = $"Payment provider '{paymentProviderName}' is not configured",
-                        ErrorCode = "PROVIDER_NOT_AVAILABLE"
-                    };
-                }
-
-                // Create provider instance - pass null to use the factory's internal service provider
-                // which was properly configured with HttpClient in Program.cs
-                var provider = _paymentProviderFactory.CreateProvider(paymentProviderName);
-
-                // Parse credit card expiration
-                var expirationParts = Order.Ccexp?.Split('/') ?? new[] { "", "" };
-                var expMonth = expirationParts.Length > 0 ? expirationParts[0].Trim() : "01";
-                var expYear = expirationParts.Length > 1 ? expirationParts[1].Trim() : "25";
-
-                // Build payment request
-                var request = new PaymentRequest {
-                    TransactionId = Order.Id,
-                    Amount = (long)(CartTotal * 100), // Convert to cents
-                    CurrencyCode = "USD",
-                    CardNumber = Order.Ccnumber,
-                    ExpirationMonth = expMonth,
-                    ExpirationYear = expYear,
-                    CardCode = Order.CccardCode,
-                    CardholderName = $"{Order.FirstName} {Order.LastName}",
-                    CustomerEmail = Order.Email,
-                    CustomerPhone = Order.Phone,
-                    BillingAddress = Order.BillingAddress,
-                    BillingCity = Order.BillingCity,
-                    BillingState = Order.BillingState,
-                    BillingZip = Order.BillingZip,
-                    BillingCountry = Order.BillingCountry,
-                    ShippingAddress = Order.ShippingAddress,
-                    ShippingCity = Order.ShippingCity,
-                    ShippingState = Order.ShippingState,
-                    ShippingZip = Order.ShippingZip,
-                    ShippingCountry = Order.ShippingCountry,
-                    InvoiceNumber = Order.InvoiceNumber,
-                    Description = "Portal Store Purchase"
-                };
-
-                _logger.LogInformation("Processing payment via {Provider} for order {OrderId}: Amount={Amount}", 
-                    paymentProviderName, Order.Id, CartTotal);
-
-                // Process payment
-                var response = await provider.ProcessPaymentAsync(request);
-
-                _logger.LogInformation("Payment processed via {Provider} for order {OrderId}: Approved={IsApproved}, ResponseCode={ResponseCode}",
-                    paymentProviderName, Order.Id, response.IsApproved, response.ResponseCode);
-
-                return response;
-            } catch (Exception ex) {
-                _logger.LogError(ex, "Error processing payment for order {OrderId}", Order.Id);
-                return new PaymentResponse {
-                    IsApproved = false,
-                    ErrorMessage = $"An error occurred processing your payment: {ex.Message}",
-                    ErrorCode = "PAYMENT_ERROR"
-                };
-            }
-        }
-
-        /// <summary>
-        /// Gets the configured payment provider name from application settings.
-        /// The administrator determines which single payment provider is used for all transactions.
-        /// </summary>
-        /// <returns>The configured payment provider name (e.g., "AuthorizeNet", "PayPal"), or null if not configured</returns>
         private string GetConfiguredPaymentProvider() {
-            // Check for payment provider configuration in app settings
             var config = _configService.GetByKey("PaymentProvider");
             if (config != null && !string.IsNullOrEmpty(config.ConfigValue)) {
                 return config.ConfigValue.Trim();
             }
 
-            // Log if no configuration found
             _logger.LogWarning("PaymentProvider configuration key not found in settings");
             return string.Empty;
         }
 
         private string GenerateInvoiceNumber() {
-            // DB column supports max 20 characters, so keep invoice number short
-            // Format: INV-{yyMMddHHmm}-{8-char GUID segment} (total 3+1+10+1+5 = 20)
             var timestamp = DateTime.Now.ToString("yyMMddHHmm");
             var guidSegment = Guid.NewGuid().ToString("N").Substring(0, 5).ToUpperInvariant();
             return $"INV-{timestamp}-{guidSegment}";
         }
 
-        /// <summary>
-        /// Logs payment failure details to the database Log table.
-        /// </summary>
         private void LogPaymentFailure(string userId, string orderId, string provider, PaymentResponse response)
         {
             try
@@ -349,8 +369,27 @@ namespace digioz.Portal.Web.Pages.Store {
             }
             catch (Exception ex)
             {
-                // Log the logging failure to ILogger only to avoid infinite recursion
                 _logger.LogError(ex, "Failed to log payment failure to database");
+            }
+        }
+
+        private void LogCheckoutError(Exception ex)
+        {
+            var logEntry = new Log
+            {
+                Message = $"Error during checkout processing",
+                Level = "Error",
+                Exception = ex.ToString(),
+                LogEvent = "PaymentError",
+                Timestamp = DateTime.UtcNow
+            };
+            try
+            {
+                _logService.Add(logEntry);
+            }
+            catch (Exception logEx)
+            {
+                _logger.LogError(logEx, "Failed to log checkout error to database");
             }
         }
     }
