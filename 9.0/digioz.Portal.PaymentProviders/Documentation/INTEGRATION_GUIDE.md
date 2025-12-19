@@ -2,6 +2,13 @@
 
 This guide explains how to integrate the `digioz.Portal.PaymentProviders` library into the main digioz Portal web application.
 
+## Overview
+
+The payment providers library supports two integration patterns:
+
+1. **Direct Card Processing** (Authorize.net) - Server-side, immediate charge
+2. **Redirect-Based Processing** (PayPal) - User redirects to PayPal for approval
+
 ## Step 1: Update Project Reference
 
 Add a reference to the payment providers library in `digioz.Portal.Web.csproj`:
@@ -14,25 +21,58 @@ Add a reference to the payment providers library in `digioz.Portal.Web.csproj`:
 
 ## Step 2: Configure in Program.cs
 
-In your `Program.cs` (or `Startup.cs` for older .NET versions), add the payment providers configuration:
+In your `Program.cs`, add the payment providers configuration:
 
 ```csharp
-using digioz.Portal.PaymentProviders.Examples;
 using digioz.Portal.PaymentProviders.DependencyInjection;
+using digioz.Portal.Web.Services;
 
-var builder = WebApplicationBuilder.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
-// ... existing service registrations ...
+// Configure HttpClient for payment providers BEFORE registering payment providers
+builder.Services.AddHttpClient<digioz.Portal.PaymentProviders.Providers.AuthorizeNetProvider>()
+    .ConfigureHttpClient(client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(30);
+    });
+
+builder.Services.AddHttpClient<digioz.Portal.PaymentProviders.Providers.PayPalProvider>()
+    .ConfigureHttpClient(client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(30);
+    });
 
 // Add payment providers with configuration from appsettings.json
-builder.Services.ConfigurePaymentProviders(builder.Configuration);
+builder.Services.AddPaymentProviders(paymentProviderBuilder =>
+{
+    var configuration = builder.Configuration;
 
-// Or use environment variables:
-// builder.Services.ConfigurePaymentProvidersFromEnvironment();
+    var authNetConfig = configuration.GetSection("PaymentProviders:AuthorizeNet");
+    if (authNetConfig.Exists())
+    {
+        paymentProviderBuilder.ConfigureProvider("AuthorizeNet", config =>
+        {
+            config.ApiKey = authNetConfig["ApiKey"];
+            config.ApiSecret = authNetConfig["ApiSecret"];
+            config.IsTestMode = authNetConfig.GetValue<bool>("IsTestMode");
+        });
+    }
 
-var app = builder.Build();
+    var paypalConfig = configuration.GetSection("PaymentProviders:PayPal");
+    if (paypalConfig.Exists())
+    {
+        paymentProviderBuilder.ConfigureProvider("PayPal", config =>
+        {
+            // REST API: ClientId and ClientSecret
+            config.ApiKey = paypalConfig["ClientId"];
+            config.ApiSecret = paypalConfig["ClientSecret"];
+            config.IsTestMode = paypalConfig.GetValue<bool>("IsTestMode");
+        });
+    }
+});
 
-// ... rest of your application setup ...
+// Register PayPal redirect service for redirect-based checkout
+builder.Services.AddScoped<IPayPalRedirectService, PayPalRedirectService>();
 ```
 
 ## Step 3: Configure appsettings.json
@@ -48,9 +88,8 @@ Add payment provider configuration to your `appsettings.json`:
       "IsTestMode": true
     },
     "PayPal": {
-      "ApiKey": "YOUR_PAYPAL_API_USERNAME",
-      "ApiSecret": "YOUR_PAYPAL_API_PASSWORD",
-      "MerchantId": "YOUR_PAYPAL_API_SIGNATURE",
+      "ClientId": "YOUR_PAYPAL_CLIENT_ID",
+      "ClientSecret": "YOUR_PAYPAL_CLIENT_SECRET",
       "IsTestMode": true
     }
   }
@@ -68,384 +107,333 @@ For production environments, use `appsettings.Production.json`:
       "IsTestMode": false
     },
     "PayPal": {
-      "ApiKey": "YOUR_PRODUCTION_USERNAME",
-      "ApiSecret": "YOUR_PRODUCTION_PASSWORD",
-      "MerchantId": "YOUR_PRODUCTION_SIGNATURE",
+      "ClientId": "YOUR_PRODUCTION_CLIENT_ID",
+      "ClientSecret": "YOUR_PRODUCTION_CLIENT_SECRET",
       "IsTestMode": false
     }
   }
 }
 ```
 
-## Step 4: Create Payment Processing Service
+## Step 4: Implement Checkout Logic (Razor Pages)
 
-Create a new service in your application to handle payment processing. Here's an example:
+### Checkout Page Model (Checkout.cshtml.cs)
 
 ```csharp
 using digioz.Portal.PaymentProviders.Abstractions;
 using digioz.Portal.PaymentProviders.Models;
-using digioz.Portal.Bo;
-
-namespace digioz.Portal.Web.Services
-{
-    public interface IOrderPaymentService
-    {
-        Task<PaymentResponse> ProcessOrderPaymentAsync(Order order, CheckOutViewModel checkout);
-        Task<PaymentResponse> RefundOrderPaymentAsync(Order order, decimal? refundAmount = null);
-    }
-
-    public class OrderPaymentService : IOrderPaymentService
-    {
-        private readonly IPaymentProviderFactory _paymentFactory;
-        private readonly ILogger<OrderPaymentService> _logger;
-
-        public OrderPaymentService(
-            IPaymentProviderFactory paymentFactory,
-            ILogger<OrderPaymentService> logger)
-        {
-            _paymentFactory = paymentFactory;
-            _logger = logger;
-        }
-
-        public async Task<PaymentResponse> ProcessOrderPaymentAsync(
-            Order order,
-            CheckOutViewModel checkout)
-        {
-            try
-            {
-                var provider = _paymentFactory.CreateProvider(checkout.PaymentGateway);
-
-                var request = new PaymentRequest
-                {
-                    TransactionId = order.Id,
-                    Amount = (long)(order.Total * 100), // Convert to cents
-                    CurrencyCode = "USD",
-                    CardNumber = checkout.CCNumber,
-                    ExpirationMonth = checkout.CCExpMonth,
-                    ExpirationYear = checkout.CCExpYear,
-                    CardCode = checkout.CCCardCode,
-                    CardholderName = $"{checkout.FirstName} {checkout.LastName}",
-                    CustomerEmail = checkout.Email,
-                    CustomerPhone = checkout.Phone,
-                    BillingAddress = checkout.BillingAddress,
-                    BillingCity = checkout.BillingCity,
-                    BillingState = checkout.BillingState,
-                    BillingZip = checkout.BillingZip,
-                    BillingCountry = checkout.BillingCountry,
-                    ShippingAddress = checkout.ShippingAddress,
-                    ShippingCity = checkout.ShippingCity,
-                    ShippingState = checkout.ShippingState,
-                    ShippingZip = checkout.ShippingZip,
-                    ShippingCountry = checkout.ShippingCountry,
-                    InvoiceNumber = order.InvoiceNumber,
-                    Description = "Portal Store Purchase"
-                };
-
-                var response = await provider.ProcessPaymentAsync(request);
-
-                _logger.LogInformation(
-                    "Payment processed for order {OrderId} via {Provider}: Approved={IsApproved}",
-                    order.Id,
-                    checkout.PaymentGateway,
-                    response.IsApproved);
-
-                return response;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error processing payment for order {OrderId}", order.Id);
-                throw;
-            }
-        }
-
-        public async Task<PaymentResponse> RefundOrderPaymentAsync(
-            Order order,
-            decimal? refundAmount = null)
-        {
-            try
-            {
-                var paymentGateway = DeterminePaymentGateway(order); // Implement based on your logic
-                var provider = _paymentFactory.CreateProvider(paymentGateway);
-
-                var amount = refundAmount.HasValue ? (long)(refundAmount.Value * 100) : (long?)null;
-                var response = await provider.RefundAsync(order.TrxId, (decimal?)amount);
-
-                _logger.LogInformation(
-                    "Refund processed for order {OrderId}: Approved={IsApproved}",
-                    order.Id,
-                    response.IsApproved);
-
-                return response;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error refunding order {OrderId}", order.Id);
-                throw;
-            }
-        }
-
-        private string DeterminePaymentGateway(Order order)
-        {
-            // Implement logic to determine which gateway was used for this order
-            // Could be stored in the order or retrieved from configuration
-            return "AuthorizeNet"; // Default
-        }
-    }
-}
-```
-
-Register the service in Program.cs:
-
-```csharp
-builder.Services.AddScoped<IOrderPaymentService, OrderPaymentService>();
-```
-
-## Step 5: Update Checkout Page Handler
-
-Update your checkout Razor Page to use the new payment service:
-
-```csharp
 using digioz.Portal.Web.Services;
-using digioz.Portal.Bo.ViewModels;
-using digioz.Portal.Bo;
 
-namespace digioz.Portal.Web.Pages
+public class CheckoutModel : PageModel
 {
-    public class CheckoutModel : PageModel
+    private readonly IPaymentProviderFactory _paymentProviderFactory;
+    private readonly IPayPalRedirectService _payPalRedirectService;
+    private readonly IOrderService _orderService;
+
+    [BindProperty]
+    public Order Order { get; set; }
+
+    public async Task<IActionResult> OnPostAsync()
     {
-        private readonly IOrderPaymentService _paymentService;
-        private readonly IOrderService _orderService; // Your existing service
-        private readonly ILogger<CheckoutModel> _logger;
+        if (!ModelState.IsValid)
+            return Page();
 
-        [BindProperty]
-        public CheckOutViewModel CheckOut { get; set; }
+        // Get configured payment provider
+        var providerName = GetConfiguredPaymentProvider(); // e.g., "AuthorizeNet" or "PayPal"
 
-        public CheckoutModel(
-            IOrderPaymentService paymentService,
-            IOrderService orderService,
-            ILogger<CheckoutModel> logger)
+        // Branch based on provider type
+        if (string.Equals(providerName, "PayPal", StringComparison.OrdinalIgnoreCase))
         {
-            _paymentService = paymentService;
-            _orderService = orderService;
-            _logger = logger;
+            return await ProcessPayPalRedirectAsync();
         }
-
-        public async Task<IActionResult> OnPostAsync()
+        else
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
+            return await ProcessDirectCardPaymentAsync(providerName);
+        }
+    }
 
-            try
-            {
-                // Create order
-                var order = new Order
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    UserId = User.FindFirst("sub")?.Value,
-                    OrderDate = DateTime.Now,
-                    FirstName = CheckOut.FirstName,
-                    LastName = CheckOut.LastName,
-                    Email = CheckOut.Email,
-                    Phone = CheckOut.Phone,
-                    ShippingAddress = CheckOut.ShippingAddress,
-                    ShippingCity = CheckOut.ShippingCity,
-                    ShippingState = CheckOut.ShippingState,
-                    ShippingZip = CheckOut.ShippingZip,
-                    ShippingCountry = CheckOut.ShippingCountry,
-                    BillingAddress = CheckOut.BillingAddress,
-                    BillingCity = CheckOut.BillingCity,
-                    BillingState = CheckOut.BillingState,
-                    BillingZip = CheckOut.BillingZip,
-                    BillingCountry = CheckOut.BillingCountry,
-                    Total = 100.00m, // Calculate from cart
-                    Ccnumber = CheckOut.CCNumber,
-                    Ccexp = $"{CheckOut.CCExpMonth}/{CheckOut.CCExpYear}",
-                    CccardCode = CheckOut.CCCardCode,
-                    TrxDescription = "Store Purchase"
-                };
+    private async Task<IActionResult> ProcessPayPalRedirectAsync()
+    {
+        // Save pending order to database
+        Order.TrxApproved = false;
+        Order.TrxResponseCode = "PENDING";
+        Order.TrxMessage = "Awaiting PayPal approval";
+        _orderService.Add(Order);
 
-                // Process payment
-                var paymentResponse = await _paymentService.ProcessOrderPaymentAsync(order, CheckOut);
+        // Build payment request
+        var request = new PaymentRequest
+        {
+            TransactionId = Order.Id,
+            Amount = Order.Total,
+            CurrencyCode = "USD",
+            InvoiceNumber = Order.InvoiceNumber,
+            Description = "Store Purchase"
+        };
 
-                if (paymentResponse.IsApproved)
-                {
-                    // Update order with transaction details
-                    order.TrxApproved = true;
-                    order.TrxAuthorizationCode = paymentResponse.AuthorizationCode;
-                    order.TrxId = paymentResponse.TransactionId;
-                    order.TrxMessage = paymentResponse.Message;
-                    order.TrxResponseCode = paymentResponse.ResponseCode;
+        // Get base URL for PayPal callbacks
+        var returnBaseUrl = $"{Request.Scheme}://{Request.Host}";
 
-                    // Save order
-                    await _orderService.SaveOrderAsync(order);
+        // Create PayPal order and get approval URL
+        var (paypalOrderId, approveUrl) = await _payPalRedirectService.CreateOrderAsync(request, returnBaseUrl);
 
-                    // Clear cart, send confirmation email, etc.
-                    // ...
+        // Store PayPal order ID in order record
+        Order.TrxId = paypalOrderId;
+        _orderService.Update(Order);
 
-                    return RedirectToPage("OrderConfirmation", new { orderId = order.Id });
-                }
-                else
-                {
-                    ModelState.AddModelError("", $"Payment declined: {paymentResponse.ErrorMessage}");
-                    _logger.LogWarning("Payment declined for order: {ErrorCode} - {ErrorMessage}",
-                        paymentResponse.ErrorCode,
-                        paymentResponse.ErrorMessage);
-                    return Page();
-                }
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "An error occurred processing your payment. Please try again.");
-                _logger.LogError(ex, "Error processing checkout");
-                return Page();
-            }
+        // Redirect user to PayPal
+        return Redirect(approveUrl);
+    }
+
+    private async Task<IActionResult> ProcessDirectCardPaymentAsync(string providerName)
+    {
+        var provider = _paymentProviderFactory.CreateProvider(providerName);
+
+        var request = new PaymentRequest
+        {
+            TransactionId = Order.Id,
+            Amount = Order.Total,
+            CurrencyCode = "USD",
+            CardNumber = Order.Ccnumber,
+            ExpirationMonth = Order.CcExpMonth,
+            ExpirationYear = Order.CcExpYear,
+            CardCode = Order.CccardCode,
+            // ... other fields
+        };
+
+        var response = await provider.ProcessPaymentAsync(request);
+
+        if (response.IsApproved)
+        {
+            Order.TrxApproved = true;
+            Order.TrxId = response.TransactionId;
+            Order.TrxAuthorizationCode = response.AuthorizationCode;
+            _orderService.Add(Order);
+
+            return RedirectToPage("OrderConfirmation", new { orderId = Order.Id });
+        }
+        else
+        {
+            ModelState.AddModelError("", $"Payment declined: {response.ErrorMessage}");
+            return Page();
         }
     }
 }
 ```
 
-## Step 6: Update CheckOutViewModel (Optional)
+## Step 5: Create PayPal Return Handler
 
-Add a property for payment gateway selection if not already present:
+Create `PayPalReturn.cshtml.cs` to handle the redirect back from PayPal:
 
 ```csharp
-[Required]
-[StringLength(40)]
-[DisplayName("Payment Gateway")]
-public string PaymentGateway { get; set; } = "AuthorizeNet";
+[Authorize]
+public class PayPalReturnModel : PageModel
+{
+    private readonly IPayPalRedirectService _payPalRedirectService;
+    private readonly IOrderService _orderService;
+    private readonly IShoppingCartService _cartService;
+
+    public async Task<IActionResult> OnGetAsync([FromQuery] string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            TempData["Error"] = "Invalid PayPal return.";
+            return RedirectToPage("/Store/Index");
+        }
+
+        var userId = User.FindFirst("sub")?.Value;
+
+        // Find pending order by PayPal order ID
+        var order = _orderService.GetAll()
+            .Where(o => o.TrxId == token && o.UserId == userId && o.TrxResponseCode == "PENDING")
+            .FirstOrDefault();
+
+        if (order == null)
+        {
+            TempData["Error"] = "Order not found.";
+            return RedirectToPage("/Store/Index");
+        }
+
+        // Build request for capture
+        var request = new PaymentRequest
+        {
+            TransactionId = order.Id,
+            Amount = order.Total,
+            CurrencyCode = "USD",
+            InvoiceNumber = order.InvoiceNumber
+        };
+
+        // Capture the PayPal payment
+        var response = await _payPalRedirectService.CaptureOrderAsync(token, request);
+
+        if (response.IsApproved)
+        {
+            // Update order with success
+            order.TrxApproved = true;
+            order.TrxId = response.TransactionId;
+            order.TrxAuthorizationCode = response.AuthorizationCode;
+            order.TrxMessage = response.Message;
+            order.TrxResponseCode = response.ResponseCode;
+            _orderService.Update(order);
+
+            // Clear cart, create order details, etc.
+            // ...
+
+            return RedirectToPage("OrderConfirmation", new { orderId = order.Id });
+        }
+        else
+        {
+            // Update order with failure
+            order.TrxMessage = response.ErrorMessage;
+            order.TrxResponseCode = response.ResponseCode;
+            _orderService.Update(order);
+
+            TempData["Error"] = $"Payment failed: {response.ErrorMessage}";
+            return RedirectToPage("/Store/Checkout");
+        }
+    }
+}
 ```
 
-Add to your checkout view:
+Create `PayPalReturn.cshtml`:
 
 ```html
-<div class="form-group">
-    <label asp-for="PaymentGateway"></label>
-    <select asp-for="PaymentGateway" class="form-control">
-        <option value="AuthorizeNet">Authorize.net</option>
-        <option value="PayPal">PayPal</option>
-    </select>
+@page
+@model PayPalReturnModel
+@{
+    ViewData["Title"] = "Processing Payment";
+}
+
+<div class="container mt-5">
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h3 class="mt-3">Processing your PayPal payment...</h3>
+        <p class="text-muted">Please wait.</p>
+    </div>
 </div>
 ```
 
-## Step 7: Error Handling
+## Step 6: Create PayPal Redirect Service
 
-Implement proper error handling and logging throughout your payment processing:
+Create `IPayPalRedirectService.cs`:
+
+```csharp
+public interface IPayPalRedirectService
+{
+    Task<(string orderId, string approveUrl)> CreateOrderAsync(PaymentRequest request, string returnBaseUrl);
+    Task<PaymentResponse> CaptureOrderAsync(string paypalOrderId, PaymentRequest originalRequest);
+}
+
+public class PayPalRedirectService : IPayPalRedirectService
+{
+    private readonly IPaymentProviderFactory _factory;
+
+    public PayPalRedirectService(IPaymentProviderFactory factory)
+    {
+        _factory = factory;
+    }
+
+    public async Task<(string orderId, string approveUrl)> CreateOrderAsync(PaymentRequest request, string returnBaseUrl)
+    {
+        var provider = _factory.CreateProvider("PayPal") as PayPalProvider;
+        if (provider == null)
+            throw new InvalidOperationException("PayPal provider not available.");
+
+        return await provider.CreateOrderAndGetApprovalUrlAsync(request, returnBaseUrl);
+    }
+
+    public async Task<PaymentResponse> CaptureOrderAsync(string paypalOrderId, PaymentRequest originalRequest)
+    {
+        var provider = _factory.CreateProvider("PayPal") as PayPalProvider;
+        if (provider == null)
+            throw new InvalidOperationException("PayPal provider not available.");
+
+        return await provider.CaptureApprovedOrderAsync(paypalOrderId, originalRequest);
+    }
+}
+```
+
+## Payment Provider Comparison
+
+| Feature | Authorize.Net | PayPal (REST) |
+|---------|---------------|---------------|
+| Integration Type | Direct (Server-side) | Redirect (User approval) |
+| Card Data | Collected on your site | Not collected (PayPal handles) |
+| User Experience | Single page checkout | Redirect to PayPal, then back |
+| Payment Method | `ProcessPaymentAsync()` | `CreateOrderAndGetApprovalUrlAsync()` + `CaptureApprovedOrderAsync()` |
+| Return URL | N/A | Dynamic (based on request host) |
+| Configuration | ApiKey, ApiSecret | ClientId, ClientSecret |
+
+## Testing
+
+### Authorize.net Test Cards
+- **Approved**: 4111111111111111
+- **Declined**: 4222222222222220
+
+### PayPal Sandbox
+1. Create sandbox accounts at https://developer.paypal.com
+2. Use sandbox ClientId and ClientSecret
+3. Set `IsTestMode: true`
+4. Test the full redirect flow
+
+## Security Considerations
+
+1. **Never log credit card numbers or CVV codes**
+2. **Use HTTPS** - All payment communication must be encrypted
+3. **Store credentials securely** - Use Azure Key Vault or similar
+4. **Implement PCI DSS compliance** for card-based processing
+5. **Validate return URLs** - Ensure PayPal returns match your domain
+6. **Handle pending orders** - Clean up abandoned PayPal orders
+
+## Error Handling
 
 ```csharp
 try
 {
-    var response = await paymentService.ProcessOrderPaymentAsync(order, checkout);
+    var response = await provider.ProcessPaymentAsync(request);
     
     if (!response.IsApproved)
     {
         // Handle declined payment
-        await LogPaymentFailure(order.Id, response);
-        TempData["Error"] = "Payment was declined. Please check your card details and try again.";
+        _logger.LogWarning("Payment declined: {ErrorCode}", response.ErrorCode);
+        ModelState.AddModelError("", $"Payment declined: {response.ErrorMessage}");
     }
 }
 catch (ArgumentException ex)
 {
-    // Handle invalid configuration or invalid request
-    await LogPaymentError(order.Id, ex);
-    TempData["Error"] = "Payment gateway is not properly configured.";
+    // Invalid configuration or request
+    _logger.LogError(ex, "Invalid payment request");
 }
 catch (Exception ex)
 {
-    // Handle unexpected errors
-    await LogPaymentError(order.Id, ex);
-    TempData["Error"] = "An unexpected error occurred. Please try again later.";
+    // Unexpected error
+    _logger.LogError(ex, "Payment processing error");
 }
 ```
 
-## Step 8: Security Considerations
+## Troubleshooting
 
-1. **Never store credit card data directly in the database** - Use tokenization instead
-2. **Use HTTPS** - All payment communication should be encrypted
-3. **Store credentials securely** - Use Azure Key Vault, AWS Secrets Manager, or similar
-4. **Implement PCI DSS compliance** - Validate and maintain compliance
-5. **Log sensitive data carefully** - Never log full card numbers or CVV codes
-6. **Implement rate limiting** - Prevent brute force attacks on payment endpoints
-
-## Testing
-
-For development and testing:
-
-1. Use test/sandbox credentials in `appsettings.Development.json`
-2. Use the Mock provider for unit tests
-3. Test with provider-specific test card numbers:
-   - **Authorize.net**: 4111111111111111 (approved), 4222222222222220 (declined)
-   - **PayPal**: See their sandbox testing documentation
-
-Example unit test:
-
-```csharp
-[TestClass]
-public class OrderPaymentServiceTests
-{
-    [TestMethod]
-    public async Task ProcessOrderPayment_WithValidPayment_ReturnsApproved()
-    {
-        // Arrange
-        var mockFactory = new Mock<IPaymentProviderFactory>();
-        var mockProvider = new Mock<IPaymentProvider>();
-        var mockLogger = new Mock<ILogger<OrderPaymentService>>();
-
-        mockFactory.Setup(f => f.CreateProvider("AuthorizeNet"))
-            .Returns(mockProvider.Object);
-
-        mockProvider.Setup(p => p.ProcessPaymentAsync(It.IsAny<PaymentRequest>()))
-            .ReturnsAsync(new PaymentResponse { IsApproved = true });
-
-        var service = new OrderPaymentService(mockFactory.Object, mockLogger.Object);
-
-        // Act & Assert
-        // Your test code here
-    }
-}
-```
-
-## Migration from Old Payment System
-
-If you have an existing payment processing implementation:
-
-1. Keep both implementations running in parallel
-2. Add feature flags to enable the new payment providers gradually
-3. Log both old and new results for comparison
-4. Once verified, remove the old implementation
-
-```csharp
-if (featureFlags.UseNewPaymentProviders)
-{
-    var response = await _paymentService.ProcessOrderPaymentAsync(order, checkout);
-}
-else
-{
-    var response = await _legacyPaymentService.ProcessOrderPaymentAsync(order, checkout);
-}
-```
-
-## Support and Troubleshooting
+### PayPal Return URL Issues
+- Verify return URL format: `{scheme}://{host}/Store/PayPalReturn`
+- Check logs for "PayPal return: no pending order found"
+- Ensure order is saved with `TrxResponseCode = "PENDING"`
+- Verify `token` query parameter is present
 
 ### Provider Not Found
-- Ensure the provider name matches the registration (case-insensitive)
+- Ensure provider name matches registration (case-insensitive)
 - Check that configuration is properly loaded
-- Verify the provider is registered in the DI container
+- Verify HttpClient is registered for the provider
 
 ### Configuration Issues
 - Verify credentials in appsettings.json
 - Check that `IsTestMode` matches your account type
 - Use environment-specific configuration files
 
-### Payment Failures
-- Check the `ErrorCode` and `ErrorMessage` in the response
-- Review provider-specific error codes in their documentation
-- Log all transaction details for debugging
-
 ## Additional Resources
 
 - [Authorize.net Documentation](https://developer.authorize.net/)
-- [PayPal Documentation](https://developer.paypal.com/)
-- [Payment PCI DSS Compliance](https://www.pcisecuritystandards.org/)
+- [PayPal REST API Documentation](https://developer.paypal.com/api/rest/)
+- [PayPal Orders API](https://developer.paypal.com/docs/api/orders/v2/)
+- [PCI DSS Compliance](https://www.pcisecuritystandards.org/)
 
