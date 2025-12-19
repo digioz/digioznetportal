@@ -58,9 +58,15 @@ namespace digioz.Portal.Web.Pages.Store {
 
         public List<CartItemViewModel> CartItems { get; set; } = new();
         public decimal CartTotal { get; set; }
+        
+        public string PaymentProvider { get; set; } = string.Empty;
+        public bool IsPayPal => string.Equals(PaymentProvider, "PayPal", StringComparison.OrdinalIgnoreCase);
 
         public void OnGet() {
             LoadCartItems();
+            PaymentProvider = GetConfiguredPaymentProvider();
+            
+            _logger.LogInformation("Checkout OnGet: PaymentProvider = '{PaymentProvider}'", PaymentProvider);
 
             // Pre-populate email from the authenticated user if available
             if (string.IsNullOrWhiteSpace(Order.Email))
@@ -72,6 +78,19 @@ namespace digioz.Portal.Web.Pages.Store {
 
         public async Task<IActionResult> OnPostAsync() {
             LoadCartItems();
+            PaymentProvider = GetConfiguredPaymentProvider();
+            
+            _logger.LogInformation("Checkout OnPostAsync: PaymentProvider = '{PaymentProvider}', IsPayPal = {IsPayPal}", 
+                PaymentProvider, IsPayPal);
+
+            // For PayPal, clear any model state errors related to credit card fields
+            if (IsPayPal)
+            {
+                _logger.LogInformation("Removing credit card validation errors for PayPal");
+                ModelState.Remove("Order.Ccnumber");
+                ModelState.Remove("Order.Ccexp");
+                ModelState.Remove("Order.CccardCode");
+            }
 
             // Ensure email is populated on POST from user claims if missing
             if (string.IsNullOrWhiteSpace(Order.Email))
@@ -81,6 +100,8 @@ namespace digioz.Portal.Web.Pages.Store {
             }
 
             if (!ModelState.IsValid || !CartItems.Any()) {
+                _logger.LogWarning("ModelState invalid or cart empty. ModelState.IsValid={IsValid}, CartItems.Count={Count}", 
+                    ModelState.IsValid, CartItems.Count);
                 return Page();
             }
 
@@ -119,7 +140,10 @@ namespace digioz.Portal.Web.Pages.Store {
                 // Get configured provider
                 var paymentProviderName = GetConfiguredPaymentProvider();
                 
+                _logger.LogInformation("Payment processing: providerName = '{ProviderName}', checking if PayPal", paymentProviderName);
+                
                 if (string.IsNullOrEmpty(paymentProviderName)) {
+                    _logger.LogError("Payment provider name is null or empty");
                     ModelState.AddModelError("", "Payment provider is not configured. Please contact support.");
                     return Page();
                 }
@@ -127,12 +151,22 @@ namespace digioz.Portal.Web.Pages.Store {
                 // Check if this is PayPal: use redirect flow
                 if (string.Equals(paymentProviderName, "PayPal", StringComparison.OrdinalIgnoreCase))
                 {
+                    _logger.LogInformation("Using PayPal redirect flow for order {OrderId}", Order.Id);
                     return await ProcessPayPalRedirectAsync(userId);
                 }
 
                 // Otherwise use direct card processing (e.g., Authorize.Net)
+                _logger.LogInformation("Using direct payment with provider '{Provider}' for order {OrderId}", paymentProviderName, Order.Id);
+                
+                // Store the full credit card number temporarily for payment processing
+                var fullCardNumber = Order.Ccnumber;
+                var fullCvv = Order.CccardCode;
+                
                 var paymentResponse = await ProcessPaymentAsync(paymentProviderName);
 
+                // Mask sensitive credit card data before saving to database
+                MaskCreditCardData();
+                
                 Order.TrxApproved = paymentResponse.IsApproved;
                 Order.TrxId = paymentResponse.TransactionId;
                 Order.TrxAuthorizationCode = paymentResponse.AuthorizationCode;
@@ -173,38 +207,57 @@ namespace digioz.Portal.Web.Pages.Store {
         {
             try
             {
+                _logger.LogInformation("ProcessPayPalRedirectAsync: Starting PayPal order creation for user {UserId}", userId);
+                
                 // Save a pending order record in the database BEFORE redirecting to PayPal
                 // This ensures we can retrieve it when PayPal redirects back
                 Order.TrxApproved = false; // Mark as pending
                 Order.TrxMessage = "Pending PayPal approval";
                 Order.TrxResponseCode = "PENDING";
 
+                // Mask any credit card data (PayPal doesn't use credit cards, but mask any dummy values)
+                MaskCreditCardData();
+
+                _logger.LogInformation("ProcessPayPalRedirectAsync: Saving pending order {OrderId}", Order.Id);
                 _orderService.Add(Order);
 
                 // Build payment request for PayPal order creation
                 var request = BuildPaymentRequest();
 
-                _logger.LogInformation("Creating PayPal order for {OrderId}", Order.Id);
+                _logger.LogInformation("ProcessPayPalRedirectAsync: Creating PayPal order for {OrderId}, Amount={Amount}", 
+                    Order.Id, request.Amount);
 
                 // Get current base URL
                 var returnBaseUrl = $"{Request.Scheme}://{Request.Host}";
+                _logger.LogInformation("ProcessPayPalRedirectAsync: Return base URL = {ReturnBaseUrl}", returnBaseUrl);
 
                 // Create PayPal order and get approval URL
                 var (paypalOrderId, approveUrl) = await _payPalRedirectService.CreateOrderAsync(request, returnBaseUrl);
 
-                _logger.LogInformation("PayPal order created: {PayPalOrderId}, redirecting to approval", paypalOrderId);
+                _logger.LogInformation("ProcessPayPalRedirectAsync: PayPal order created successfully. PayPalOrderId={PayPalOrderId}, ApproveUrl={ApproveUrl}", 
+                    paypalOrderId, approveUrl);
 
                 // Store PayPal order ID in the pending order record
                 Order.TrxId = paypalOrderId;
                 _orderService.Update(Order);
 
+                _logger.LogInformation("ProcessPayPalRedirectAsync: Redirecting to PayPal approval URL");
+                
                 // Redirect to PayPal for approval (order context is now in database)
                 return Redirect(approveUrl);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating PayPal order");
-                ModelState.AddModelError("", "Failed to initiate PayPal payment. Please try again.");
+                _logger.LogError(ex, "ProcessPayPalRedirectAsync: Error creating PayPal order. Exception: {Message}, StackTrace: {StackTrace}", 
+                    ex.Message, ex.StackTrace);
+                
+                // Try to get inner exception details
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError("ProcessPayPalRedirectAsync: Inner exception: {InnerMessage}", ex.InnerException.Message);
+                }
+                
+                ModelState.AddModelError("", $"Failed to initiate PayPal payment: {ex.Message}");
                 return Page();
             }
         }
@@ -331,10 +384,12 @@ namespace digioz.Portal.Web.Pages.Store {
         private string GetConfiguredPaymentProvider() {
             var config = _configService.GetByKey("PaymentProvider");
             if (config != null && !string.IsNullOrEmpty(config.ConfigValue)) {
-                return config.ConfigValue.Trim();
+                var value = config.ConfigValue.Trim();
+                _logger.LogInformation("GetConfiguredPaymentProvider: Found config value = '{Value}'", value);
+                return value;
             }
 
-            _logger.LogWarning("PaymentProvider configuration key not found in settings");
+            _logger.LogWarning("GetConfiguredPaymentProvider: PaymentProvider configuration key not found in settings");
             return string.Empty;
         }
 
@@ -390,6 +445,32 @@ namespace digioz.Portal.Web.Pages.Store {
             catch (Exception logEx)
             {
                 _logger.LogError(logEx, "Failed to log checkout error to database");
+            }
+        }
+
+        private void MaskCreditCardData()
+        {
+            // Only save last 4 digits of credit card for security
+            if (!string.IsNullOrEmpty(Order.Ccnumber))
+            {
+                var cardNumber = Order.Ccnumber.Replace(" ", "").Replace("-", "");
+                if (cardNumber.Length >= 4)
+                {
+                    var last4 = cardNumber.Substring(cardNumber.Length - 4);
+                    Order.Ccnumber = $"****{last4}";
+                    _logger.LogInformation("Credit card number masked for order {OrderId}", Order.Id);
+                }
+                else
+                {
+                    Order.Ccnumber = "****";
+                }
+            }
+
+            // Remove CVV completely - never store this
+            if (!string.IsNullOrEmpty(Order.CccardCode))
+            {
+                Order.CccardCode = "***";
+                _logger.LogInformation("CVV masked for order {OrderId}", Order.Id);
             }
         }
     }

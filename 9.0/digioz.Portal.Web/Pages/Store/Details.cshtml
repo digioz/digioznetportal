@@ -7,170 +7,175 @@
     Layout = "/Pages/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    @if (Model.Product != null)
-    {
-        <div class="row mb-4">
-            <div class="col-12">
-                <a asp-page="Index" class="btn btn-sm btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Back to Products
-                </a>
-            </div>
-        </div>
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="container mt-4">
+            @if (Model.Product != null)
+            {
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <a asp-page="Index" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Products
+                        </a>
+                    </div>
+                </div>
 
-        <div class="row">
-            <!-- Product Image -->
-            <div class="col-md-5">
-                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
-                    @if (!string.IsNullOrEmpty(Model.Product.Image))
-                    {
-                        <img src="/img/Products/Full/@Model.Product.Image" alt="@Model.Product.Name" class="img-fluid rounded" />
-                    }
-                    else
-                    {
-                        <div style="height: 400px; display: flex; align-items: center; justify-content: center;">
-                            <div class="text-center text-muted">
-                                <i class="bi bi-image" style="font-size: 5rem;"></i>
-                                <p>No Image Available</p>
+                <div class="row">
+                    <!-- Product Image -->
+                    <div class="col-md-5">
+                        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+                            @if (!string.IsNullOrEmpty(Model.Product.Image))
+                            {
+                                <img src="/img/Products/Full/@Model.Product.Image" alt="@Model.Product.Name" class="img-fluid rounded" />
+                            }
+                            else
+                            {
+                                <div style="height: 400px; display: flex; align-items: center; justify-content: center;">
+                                    <div class="text-center text-muted">
+                                        <i class="bi bi-image" style="font-size: 5rem;"></i>
+                                        <p>No Image Available</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="col-md-7">
+                        <h1>@Model.Product.Name</h1>
+
+                        @if (!string.IsNullOrEmpty(Model.CategoryName))
+                        {
+                            <p class="text-muted">
+                                <small>Category: <strong>@Model.CategoryName</strong></small>
+                            </p>
+                        }
+
+                        <div class="mb-4">
+                            <h3 class="text-primary">@Model.Product.Price.ToString("C")</h3>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.Product.ShortDescription))
+                        {
+                            <p>@Model.Product.ShortDescription</p>
+                        }
+
+                        <!-- Product Information -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                @if (!string.IsNullOrEmpty(Model.Product.Sku))
+                                {
+                                    <p><strong>SKU:</strong> @Model.Product.Sku</p>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.Product.Make))
+                                {
+                                    <p><strong>Make:</strong> @Model.Product.Make</p>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.Product.Model))
+                                {
+                                    <p><strong>Model:</strong> @Model.Product.Model</p>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.Product.Weight))
+                                {
+                                    <p><strong>Weight:</strong> @Model.Product.Weight</p>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.Product.Dimensions))
+                                {
+                                    <p><strong>Dimensions:</strong> @Model.Product.Dimensions</p>
+                                }
+                                @if (Model.Product.UnitsInStock.HasValue)
+                                {
+                                    <p><strong>Units In Stock:</strong> @Model.Product.UnitsInStock</p>
+                                }
                             </div>
                         </div>
-                    }
-                </div>
-            </div>
 
-            <!-- Product Details -->
-            <div class="col-md-7">
-                <h1>@Model.Product.Name</h1>
-                
-                @if (!string.IsNullOrEmpty(Model.CategoryName))
-                {
-                    <p class="text-muted">
-                        <small>Category: <strong>@Model.CategoryName</strong></small>
-                    </p>
-                }
+                        <!-- Out of Stock Alert -->
+                        @if (Model.Product.OutOfStock)
+                        {
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i> This product is currently out of stock.
+                            </div>
+                        }
 
-                <div class="mb-4">
-                    <h3 class="text-primary">@Model.Product.Price.ToString("C")</h3>
-                </div>
-
-                @if (!string.IsNullOrEmpty(Model.Product.ShortDescription))
-                {
-                    <p>@Model.Product.ShortDescription</p>
-                }
-
-                <!-- Product Information -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        @if (!string.IsNullOrEmpty(Model.Product.Sku))
+                        <!-- Add to Cart -->
+                        @if (User.Identity?.IsAuthenticated == true && !Model.Product.OutOfStock)
                         {
-                            <p><strong>SKU:</strong> @Model.Product.Sku</p>
+                            <button type="button" class="btn btn-primary btn-lg add-to-cart" data-product-id="@Model.Product.Id" data-product-name="@Model.Product.Name">
+                                <i class="bi bi-cart-plus"></i> Add to Cart
+                            </button>
                         }
-                        @if (!string.IsNullOrEmpty(Model.Product.Make))
+                        else if (Model.Product.OutOfStock)
                         {
-                            <p><strong>Make:</strong> @Model.Product.Make</p>
+                            <button type="button" class="btn btn-secondary btn-lg" disabled>
+                                <i class="bi bi-cart-plus"></i> Out of Stock
+                            </button>
                         }
-                        @if (!string.IsNullOrEmpty(Model.Product.Model))
+                        else
                         {
-                            <p><strong>Model:</strong> @Model.Product.Model</p>
-                        }
-                        @if (!string.IsNullOrEmpty(Model.Product.Weight))
-                        {
-                            <p><strong>Weight:</strong> @Model.Product.Weight</p>
-                        }
-                        @if (!string.IsNullOrEmpty(Model.Product.Dimensions))
-                        {
-                            <p><strong>Dimensions:</strong> @Model.Product.Dimensions</p>
-                        }
-                        @if (Model.Product.UnitsInStock.HasValue)
-                        {
-                            <p><strong>Units In Stock:</strong> @Model.Product.UnitsInStock</p>
+                            <a asp-page="/Identity/Account/Login" class="btn btn-primary btn-lg">
+                                <i class="bi bi-person"></i> Login to Add to Cart
+                            </a>
                         }
                     </div>
                 </div>
 
-                <!-- Out of Stock Alert -->
-                @if (Model.Product.OutOfStock)
+                <!-- Product Description -->
+                @if (!string.IsNullOrEmpty(Model.Product.Description))
                 {
-                    <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle"></i> This product is currently out of stock.
-                    </div>
-                }
-
-                <!-- Add to Cart -->
-                @if (User.Identity?.IsAuthenticated == true && !Model.Product.OutOfStock)
-                {
-                    <button type="button" class="btn btn-primary btn-lg add-to-cart" data-product-id="@Model.Product.Id" data-product-name="@Model.Product.Name">
-                        <i class="bi bi-cart-plus"></i> Add to Cart
-                    </button>
-                }
-                else if (Model.Product.OutOfStock)
-                {
-                    <button type="button" class="btn btn-secondary btn-lg" disabled>
-                        <i class="bi bi-cart-plus"></i> Out of Stock
-                    </button>
-                }
-                else
-                {
-                    <a asp-page="/Identity/Account/Login" class="btn btn-primary btn-lg">
-                        <i class="bi bi-person"></i> Login to Add to Cart
-                    </a>
-                }
-            </div>
-        </div>
-
-        <!-- Product Description -->
-        @if (!string.IsNullOrEmpty(Model.Product.Description))
-        {
-            <div class="row mt-5">
-                <div class="col-12">
-                    <h4>Description</h4>
-                    <div class="card">
-                        <div class="card-body">
-                            @Html.Raw(Model.Product.Description)
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <h4>Description</h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    @Html.Raw(Model.Product.Description)
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        }
+                }
 
-        <!-- Product Options -->
-        @if (Model.ProductOptions.Any())
-        {
-            <div class="row mt-5">
-                <div class="col-12">
-                    <h4>Product Options</h4>
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Value</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var option in Model.ProductOptions)
-                                {
-                                    <tr>
-                                        <td>@option.OptionType</td>
-                                        <td>@option.OptionValue</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                <!-- Product Options -->
+                @if (Model.ProductOptions.Any())
+                {
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <h4>Product Options</h4>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var option in Model.ProductOptions)
+                                        {
+                                            <tr>
+                                                <td>@option.OptionType</td>
+                                                <td>@option.OptionValue</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-danger">
+                    <p>Product not found.</p>
                 </div>
-            </div>
-        }
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <p>Product not found.</p>
+                <a asp-page="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Products
+                </a>
+            }
         </div>
-        <a asp-page="Index" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Back to Products
-        </a>
-    }
+    </div>
 </div>
 
 @section Scripts {
