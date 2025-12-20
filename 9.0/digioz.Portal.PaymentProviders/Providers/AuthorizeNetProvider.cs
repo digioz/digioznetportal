@@ -95,8 +95,8 @@ namespace digioz.Portal.PaymentProviders.Providers
                 { "x_card_num", request.CardNumber ?? "" },
                 { "x_exp_date", $"{request.ExpirationMonth}/{request.ExpirationYear}" },
                 { "x_card_code", request.CardCode ?? "" },
-                // Convert cents back to dollars with 2 decimal places (request.Amount is in cents)
-                { "x_amount", (request.Amount / 100m).ToString("F2") },
+                // Amount is already in dollars, use it directly
+                { "x_amount", request.Amount.ToString("F2") },
                 { "x_currency_code", request.CurrencyCode },
                 { "x_description", request.Description ?? "" },
                 { "x_invoice_num", request.InvoiceNumber ?? "" },

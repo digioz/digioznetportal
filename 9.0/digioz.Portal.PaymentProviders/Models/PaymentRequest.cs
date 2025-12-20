@@ -11,7 +11,7 @@ namespace digioz.Portal.PaymentProviders.Models
         public string? TransactionId { get; set; }
 
         /// <summary>
-        /// The amount to charge in the smallest currency unit (e.g., cents for USD).
+        /// The amount to charge in dollars (e.g., 19.90 for $19.90).
         /// </summary>
         public decimal Amount { get; set; }
 
