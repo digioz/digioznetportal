@@ -60,9 +60,7 @@ namespace digioz.Portal.Web.Pages.Store
             try
             {
                 // Find the pending order by PayPal order ID (stored in TrxId)
-                var order = _orderService.GetAll()
-                    .Where(o => o.TrxId == token && o.UserId == userId && o.TrxResponseCode == "PENDING")
-                    .FirstOrDefault();
+                var order = _orderService.GetByTokenAndUserId(token, userId, "PENDING");
 
                 if (order == null)
                 {
@@ -151,6 +149,11 @@ namespace digioz.Portal.Web.Pages.Store
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error capturing PayPal payment for token {Token}", token);
+
+                var order = _orderService.GetByTokenAndUserId(token, userId);
+                var orderId = order?.Id ?? "Unknown";
+
+                LogCheckoutError(ex, orderId);
 
                 TempData["Error"] = "An error occurred processing your payment. Please contact support.";
                 return RedirectToPage("/Store/Index");

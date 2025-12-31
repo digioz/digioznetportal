@@ -126,13 +126,10 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Product
             else
             {
                 // Delete all options if none are provided
-                if (Item != null)
+                var existingOptions = _optionService.GetAll().Where(o => o.ProductId == Item.Id).ToList();
+                foreach (var option in existingOptions)
                 {
-                    var existingOptions = _optionService.GetAll().Where(o => o.ProductId == Item.Id).ToList();
-                    foreach (var option in existingOptions)
-                    {
-                        _optionService.Delete(option.Id);
-                    }
+                    _optionService.Delete(option.Id);
                 }
             }
 

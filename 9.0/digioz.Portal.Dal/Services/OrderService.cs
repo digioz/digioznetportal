@@ -100,5 +100,21 @@ namespace digioz.Portal.Dal.Services
 
             return orders.Count;
         }
+
+        public Order GetByTokenAndUserId(string token, string userId, string responseCode = null)
+        {
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(userId))
+                return null;
+
+            var query = _context.Orders
+                .Where(o => o.TrxId == token && o.UserId == userId);
+
+            if (!string.IsNullOrEmpty(responseCode))
+            {
+                query = query.Where(o => o.TrxResponseCode == responseCode);
+            }
+
+            return query.FirstOrDefault();
+        }
     }
 }

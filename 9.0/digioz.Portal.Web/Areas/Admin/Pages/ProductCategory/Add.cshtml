@@ -54,7 +54,7 @@
                 .create(document.querySelector('#editor'))
                 .then(editor => {
                     window.__ck = editor;
-                    // set editor editable area min-height to roughly30 lines (fallback)
+                    // set editor editable area min-height to roughly 30 lines (fallback)
                     try { editor.ui.view.editable.element.style.minHeight = '30em'; } catch(e){}
                     const form = document.querySelector('form');
                     form.addEventListener('submit', function(){
