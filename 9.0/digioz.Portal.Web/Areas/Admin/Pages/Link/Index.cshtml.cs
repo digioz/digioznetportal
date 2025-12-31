@@ -25,42 +25,27 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
         [BindProperty(SupportsGet = true)] public int PageSize { get; set; } =10;
         [BindProperty(SupportsGet = true)] public string VisibilityFilter { get; set; } = "all";
         [BindProperty(SupportsGet = true)] public int? CategoryFilter { get; set; }
+        [BindProperty(SupportsGet = true)] public string? SearchQuery { get; set; }
         public int TotalCount { get; private set; }
         public int TotalPages => (int)Math.Ceiling((double)TotalCount / Math.Max(1, PageSize));
 
         public void OnGet()
         {
-            var all = _service.GetAll().OrderByDescending(p => p.Id).ToList();
-
-            // Apply visibility filter
-            if (!string.IsNullOrWhiteSpace(VisibilityFilter))
-            {
-                switch (VisibilityFilter.ToLower())
-                {
-                    case "visible":
-                        all = all.Where(l => l.Visible).ToList();
-                        break;
-                    case "notvisible":
-                        all = all.Where(l => !l.Visible).ToList();
-                        break;
-                    case "all":
-                    default:
-                        // No filter, show all
-                        break;
-                }
-            }
-
-            // Apply category filter
-            if (CategoryFilter.HasValue && CategoryFilter.Value > 0)
-            {
-                all = all.Where(l => l.LinkCategory == CategoryFilter.Value).ToList();
-            }
-
-            TotalCount = all.Count;
             if (PageNumber <1) PageNumber =1;
             if (PageSize <1) PageSize =10;
             var skip = (PageNumber -1) * PageSize;
-            Items = all.Skip(skip).Take(PageSize).ToList();
+
+            // Use the new AdminSearch method from the service layer
+            Items = _service.AdminSearch(
+                SearchQuery, 
+                VisibilityFilter ?? "all", 
+                CategoryFilter, 
+                skip, 
+                PageSize, 
+                out int totalCount
+            );
+            
+            TotalCount = totalCount;
 
             // Preload categories dictionary for display
             var categories = _categoryService.GetAll().ToList();
@@ -80,7 +65,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
                 }));
         }
 
-        public IActionResult OnPostToggleVisibility(int id, int pageNumber, string visibilityFilter = "all", int? categoryFilter = null)
+        public IActionResult OnPostToggleVisibility(int id, int pageNumber, string visibilityFilter = "all", int? categoryFilter = null, string? searchQuery = null)
         {
             var link = _service.Get(id);
             if (link != null)
@@ -89,7 +74,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
                 _service.Update(link);
             }
 
-            return RedirectToPage(new { pageNumber, visibilityFilter, categoryFilter });
+            return RedirectToPage(new { pageNumber, visibilityFilter, categoryFilter, searchQuery });
         }
     }
 }

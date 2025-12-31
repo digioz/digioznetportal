@@ -97,5 +97,52 @@ namespace digioz.Portal.Dal.Services
                 .Take(take)
                 .ToList();
         }
+
+        public List<Link> AdminSearch(string searchQuery, string visibilityFilter, int? categoryFilter, int skip, int take, out int totalCount)
+        {
+            var q = _context.Links.AsQueryable();
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                var searchTerm = searchQuery.Trim().ToLower();
+                q = q.Where(l => 
+                    (!string.IsNullOrWhiteSpace(l.Name) && l.Name.ToLower().Contains(searchTerm)) ||
+                    (!string.IsNullOrWhiteSpace(l.Url) && l.Url.ToLower().Contains(searchTerm))
+                );
+            }
+
+            // Apply visibility filter
+            if (!string.IsNullOrWhiteSpace(visibilityFilter))
+            {
+                switch (visibilityFilter.ToLower())
+                {
+                    case "visible":
+                        q = q.Where(l => l.Visible);
+                        break;
+                    case "notvisible":
+                        q = q.Where(l => !l.Visible);
+                        break;
+                    case "all":
+                    default:
+                        // No filter, show all
+                        break;
+                }
+            }
+
+            // Apply category filter
+            if (categoryFilter.HasValue && categoryFilter.Value > 0)
+            {
+                q = q.Where(l => l.LinkCategory == categoryFilter.Value);
+            }
+
+            totalCount = q.Count();
+            
+            return q
+                .OrderByDescending(l => l.Id)
+                .Skip(skip)
+                .Take(take)
+                .ToList();
+        }
     }
 }
