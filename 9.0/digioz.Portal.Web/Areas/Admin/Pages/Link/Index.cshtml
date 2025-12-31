@@ -17,7 +17,27 @@
 			<a class="btn btn-sm btn-primary" asp-area="Admin" asp-page="/Link/Add">Add Link</a>
 		</div>
 	</div>
-	<div class="card-body p-0">
+	<div class="card-body">
+		<form method="get" class="row g-3 mb-3">
+			<div class="col-md-4">
+				<label for="visibilityFilter" class="form-label">Visibility</label>
+				<select id="visibilityFilter" name="VisibilityFilter" class="form-select" onchange="this.form.submit()">
+					<option value="all" selected="@(Model.VisibilityFilter == "all")">All</option>
+					<option value="visible" selected="@(Model.VisibilityFilter == "visible")">Visible</option>
+					<option value="notvisible" selected="@(Model.VisibilityFilter == "notvisible")">Not Visible</option>
+				</select>
+			</div>
+			<div class="col-md-4">
+				<label for="categoryFilter" class="form-label">Category</label>
+				<select id="categoryFilter" name="CategoryFilter" class="form-select" onchange="this.form.submit()">
+					@foreach (var option in Model.CategoryFilterOptions)
+					{
+						<option value="@option.Value" selected="@option.Selected">@option.Text</option>
+					}
+				</select>
+			</div>
+			<input type="hidden" name="PageNumber" value="1" />
+		</form>
 		<div class="table-responsive">
 			<table class="table table-sm table-hover mb-0 align-middle">
 				<thead class="table-light">
@@ -49,6 +69,8 @@
 									<form method="post" asp-page-handler="ToggleVisibility" class="d-inline">
 										<input type="hidden" name="id" value="@item.Id" />
 										<input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+										<input type="hidden" name="visibilityFilter" value="@Model.VisibilityFilter" />
+										<input type="hidden" name="categoryFilter" value="@Model.CategoryFilter" />
 										<button type="submit" 
 												class="btn btn-link p-0 text-decoration-none"
 												title="Click to toggle visibility">
