@@ -16,5 +16,8 @@ namespace digioz.Portal.Dal.Services.Interfaces
         // Bulk operations for performance
         int DeleteByUserId(string userId);
         int ReassignByUserId(string fromUserId, string toUserId);
+        
+        // Get order by PayPal token and user
+        Order GetByTokenAndUserId(string token, string userId, string responseCode = null);
     }
 }

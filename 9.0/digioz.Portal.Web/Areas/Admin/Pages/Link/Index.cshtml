@@ -2,6 +2,7 @@
 @model digioz.Portal.Web.Areas.Admin.Pages.Link.IndexModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @addTagHelper *, LazZiya.TagHelpers
+@using digioz.Portal.Utilities
 @{
 	ViewBag.Title = "Links";
 	Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
@@ -17,14 +18,52 @@
 			<a class="btn btn-sm btn-primary" asp-area="Admin" asp-page="/Link/Add">Add Link</a>
 		</div>
 	</div>
-	<div class="card-body p-0">
+	<div class="card-body">
+		<form method="get" class="row g-3 mb-3">
+			<div class="col-md-3">
+				<label for="searchQuery" class="form-label">Search</label>
+				<input type="text" 
+					   id="searchQuery" 
+					   name="SearchQuery" 
+					   class="form-control" 
+					   placeholder="Search by name or URL..." 
+					   value="@Model.SearchQuery" />
+			</div>
+			<div class="col-md-3">
+				<label for="visibilityFilter" class="form-label">Visibility</label>
+				<select id="visibilityFilter" name="VisibilityFilter" class="form-select" onchange="this.form.submit()">
+					<option value="all" selected="@(Model.VisibilityFilter == "all" ? "selected" : null)">All</option>
+					<option value="visible" selected="@(Model.VisibilityFilter == "visible" ? "selected" : null)">Visible</option>
+					<option value="notvisible" selected="@(Model.VisibilityFilter == "notvisible" ? "selected" : null)">Not Visible</option>
+				</select>
+			</div>
+			<div class="col-md-3">
+				<label for="categoryFilter" class="form-label">Category</label>
+				<select id="categoryFilter" name="CategoryFilter" class="form-select" onchange="this.form.submit()">
+					@foreach (var option in Model.CategoryFilterOptions)
+					{
+						<option value="@option.Value" selected="@(option.Selected ? "selected" : null)">@option.Text</option>
+					}
+				</select>
+			</div>
+			<div class="col-md-3 d-flex align-items-end gap-2">
+				<button type="submit" class="btn btn-primary flex-fill">
+					<i class="bi bi-search"></i> Search
+				</button>
+				<a asp-area="Admin" asp-page="/Link/Index" class="btn btn-outline-secondary flex-fill">
+					<i class="bi bi-x-circle"></i> Clear
+				</a>
+			</div>
+			<input type="hidden" name="PageNumber" value="1" />
+		</form>
 		<div class="table-responsive">
 			<table class="table table-sm table-hover mb-0 align-middle">
 				<thead class="table-light">
 					<tr>
 						<th>Name</th>
 						<th>Category</th>
-						<th>Url</th>
+						<th>Description</th>
+						<th class="text-center" style="width:80px">Link</th>
 						<th class="text-center">Visible</th>
 						<th style="width:300px" class="text-end">Action</th>
 					</tr>
@@ -34,21 +73,30 @@
 					{
 						foreach (var item in Model.Items)
 						{
+							var strippedDescription = string.IsNullOrWhiteSpace(item.Description) ? "" : StringUtils.StripHtmlFromString(item.Description);
+							var description = strippedDescription.Length > 100 ? strippedDescription.Substring(0, 100) + "..." : strippedDescription;
 							<tr>
 								<td>@item.Name</td>
 								<td>@(Model.CategoryNames.TryGetValue(item.LinkCategory, out var cn) ? cn : "-")</td>
 								<td>
+									<span title="@strippedDescription">@description</span>
+								</td>
+								<td class="text-center">
 									<a href="@item.Url" 
 									   target="_blank" 
 									   rel="noopener noreferrer"
-									   title="@(string.IsNullOrWhiteSpace(item.Description) ? item.Url : item.Description)">
-										@item.Url
+									   class="btn btn-sm btn-outline-primary px-2 py-0"
+									   title="@item.Url">
+										<i class="bi bi-box-arrow-up-right"></i>
 									</a>
 								</td>
 								<td class="text-center">
 									<form method="post" asp-page-handler="ToggleVisibility" class="d-inline">
 										<input type="hidden" name="id" value="@item.Id" />
 										<input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+										<input type="hidden" name="visibilityFilter" value="@Model.VisibilityFilter" />
+										<input type="hidden" name="categoryFilter" value="@Model.CategoryFilter" />
+										<input type="hidden" name="searchQuery" value="@Model.SearchQuery" />
 										<button type="submit" 
 												class="btn btn-link p-0 text-decoration-none"
 												title="Click to toggle visibility">
@@ -73,7 +121,7 @@
 					}
 					else
 					{
-						<tr><td colspan="5" class="text-center text-muted py-4">No links found.</td></tr>
+						<tr><td colspan="6" class="text-center text-muted py-4">No links found.</td></tr>
 					}
 				</tbody>
 			</table>

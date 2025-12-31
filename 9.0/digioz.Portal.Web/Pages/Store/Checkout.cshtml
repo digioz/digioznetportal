@@ -1,3 +1,324 @@
 @page
-@model CheckoutModel
-<h2>Store Checkout</h2>
+@model digioz.Portal.Web.Pages.Store.CheckoutModel
+@using System.Security.Claims
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Checkout";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1 class="mb-4">Checkout</h1>
+
+                    <form method="post">
+                        <!-- Error Messages -->
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Any()))
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <h4 class="alert-heading">
+                                    <i class="bi bi-exclamation-circle"></i> Payment Failed
+                                </h4>
+                                @foreach (var modelState in ViewData.ModelState.Values)
+                                {
+                                    @foreach (var error in modelState.Errors)
+                                    {
+                                        <div>@error.ErrorMessage</div>
+                                    }
+                                }
+                                <hr>
+                                <p class="mb-0">
+                                    <strong>Please check your information and try again.</strong> If the problem persists, please contact support.
+                                </p>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+
+                        <!-- Order Summary -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Order Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                @if (Model.CartItems.Any())
+                                {
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th>Quantity</th>
+                                                    <th>Price</th>
+                                                    <th>Subtotal</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in Model.CartItems)
+                                                {
+                                                    <tr>
+                                                        <td>@item.ProductName</td>
+                                                        <td>@item.Quantity</td>
+                                                        <td>@item.Price.ToString("C")</td>
+                                                        <td>@string.Format("{0:C}", item.Quantity * item.Price)</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="table-light fw-bold">
+                                                    <td colspan="3" class="text-end">Total:</td>
+                                                    <td>@Model.CartTotal.ToString("C")</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="text-muted">Your cart is empty.</p>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Billing Information -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Billing Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="Order.FirstName" class="form-label">First Name</label>
+                                        <input asp-for="Order.FirstName" class="form-control" required />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="Order.LastName" class="form-label">Last Name</label>
+                                        <input asp-for="Order.LastName" class="form-control" required />
+                                    </div>
+                                    <div class="col-12">
+                                        <label asp-for="Order.Email" class="form-label">Email</label>
+                                        <input asp-for="Order.Email" class="form-control" type="email" required />
+                                    </div>
+                                    <div class="col-12">
+                                        <label asp-for="Order.BillingAddress" class="form-label">Billing Address</label>
+                                        <input asp-for="Order.BillingAddress" class="form-control" required />
+                                    </div>
+                                    <div class="col-12">
+                                        <label asp-for="Order.BillingAddress2" class="form-label">Billing Address Line 2</label>
+                                        <input asp-for="Order.BillingAddress2" class="form-control" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="Order.BillingCity" class="form-label">City</label>
+                                        <input asp-for="Order.BillingCity" class="form-control" required />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label asp-for="Order.BillingState" class="form-label">State/Province</label>
+                                        <input asp-for="Order.BillingState" class="form-control" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label asp-for="Order.BillingZip" class="form-label">ZIP/Postal Code</label>
+                                        <input asp-for="Order.BillingZip" class="form-control" required />
+                                    </div>
+                                    <div class="col-12">
+                                        <label asp-for="Order.BillingCountry" class="form-label">Country</label>
+                                        <input asp-for="Order.BillingCountry" class="form-control" required />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Information -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Shipping Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="sameAsBilling" checked onchange="toggleShippingAddress()" />
+                                    <label class="form-check-label" for="sameAsBilling">
+                                        Shipping address same as billing
+                                    </label>
+                                </div>
+                                <div id="shippingFields" style="display: none;">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label asp-for="Order.ShippingAddress" class="form-label">Shipping Address</label>
+                                            <input asp-for="Order.ShippingAddress" class="form-control" />
+                                        </div>
+                                        <div class="col-12">
+                                            <label asp-for="Order.ShippingAddress2" class="form-label">Shipping Address Line 2</label>
+                                            <input asp-for="Order.ShippingAddress2" class="form-control" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label asp-for="Order.ShippingCity" class="form-label">City</label>
+                                            <input asp-for="Order.ShippingCity" class="form-control" />
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label asp-for="Order.ShippingState" class="form-label">State/Province</label>
+                                            <input asp-for="Order.ShippingState" class="form-control" />
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label asp-for="Order.ShippingZip" class="form-label">ZIP/Postal Code</label>
+                                            <input asp-for="Order.ShippingZip" class="form-control" />
+                                        </div>
+                                        <div class="col-12">
+                                            <label asp-for="Order.ShippingCountry" class="form-label">Country</label>
+                                            <input asp-for="Order.ShippingCountry" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Information -->
+                        @if (!Model.IsPayPal)
+                        {
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Payment Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label asp-for="Order.Ccnumber" class="form-label">Card Number</label>
+                                            <input asp-for="Order.Ccnumber" class="form-control" placeholder="1234 5678 9012 3456" required />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label asp-for="Order.Ccexp" class="form-label">Expiration Date</label>
+                                            <input asp-for="Order.Ccexp" class="form-control" placeholder="MM/YY" required />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label asp-for="Order.CccardCode" class="form-label">CVV</label>
+                                            <input asp-for="Order.CccardCode" class="form-control" placeholder="123" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Hidden fields for PayPal - set dummy values to pass validation -->
+                            <input type="hidden" asp-for="Order.Ccnumber" value="0000000000000000" />
+                            <input type="hidden" asp-for="Order.Ccexp" value="01/99" />
+                            <input type="hidden" asp-for="Order.CccardCode" value="000" />
+                            
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Payment Method</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-info mb-0" role="alert">
+                                        <i class="bi bi-info-circle"></i>
+                                        <strong>PayPal Payment</strong><br />
+                                        You will be redirected to PayPal to complete your payment securely.
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="d-flex gap-2">
+                            <a asp-page="List" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Cart
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg flex-grow-1">
+                                @if (Model.IsPayPal)
+                                {
+                                    <i class="bi bi-paypal"></i> <text>Continue to PayPal (@Model.CartTotal.ToString("C"))</text>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-credit-card"></i> <text>Place Order and Pay (@Model.CartTotal.ToString("C"))</text>
+                                }
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Order Summary Sidebar -->
+                <div class="col-lg-4">
+                    <div class="card sticky-top" style="top: 20px;">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Order Total</h5>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.CartItems.Any())
+                            {
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td>Subtotal:</td>
+                                        <td class="text-end">@Model.CartTotal.ToString("C")</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Shipping:</td>
+                                        <td class="text-end">TBD</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tax:</td>
+                                        <td class="text-end">TBD</td>
+                                    </tr>
+                                    <tr class="table-light fw-bold">
+                                        <td>Total:</td>
+                                        <td class="text-end">@Model.CartTotal.ToString("C")</td>
+                                    </tr>
+                                </table>
+                            }
+                            else
+                            {
+                                <p class="text-muted">Your cart is empty.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleShippingAddress() {
+            const checkbox = document.getElementById('sameAsBilling');
+            const shippingFields = document.getElementById('shippingFields');
+            shippingFields.style.display = checkbox.checked ? 'none' : 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add form submit logging
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    console.log('Form submit event fired');
+                    console.log('Form is valid:', form.checkValidity());
+                    
+                    if (!form.checkValidity()) {
+                        console.log('Form validation failed - preventing submission');
+                        e.preventDefault();
+                        form.reportValidity();
+                        return false;
+                    }
+                    
+                    console.log('Form submitting to server...');
+                });
+            }
+            
+            // Razor generates id="Order_Ccexp" for asp-for="Order.Ccexp"
+            const expInput = document.getElementById('Order_Ccexp');
+
+            if (!expInput) return;
+
+            expInput.addEventListener('input', function (e) {
+                let value = e.target.value.replace(/[^\d]/g, ''); // keep digits only
+
+                // Insert slash after two digits
+                if (value.length > 2) {
+                    value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                }
+
+                e.target.value = value;
+            });
+        });
+    </script>
+}

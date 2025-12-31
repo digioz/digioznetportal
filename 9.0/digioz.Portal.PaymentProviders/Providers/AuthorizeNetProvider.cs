@@ -15,9 +15,13 @@ namespace digioz.Portal.PaymentProviders.Providers
 
         public override string Name => "AuthorizeNet";
 
-        public AuthorizeNetProvider(HttpClient? httpClient = null)
+        /// <summary>
+        /// Constructor that accepts HttpClient via dependency injection.
+        /// </summary>
+        /// <param name="httpClient">HttpClient instance managed by the DI container.</param>
+        public AuthorizeNetProvider(HttpClient httpClient)
         {
-            _httpClient = httpClient ?? new HttpClient();
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
         public override bool ValidateConfiguration()
@@ -91,6 +95,7 @@ namespace digioz.Portal.PaymentProviders.Providers
                 { "x_card_num", request.CardNumber ?? "" },
                 { "x_exp_date", $"{request.ExpirationMonth}/{request.ExpirationYear}" },
                 { "x_card_code", request.CardCode ?? "" },
+                // Amount is already in dollars, use it directly
                 { "x_amount", request.Amount.ToString("F2") },
                 { "x_currency_code", request.CurrencyCode },
                 { "x_description", request.Description ?? "" },

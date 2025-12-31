@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using digioz.Portal.Web.Hubs;
 using digioz.Portal.EmailProviders.Extensions;
 using System.Net;
+using digioz.Portal.PaymentProviders.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -121,6 +122,48 @@ builder.Services.AddScoped<LinkCheckerService>();
 builder.Services.AddEmailProviders();
 builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>();
 
+// Configure HttpClient for payment providers BEFORE registering payment providers
+builder.Services.AddHttpClient<digioz.Portal.PaymentProviders.Providers.AuthorizeNetProvider>()
+    .ConfigureHttpClient(client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(30);
+    });
+
+builder.Services.AddHttpClient<digioz.Portal.PaymentProviders.Providers.PayPalProvider>()
+    .ConfigureHttpClient(client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(30);
+    });
+
+// Add payment providers configuration
+builder.Services.AddPaymentProviders(paymentProviderBuilder =>
+{
+    var configuration = builder.Configuration;
+
+    var authNetConfig = configuration.GetSection("PaymentProviders:AuthorizeNet");
+    if (authNetConfig.Exists())
+    {
+        paymentProviderBuilder.ConfigureProvider("AuthorizeNet", config =>
+        {
+            config.ApiKey = authNetConfig["ApiKey"];
+            config.ApiSecret = authNetConfig["ApiSecret"];
+            config.IsTestMode = authNetConfig.GetValue<bool>("IsTestMode");
+        });
+    }
+
+    var paypalConfig = configuration.GetSection("PaymentProviders:PayPal");
+    if (paypalConfig.Exists())
+    {
+        paymentProviderBuilder.ConfigureProvider("PayPal", config =>
+        {
+            // REST: map ClientId/ClientSecret into generic fields
+            config.ApiKey = paypalConfig["ClientId"];       // ClientId
+            config.ApiSecret = paypalConfig["ClientSecret"]; // ClientSecret
+            config.IsTestMode = paypalConfig.GetValue<bool>("IsTestMode");
+        });
+    }
+});
+
 builder.Services.AddMemoryCache();
 
 // Recaptcha verification needs HttpClient
@@ -185,6 +228,8 @@ builder.Services.AddVisitorInfoLogging();
 
 // SignalR registration
 builder.Services.AddSignalR();
+
+builder.Services.AddScoped<IPayPalRedirectService, PayPalRedirectService>();
 
 var app = builder.Build();
 
@@ -253,6 +298,9 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Map API controllers with attribute routing
+app.MapControllers();
 
 // Remove MapStaticAssets() and use traditional MapRazorPages()
 app.MapRazorPages();

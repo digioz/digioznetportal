@@ -55,4 +55,9 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Api\Controllers\" />
+    <Folder Include="Models\AppStart\" />
+  </ItemGroup>
+
 </Project>

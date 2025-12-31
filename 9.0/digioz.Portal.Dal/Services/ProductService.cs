@@ -53,5 +53,12 @@ namespace digioz.Portal.Dal.Services
                 .Where(p => p.Id == id)
                 .ExecuteUpdate(setters => setters.SetProperty(p => p.Views, p => p.Views + 1));
         }
+
+        public void ClearProductCategory(string categoryId)
+        {
+            _context.Products
+                .Where(p => p.ProductCategoryId == categoryId)
+                .ExecuteUpdate(setters => setters.SetProperty(p => p.ProductCategoryId, (string)null));
+        }
     }
 }

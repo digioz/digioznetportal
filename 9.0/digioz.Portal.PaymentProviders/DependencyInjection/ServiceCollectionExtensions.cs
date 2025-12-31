@@ -29,9 +29,9 @@ namespace digioz.Portal.PaymentProviders.DependencyInjection
             // Allow custom configuration
             configure?.Invoke(builder);
 
-            // Register factory
-            services.AddSingleton(sp => builder.Build(sp));
-            services.AddSingleton<IPaymentProviderFactory>(sp => sp.GetRequiredService<PaymentProviderFactory>());
+            // Register factory as singleton (factory itself is stateless)
+            // The factory will create providers on-demand from the scoped service provider
+            services.AddSingleton<IPaymentProviderFactory>(sp => builder.Build(sp));
 
             return services;
         }
@@ -74,15 +74,14 @@ namespace digioz.Portal.PaymentProviders.DependencyInjection
             PaymentProviderConfig config)
             where T : class, IPaymentProvider
         {
-            services.AddScoped<T>();
-            services.AddSingleton(sp =>
+            services.AddTransient<T>();
+            services.AddSingleton<IPaymentProviderFactory>(sp =>
             {
                 var factory = new PaymentProviderFactory(sp);
                 factory.RegisterProvider(providerName, typeof(T));
                 factory.RegisterConfiguration(providerName, config);
                 return factory;
             });
-            services.AddSingleton<IPaymentProviderFactory>(sp => sp.GetRequiredService<PaymentProviderFactory>());
 
             return services;
         }
@@ -117,7 +116,9 @@ namespace digioz.Portal.PaymentProviders.DependencyInjection
                 throw new ArgumentException("Provider name cannot be empty.", nameof(name));
 
             _factory.RegisterProvider(name, typeof(T));
-            _services.AddScoped<T>();
+            // Register as Transient instead of Scoped to avoid DI scope issues
+            // Payment providers are stateless after initialization and don't need to be scoped
+            _services.AddTransient<T>();
 
             return this;
         }

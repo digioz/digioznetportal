@@ -53,7 +53,7 @@ namespace digioz.Portal.PaymentProviders.Examples
             var request = new PaymentRequest
             {
                 TransactionId = Guid.NewGuid().ToString(),
-                Amount = Math.Round(amount * 100, 0), // Convert to cents (smallest currency unit) with rounding
+                Amount = amount, // Amount in dollars (e.g., 19.90 for $19.90)
                 CurrencyCode = "USD",
                 CardNumber = cardNumber,
                 ExpirationMonth = expMonth,
@@ -93,10 +93,8 @@ namespace digioz.Portal.PaymentProviders.Examples
 
             var provider = _paymentProviderFactory.CreateProvider(providerName);
 
-            // Convert amount to cents if provided, with rounding to handle floating-point precision
-            var amount = refundAmount.HasValue ? Math.Round(refundAmount.Value * 100, 0) : (decimal?)null;
-
-            var response = await provider.RefundAsync(transactionId, amount);
+            // Amount is already in dollars, pass it directly
+            var response = await provider.RefundAsync(transactionId, refundAmount);
 
             return response;
         }
