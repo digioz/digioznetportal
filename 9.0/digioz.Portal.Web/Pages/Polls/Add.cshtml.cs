@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Dal.Services.Interfaces;
@@ -14,10 +15,13 @@ namespace digioz.Portal.Pages.Polls
     {
         private readonly IPollService _pollService;
         private readonly IPollAnswerService _answerService;
-        public AddModel(IPollService pollService, IPollAnswerService answerService)
+        private readonly UserManager<IdentityUser> _userManager;
+        
+        public AddModel(IPollService pollService, IPollAnswerService answerService, UserManager<IdentityUser> userManager)
         {
             _pollService = pollService;
             _answerService = answerService;
+            _userManager = userManager;
         }
 
         [BindProperty] public digioz.Portal.Bo.Poll Item { get; set; } = new digioz.Portal.Bo.Poll { Id = Guid.NewGuid().ToString(), DateCreated = DateTime.UtcNow };        
@@ -25,7 +29,7 @@ namespace digioz.Portal.Pages.Polls
 
         public void OnGet() { }
 
-        public IActionResult OnPost()
+        public async System.Threading.Tasks.Task<IActionResult> OnPostAsync()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Forbid();
@@ -54,6 +58,21 @@ namespace digioz.Portal.Pages.Polls
             Item.Id = string.IsNullOrEmpty(Item.Id) ? Guid.NewGuid().ToString() : Item.Id;
             Item.DateCreated = DateTime.UtcNow;
             Item.UserId = userId;
+
+            var user = await _userManager.FindByIdAsync(userId);
+            var isAdmin = user != null && await _userManager.IsInRoleAsync(user, "Administrator");
+            
+            if (isAdmin)
+            {
+                Item.Visible = true;
+                Item.Approved = true;
+            }
+            else
+            {
+                Item.Visible = false;
+                Item.Approved = false;
+            }
+
             _pollService.Add(Item);
 
             // Add sanitized answers

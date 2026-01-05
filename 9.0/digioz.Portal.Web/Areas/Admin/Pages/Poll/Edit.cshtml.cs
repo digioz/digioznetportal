@@ -39,18 +39,21 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
 
         public IActionResult OnPost()
         {
-            // Sanitize poll question
             Item.Slug = InputSanitizer.SanitizePollQuestion(Item.Slug);
             
             if (!ModelState.IsValid) return Page();
             
+            if (Item.Visible != true)
+                Item.Visible = false;
+            
+            if (Item.Approved != true)
+                Item.Approved = false;
+            
             _service.Update(Item);
 
-            // Normalize helper
             string Norm(string s) => (s ?? string.Empty).Trim();
             string Key(string s) => Norm(s).ToLowerInvariant();
 
-            // Parse and sanitize requested answers from CSV
             var rawAnswers = (NewAnswersCsv ?? string.Empty)
                 .Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .Select(a => a.Trim())
@@ -58,7 +61,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
             
             var requested = InputSanitizer.SanitizePollAnswers(rawAnswers);
             
-            // Validate minimum answer count
             var answerValidation = InputSanitizer.ValidateList(requested, "answers", minCount: 2, maxCount: 50);
             if (answerValidation != null)
             {
@@ -69,7 +71,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
 
             var existing = _answerService.GetByPollId(Item.Id);
 
-            // Identify duplicates (keep first per normalized text)
             var dupIds = new List<string>();
             foreach (var grp in existing.GroupBy(a => Key(a.Answer)))
             {
@@ -77,7 +78,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
                 dupIds.AddRange(grp.Where(a => a.Id != keep.Id).Select(a => a.Id));
             }
 
-            // Identify answers to remove based on requested list (only when requested provided)
             var toRemoveByRequest = existing
                 .Where(e => requested.Count > 0 && !requested.Contains(Norm(e.Answer), StringComparer.OrdinalIgnoreCase))
                 .Select(e => e.Id)
@@ -90,7 +90,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
 
             var answersToKeepIds = existing.Select(a => a.Id).Except(answersToRemoveIds).ToHashSet();
 
-            // Use targeted retrieval for votes in this poll
             var votesForPoll = _voteService.GetByPollAnswerIds(existing.Select(a => a.Id));
             var votesToRemovedAnswers = votesForPoll.Where(v => answersToRemoveIds.Contains(v.PollAnswerId)).ToList();
             var affectedUserIds = votesToRemovedAnswers.Select(v => v.UserId).Distinct().ToList();
@@ -100,20 +99,16 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
                 bool hasOtherVote = votesForPoll.Any(v => v.UserId == uid && answersToKeepIds.Contains(v.PollAnswerId));
                 if (!hasOtherVote)
                 {
-                    // Only delete user vote record if the user will have no remaining votes for this poll
                     _usersVoteService.Delete(Item.Id, uid);
                 }
             }
 
-            // Remove votes and answers marked for deletion
             foreach (var ansId in answersToRemoveIds)
             {
-                // Use efficient bulk deletion at database level
                 _voteService.DeleteByAnswerId(ansId);
                 _answerService.Delete(ansId);
             }
 
-            // Add new answers (avoid duplicates by normalized text against kept answers)
             var keptNormalized = existing
                 .Where(a => answersToKeepIds.Contains(a.Id))
                 .Select(a => Norm(a.Answer))

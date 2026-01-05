@@ -27,6 +27,7 @@ namespace digioz.Portal.Dal.Services
         public List<Poll> GetLatest(int count)
         {
             return _context.Polls
+                .Where(p => p.Visible == true && p.Approved == true)
                 .OrderByDescending(p => p.DateCreated)
                 .Take(count)
                 .ToList();
@@ -35,7 +36,7 @@ namespace digioz.Portal.Dal.Services
         public List<Poll> GetLatestFeatured(int count)
         {
             return _context.Polls
-                .Where(p => p.Featured)
+                .Where(p => p.Featured && p.Visible == true && p.Approved == true)
                 .OrderByDescending(p => p.DateCreated)
                 .Take(count)
                 .ToList();

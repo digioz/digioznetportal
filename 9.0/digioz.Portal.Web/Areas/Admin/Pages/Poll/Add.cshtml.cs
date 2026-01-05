@@ -18,7 +18,13 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
             _answerService = answerService;
         }
 
-        [BindProperty] public digioz.Portal.Bo.Poll Item { get; set; } = new digioz.Portal.Bo.Poll { Id = Guid.NewGuid().ToString(), DateCreated = DateTime.UtcNow };
+        [BindProperty] public digioz.Portal.Bo.Poll Item { get; set; } = new digioz.Portal.Bo.Poll 
+        { 
+            Id = Guid.NewGuid().ToString(), 
+            DateCreated = DateTime.UtcNow,
+            Visible = true,
+            Approved = true
+        };
         [BindProperty] public string NewAnswersCsv { get; set; } = string.Empty;
 
         public void OnGet() { }
@@ -53,6 +59,13 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
             if (string.IsNullOrEmpty(Item.Id)) Item.Id = Guid.NewGuid().ToString();
             Item.DateCreated = DateTime.UtcNow;
             Item.UserId = userId;
+            
+            if (Item.Visible != true)
+                Item.Visible = false;
+            
+            if (Item.Approved != true)
+                Item.Approved = false;
+            
             _service.Add(Item);
 
             // Add sanitized answers

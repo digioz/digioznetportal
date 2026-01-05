@@ -19,6 +19,7 @@
                 <thead>
                     <tr>
                         <th>Question</th>
+                        <th>Status</th>
                         <th>Featured</th>
                         <th>Created</th>
                         <th>Closed</th>
@@ -31,8 +32,26 @@
                         foreach (var p in Model.Items)
                         {
                             var isOwner = isLoggedIn && p.UserId == Model.CurrentUserId;
+                            var isPublished = p.Visible == true && p.Approved == true;
                             <tr>
                                 <td>@p.Slug</td>
+                                <td>
+                                    @if (isPublished)
+                                    {
+                                        <span class="badge bg-success">Published</span>
+                                    }
+                                    else if (isOwner)
+                                    {
+                                        @if (p.Visible != true)
+                                        {
+                                            <span class="badge bg-warning text-dark">Not Visible</span>
+                                        }
+                                        @if (p.Approved != true)
+                                        {
+                                            <span class="badge bg-warning text-dark">Pending Approval</span>
+                                        }
+                                    }
+                                </td>
                                 <td>@(p.Featured ? "Yes" : "No")</td>
                                 <td>@p.DateCreated.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
                                 <td>@(p.IsClosed ? "Yes" : "No")</td>
@@ -49,7 +68,7 @@
                     }
                     else
                     {
-                        <tr><td colspan="5" class="text-muted">No polls found.</td></tr>
+                        <tr><td colspan="6" class="text-muted">No polls found.</td></tr>
                     }
                 </tbody>
             </table>
