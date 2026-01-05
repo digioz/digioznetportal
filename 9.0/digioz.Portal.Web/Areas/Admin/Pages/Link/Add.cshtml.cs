@@ -20,6 +20,9 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
         [BindProperty]
         public digioz.Portal.Bo.Link Item { get; set; } = new digioz.Portal.Bo.Link { Visible = true, Timestamp = DateTime.UtcNow };
 
+        [BindProperty]
+        public bool IsApproved { get; set; } = true;
+
         public SelectList CategoryList { get; private set; } = new SelectList(Enumerable.Empty<object>());
 
         public void OnGet()
@@ -52,6 +55,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
             }
 
             Item.Timestamp = DateTime.UtcNow;
+            Item.Approved = IsApproved;
             _service.Add(Item);
             return RedirectToPage("/Link/Index", new { area = "Admin" });
         }

@@ -15,12 +15,18 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
         { _service = service; _categoryService = categoryService; }
 
         [BindProperty] public digioz.Portal.Bo.Link? Item { get; set; }
+        
+        [BindProperty]
+        public bool IsApproved { get; set; }
+        
         public SelectList CategoryList { get; private set; } = new SelectList(Enumerable.Empty<object>());
 
         public IActionResult OnGet(int id)
         {
             Item = _service.Get(id);
             if (Item == null) return RedirectToPage("/Link/Index", new { area = "Admin" });
+            
+            IsApproved = Item.Approved ?? false;
             LoadCategories();
             return Page();
         }
@@ -47,7 +53,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
             existingLink.Description = Item.Description;
             existingLink.LinkCategory = Item.LinkCategory;
             existingLink.Visible = Item.Visible;
-            existingLink.Approved = Item.Approved;
+            existingLink.Approved = IsApproved;
             existingLink.Timestamp = DateTime.UtcNow;
 
             _service.Update(existingLink);
