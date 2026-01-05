@@ -31,24 +31,11 @@ namespace digioz.Portal.Pages.Polls
         {
             CurrentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             
-            var allPolls = _pollService.GetAll();
-            
-            var filteredPolls = allPolls.Where(p =>
-            {
-                bool isOwnPoll = !string.IsNullOrEmpty(CurrentUserId) && p.UserId == CurrentUserId;
-                bool isVisibleAndApproved = p.Visible == true && p.Approved == true;
-                
-                return isOwnPoll || isVisibleAndApproved;
-            })
-            .OrderByDescending(p => p.DateCreated)
-            .ToList();
-
-            TotalCount = filteredPolls.Count;
             if (PageNumber < 1) PageNumber = 1;
             if (PageSize < 1) PageSize = 5;
 
-            var skip = (PageNumber - 1) * PageSize;
-            Items = filteredPolls.Skip(skip).Take(PageSize).ToList();
+            Items = _pollService.GetPagedFiltered(PageNumber, PageSize, CurrentUserId, out var total);
+            TotalCount = total;
 
             if (!string.IsNullOrEmpty(CurrentUserId))
             {
