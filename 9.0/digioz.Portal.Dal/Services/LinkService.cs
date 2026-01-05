@@ -98,7 +98,7 @@ namespace digioz.Portal.Dal.Services
                 .ToList();
         }
 
-        public List<Link> AdminSearch(string searchQuery, string visibilityFilter, int? categoryFilter, int skip, int take, out int totalCount)
+        public List<Link> AdminSearch(string searchQuery, string visibilityFilter, string approvalFilter, int? categoryFilter, int skip, int take, out int totalCount)
         {
             var q = _context.Links.AsQueryable();
 
@@ -122,6 +122,24 @@ namespace digioz.Portal.Dal.Services
                         break;
                     case "notvisible":
                         q = q.Where(l => !l.Visible);
+                        break;
+                    case "all":
+                    default:
+                        // No filter, show all
+                        break;
+                }
+            }
+
+            // Apply approval filter
+            if (!string.IsNullOrWhiteSpace(approvalFilter))
+            {
+                switch (approvalFilter.ToLower())
+                {
+                    case "approved":
+                        q = q.Where(l => l.Approved == true);
+                        break;
+                    case "notapproved":
+                        q = q.Where(l => l.Approved == false || l.Approved == null);
                         break;
                     case "all":
                     default:

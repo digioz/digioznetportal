@@ -47,6 +47,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
             existingLink.Description = Item.Description;
             existingLink.LinkCategory = Item.LinkCategory;
             existingLink.Visible = Item.Visible;
+            existingLink.Approved = Item.Approved;
             existingLink.Timestamp = DateTime.UtcNow;
 
             _service.Update(existingLink);
