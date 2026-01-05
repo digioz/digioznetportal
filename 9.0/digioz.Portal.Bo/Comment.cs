@@ -17,5 +17,7 @@ namespace digioz.Portal.Bo
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public int Likes { get; set; }
+        public bool? Visible { get; set; }
+        public bool? Approved { get; set; }
     }
 }
