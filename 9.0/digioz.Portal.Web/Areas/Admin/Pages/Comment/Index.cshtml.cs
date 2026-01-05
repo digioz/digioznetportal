@@ -35,48 +35,39 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Comment
 
         public void OnGet()
         {
-            var all = _service.GetAll();
-            
-            // Get unique reference types for dropdown
-            ReferenceTypes = all
-                .Where(c => !string.IsNullOrEmpty(c.ReferenceType))
-                .Select(c => c.ReferenceType!)
-                .Distinct()
-                .OrderBy(r => r)
-                .ToList();
-
-            // Apply filters
-            var filtered = all.AsQueryable();
-
-            if (!string.IsNullOrEmpty(VisibleFilter))
-            {
-                if (VisibleFilter == "Visible")
-                    filtered = filtered.Where(c => c.Visible == true);
-                else if (VisibleFilter == "NotVisible")
-                    filtered = filtered.Where(c => c.Visible == false || c.Visible == null);
-            }
-
-            if (!string.IsNullOrEmpty(ApprovedFilter))
-            {
-                if (ApprovedFilter == "Approved")
-                    filtered = filtered.Where(c => c.Approved == true);
-                else if (ApprovedFilter == "NotApproved")
-                    filtered = filtered.Where(c => c.Approved == false || c.Approved == null);
-            }
-
-            if (!string.IsNullOrEmpty(ReferenceTypeFilter) && ReferenceTypeFilter != "All")
-            {
-                filtered = filtered.Where(c => c.ReferenceType == ReferenceTypeFilter);
-            }
-
-            var result = filtered.OrderByDescending(c => c.ModifiedDate ?? c.CreatedDate).ToList();
-
-            TotalCount = result.Count;
             if (PageNumber < 1) PageNumber = 1;
             if (PageSize < 1) PageSize = 10;
 
-            var skip = (PageNumber - 1) * PageSize;
-            Items = result.Skip(skip).Take(PageSize).ToList();
+            // Get distinct reference types for dropdown (database-level)
+            ReferenceTypes = _service.GetDistinctReferenceTypes();
+
+            // Parse filter parameters
+            bool? visibleFilterValue = null;
+            if (VisibleFilter == "Visible")
+                visibleFilterValue = true;
+            else if (VisibleFilter == "NotVisible")
+                visibleFilterValue = false;
+
+            bool? approvedFilterValue = null;
+            if (ApprovedFilter == "Approved")
+                approvedFilterValue = true;
+            else if (ApprovedFilter == "NotApproved")
+                approvedFilterValue = false;
+
+            string? referenceTypeFilterValue = null;
+            if (!string.IsNullOrEmpty(ReferenceTypeFilter) && ReferenceTypeFilter != "All")
+                referenceTypeFilterValue = ReferenceTypeFilter;
+
+            // Get filtered and paginated data (database-level)
+            Items = _service.GetPagedFiltered(
+                PageNumber, 
+                PageSize, 
+                visibleFilterValue, 
+                approvedFilterValue, 
+                referenceTypeFilterValue, 
+                out var total
+            );
+            TotalCount = total;
         }
 
         public IActionResult OnPostToggleVisible(string id)

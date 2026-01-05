@@ -139,5 +139,62 @@ namespace digioz.Portal.Dal.Services
                 .Take(take)
                 .ToList();
         }
+
+        public List<Comment> GetPagedFiltered(int pageNumber, int pageSize, bool? visibleFilter, bool? approvedFilter, string? referenceTypeFilter, out int totalCount)
+        {
+            var query = _context.Comments.AsNoTracking().AsQueryable();
+
+            // Apply visible filter
+            if (visibleFilter.HasValue)
+            {
+                if (visibleFilter.Value)
+                {
+                    query = query.Where(c => c.Visible == true);
+                }
+                else
+                {
+                    query = query.Where(c => c.Visible == false || c.Visible == null);
+                }
+            }
+
+            // Apply approved filter
+            if (approvedFilter.HasValue)
+            {
+                if (approvedFilter.Value)
+                {
+                    query = query.Where(c => c.Approved == true);
+                }
+                else
+                {
+                    query = query.Where(c => c.Approved == false || c.Approved == null);
+                }
+            }
+
+            // Apply reference type filter
+            if (!string.IsNullOrEmpty(referenceTypeFilter))
+            {
+                query = query.Where(c => c.ReferenceType == referenceTypeFilter);
+            }
+
+            // Order by modified date
+            query = query.OrderByDescending(c => c.ModifiedDate ?? c.CreatedDate);
+
+            // Get total count
+            totalCount = query.Count();
+
+            // Apply pagination
+            var skip = (pageNumber - 1) * pageSize;
+            return query.Skip(skip).Take(pageSize).ToList();
+        }
+
+        public List<string> GetDistinctReferenceTypes()
+        {
+            return _context.Comments
+                .Where(c => !string.IsNullOrEmpty(c.ReferenceType))
+                .Select(c => c.ReferenceType)
+                .Distinct()
+                .OrderBy(r => r)
+                .ToList();
+        }
     }
 }

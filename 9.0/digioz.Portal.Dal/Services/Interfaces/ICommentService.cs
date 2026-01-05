@@ -28,5 +28,23 @@ namespace digioz.Portal.Dal.Services.Interfaces
         /// <param name="totalCount">Output parameter for total matching count</param>
         /// <returns>List of matching comments</returns>
         List<Comment> Search(string term, int skip, int take, out int totalCount);
+        
+        /// <summary>
+        /// Gets paginated and filtered comments with database-level filtering.
+        /// </summary>
+        /// <param name="pageNumber">Page number (1-based)</param>
+        /// <param name="pageSize">Number of items per page</param>
+        /// <param name="visibleFilter">Filter by visible status: null=all, true=visible only, false=not visible only</param>
+        /// <param name="approvedFilter">Filter by approved status: null=all, true=approved only, false=not approved only</param>
+        /// <param name="referenceTypeFilter">Filter by reference type (null or empty for all)</param>
+        /// <param name="totalCount">Output parameter for total matching count</param>
+        /// <returns>Filtered and paginated list of comments</returns>
+        List<Comment> GetPagedFiltered(int pageNumber, int pageSize, bool? visibleFilter, bool? approvedFilter, string? referenceTypeFilter, out int totalCount);
+        
+        /// <summary>
+        /// Gets distinct reference types for filtering purposes.
+        /// </summary>
+        /// <returns>List of unique reference types</returns>
+        List<string> GetDistinctReferenceTypes();
     }
 }
