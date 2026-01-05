@@ -1,0 +1,83 @@
+@page "{id}"
+@model digioz.Portal.Web.Areas.Admin.Pages.Comment.DetailsModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Comment Details";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Comment Details</span>
+        <div>
+            <a asp-area="Admin" asp-page="/Comment/Edit" asp-route-id="@Model.Item?.Id" class="btn btn-sm btn-primary">Edit</a>
+            <a asp-area="Admin" asp-page="/Comment/Index" class="btn btn-sm btn-secondary">Back</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Id</dt>
+            <dd class="col-sm-9">@Model.Item?.Id</dd>
+            
+            <dt class="col-sm-3">User Id</dt>
+            <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Item?.UserId) ? "N/A" : Model.Item.UserId)</dd>
+            
+            <dt class="col-sm-3">Username</dt>
+            <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Item?.Username) ? "Anonymous" : Model.Item.Username)</dd>
+            
+            <dt class="col-sm-3">Reference Type</dt>
+            <dd class="col-sm-9">@Model.Item?.ReferenceType</dd>
+            
+            <dt class="col-sm-3">Reference Id</dt>
+            <dd class="col-sm-9">@Model.Item?.ReferenceId</dd>
+            
+            <dt class="col-sm-3">Body</dt>
+            <dd class="col-sm-9">
+                <div class="card">
+                    <div class="card-body" style="white-space: pre-wrap; word-wrap: break-word;">@Model.Item?.Body</div>
+                </div>
+            </dd>
+            
+            <dt class="col-sm-3">Likes</dt>
+            <dd class="col-sm-9">@Model.Item?.Likes</dd>
+            
+            <dt class="col-sm-3">Visible</dt>
+            <dd class="col-sm-9">
+                @if (Model.Item?.Visible == true)
+                {
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle"></i> Yes
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">
+                        <i class="bi bi-x-circle"></i> No
+                    </span>
+                }
+            </dd>
+            
+            <dt class="col-sm-3">Approved</dt>
+            <dd class="col-sm-9">
+                @if (Model.Item?.Approved == true)
+                {
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle"></i> Yes
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">
+                        <i class="bi bi-x-circle"></i> No
+                    </span>
+                }
+            </dd>
+            
+            <dt class="col-sm-3">Created Date</dt>
+            <dd class="col-sm-9">@Model.Item?.CreatedDate?.ToString("yyyy-MM-dd HH:mm:ss")</dd>
+            
+            <dt class="col-sm-3">Modified Date</dt>
+            <dd class="col-sm-9">@Model.Item?.ModifiedDate?.ToString("yyyy-MM-dd HH:mm:ss")</dd>
+        </dl>
+    </div>
+</div>

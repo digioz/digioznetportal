@@ -25,11 +25,15 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Comment
         {
             if (!ModelState.IsValid) return Page();
             if (Item == null) return RedirectToPage("/Comment/Index", new { area = "Admin" });
-            // Load the existing record and only update allowed fields
+            
             var existing = _service.Get(Item.Id);
             if (existing == null) return RedirectToPage("/Comment/Index", new { area = "Admin" });
-            existing.Body = Item.Body; // only editable field
-            existing.ModifiedDate = DateTime.UtcNow; // update modification time
+            
+            existing.Body = Item.Body;
+            existing.Visible = Item.Visible;
+            existing.Approved = Item.Approved;
+            existing.ModifiedDate = DateTime.UtcNow;
+            
             _service.Update(existing);
             return RedirectToPage("/Comment/Index", new { area = "Admin" });
         }

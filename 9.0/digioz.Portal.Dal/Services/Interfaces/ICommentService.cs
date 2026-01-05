@@ -10,6 +10,7 @@ namespace digioz.Portal.Dal.Services.Interfaces
         List<Comment> GetByReferenceType(string referenceType);
         List<Comment> GetByUserId(string userId);
         int CountByUserId(string userId);
+        int CountApprovedByUserId(string userId);
         void Add(Comment comment);
         void Update(Comment comment);
         void Delete(string id);

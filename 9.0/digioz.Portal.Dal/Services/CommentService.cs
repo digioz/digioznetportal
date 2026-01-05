@@ -53,6 +53,14 @@ namespace digioz.Portal.Dal.Services
             return _context.Comments.Count(c => !string.IsNullOrEmpty(c.UserId) && c.UserId == userId);
         }
 
+        public int CountApprovedByUserId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return 0;
+
+            return _context.Comments.Count(c => !string.IsNullOrEmpty(c.UserId) && c.UserId == userId && c.Approved == true);
+        }
+
         public void Add(Comment comment)
         {
             _context.Comments.Add(comment);
