@@ -76,11 +76,12 @@ namespace digioz.Portal.Pages.Polls
             bool isOwnPoll = poll.UserId == userId;
             bool isVisibleAndApproved = poll.Visible == true && poll.Approved == true;
             
-            if (!isOwnPoll && !isVisibleAndApproved)
+            // Users cannot vote on unapproved polls (including their own)
+            if (!isVisibleAndApproved)
             {
                 return NotFound();
             }
-            
+                       
             var prior = _usersVoteService.Get(id, userId);
             if (prior != null) return RedirectToPage(new { id });
             
