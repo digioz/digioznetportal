@@ -177,7 +177,8 @@
                 .then(result => {
                     if (result.success) {
                         if (result.message) {
-                            showNotification(result.message, result.message.includes('awaiting approval') ? 'warning' : 'success');
+                            const notificationType = result.requiresApproval ? 'warning' : 'success';
+                            showNotification(result.message, notificationType);
                         }
                         setTimeout(() => window.location.reload(), 1500);
                     } else {
@@ -202,7 +203,8 @@
                             .then(result => {
                                 if (result.success) {
                                     if (result.message) {
-                                        showNotification(result.message, result.message.includes('awaiting approval') ? 'warning' : 'success');
+                                        const notificationType = result.requiresApproval ? 'warning' : 'success';
+                                        showNotification(result.message, notificationType);
                                     }
                                     setTimeout(() => window.location.reload(), 1500);
                                 } else {

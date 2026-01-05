@@ -47,14 +47,14 @@ namespace digioz.Portal.Web.Pages.Comments
             if (!User.Identity?.IsAuthenticated ?? true)
             {
                 if (isAjaxRequest)
-                    return new JsonResult(new { success = false, message = "You must be logged in to post comments." });
+                    return new JsonResult(new { success = false, message = "You must be logged in to post comments.", requiresApproval = false });
                 return Redirect(referer ?? "/");
             }
 
             if (string.IsNullOrWhiteSpace(comment) || comment.Length > 5000)
             {
                 if (isAjaxRequest)
-                    return new JsonResult(new { success = false, message = "Comment is required and must be less than 5000 characters." });
+                    return new JsonResult(new { success = false, message = "Comment is required and must be less than 5000 characters.", requiresApproval = false });
                 return Redirect(referer ?? "/");
             }
 
@@ -68,7 +68,7 @@ namespace digioz.Portal.Web.Pages.Comments
                 if (string.IsNullOrWhiteSpace(secret) || string.IsNullOrWhiteSpace(recaptchaToken) || !await VerifyRecaptchaV3Async(secret, recaptchaToken, "comment"))
                 {
                     if (isAjaxRequest)
-                        return new JsonResult(new { success = false, message = "ReCAPTCHA verification failed." });
+                        return new JsonResult(new { success = false, message = "ReCAPTCHA verification failed.", requiresApproval = false });
                     return Redirect(referer ?? "/");
                 }
             }
@@ -89,12 +89,13 @@ namespace digioz.Portal.Web.Pages.Comments
 
             bool isVisible = true;
             bool isApproved = true;
+            bool requiresApproval = false;
             string? statusMessage = null;
 
             var requireApprovalConfig = cfg.FirstOrDefault(c => c.ConfigKey == "Comment:RequireApproval");
-            var requireApproval = bool.TryParse(requireApprovalConfig?.ConfigValue, out var reqApproval) && reqApproval;
+            var requireApprovalEnabled = bool.TryParse(requireApprovalConfig?.ConfigValue, out var reqApproval) && reqApproval;
 
-            if (requireApproval && !string.IsNullOrEmpty(userId))
+            if (requireApprovalEnabled && !string.IsNullOrEmpty(userId))
             {
                 var minValueConfig = cfg.FirstOrDefault(c => c.ConfigKey == "Comment:RequireApprovalMinValue");
                 var minValue = int.TryParse(minValueConfig?.ConfigValue, out var minVal) ? minVal : 5;
@@ -105,6 +106,7 @@ namespace digioz.Portal.Web.Pages.Comments
                 {
                     isVisible = false;
                     isApproved = false;
+                    requiresApproval = true;
                     statusMessage = "Your comment has been submitted and is awaiting approval.";
                 }
             }
@@ -129,7 +131,12 @@ namespace digioz.Portal.Web.Pages.Comments
             
             if (isAjaxRequest)
             {
-                return new JsonResult(new { success = true, message = statusMessage ?? "Comment posted successfully!" });
+                return new JsonResult(new 
+                { 
+                    success = true, 
+                    message = statusMessage ?? "Comment posted successfully!", 
+                    requiresApproval = requiresApproval 
+                });
             }
             
             return Redirect(referer ?? "/");
