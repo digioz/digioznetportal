@@ -81,15 +81,10 @@ namespace digioz.Portal.Web.Data.Migrations
                 name: "Approved",
                 table: "Poll");
 
-            migrationBuilder.DeleteData(
-                table: "Config",
-                keyColumn: "ConfigKey",
-                keyValue: "Comment:RequireApproval");
-
-            migrationBuilder.DeleteData(
-                table: "Config",
-                keyColumn: "ConfigKey",
-                keyValue: "Comment:RequireApprovalMinValue");
+            migrationBuilder.Sql(@"
+                DELETE FROM [Config] WHERE [ConfigKey] = 'Comment:RequireApproval';
+                DELETE FROM [Config] WHERE [ConfigKey] = 'Comment:RequireApprovalMinValue';
+            ");
         }
     }
 }
