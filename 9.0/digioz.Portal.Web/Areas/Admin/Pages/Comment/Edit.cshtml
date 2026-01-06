@@ -13,19 +13,12 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Item.Id" />
             
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="form-label">User Id</label>
-                        <input class="form-control" value="@Model.Item?.UserId" readonly />
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input class="form-control" value="@Model.Item?.Username" readonly />
-                    </div>
-                </div>
+            <div class="mb-3">
+                <label asp-for="Item.UserId" class="form-label">User</label>
+                <select asp-for="Item.UserId" asp-items="Model.UserList" class="form-select">
+                    <option value="">-- Select User --</option>
+                </select>
+                <span asp-validation-for="Item.UserId" class="text-danger"></span>
             </div>
             
             <div class="row">
@@ -67,14 +60,14 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="mb-3 form-check">
-                        <input asp-for="Item.Visible" class="form-check-input" />
-                        <label asp-for="Item.Visible" class="form-check-label"></label>
+                        <input asp-for="VisibleCheckbox" type="checkbox" class="form-check-input" />
+                        <label asp-for="VisibleCheckbox" class="form-check-label">Visible</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3 form-check">
-                        <input asp-for="Item.Approved" class="form-check-input" />
-                        <label asp-for="Item.Approved" class="form-check-label"></label>
+                        <input asp-for="ApprovedCheckbox" type="checkbox" class="form-check-input" />
+                        <label asp-for="ApprovedCheckbox" class="form-check-label">Approved</label>
                     </div>
                 </div>
             </div>

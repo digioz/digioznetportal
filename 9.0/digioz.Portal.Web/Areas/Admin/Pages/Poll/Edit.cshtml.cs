@@ -43,13 +43,21 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
             
             if (!ModelState.IsValid) return Page();
             
-            if (Item.Visible != true)
-                Item.Visible = false;
+            // Get existing poll to preserve DateCreated and other fields
+            var existing = _service.Get(Item.Id);
+            if (existing == null) return NotFound();
             
-            if (Item.Approved != true)
-                Item.Approved = false;
+            // Update only the editable fields
+            existing.Slug = Item.Slug;
+            existing.UserId = Item.UserId;
+            existing.Featured = Item.Featured;
+            existing.IsClosed = Item.IsClosed;
+            existing.AllowMultipleOptionsVote = Item.AllowMultipleOptionsVote;
+            existing.Visible = Item.Visible == true ? true : false;
+            existing.Approved = Item.Approved == true ? true : false;
+            // DateCreated is preserved from existing poll
             
-            _service.Update(Item);
+            _service.Update(existing);
 
             string Norm(string s) => (s ?? string.Empty).Trim();
             string Key(string s) => Norm(s).ToLowerInvariant();
@@ -69,16 +77,16 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
                 return Page();
             }
 
-            var existing = _answerService.GetByPollId(Item.Id);
+            var existingAnswers = _answerService.GetByPollId(Item.Id);
 
             var dupIds = new List<string>();
-            foreach (var grp in existing.GroupBy(a => Key(a.Answer)))
+            foreach (var grp in existingAnswers.GroupBy(a => Key(a.Answer)))
             {
                 var keep = grp.OrderBy(a => a.Id).First();
                 dupIds.AddRange(grp.Where(a => a.Id != keep.Id).Select(a => a.Id));
             }
 
-            var toRemoveByRequest = existing
+            var toRemoveByRequest = existingAnswers
                 .Where(e => requested.Count > 0 && !requested.Contains(Norm(e.Answer), StringComparer.OrdinalIgnoreCase))
                 .Select(e => e.Id)
                 .ToList();
@@ -88,9 +96,9 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
                 .Distinct()
                 .ToList();
 
-            var answersToKeepIds = existing.Select(a => a.Id).Except(answersToRemoveIds).ToHashSet();
+            var answersToKeepIds = existingAnswers.Select(a => a.Id).Except(answersToRemoveIds).ToHashSet();
 
-            var votesForPoll = _voteService.GetByPollAnswerIds(existing.Select(a => a.Id));
+            var votesForPoll = _voteService.GetByPollAnswerIds(existingAnswers.Select(a => a.Id));
             var votesToRemovedAnswers = votesForPoll.Where(v => answersToRemoveIds.Contains(v.PollAnswerId)).ToList();
             var affectedUserIds = votesToRemovedAnswers.Select(v => v.UserId).Distinct().ToList();
 
@@ -109,7 +117,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
                 _answerService.Delete(ansId);
             }
 
-            var keptNormalized = existing
+            var keptNormalized = existingAnswers
                 .Where(a => answersToKeepIds.Contains(a.Id))
                 .Select(a => Norm(a.Answer))
                 .Where(s => !string.IsNullOrWhiteSpace(s))
