@@ -140,7 +140,7 @@ namespace digioz.Portal.Dal.Services
                 .ToList();
         }
 
-        public List<Comment> GetPagedFiltered(int pageNumber, int pageSize, bool? visibleFilter, bool? approvedFilter, string? referenceTypeFilter, out int totalCount)
+        public List<Comment> GetPagedFiltered(int pageNumber, int pageSize, bool? visibleFilter, bool? approvedFilter, string referenceTypeFilter, out int totalCount)
         {
             var query = _context.Comments.AsNoTracking().AsQueryable();
 

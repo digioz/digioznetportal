@@ -65,7 +65,7 @@ namespace digioz.Portal.Dal.Services
             return query.Skip(skip).Take(pageSize).ToList();
         }
 
-        public List<Poll> GetPagedFiltered(int pageNumber, int pageSize, string? userId, out int totalCount)
+        public List<Poll> GetPagedFiltered(int pageNumber, int pageSize, string userId, out int totalCount)
         {
             var query = _context.Polls.AsQueryable();
             

@@ -12,7 +12,7 @@ namespace digioz.Portal.Dal.Services.Interfaces
         List<Poll> GetLatestFeatured(int count);
         List<Poll> GetByIds(IEnumerable<string> ids);
         List<Poll> GetPaged(int pageNumber, int pageSize, out int totalCount);
-        List<Poll> GetPagedFiltered(int pageNumber, int pageSize, string? userId, out int totalCount);
+        List<Poll> GetPagedFiltered(int pageNumber, int pageSize, string userId, out int totalCount);
         int CountByUserId(string userId);
         void Add(Poll poll);
         void Update(Poll poll);
