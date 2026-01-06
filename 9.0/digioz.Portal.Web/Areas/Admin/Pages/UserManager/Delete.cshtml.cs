@@ -134,17 +134,29 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
 
             try
             {
-                // Get the System user ID for reassignment
-                var systemProfile = _profileService.GetAll()
-                    .FirstOrDefault(p => p.DisplayName != null && p.DisplayName.Equals("System", StringComparison.OrdinalIgnoreCase));
-                
-                string? systemUserId = systemProfile?.UserId;
+                // Check if admin wants to preserve any content (any checkbox unchecked)
+                bool wantsToPreserveContent = !Options.DeletePictures || !Options.DeleteVideos || 
+                                             !Options.DeletePolls || !Options.DeleteChat || 
+                                             !Options.DeleteComments || !Options.DeleteOrders;
 
-                if (string.IsNullOrEmpty(systemUserId))
+                // Get the System user ID for reassignment if needed
+                string? systemUserId = null;
+                if (wantsToPreserveContent)
                 {
-                    StatusMessage = "Error: System user not found. Please ensure a user with DisplayName 'System' exists before deleting users.";
-                    await LoadRelatedDataAsync(id);
-                    return Page();
+                    var systemProfile = _profileService.GetAll()
+                        .FirstOrDefault(p => p.DisplayName != null && p.DisplayName.Equals("System", StringComparison.OrdinalIgnoreCase));
+                    
+                    systemUserId = systemProfile?.UserId;
+
+                    // If admin wants to preserve content but System user doesn't exist, fail the operation
+                    if (string.IsNullOrEmpty(systemUserId))
+                    {
+                        _logger.LogError("System user not found. Cannot delete user account when admin wants to preserve content.");
+                        StatusMessage = "Error: System user not found. Cannot delete this user while preserving content. " +
+                                      "Please ensure a user with DisplayName 'System' exists or check all boxes to delete all content.";
+                        await LoadRelatedDataAsync(id);
+                        return Page();
+                    }
                 }
 
                 // Handle Pictures - Delete or Reassign (using efficient bulk operations)

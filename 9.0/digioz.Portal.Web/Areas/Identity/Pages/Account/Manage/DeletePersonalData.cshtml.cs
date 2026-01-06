@@ -146,15 +146,41 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
 
             try
             {
-                // Get the System user ID for reassignment
-                var systemProfile = _profileService.GetAll()
-                    .FirstOrDefault(p => p.DisplayName != null && p.DisplayName.Equals("System", StringComparison.OrdinalIgnoreCase));
-                
-                string systemUserId = systemProfile?.UserId;
+                // Check if user wants to preserve any content (any checkbox unchecked)
+                bool wantsToPreserveContent = !Options.DeletePictures || !Options.DeleteVideos || 
+                                             !Options.DeletePolls || !Options.DeleteChat || 
+                                             !Options.DeleteComments || !Options.DeleteOrders;
 
-                if (string.IsNullOrEmpty(systemUserId))
+                // Get the System user ID for reassignment if needed
+                string systemUserId = null;
+                if (wantsToPreserveContent)
                 {
-                    _logger.LogWarning("System user not found. Content will be deleted instead of reassigned.");
+                    var systemProfile = _profileService.GetAll()
+                        .FirstOrDefault(p => p.DisplayName != null && p.DisplayName.Equals("System", StringComparison.OrdinalIgnoreCase));
+                    
+                    systemUserId = systemProfile?.UserId;
+
+                    // If user wants to preserve content but System user doesn't exist, fail the operation
+                    if (string.IsNullOrEmpty(systemUserId))
+                    {
+                        _logger.LogError("System user not found. Cannot delete account when user wants to preserve content without System user for reassignment.");
+                        ModelState.AddModelError(string.Empty, 
+                            "Unable to delete your account while preserving content. The System user required for content reassignment was not found. " +
+                            "Please contact the administrator or check all boxes to delete all content.");
+                        
+                        // Reload related data
+                        RelatedData = new UserRelatedData
+                        {
+                            PictureCount = _pictureService.CountByUserId(userId),
+                            VideoCount = _videoService.CountByUserId(userId),
+                            PollCount = _pollService.CountByUserId(userId),
+                            ChatCount = _chatService.CountByUserId(userId),
+                            CommentCount = _commentService.CountByUserId(userId),
+                            OrderCount = _orderService.CountByUserId(userId)
+                        };
+                        
+                        return Page();
+                    }
                 }
 
                 // Handle Pictures - Delete or Reassign
@@ -162,7 +188,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                 {
                     _pictureService.DeleteByUserId(userId);
                 }
-                else if (!string.IsNullOrEmpty(systemUserId))
+                else
                 {
                     _pictureService.ReassignByUserId(userId, systemUserId);
                 }
@@ -172,7 +198,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                 {
                     _videoService.DeleteByUserId(userId);
                 }
-                else if (!string.IsNullOrEmpty(systemUserId))
+                else
                 {
                     _videoService.ReassignByUserId(userId, systemUserId);
                 }
@@ -182,7 +208,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                 {
                     _pollService.DeleteByUserId(userId);
                 }
-                else if (!string.IsNullOrEmpty(systemUserId))
+                else
                 {
                     _pollService.ReassignByUserId(userId, systemUserId);
                 }
@@ -192,7 +218,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                 {
                     _chatService.DeleteByUserId(userId);
                 }
-                else if (!string.IsNullOrEmpty(systemUserId))
+                else
                 {
                     _chatService.ReassignByUserId(userId, systemUserId);
                 }
@@ -202,7 +228,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                 {
                     _commentService.DeleteByUserId(userId);
                 }
-                else if (!string.IsNullOrEmpty(systemUserId))
+                else
                 {
                     _commentService.ReassignByUserId(userId, systemUserId);
                 }
@@ -212,7 +238,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                 {
                     _orderService.DeleteByUserId(userId);
                 }
-                else if (!string.IsNullOrEmpty(systemUserId))
+                else
                 {
                     _orderService.ReassignByUserId(userId, systemUserId);
                 }
