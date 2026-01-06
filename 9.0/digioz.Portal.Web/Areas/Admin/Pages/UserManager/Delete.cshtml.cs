@@ -134,17 +134,27 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
 
             try
             {
-                // Get the System user ID for reassignment
-                var systemProfile = _profileService.GetAll()
-                    .FirstOrDefault(p => p.DisplayName != null && p.DisplayName.Equals("System", StringComparison.OrdinalIgnoreCase));
-                
-                string? systemUserId = systemProfile?.UserId;
+                // Check if admin wants to preserve any content (any checkbox unchecked)
+                bool wantsToPreserveContent = !Options.DeletePictures || !Options.DeleteVideos || 
+                                             !Options.DeletePolls || !Options.DeleteChat || 
+                                             !Options.DeleteComments || !Options.DeleteOrders;
 
-                if (string.IsNullOrEmpty(systemUserId))
+                // Get the System user ID for reassignment if needed
+                string? systemUserId = null;
+                if (wantsToPreserveContent)
                 {
-                    StatusMessage = "Error: System user not found. Please ensure a user with DisplayName 'System' exists before deleting users.";
-                    await LoadRelatedDataAsync(id);
-                    return Page();
+                    var systemProfile = _profileService.GetByDisplayName("System");
+                    systemUserId = systemProfile?.UserId;
+
+                    // If admin wants to preserve content but System user doesn't exist, fail the operation
+                    if (string.IsNullOrEmpty(systemUserId))
+                    {
+                        _logger.LogError("System user not found. Cannot delete user account when admin wants to preserve content without System user for reassignment.");
+                        StatusMessage = "Error: System user not found. Cannot delete this user while preserving content. " +
+                                      "Please ensure a user with DisplayName 'System' exists or check all boxes to delete all content.";
+                        await LoadRelatedDataAsync(id);
+                        return Page();
+                    }
                 }
 
                 // Handle Pictures - Delete or Reassign (using efficient bulk operations)
@@ -207,13 +217,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                     _orderService.ReassignByUserId(id, systemUserId);
                 }
 
-                // Delete profile
-                var profile = _profileService.GetByUserId(id);
-                if (profile != null)
-                {
-                    _profileService.Delete(profile.Id);
-                }
-
                 // Get the user's identity to invalidate their session
                 var identityUser = await _userManager.FindByIdAsync(id);
                 if (identityUser != null)
@@ -250,13 +253,30 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                     }
                 }
 
+                // Delete profile after successful user account deletion
+                // Use try-catch to prevent profile deletion failure from affecting the overall operation
+                try
+                {
+                    var profile = _profileService.GetByUserId(id);
+                    if (profile != null)
+                    {
+                        _profileService.Delete(profile.Id);
+                    }
+                }
+                catch (Exception profileEx)
+                {
+                    // Log the profile deletion error but don't fail the operation
+                    // The user account is already deleted at this point
+                    _logger.LogError(profileEx, "Error deleting profile for user {UserId}. User account was successfully deleted but profile may remain orphaned.", id);
+                }
+
                 StatusMessage = "User deleted successfully. The user's security stamp has been invalidated and they will be forcefully signed out on their next request.";
                 return RedirectToPage("/UserManager/Index");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting user {UserId}", id);
-                StatusMessage = $"Error deleting user: {ex.Message}";
+                StatusMessage = "Error: An unexpected error occurred while deleting this user. Please check the logs for details.";
                 await LoadRelatedDataAsync(id);
                 return Page();
             }

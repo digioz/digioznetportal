@@ -13,9 +13,116 @@
     </p>
 </div>
 
+@if (Model.RelatedData != null)
+{
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5 class="mb-0">Your Content</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">The following data is associated with your account:</p>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Data Type</th>
+                            <th class="text-end">Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="bi bi-image"></i> Pictures</td>
+                            <td class="text-end">@Model.RelatedData.PictureCount</td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-camera-video"></i> Videos</td>
+                            <td class="text-end">@Model.RelatedData.VideoCount</td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-bar-chart"></i> Polls</td>
+                            <td class="text-end">@Model.RelatedData.PollCount</td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-chat"></i> Chat Messages</td>
+                            <td class="text-end">@Model.RelatedData.ChatCount</td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-chat-left-text"></i> Comments</td>
+                            <td class="text-end">@Model.RelatedData.CommentCount</td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-cart"></i> Orders</td>
+                            <td class="text-end">@Model.RelatedData.OrderCount</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
 <div>
     <form id="delete-user" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        
+        <h5 class="mb-3">Deletion Options</h5>
+        <p class="text-muted">Choose what to do with your content. Unchecked items will be reassigned to "System" user to preserve data integrity.</p>
+
+        @if (Model.RelatedData != null)
+        {
+            <div class="form-check mb-2">
+                <input asp-for="Options.DeletePictures" class="form-check-input" />
+                <label asp-for="Options.DeletePictures" class="form-check-label">
+                    <strong>Delete</strong> all pictures (@Model.RelatedData.PictureCount)
+                </label>
+            </div>
+
+            <div class="form-check mb-2">
+                <input asp-for="Options.DeleteVideos" class="form-check-input" />
+                <label asp-for="Options.DeleteVideos" class="form-check-label">
+                    <strong>Delete</strong> all videos (@Model.RelatedData.VideoCount)
+                </label>
+            </div>
+
+            <div class="form-check mb-2">
+                <input asp-for="Options.DeletePolls" class="form-check-input" />
+                <label asp-for="Options.DeletePolls" class="form-check-label">
+                    <strong>Delete</strong> all polls (@Model.RelatedData.PollCount)
+                </label>
+            </div>
+
+            <div class="form-check mb-2">
+                <input asp-for="Options.DeleteChat" class="form-check-input" />
+                <label asp-for="Options.DeleteChat" class="form-check-label">
+                    <strong>Delete</strong> all chat messages (@Model.RelatedData.ChatCount)
+                </label>
+            </div>
+
+            <div class="form-check mb-2">
+                <input asp-for="Options.DeleteComments" class="form-check-input" />
+                <label asp-for="Options.DeleteComments" class="form-check-label">
+                    <strong>Delete</strong> all comments (@Model.RelatedData.CommentCount)
+                </label>
+            </div>
+
+            <div class="form-check mb-2">
+                <input asp-for="Options.DeleteOrders" class="form-check-input" />
+                <label asp-for="Options.DeleteOrders" class="form-check-label">
+                    <strong>Delete</strong> all orders (@Model.RelatedData.OrderCount)
+                </label>
+            </div>
+        }
+
+        <div class="alert alert-info mt-3">
+            <i class="bi bi-info-circle"></i> 
+            <strong>Important Notes:</strong>
+            <ul class="mb-0 mt-2">
+                <li>Your user account and profile will always be permanently deleted.</li>
+                <li><strong>Checked items</strong> will be permanently deleted from the system.</li>
+                <li><strong>Unchecked items</strong> will be reassigned to the "System" user to preserve data integrity.</li>
+            </ul>
+        </div>
+
         @if (Model.RequirePassword)
         {
             <div class="form-floating mb-3">

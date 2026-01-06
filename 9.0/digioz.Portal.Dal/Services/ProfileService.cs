@@ -30,6 +30,14 @@ namespace digioz.Portal.Dal.Services
             return _context.Profiles.FirstOrDefault(p => p.Email == email);
         }
 
+        public Profile GetByDisplayName(string displayName)
+        {
+            if (string.IsNullOrEmpty(displayName))
+                return null;
+
+            return _context.Profiles.FirstOrDefault(p => p.DisplayName != null && p.DisplayName.ToLower() == displayName.ToLower());
+        }
+
         public List<Profile> GetAll()
         {
             return _context.Profiles.ToList();
