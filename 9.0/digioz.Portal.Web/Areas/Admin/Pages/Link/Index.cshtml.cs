@@ -21,9 +21,10 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
         public IReadOnlyList<digioz.Portal.Bo.Link> Items { get; private set; } = Array.Empty<digioz.Portal.Bo.Link>();
         public Dictionary<int, string> CategoryNames { get; private set; } = new();
         public List<SelectListItem> CategoryFilterOptions { get; private set; } = new();
-        [BindProperty(SupportsGet = true)] public int PageNumber { get; set; } =1;
-        [BindProperty(SupportsGet = true)] public int PageSize { get; set; } =10;
+        [BindProperty(SupportsGet = true)] public int PageNumber { get; set; } = 1;
+        [BindProperty(SupportsGet = true)] public int PageSize { get; set; } = 10;
         [BindProperty(SupportsGet = true)] public string VisibilityFilter { get; set; } = "all";
+        [BindProperty(SupportsGet = true)] public string ApprovalFilter { get; set; } = "all";
         [BindProperty(SupportsGet = true)] public int? CategoryFilter { get; set; }
         [BindProperty(SupportsGet = true)] public string? SearchQuery { get; set; }
         public int TotalCount { get; private set; }
@@ -31,14 +32,15 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
 
         public void OnGet()
         {
-            if (PageNumber <1) PageNumber =1;
-            if (PageSize <1) PageSize =10;
-            var skip = (PageNumber -1) * PageSize;
+            if (PageNumber < 1) PageNumber = 1;
+            if (PageSize < 1) PageSize = 10;
+            var skip = (PageNumber - 1) * PageSize;
 
-            // Use the new AdminSearch method from the service layer
+            // Use the updated AdminSearch method from the service layer
             Items = _service.AdminSearch(
                 SearchQuery, 
-                VisibilityFilter ?? "all", 
+                VisibilityFilter ?? "all",
+                ApprovalFilter ?? "all",
                 CategoryFilter, 
                 skip, 
                 PageSize, 
@@ -65,7 +67,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
                 }));
         }
 
-        public IActionResult OnPostToggleVisibility(int id, int pageNumber, string visibilityFilter = "all", int? categoryFilter = null, string? searchQuery = null)
+        public IActionResult OnPostToggleVisibility(int id, int pageNumber, string visibilityFilter = "all", string approvalFilter = "all", int? categoryFilter = null, string? searchQuery = null)
         {
             var link = _service.Get(id);
             if (link != null)
@@ -74,7 +76,19 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
                 _service.Update(link);
             }
 
-            return RedirectToPage(new { pageNumber, visibilityFilter, categoryFilter, searchQuery });
+            return RedirectToPage(new { pageNumber, visibilityFilter, approvalFilter, categoryFilter, searchQuery });
+        }
+
+        public IActionResult OnPostToggleApproval(int id, int pageNumber, string visibilityFilter = "all", string approvalFilter = "all", int? categoryFilter = null, string? searchQuery = null)
+        {
+            var link = _service.Get(id);
+            if (link != null)
+            {
+                link.Approved = !(link.Approved ?? false);
+                _service.Update(link);
+            }
+
+            return RedirectToPage(new { pageNumber, visibilityFilter, approvalFilter, categoryFilter, searchQuery });
         }
     }
 }

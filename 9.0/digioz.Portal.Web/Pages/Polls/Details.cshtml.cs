@@ -43,12 +43,20 @@ namespace digioz.Portal.Pages.Polls
             if (string.IsNullOrEmpty(id)) return BadRequest();
             var poll = _pollService.Get(id);
             if (poll == null) return NotFound();
+            
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+            bool isOwnPoll = !string.IsNullOrEmpty(userId) && poll.UserId == userId;
+            bool isVisibleAndApproved = poll.Visible == true && poll.Approved == true;
+            
+            if (!isOwnPoll && !isVisibleAndApproved)
+            {
+                return NotFound();
+            }
+            
             Item = poll;
             Answers = _answerService.GetByPollId(id);
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             HasVoted = !string.IsNullOrEmpty(userId) && _usersVoteService.Get(id, userId) != null;
 
-            // Generate poll results chart if user has voted
             if (HasVoted)
             {
                 ResultsChartBase64 = GenerateResultsChart(Answers);
@@ -61,13 +69,26 @@ namespace digioz.Portal.Pages.Polls
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             if (string.IsNullOrEmpty(userId)) return Forbid();
+            
             var poll = _pollService.Get(id);
             if (poll == null) return NotFound();
+            
+            bool isOwnPoll = poll.UserId == userId;
+            bool isVisibleAndApproved = poll.Visible == true && poll.Approved == true;
+            
+            // Users cannot vote on unapproved polls (including their own)
+            if (!isVisibleAndApproved)
+            {
+                return NotFound();
+            }
+                       
             var prior = _usersVoteService.Get(id, userId);
             if (prior != null) return RedirectToPage(new { id });
+            
             var validAnswers = _answerService.GetByPollId(id);
             var selected = (SelectedAnswerIds ?? new System.Collections.Generic.List<string>())
                 .Where(s => validAnswers.Any(a => a.Id == s)).Distinct().ToList();
+            
             if (!selected.Any())
             {
                 ModelState.AddModelError(string.Empty, "Select at least one answer.");
@@ -76,13 +97,17 @@ namespace digioz.Portal.Pages.Polls
                 HasVoted = false;
                 return Page();
             }
+            
             if (!poll.AllowMultipleOptionsVote && selected.Count > 1)
                 selected = selected.Take(1).ToList();
+            
             _usersVoteService.Add(new digioz.Portal.Bo.PollUsersVote { PollId = id, UserId = userId, DateVoted = System.DateTime.UtcNow.ToString("o") });
+            
             foreach (var ans in selected)
             {
                 _voteService.Add(new digioz.Portal.Bo.PollVote { Id = System.Guid.NewGuid().ToString(), UserId = userId, PollAnswerId = ans });
             }
+            
             return RedirectToPage(new { id });
         }
 

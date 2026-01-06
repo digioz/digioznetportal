@@ -57,15 +57,16 @@ namespace digioz.Portal.Web.Pages.Shared.Components.CommentsMenu
             {
                 // Get comments for specific reference (e.g., specific announcement)
                 comments = _commentService.GetByReferenceType(referenceType)
-                    .Where(c => c.ReferenceId == referenceId)
-                    .OrderByDescending(c => c.CreatedDate) // Order by newest first
+                    .Where(c => c.ReferenceId == referenceId && c.Visible == true && c.Approved == true)
+                    .OrderByDescending(c => c.CreatedDate)
                     .ToList();
             }
             else
             {
                 // Get all comments for this reference type
                 comments = _commentService.GetByReferenceType(referenceType)
-                    .OrderByDescending(c => c.CreatedDate) // Order by newest first
+                    .Where(c => c.Visible == true && c.Approved == true)
+                    .OrderByDescending(c => c.CreatedDate)
                     .ToList();
             }
 

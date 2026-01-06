@@ -42,13 +42,22 @@ namespace digioz.Portal.Web.Pages.Comments
         public async Task<IActionResult> OnPostAsync()
         {
             var referer = Request.Headers["Referer"].ToString();
+            var isAjaxRequest = Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+            
             if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                if (isAjaxRequest)
+                    return new JsonResult(new { success = false, message = "You must be logged in to post comments.", requiresApproval = false });
                 return Redirect(referer ?? "/");
+            }
 
             if (string.IsNullOrWhiteSpace(comment) || comment.Length > 5000)
+            {
+                if (isAjaxRequest)
+                    return new JsonResult(new { success = false, message = "Comment is required and must be less than 5000 characters.", requiresApproval = false });
                 return Redirect(referer ?? "/");
+            }
 
-            // Sanitize comment but preserve line breaks
             var sanitized = StringUtils.SanitizeCommentPreservingLineBreaks(comment);
 
             var cfg = _configService.GetAll();
@@ -57,7 +66,11 @@ namespace digioz.Portal.Web.Pages.Comments
             {
                 var secret = cfg.FirstOrDefault(c => c.ConfigKey == "RecaptchaPrivateKey")?.ConfigValue;
                 if (string.IsNullOrWhiteSpace(secret) || string.IsNullOrWhiteSpace(recaptchaToken) || !await VerifyRecaptchaV3Async(secret, recaptchaToken, "comment"))
+                {
+                    if (isAjaxRequest)
+                        return new JsonResult(new { success = false, message = "ReCAPTCHA verification failed.", requiresApproval = false });
                     return Redirect(referer ?? "/");
+                }
             }
 
             if (string.IsNullOrWhiteSpace(referenceType))
@@ -72,21 +85,60 @@ namespace digioz.Portal.Web.Pages.Comments
             if (string.IsNullOrWhiteSpace(referenceType) || referenceType == "/") referenceType = "/Index";
 
             var userName = User.Identity?.Name;
+            var userId = !string.IsNullOrEmpty(userName) ? _userHelper.GetUserIdByEmail(userName) : null;
+
+            bool isVisible = true;
+            bool isApproved = true;
+            bool requiresApproval = false;
+            string? statusMessage = null;
+
+            var requireApprovalConfig = cfg.FirstOrDefault(c => c.ConfigKey == "Comment:RequireApproval");
+            var requireApprovalEnabled = bool.TryParse(requireApprovalConfig?.ConfigValue, out var reqApproval) && reqApproval;
+
+            if (requireApprovalEnabled && !string.IsNullOrEmpty(userId))
+            {
+                var minValueConfig = cfg.FirstOrDefault(c => c.ConfigKey == "Comment:RequireApprovalMinValue");
+                var minValue = int.TryParse(minValueConfig?.ConfigValue, out var minVal) ? minVal : 5;
+
+                var approvedCommentCount = _commentService.CountApprovedByUserId(userId);
+
+                if (approvedCommentCount < minValue)
+                {
+                    isVisible = false;
+                    isApproved = false;
+                    requiresApproval = true;
+                    statusMessage = "Your comment has been submitted and is awaiting approval.";
+                }
+            }
+
             var newComment = new Comment
             {
                 Id = Guid.NewGuid().ToString(),
                 ReferenceId = referenceId,
                 ReferenceType = referenceType,
                 Body = sanitized,
-                UserId = !string.IsNullOrEmpty(userName) ? _userHelper.GetUserIdByEmail(userName) : null,
+                UserId = userId,
                 Username = userName,
                 CreatedDate = DateTime.UtcNow,
                 ModifiedDate = DateTime.UtcNow,
-                Likes = 0
+                Likes = 0,
+                Visible = isVisible,
+                Approved = isApproved
             };
             _commentService.Add(newComment);
 
             _cache.Remove("CommentsMenu_" + referenceType);
+            
+            if (isAjaxRequest)
+            {
+                return new JsonResult(new 
+                { 
+                    success = true, 
+                    message = statusMessage ?? "Comment posted successfully!", 
+                    requiresApproval = requiresApproval 
+                });
+            }
+            
             return Redirect(referer ?? "/");
         }
 

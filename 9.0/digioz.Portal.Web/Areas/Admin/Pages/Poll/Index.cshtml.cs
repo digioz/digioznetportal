@@ -24,5 +24,27 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Poll
             Items = _service.GetPaged(pageNumber, pageSize, out var total);
             TotalCount = total;
         }
+
+        public IActionResult OnPostToggleVisible(string id)
+        {
+            var poll = _service.Get(id);
+            if (poll != null)
+            {
+                poll.Visible = !(poll.Visible ?? false);
+                _service.Update(poll);
+            }
+            return RedirectToPage(new { pageNumber, pageSize });
+        }
+
+        public IActionResult OnPostToggleApproved(string id)
+        {
+            var poll = _service.Get(id);
+            if (poll != null)
+            {
+                poll.Approved = !(poll.Approved ?? false);
+                _service.Update(poll);
+            }
+            return RedirectToPage(new { pageNumber, pageSize });
+        }
     }
 }

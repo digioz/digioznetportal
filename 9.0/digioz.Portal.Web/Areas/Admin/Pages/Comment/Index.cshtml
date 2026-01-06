@@ -10,38 +10,105 @@
 <div class="card shadow-sm">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span>Comment Management</span>
+        <a asp-area="Admin" asp-page="/Comment/Add" class="btn btn-sm btn-primary">Add Comment</a>
     </div>
     <div class="card-body">
-        <table class="table table-striped table-sm align-middle">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>User</th>
-                    <th>Ref Type</th>
-                    <th>Ref Id</th>
-                    <th>Preview</th>
-                    <th>Modified</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var c in Model.Items)
-                {
+        <!-- Filters -->
+        <form method="get" class="row g-3 mb-3">
+            <div class="col-md-3">
+                <label class="form-label">Visible</label>
+                <select asp-for="VisibleFilter" class="form-select" onchange="this.form.submit()">
+                    <option value="">All</option>
+                    <option value="Visible">Visible</option>
+                    <option value="NotVisible">Not Visible</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Approved</label>
+                <select asp-for="ApprovedFilter" class="form-select" onchange="this.form.submit()">
+                    <option value="">All</option>
+                    <option value="Approved">Approved</option>
+                    <option value="NotApproved">Not Approved</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Reference Type</label>
+                <select asp-for="ReferenceTypeFilter" class="form-select" onchange="this.form.submit()">
+                    <option value="All">All</option>
+                    @foreach (var refType in Model.ReferenceTypes)
+                    {
+                        <option value="@refType">@refType</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <a asp-area="Admin" asp-page="/Comment/Index" class="btn btn-secondary">Clear Filters</a>
+            </div>
+        </form>
+
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="table table-striped table-sm align-middle">
+                <thead>
                     <tr>
-                        <td class="text-truncate" style="max-width:150px">@c.Id</td>
-                        <td>@(string.IsNullOrEmpty(c.Username) ? "Anonymous" : c.Username)</td>
-                        <td class="text-truncate" style="max-width:140px">@c.ReferenceType</td>
-                        <td class="text-truncate" style="max-width:120px">@c.ReferenceId</td>
-                        <td class="text-truncate" style="max-width:260px">@c.Body</td>
-                        <td>@(c.ModifiedDate ?? c.CreatedDate)</td>
-                        <td class="text-end">
-                            <a asp-area="Admin" asp-page="/Comment/Edit" asp-route-id="@c.Id" class="btn btn-sm btn-primary">Edit</a>
-                            <a asp-area="Admin" asp-page="/Comment/Delete" asp-route-id="@c.Id" class="btn btn-sm btn-danger">Delete</a>
-                        </td>
+                        <th style="width:150px">Id</th>
+                        <th>User</th>
+                        <th>Ref Type</th>
+                        <th>Ref Id</th>
+                        <th>Preview</th>
+                        <th style="width:80px" class="text-center">Visible</th>
+                        <th style="width:80px" class="text-center">Approved</th>
+                        <th>Modified</th>
+                        <th style="width:200px" class="text-end">Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model.Items)
+                    {
+                        <tr>
+                            <td class="text-truncate" style="max-width:150px" title="@c.Id">@c.Id</td>
+                            <td>@(string.IsNullOrEmpty(c.Username) ? "Anonymous" : c.Username)</td>
+                            <td class="text-truncate" style="max-width:120px" title="@c.ReferenceType">@c.ReferenceType</td>
+                            <td class="text-truncate" style="max-width:100px" title="@c.ReferenceId">@c.ReferenceId</td>
+                            <td class="text-truncate" style="max-width:200px" title="@c.Body">@c.Body</td>
+                            <td class="text-center">
+                                <form method="post" asp-page-handler="ToggleVisible" asp-route-id="@c.Id" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm @(c.Visible == true ? "btn-success" : "btn-secondary")" title="Click to toggle">
+                                        <i class="bi bi-@(c.Visible == true ? "check-circle" : "x-circle")"></i>
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="text-center">
+                                <form method="post" asp-page-handler="ToggleApproved" asp-route-id="@c.Id" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm @(c.Approved == true ? "btn-success" : "btn-secondary")" title="Click to toggle">
+                                        <i class="bi bi-@(c.Approved == true ? "check-circle" : "x-circle")"></i>
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="small">@((c.ModifiedDate ?? c.CreatedDate)?.ToString("yyyy-MM-dd HH:mm"))</td>
+                            <td class="text-end">
+                                <a asp-area="Admin" asp-page="/Comment/Details" asp-route-id="@c.Id" class="btn btn-sm btn-info" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-area="Admin" asp-page="/Comment/Edit" asp-route-id="@c.Id" class="btn btn-sm btn-primary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-area="Admin" asp-page="/Comment/Delete" asp-route-id="@c.Id" class="btn btn-sm btn-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Items.Any())
+        {
+            <div class="alert alert-info">No comments found matching the selected filters.</div>
+        }
 
         <paging total-records="@Model.TotalCount"
                 page-no="@Model.PageNumber"
@@ -49,6 +116,13 @@
                 query-string-key-page-no="pageNumber"
                 show-prev-next="true"
                 show-first-last="true"
-                class="pagination justify-content-center"></paging>
+                class="pagination justify-content-center">
+            <route-values>
+                <rv key="VisibleFilter" value="@Model.VisibleFilter"></rv>
+                <rv key="ApprovedFilter" value="@Model.ApprovedFilter"></rv>
+                <rv key="ReferenceTypeFilter" value="@Model.ReferenceTypeFilter"></rv>
+                <rv key="PageSize" value="@Model.PageSize"></rv>
+            </route-values>
+        </paging>
     </div>
 </div>

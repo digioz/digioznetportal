@@ -27,6 +27,7 @@ namespace digioz.Portal.Dal.Services
         public List<Poll> GetLatest(int count)
         {
             return _context.Polls
+                .Where(p => p.Visible == true && p.Approved == true)
                 .OrderByDescending(p => p.DateCreated)
                 .Take(count)
                 .ToList();
@@ -35,7 +36,7 @@ namespace digioz.Portal.Dal.Services
         public List<Poll> GetLatestFeatured(int count)
         {
             return _context.Polls
-                .Where(p => p.Featured)
+                .Where(p => p.Featured && p.Visible == true && p.Approved == true)
                 .OrderByDescending(p => p.DateCreated)
                 .Take(count)
                 .ToList();
@@ -60,6 +61,29 @@ namespace digioz.Portal.Dal.Services
         {
             var query = _context.Polls.OrderByDescending(p => p.DateCreated);
             totalCount = query.Count();
+            var skip = (pageNumber - 1) * pageSize;
+            return query.Skip(skip).Take(pageSize).ToList();
+        }
+
+        public List<Poll> GetPagedFiltered(int pageNumber, int pageSize, string userId, out int totalCount)
+        {
+            var query = _context.Polls.AsQueryable();
+            
+            if (!string.IsNullOrEmpty(userId))
+            {
+                query = query.Where(p => 
+                    (p.UserId == userId) || 
+                    (p.Visible == true && p.Approved == true)
+                );
+            }
+            else
+            {
+                query = query.Where(p => p.Visible == true && p.Approved == true);
+            }
+            
+            query = query.OrderByDescending(p => p.DateCreated);
+            totalCount = query.Count();
+            
             var skip = (pageNumber - 1) * pageSize;
             return query.Skip(skip).Take(pageSize).ToList();
         }

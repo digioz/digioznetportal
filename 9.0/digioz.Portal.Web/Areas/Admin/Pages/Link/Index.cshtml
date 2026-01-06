@@ -29,12 +29,20 @@
 					   placeholder="Search by name or URL..." 
 					   value="@Model.SearchQuery" />
 			</div>
-			<div class="col-md-3">
+			<div class="col-md-2">
 				<label for="visibilityFilter" class="form-label">Visibility</label>
 				<select id="visibilityFilter" name="VisibilityFilter" class="form-select" onchange="this.form.submit()">
 					<option value="all" selected="@(Model.VisibilityFilter == "all" ? "selected" : null)">All</option>
 					<option value="visible" selected="@(Model.VisibilityFilter == "visible" ? "selected" : null)">Visible</option>
 					<option value="notvisible" selected="@(Model.VisibilityFilter == "notvisible" ? "selected" : null)">Not Visible</option>
+				</select>
+			</div>
+			<div class="col-md-2">
+				<label for="approvalFilter" class="form-label">Approval</label>
+				<select id="approvalFilter" name="ApprovalFilter" class="form-select" onchange="this.form.submit()">
+					<option value="all" selected="@(Model.ApprovalFilter == "all" ? "selected" : null)">All</option>
+					<option value="approved" selected="@(Model.ApprovalFilter == "approved" ? "selected" : null)">Approved</option>
+					<option value="notapproved" selected="@(Model.ApprovalFilter == "notapproved" ? "selected" : null)">Not Approved</option>
 				</select>
 			</div>
 			<div class="col-md-3">
@@ -46,12 +54,12 @@
 					}
 				</select>
 			</div>
-			<div class="col-md-3 d-flex align-items-end gap-2">
+			<div class="col-md-2 d-flex align-items-end gap-2">
 				<button type="submit" class="btn btn-primary flex-fill">
-					<i class="bi bi-search"></i> Search
+					<i class="bi bi-search"></i>
 				</button>
 				<a asp-area="Admin" asp-page="/Link/Index" class="btn btn-outline-secondary flex-fill">
-					<i class="bi bi-x-circle"></i> Clear
+					<i class="bi bi-x-circle"></i>
 				</a>
 			</div>
 			<input type="hidden" name="PageNumber" value="1" />
@@ -65,6 +73,7 @@
 						<th>Description</th>
 						<th class="text-center" style="width:80px">Link</th>
 						<th class="text-center">Visible</th>
+						<th class="text-center">Approved</th>
 						<th style="width:300px" class="text-end">Action</th>
 					</tr>
 				</thead>
@@ -95,6 +104,7 @@
 										<input type="hidden" name="id" value="@item.Id" />
 										<input type="hidden" name="pageNumber" value="@Model.PageNumber" />
 										<input type="hidden" name="visibilityFilter" value="@Model.VisibilityFilter" />
+										<input type="hidden" name="approvalFilter" value="@Model.ApprovalFilter" />
 										<input type="hidden" name="categoryFilter" value="@Model.CategoryFilter" />
 										<input type="hidden" name="searchQuery" value="@Model.SearchQuery" />
 										<button type="submit" 
@@ -111,6 +121,28 @@
 										</button>
 									</form>
 								</td>
+								<td class="text-center">
+									<form method="post" asp-page-handler="ToggleApproval" class="d-inline">
+										<input type="hidden" name="id" value="@item.Id" />
+										<input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+										<input type="hidden" name="visibilityFilter" value="@Model.VisibilityFilter" />
+										<input type="hidden" name="approvalFilter" value="@Model.ApprovalFilter" />
+										<input type="hidden" name="categoryFilter" value="@Model.CategoryFilter" />
+										<input type="hidden" name="searchQuery" value="@Model.SearchQuery" />
+										<button type="submit" 
+												class="btn btn-link p-0 text-decoration-none"
+												title="Click to toggle approval">
+											@if (item.Approved ?? false)
+											{
+												<span class="badge bg-success" style="cursor: pointer;">Yes</span>
+											}
+											else
+											{
+												<span class="badge bg-warning text-dark" style="cursor: pointer;">No</span>
+											}
+										</button>
+									</form>
+								</td>
 								<td class="text-end">
 									<a class="btn btn-sm btn-outline-secondary px-1 py-0 fs-6" asp-area="Admin" asp-page="/Link/Detail" asp-route-id="@item.Id" title="Detail" aria-label="Detail"><i class="bi bi-eye"></i></a>
 									<a class="btn btn-sm btn-outline-primary px-1 py-0 fs-6" asp-area="Admin" asp-page="/Link/Edit" asp-route-id="@item.Id" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
@@ -121,7 +153,7 @@
 					}
 					else
 					{
-						<tr><td colspan="6" class="text-center text-muted py-4">No links found.</td></tr>
+						<tr><td colspan="7" class="text-center text-muted py-4">No links found.</td></tr>
 					}
 				</tbody>
 			</table>

@@ -41,9 +41,17 @@
         <input class="form-check-input" asp-for="Item.IsClosed" />
         <label class="form-check-label" asp-for="Item.IsClosed"></label>
     </div>
-    <div class="form-check mb-3">
+    <div class="form-check mb-2">
         <input class="form-check-input" asp-for="Item.AllowMultipleOptionsVote" />
         <label class="form-check-label" asp-for="Item.AllowMultipleOptionsVote"></label>
+    </div>
+    <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" id="Visible" name="Item.Visible" value="true" checked="@(Model.Item.Visible == true)" />
+        <label class="form-check-label" for="Visible">Visible</label>
+    </div>
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="Approved" name="Item.Approved" value="true" checked="@(Model.Item.Approved == true)" />
+        <label class="form-check-label" for="Approved">Approved</label>
     </div>
     <button type="submit" class="btn btn-primary">Save</button>
     <a class="btn btn-secondary" asp-page="Index">Cancel</a>

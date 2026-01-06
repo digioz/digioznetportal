@@ -29,9 +29,9 @@ namespace digioz.Portal.Pages.Links {
             if (id.HasValue)
             {
                 SelectedLink = _linkService.Get(id.Value);
-                if (SelectedLink != null && !SelectedLink.Visible)
+                if (SelectedLink != null && (!SelectedLink.Visible || !(SelectedLink.Approved ?? false)))
                 {
-                    // Don't show non-visible links
+                    // Don't show non-visible or non-approved links
                     SelectedLink = null;
                 }
                 else if (SelectedLink != null)
@@ -42,14 +42,14 @@ namespace digioz.Portal.Pages.Links {
                 return;
             }
 
-            // Otherwise, show all links grouped by category
+            // Otherwise, show all links grouped by category (only visible and approved)
             var categories = _linkCategoryService.GetAll()
                 .Where(c => c.Visible)
                 .OrderBy(c => c.Name)
                 .ToList();
 
             var links = _linkService.GetAll()
-                .Where(l => l.Visible)
+                .Where(l => l.Visible && (l.Approved ?? false))
                 .OrderBy(l => l.Name)
                 .ToList();
 

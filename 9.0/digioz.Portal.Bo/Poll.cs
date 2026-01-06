@@ -19,5 +19,7 @@ namespace digioz.Portal.Bo
         public DateTime DateCreated { get; set; }
         public bool Featured { get; set; }
         public bool AllowMultipleOptionsVote { get; set; }
+        public bool? Visible { get; set; }
+        public bool? Approved { get; set; }
     }
 }

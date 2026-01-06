@@ -1,27 +1,28 @@
 using System;
 using System.Linq;
+using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace digioz.Portal.Web.Areas.Admin.Pages.Link
+namespace digioz.Portal.Pages.Links
 {
+    [Authorize]
     public class AddModel : PageModel
     {
-        private readonly ILinkService _service;
-        private readonly ILinkCategoryService _categoryService;
-        public AddModel(ILinkService service, ILinkCategoryService categoryService)
+        private readonly ILinkService _linkService;
+        private readonly ILinkCategoryService _linkCategoryService;
+
+        public AddModel(ILinkService linkService, ILinkCategoryService linkCategoryService)
         {
-            _service = service;
-            _categoryService = categoryService;
+            _linkService = linkService;
+            _linkCategoryService = linkCategoryService;
         }
 
         [BindProperty]
-        public digioz.Portal.Bo.Link Item { get; set; } = new digioz.Portal.Bo.Link { Visible = true, Timestamp = DateTime.UtcNow };
-
-        [BindProperty]
-        public bool IsApproved { get; set; } = true;
+        public Link Item { get; set; } = new Link();
 
         public SelectList CategoryList { get; private set; } = new SelectList(Enumerable.Empty<object>());
 
@@ -43,7 +44,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
                 ModelState.AddModelError("Item.Name", "Name is required.");
 
             if (string.IsNullOrWhiteSpace(Item.Url))
-                ModelState.AddModelError("Item.Url", "Url is required.");
+                ModelState.AddModelError("Item.Url", "URL is required.");
 
             if (Item.LinkCategory <= 0)
                 ModelState.AddModelError("Item.LinkCategory", "Category is required.");
@@ -54,16 +55,25 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
                 return Page();
             }
 
+            // Set defaults for new user-submitted links
             Item.Timestamp = DateTime.UtcNow;
-            Item.Approved = IsApproved;
-            _service.Add(Item);
-            return RedirectToPage("/Link/Index", new { area = "Admin" });
+            Item.Visible = false;  // Not visible until approved
+            Item.Approved = false; // Requires admin approval
+            Item.Views = 0;
+
+            _linkService.Add(Item);
+
+            TempData["SuccessMessage"] = "Your link has been submitted successfully and is pending approval.";
+            return RedirectToPage("/Links/Index");
         }
 
         private void LoadCategories()
         {
-            var cats = _categoryService.GetAll().OrderBy(c => c.Name).ToList();
-            CategoryList = new SelectList(cats, nameof(digioz.Portal.Bo.LinkCategory.Id), nameof(digioz.Portal.Bo.LinkCategory.Name));
+            var categories = _linkCategoryService.GetAll()
+                .Where(c => c.Visible)
+                .OrderBy(c => c.Name)
+                .ToList();
+            CategoryList = new SelectList(categories, nameof(LinkCategory.Id), nameof(LinkCategory.Name));
         }
     }
 }

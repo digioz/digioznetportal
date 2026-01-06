@@ -12,6 +12,7 @@ namespace digioz.Portal.Pages.Polls
     {
         private readonly IPollService _pollService;
         private readonly IPollUsersVoteService _usersVoteService;
+        
         public IndexModel(IPollService pollService, IPollUsersVoteService usersVoteService)
         {
             _pollService = pollService;
@@ -30,11 +31,12 @@ namespace digioz.Portal.Pages.Polls
         {
             CurrentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
             
-            // Use the existing GetPaged method for efficient pagination
-            Items = _pollService.GetPaged(PageNumber, PageSize, out int totalCount);
-            TotalCount = totalCount;
+            if (PageNumber < 1) PageNumber = 1;
+            if (PageSize < 1) PageSize = 5;
 
-            // Use GetByUserId instead of GetAll().Where() for efficient user vote lookup
+            Items = _pollService.GetPagedFiltered(PageNumber, PageSize, CurrentUserId, out var total);
+            TotalCount = total;
+
             if (!string.IsNullOrEmpty(CurrentUserId))
             {
                 var userVotes = _usersVoteService.GetByUserId(CurrentUserId);

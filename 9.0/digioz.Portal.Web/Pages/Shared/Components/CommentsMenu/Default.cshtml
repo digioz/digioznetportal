@@ -141,8 +141,26 @@
     const recaptchaEnabled = @Json.Serialize(ViewBag.RecaptchaEnabled ?? false);
     const recaptchaPublicKey = '@Html.Raw(jsRecaptchaKey)';
 
+    function showNotification(message, type = 'info') {
+        const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : type === 'warning' ? 'alert-warning' : 'alert-info';
+        const icon = type === 'success' ? 'check-circle-fill' : type === 'error' ? 'exclamation-circle-fill' : type === 'warning' ? 'exclamation-triangle-fill' : 'info-circle-fill';
+        
+        const alert = document.createElement('div');
+        alert.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+        alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 500px;';
+        alert.innerHTML = `
+            <i class="bi bi-${icon}"></i> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        document.body.appendChild(alert);
+        
+        setTimeout(() => {
+            alert.remove();
+        }, 5000);
+    }
+
     function handleAjaxForm(form, beforeSend){
-        // Check if this form already has the handler attached
         if (form.dataset.handlerAttached === 'true') return;
         form.dataset.handlerAttached = 'true';
         
@@ -155,8 +173,19 @@
             }
             const data = new FormData(form);
             fetch(form.action, { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(()=> { window.location.reload(); })
-                .catch(()=> { window.location.reload(); });
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        if (result.message) {
+                            const notificationType = result.requiresApproval ? 'warning' : 'success';
+                            showNotification(result.message, notificationType);
+                        }
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        showNotification(result.message || 'An error occurred', 'error');
+                    }
+                })
+                .catch(() => { window.location.reload(); });
         });
     }
 
@@ -170,8 +199,19 @@
                         commentForm.querySelector('.recaptchaToken').value = token;
                         const data = new FormData(commentForm);
                         fetch(commentForm.action, { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                            .then(()=> window.location.reload())
-                            .catch(()=> window.location.reload());
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.success) {
+                                    if (result.message) {
+                                        const notificationType = result.requiresApproval ? 'warning' : 'success';
+                                        showNotification(result.message, notificationType);
+                                    }
+                                    setTimeout(() => window.location.reload(), 1500);
+                                } else {
+                                    showNotification(result.message || 'An error occurred', 'error');
+                                }
+                            })
+                            .catch(() => window.location.reload());
                     });
                 });
                 return false;
@@ -181,7 +221,6 @@
         }
     }
 
-    // Handle like forms only within this comment section
     document.querySelectorAll('#comments-root-' + uniqueId + ' .comment-like-form').forEach(f=>{
         if (f.dataset.handlerAttached === 'true') return;
         f.dataset.handlerAttached = 'true';

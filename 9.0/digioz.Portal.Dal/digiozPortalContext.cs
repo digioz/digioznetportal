@@ -200,6 +200,12 @@ namespace digioz.Portal.Dal
                 entity.Property(e => e.ParentId).HasMaxLength(128);
 
                 entity.Property(e => e.UserId).HasMaxLength(128);
+
+                entity.Property(e => e.Visible)
+                    .HasDefaultValue(false);
+
+                entity.Property(e => e.Approved)
+                    .HasDefaultValue(false);
             });
 
             modelBuilder.Entity<CommentConfig>(entity =>
@@ -230,6 +236,9 @@ namespace digioz.Portal.Dal
             modelBuilder.Entity<Link>(entity =>
             {
                 entity.ToTable("Link");
+
+                entity.Property(e => e.Approved)
+                    .HasDefaultValue(false);
             });
 
             modelBuilder.Entity<LinkCategory>(entity =>
@@ -514,6 +523,12 @@ namespace digioz.Portal.Dal
                 entity.Property(e => e.Id).HasMaxLength(128);
 
                 entity.Property(e => e.UserId).HasMaxLength(128);
+
+                entity.Property(e => e.Visible)
+                    .HasDefaultValue(false);
+
+                entity.Property(e => e.Approved)
+                    .HasDefaultValue(false);
             });
 
             modelBuilder.Entity<PollAnswer>(entity =>

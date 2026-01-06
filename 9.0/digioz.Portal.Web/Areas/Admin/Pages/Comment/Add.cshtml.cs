@@ -9,19 +9,19 @@ using System.Threading.Tasks;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Comment
 {
-    public class EditModel : PageModel
+    public class AddModel : PageModel
     {
         private readonly ICommentService _service;
         private readonly UserManager<IdentityUser> _userManager;
         
-        public EditModel(ICommentService service, UserManager<IdentityUser> userManager) 
+        public AddModel(ICommentService service, UserManager<IdentityUser> userManager) 
         { 
             _service = service;
             _userManager = userManager;
         }
 
         [BindProperty]
-        public Bo.Comment? Item { get; set; }
+        public Bo.Comment Item { get; set; } = new Bo.Comment();
         
         [BindProperty]
         public bool VisibleCheckbox { get; set; }
@@ -31,20 +31,17 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Comment
         
         public SelectList UserList { get; set; } = new SelectList(Enumerable.Empty<SelectListItem>());
 
-        public async Task<IActionResult> OnGetAsync(string id)
+        public async Task OnGetAsync()
         {
-            if (string.IsNullOrEmpty(id)) return RedirectToPage("/Comment/Index", new { area = "Admin" });
-            Item = _service.Get(id);
-            if (Item == null) return RedirectToPage("/Comment/Index", new { area = "Admin" });
-            
-            // Map nullable bool? to non-nullable bool for display
-            VisibleCheckbox = Item.Visible == true;
-            ApprovedCheckbox = Item.Approved == true;
+            // Initialize with default values
+            Item.Likes = 0;
+            Item.CreatedDate = DateTime.UtcNow;
+            Item.ModifiedDate = DateTime.UtcNow;
+            VisibleCheckbox = false;
+            ApprovedCheckbox = false;
             
             // Load users for dropdown
             await LoadUsersAsync();
-            
-            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -55,27 +52,21 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Comment
                 return Page();
             }
             
-            if (Item == null) return RedirectToPage("/Comment/Index", new { area = "Admin" });
-            
-            var existing = _service.Get(Item.Id);
-            if (existing == null) return RedirectToPage("/Comment/Index", new { area = "Admin" });
-            
-            existing.Body = Item.Body;
-            existing.UserId = Item.UserId;
+            Item.Id = Guid.NewGuid().ToString();
+            Item.CreatedDate = DateTime.UtcNow;
+            Item.ModifiedDate = DateTime.UtcNow;
+            Item.Likes = 0;
+            Item.Visible = VisibleCheckbox;
+            Item.Approved = ApprovedCheckbox;
             
             // Get username from UserId
             if (!string.IsNullOrEmpty(Item.UserId))
             {
                 var user = await _userManager.FindByIdAsync(Item.UserId);
-                existing.Username = user?.UserName;
+                Item.Username = user?.UserName;
             }
             
-            // Map non-nullable bool back to nullable bool?
-            existing.Visible = VisibleCheckbox;
-            existing.Approved = ApprovedCheckbox;
-            existing.ModifiedDate = DateTime.UtcNow;
-            
-            _service.Update(existing);
+            _service.Add(Item);
             return RedirectToPage("/Comment/Index", new { area = "Admin" });
         }
         
@@ -90,7 +81,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Comment
                 })
                 .ToList();
                 
-            UserList = new SelectList(users, "Value", "Text", Item?.UserId);
+            UserList = new SelectList(users, "Value", "Text");
         }
     }
 }

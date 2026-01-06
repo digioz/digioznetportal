@@ -5,8 +5,24 @@
 }
 
 <div class="card bg-light mb-5">
-	<div class="card-header bg-primary text-white">@ViewBag.Title</div>
+	<div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+		<span>@ViewBag.Title</span>
+		@if (User.Identity?.IsAuthenticated ?? false)
+		{
+			<a href="/Links/Add" class="btn btn-sm btn-light">
+				<i class="bi bi-plus-circle"></i> Add Link
+			</a>
+		}
+	</div>
 	<div class="card-body">
+		@if (TempData["SuccessMessage"] != null)
+		{
+			<div class="alert alert-success alert-dismissible fade show" role="alert">
+				@TempData["SuccessMessage"]
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			</div>
+		}
+
         @if (Model.SelectedLink != null)
         {
             <div class="card">

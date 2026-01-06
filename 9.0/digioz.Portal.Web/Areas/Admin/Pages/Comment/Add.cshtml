@@ -1,17 +1,16 @@
-@page "{id}"
-@model digioz.Portal.Web.Areas.Admin.Pages.Comment.EditModel
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.Comment.AddModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
-    ViewBag.Title = "Edit Comment";
+    ViewBag.Title = "Add Comment";
     Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="card shadow-sm">
-    <div class="card-header">Edit Comment</div>
+    <div class="card-header">Add Comment</div>
     <div class="card-body">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Item.Id" />
             
             <div class="mb-3">
                 <label asp-for="Item.UserId" class="form-label">User</label>
@@ -24,29 +23,16 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label class="form-label">Reference Type</label>
-                        <input class="form-control" value="@Model.Item?.ReferenceType" readonly />
+                        <label asp-for="Item.ReferenceType" class="form-label"></label>
+                        <input asp-for="Item.ReferenceType" class="form-control" />
+                        <span asp-validation-for="Item.ReferenceType" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label class="form-label">Reference Id</label>
-                        <input class="form-control" value="@Model.Item?.ReferenceId" readonly />
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="form-label">Created</label>
-                        <input class="form-control" value="@Model.Item?.CreatedDate" readonly />
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="form-label">Likes</label>
-                        <input class="form-control" value="@Model.Item?.Likes" readonly />
+                        <label asp-for="Item.ReferenceId" class="form-label"></label>
+                        <input asp-for="Item.ReferenceId" class="form-control" />
+                        <span asp-validation-for="Item.ReferenceId" class="text-danger"></span>
                     </div>
                 </div>
             </div>
@@ -74,7 +60,7 @@
             
             <div class="d-flex justify-content-between">
                 <a asp-area="Admin" asp-page="/Comment/Index" class="btn btn-secondary">Back</a>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary">Create</button>
             </div>
         </form>
     </div>
