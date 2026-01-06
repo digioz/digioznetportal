@@ -241,18 +241,28 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                     _orderService.ReassignByUserId(userId, systemUserId);
                 }
 
-                // Delete profile
-                var profile = _profileService.GetByUserId(userId);
-                if (profile != null)
-                {
-                    _profileService.Delete(profile.Id);
-                }
-
-                // Delete the user account
+                // Delete the user account first
                 var result = await _userManager.DeleteAsync(user);
                 if (!result.Succeeded)
                 {
                     throw new InvalidOperationException($"Unexpected error occurred deleting user.");
+                }
+
+                // Delete profile after successful user account deletion
+                // Use try-catch to prevent profile deletion failure from affecting the overall operation
+                try
+                {
+                    var profile = _profileService.GetByUserId(userId);
+                    if (profile != null)
+                    {
+                        _profileService.Delete(profile.Id);
+                    }
+                }
+                catch (Exception profileEx)
+                {
+                    // Log the profile deletion error but don't fail the operation
+                    // The user account is already deleted at this point
+                    _logger.LogError(profileEx, "Error deleting profile for user {UserId}. User account was successfully deleted but profile may remain orphaned.", userId);
                 }
 
                 await _signInManager.SignOutAsync();

@@ -217,13 +217,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                     _orderService.ReassignByUserId(id, systemUserId);
                 }
 
-                // Delete profile
-                var profile = _profileService.GetByUserId(id);
-                if (profile != null)
-                {
-                    _profileService.Delete(profile.Id);
-                }
-
                 // Get the user's identity to invalidate their session
                 var identityUser = await _userManager.FindByIdAsync(id);
                 if (identityUser != null)
@@ -258,6 +251,23 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                         await LoadRelatedDataAsync(id);
                         return Page();
                     }
+                }
+
+                // Delete profile after successful user account deletion
+                // Use try-catch to prevent profile deletion failure from affecting the overall operation
+                try
+                {
+                    var profile = _profileService.GetByUserId(id);
+                    if (profile != null)
+                    {
+                        _profileService.Delete(profile.Id);
+                    }
+                }
+                catch (Exception profileEx)
+                {
+                    // Log the profile deletion error but don't fail the operation
+                    // The user account is already deleted at this point
+                    _logger.LogError(profileEx, "Error deleting profile for user {UserId}. User account was successfully deleted but profile may remain orphaned.", id);
                 }
 
                 StatusMessage = "User deleted successfully. The user's security stamp has been invalidated and they will be forcefully signed out on their next request.";
