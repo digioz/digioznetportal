@@ -266,7 +266,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting user {UserId}", id);
-                StatusMessage = $"Error deleting user: {ex.Message}";
+                StatusMessage = "Error: An unexpected error occurred while deleting this user. Please check the logs for details.";
                 await LoadRelatedDataAsync(id);
                 return Page();
             }

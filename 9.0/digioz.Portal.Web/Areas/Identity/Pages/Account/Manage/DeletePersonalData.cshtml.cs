@@ -264,7 +264,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting user {UserId}", userId);
-                ModelState.AddModelError(string.Empty, $"An error occurred while deleting your account: {ex.Message}");
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred while deleting your account. Please try again or contact support if the problem persists.");
                 
                 // Reload related data
                 RelatedData = new UserRelatedData
