@@ -155,9 +155,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                 string systemUserId = null;
                 if (wantsToPreserveContent)
                 {
-                    var systemProfile = _profileService.GetAll()
-                        .FirstOrDefault(p => p.DisplayName != null && p.DisplayName.Equals("System", StringComparison.OrdinalIgnoreCase));
-                    
+                    var systemProfile = _profileService.GetByDisplayName("System");
                     systemUserId = systemProfile?.UserId;
 
                     // If user wants to preserve content but System user doesn't exist, fail the operation

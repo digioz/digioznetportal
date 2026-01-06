@@ -143,15 +143,13 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                 string? systemUserId = null;
                 if (wantsToPreserveContent)
                 {
-                    var systemProfile = _profileService.GetAll()
-                        .FirstOrDefault(p => p.DisplayName != null && p.DisplayName.Equals("System", StringComparison.OrdinalIgnoreCase));
-                    
+                    var systemProfile = _profileService.GetByDisplayName("System");
                     systemUserId = systemProfile?.UserId;
 
                     // If admin wants to preserve content but System user doesn't exist, fail the operation
                     if (string.IsNullOrEmpty(systemUserId))
                     {
-                        _logger.LogError("System user not found. Cannot delete user account when admin wants to preserve content.");
+                        _logger.LogError("System user not found. Cannot delete user account when admin wants to preserve content without System user for reassignment.");
                         StatusMessage = "Error: System user not found. Cannot delete this user while preserving content. " +
                                       "Please ensure a user with DisplayName 'System' exists or check all boxes to delete all content.";
                         await LoadRelatedDataAsync(id);
