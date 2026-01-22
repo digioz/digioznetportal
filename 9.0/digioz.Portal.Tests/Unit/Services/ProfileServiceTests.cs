@@ -461,8 +461,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Profiles.Find(1);
-            updated.Email.Should().Be("updated@example.com");
-            updated.DisplayName.Should().Be("UpdatedName");
+            updated!.Email.Should().Be("updated@example.com");
+            updated!.DisplayName.Should().Be("UpdatedName");
         }
 
         [Test]
@@ -481,9 +481,9 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Profiles.Find(1);
-            updated.FirstName.Should().Be("Jane");
-            updated.LastName.Should().Be("Smith");
-            updated.Birthday.Should().Be(new DateTime(1992, 3, 20));
+            updated!.FirstName.Should().Be("Jane");
+            updated!.LastName.Should().Be("Smith");
+            updated!.Birthday.Should().Be(new DateTime(1992, 3, 20));
         }
 
         [Test]
@@ -501,7 +501,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Profiles.Find(1);
-            updated.BirthdayVisible.Should().BeFalse();
+            updated!.BirthdayVisible.Should().BeFalse();
         }
 
         [Test]
@@ -521,10 +521,10 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Profiles.Find(1);
-            updated.Address.Should().Be("789 New St");
-            updated.City.Should().Be("Seattle");
-            updated.State.Should().Be("WA");
-            updated.Zip.Should().Be("98101");
+            updated!.Address.Should().Be("789 New St");
+            updated!.City.Should().Be("Seattle");
+            updated!.State.Should().Be("WA");
+            updated!.Zip.Should().Be("98101");
         }
 
         [Test]
@@ -542,7 +542,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Profiles.Find(1);
-            updated.ThemeId.Should().Be(3);
+            updated!.ThemeId.Should().Be(3);
         }
 
         [Test]
@@ -560,7 +560,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Profiles.Find(1);
-            updated.Avatar.Should().Be("new-avatar.jpg");
+            updated!.Avatar.Should().Be("new-avatar.jpg");
         }
 
         #endregion
@@ -609,7 +609,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Profiles.Find(1);
-            updated.Views.Should().Be(11);
+            updated!.Views.Should().Be(11);
         }
 
         [Test]
@@ -626,7 +626,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Profiles.Find(1);
-            updated.Views.Should().Be(1);
+            updated!.Views.Should().Be(1);
         }
 
         [Test]
@@ -645,7 +645,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Profiles.Find(1);
-            updated.Views.Should().Be(3);
+            updated!.Views.Should().Be(3);
         }
 
         [Test]
@@ -673,7 +673,7 @@ namespace digioz.Portal.Tests.Unit.Services
             // Act - Test 1: User makes birthday private
             _context.ChangeTracker.Clear();  // Clear before getting
             var toUpdate1 = _service.Get(1);
-            toUpdate1.BirthdayVisible = false;
+            toUpdate1!.BirthdayVisible = false;
             _service.Update(toUpdate1);
 
             // Verify it's hidden
@@ -683,7 +683,7 @@ namespace digioz.Portal.Tests.Unit.Services
             // Act - Test 2: User makes birthday public again
             _context.ChangeTracker.Clear();  // Clear before getting
             var toUpdate2 = _service.Get(1);
-            toUpdate2.BirthdayVisible = true;
+            toUpdate2!.BirthdayVisible = true;
             _service.Update(toUpdate2);
             
             // Verify it's shown
@@ -691,8 +691,8 @@ namespace digioz.Portal.Tests.Unit.Services
             var afterShown = _service.Get(1);
 
             // Assert
-            afterHidden.BirthdayVisible.Should().BeFalse();
-            afterShown.BirthdayVisible.Should().BeTrue();
+            afterHidden!.BirthdayVisible.Should().BeFalse();
+            afterShown!.BirthdayVisible.Should().BeTrue();
         }
 
         [Test]
@@ -730,8 +730,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             saved.Should().NotBeNull();
             saved!.FirstName.Should().BeNull();
-            saved.Birthday.Should().BeNull();
-            saved.ThemeId.Should().BeNull();
+            saved!.Birthday.Should().BeNull();
+            saved!.ThemeId.Should().BeNull();
         }
 
         [Test]
@@ -753,7 +753,7 @@ namespace digioz.Portal.Tests.Unit.Services
             john.Should().NotBeNull();
             jane!.Should().NotBeNull();
             john!.UserId.Should().Be("user-1");
-            jane.UserId.Should().Be("user-2");
+            jane!.UserId.Should().Be("user-2");
         }
 
         #endregion
@@ -790,10 +790,10 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Final verification
             var final = _service.Get(1);
-            final.FirstName.Should().Be("John");
-            final.LastName.Should().Be("Doe");
-            final.BirthdayVisible.Should().BeFalse();
-            final.Views.Should().Be(2);
+            final!.FirstName.Should().Be("John");
+            final!.LastName.Should().Be("Doe");
+            final!.BirthdayVisible.Should().BeFalse();
+            final!.Views.Should().Be(2);
         }
 
         [Test]
@@ -835,7 +835,7 @@ namespace digioz.Portal.Tests.Unit.Services
             // Assert
             result.Should().NotBeNull();
             result!.DisplayName.Should().Be("JaneSmith");
-            result.UserId.Should().Be("user-2");
+            result!.UserId.Should().Be("user-2");
         }
 
         #endregion
@@ -854,7 +854,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Profiles.Find(1);
-            saved.Signature.Should().HaveLength(500);
+            saved!.Signature.Should().HaveLength(500);
         }
 
         [Test]
@@ -871,9 +871,9 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Profiles.Find(1);
-            saved.FirstName.Should().Be("José");
-            saved.LastName.Should().Be("O'Brien-Smith");
-            saved.DisplayName.Should().Be("José_O'Brien");
+            saved!.FirstName.Should().Be("José");
+            saved!.LastName.Should().Be("O'Brien-Smith");
+            saved!.DisplayName.Should().Be("José_O'Brien");
         }
 
         [Test]
@@ -892,8 +892,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Profiles.Find(1);
-            saved.City.Should().Be("München");
-            saved.Country.Should().Be("Deutschland");
+            saved!.City.Should().Be("München");
+            saved!.Country.Should().Be("Deutschland");
         }
 
         [Test]
@@ -913,7 +913,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Profiles.Find(1);
-            updated.Views.Should().Be(100);
+            updated!.Views.Should().Be(100);
         }
 
         #endregion

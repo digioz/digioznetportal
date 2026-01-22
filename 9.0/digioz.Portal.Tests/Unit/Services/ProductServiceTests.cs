@@ -52,8 +52,8 @@ namespace digioz.Portal.Tests.Unit.Services
             // Assert
             result.Should().NotBeNull();
             result!.Id.Should().Be("prod-1");
-            result.Name.Should().Be("Widget");
-            result.Price.Should().Be(49.99m);
+            result!.Name.Should().Be("Widget");
+            result!.Price.Should().Be(49.99m);
         }
 
         [Test]
@@ -84,11 +84,11 @@ namespace digioz.Portal.Tests.Unit.Services
             // Assert
             result.Should().NotBeNull();
             result!.Name.Should().Be("Premium Widget");
-            result.Price.Should().Be(149.99m);
-            result.ProductCategoryId.Should().Be("cat-1");
-            result.Make.Should().Be("ACME");
-            result.Model.Should().Be("X1000");
-            result.UnitsInStock.Should().Be(50);
+            result!.Price.Should().Be(149.99m);
+            result!.ProductCategoryId.Should().Be("cat-1");
+            result!.Make.Should().Be("ACME");
+            result!.Model.Should().Be("X1000");
+            result!.UnitsInStock.Should().Be(50);
         }
 
         #endregion
@@ -160,7 +160,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             saved.Should().NotBeNull();
             saved!.Name.Should().Be("New Product");
-            saved.Price.Should().Be(79.99m);
+            saved!.Price.Should().Be(79.99m);
         }
 
         [Test]
@@ -187,13 +187,13 @@ namespace digioz.Portal.Tests.Unit.Services
 
             saved.Should().NotBeNull();
             saved!.Make.Should().Be("TestMake");
-            saved.Model.Should().Be("TestModel");
-            saved.Sku.Should().Be("SKU-12345");
-            saved.Cost.Should().Be(120m);
-            saved.UnitsInStock.Should().Be(75);
-            saved.OutOfStock.Should().BeFalse();
-            saved.Weight.Should().Be("2.5 lbs");
-            saved.Dimensions.Should().Be("12x10x3 inches");
+            saved!.Model.Should().Be("TestModel");
+            saved!.Sku.Should().Be("SKU-12345");
+            saved!.Cost.Should().Be(120m);
+            saved!.UnitsInStock.Should().Be(75);
+            saved!.OutOfStock.Should().BeFalse();
+            saved!.Weight.Should().Be("2.5 lbs");
+            saved!.Dimensions.Should().Be("12x10x3 inches");
         }
 
         [Test]
@@ -207,7 +207,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Products.Find("prod-1");
-            saved.ProductCategoryId.Should().Be("electronics-1");
+            saved.Should().NotBeNull();
+            saved!.ProductCategoryId.Should().Be("electronics-1");
         }
 
         #endregion
@@ -229,8 +230,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Products.Find("prod-1");
-            updated.Name.Should().Be("Updated Name");
-            updated.Price.Should().Be(75m);
+            updated!.Name.Should().Be("Updated Name");
+            updated!.Price.Should().Be(75m);
         }
 
         [Test]
@@ -250,8 +251,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Products.Find("prod-1");
-            updated.UnitsInStock.Should().Be(0);
-            updated.OutOfStock.Should().BeTrue();
+            updated!.UnitsInStock.Should().Be(0);
+            updated!.OutOfStock.Should().BeTrue();
         }
 
         [Test]
@@ -268,7 +269,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Products.Find("prod-1");
-            updated.Visible.Should().BeFalse();
+            updated!.Visible.Should().BeFalse();
         }
 
         [Test]
@@ -285,7 +286,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Products.Find("prod-1");
-            updated.ProductCategoryId.Should().Be("cat-2");
+            updated!.ProductCategoryId.Should().Be("cat-2");
         }
 
         [Test]
@@ -304,8 +305,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Products.Find("prod-1");
-            updated.Price.Should().Be(120m);
-            updated.Cost.Should().Be(70m);
+            updated!.Price.Should().Be(120m);
+            updated!.Cost.Should().Be(70m);
         }
 
         #endregion
@@ -354,7 +355,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Products.Find("prod-1");
-            updated.Views.Should().Be(11);
+            updated!.Views.Should().Be(11);
         }
 
         [Test]
@@ -371,7 +372,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Products.Find("prod-1");
-            updated.Views.Should().Be(1);
+            updated!.Views.Should().Be(1);
         }
 
         [Test]
@@ -390,7 +391,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Products.Find("prod-1");
-            updated.Views.Should().Be(3);
+            updated!.Views.Should().Be(3);
         }
 
         [Test]
@@ -424,9 +425,9 @@ namespace digioz.Portal.Tests.Unit.Services
             var prod2 = _context.Products.Find("prod-2");
             var prod3 = _context.Products.Find("prod-3");
 
-            prod1.ProductCategoryId.Should().BeNull();
-            prod2.ProductCategoryId.Should().BeNull();
-            prod3.ProductCategoryId.Should().Be("cat-2"); // Unchanged
+            prod1!.ProductCategoryId.Should().BeNull();
+            prod2!.ProductCategoryId.Should().BeNull();
+            prod3!.ProductCategoryId.Should().Be("cat-2"); // Unchanged
         }
 
         [Test]
@@ -442,7 +443,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var unchanged = _context.Products.Find("prod-1");
-            unchanged.ProductCategoryId.Should().Be("cat-1");
+            unchanged!.ProductCategoryId.Should().Be("cat-1");
         }
 
         [Test]
@@ -458,7 +459,7 @@ namespace digioz.Portal.Tests.Unit.Services
             act.Should().NotThrow();
 
             var unchanged = _context.Products.Find("prod-1");
-            unchanged.ProductCategoryId.Should().Be("cat-1");
+            unchanged!.ProductCategoryId.Should().Be("cat-1");
         }
 
         #endregion
@@ -478,7 +479,7 @@ namespace digioz.Portal.Tests.Unit.Services
             // Act - Simulate sales to 50 units
             _context.ChangeTracker.Clear();
             var toUpdate1 = _service.Get("prod-1");
-            toUpdate1.UnitsInStock = 50;
+            toUpdate1!.UnitsInStock = 50;
             _service.Update(toUpdate1);
             
             _context.ChangeTracker.Clear();
@@ -487,19 +488,19 @@ namespace digioz.Portal.Tests.Unit.Services
             // Simulate sales to 0 units
             _context.ChangeTracker.Clear();
             var toUpdate2 = _service.Get("prod-1");
-            toUpdate2.UnitsInStock = 0;
-            toUpdate2.OutOfStock = true;
+            toUpdate2!.UnitsInStock = 0;
+            toUpdate2!.OutOfStock = true;
             _service.Update(toUpdate2);
             
             _context.ChangeTracker.Clear();
             var after0 = _service.Get("prod-1");
 
             // Assert
-            after50.UnitsInStock.Should().Be(50);
-            after50.OutOfStock.Should().BeFalse();
+            after50!.UnitsInStock.Should().Be(50);
+            after50!.OutOfStock.Should().BeFalse();
             
-            after0.UnitsInStock.Should().Be(0);
-            after0.OutOfStock.Should().BeTrue();
+            after0!.UnitsInStock.Should().Be(0);
+            after0!.OutOfStock.Should().BeTrue();
         }
 
         [Test]
@@ -519,8 +520,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var restocked = _context.Products.Find("prod-1");
-            restocked.UnitsInStock.Should().Be(100);
-            restocked.OutOfStock.Should().BeFalse();
+            restocked!.UnitsInStock.Should().Be(100);
+            restocked!.OutOfStock.Should().BeFalse();
         }
 
         #endregion
@@ -538,7 +539,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Act
             var saved = _context.Products.Find("prod-1");
-            var profit = saved.Price - saved.Cost.Value;
+            var profit = saved!.Price - saved.Cost!.Value;
             var margin = (profit / saved.Price) * 100;
 
             // Assert
@@ -558,7 +559,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Products.Find("prod-1");
-            saved.Cost.Should().BeNull();
+            saved!.Cost.Should().BeNull();
         }
 
         [Test]
@@ -575,7 +576,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Products.Find("prod-1");
-            updated.Price.Should().Be(110m);
+            updated!.Price.Should().Be(110m);
         }
 
         #endregion
@@ -593,7 +594,7 @@ namespace digioz.Portal.Tests.Unit.Services
             // Act - Hide product
             _context.ChangeTracker.Clear();
             var toUpdate1 = _service.Get("prod-1");
-            toUpdate1.Visible = false;
+            toUpdate1!.Visible = false;
             _service.Update(toUpdate1);
             
             _context.ChangeTracker.Clear();
@@ -602,15 +603,15 @@ namespace digioz.Portal.Tests.Unit.Services
             // Show product again
             _context.ChangeTracker.Clear();
             var toUpdate2 = _service.Get("prod-1");
-            toUpdate2.Visible = true;
+            toUpdate2!.Visible = true;
             _service.Update(toUpdate2);
             
             _context.ChangeTracker.Clear();
             var afterShown = _service.Get("prod-1");
 
             // Assert
-            afterHidden.Visible.Should().BeFalse();
-            afterShown.Visible.Should().BeTrue();
+            afterHidden!.Visible.Should().BeFalse();
+            afterShown!.Visible.Should().BeTrue();
         }
 
         [Test]
@@ -670,10 +671,10 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Final verification
             var final = _service.Get("prod-1");
-            final.Visible.Should().BeTrue();
-            final.Views.Should().Be(3);
-            final.UnitsInStock.Should().Be(10);
-            final.Price.Should().Be(109.99m);
+            final!.Visible.Should().BeTrue();
+            final!.Views.Should().Be(3);
+            final!.UnitsInStock.Should().Be(10);
+            final!.Price.Should().Be(109.99m);
         }
 
         [Test]
@@ -712,7 +713,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Products.Find("prod-1");
-            saved.Price.Should().Be(0m);
+            saved!.Price.Should().Be(0m);
         }
 
         [Test]
@@ -726,7 +727,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Products.Find("prod-luxury");
-            saved.Price.Should().Be(99999.99m);
+            saved!.Price.Should().Be(99999.99m);
         }
 
         [Test]
@@ -741,7 +742,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Products.Find("prod-1");
-            saved.Description.Should().HaveLength(1000);
+            saved!.Description.Should().HaveLength(1000);
         }
 
         [Test]
@@ -755,7 +756,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Products.Find("prod-1");
-            saved.Name.Should().Be("Product™ & Co. <Special>");
+            saved!.Name.Should().Be("Product™ & Co. <Special>");
         }
 
         #endregion

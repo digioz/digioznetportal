@@ -357,7 +357,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Orders.Find("order-1");
-            updated.Total.Should().Be(150m);
+            updated.Should().NotBeNull();
+            updated!.Total.Should().Be(150m);
             updated.TrxApproved.Should().BeFalse();
         }
 
@@ -377,7 +378,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Orders.Find("order-1");
-            updated.ShippingAddress.Should().Be("456 New St");
+            updated.Should().NotBeNull();
+            updated!.ShippingAddress.Should().Be("456 New St");
             updated.ShippingCity.Should().Be("New City");
             updated.ShippingState.Should().Be("NY");
         }
@@ -398,7 +400,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Orders.Find("order-1");
-            updated.TrxApproved.Should().BeTrue();
+            updated!.TrxApproved.Should().BeTrue();
             updated.TrxAuthorizationCode.Should().Be("AUTH-UPDATED");
             updated.TrxMessage.Should().Be("Approved on retry");
         }
@@ -534,8 +536,8 @@ namespace digioz.Portal.Tests.Unit.Services
             reassignedCount.Should().Be(2);
             var order1 = _context.Orders.Find("order-1");
             var order2 = _context.Orders.Find("order-2");
-            order1.UserId.Should().Be("user-3");
-            order2.UserId.Should().Be("user-3");
+            order1!.UserId.Should().Be("user-3");
+            order2!.UserId.Should().Be("user-3");
         }
 
         [Test]
@@ -771,7 +773,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Orders.Find("order-1");
-            saved.Ccnumber.Should().Contain("XXXX"); // Verify masking
+            saved.Should().NotBeNull();
+            saved!.Ccnumber.Should().Contain("XXXX"); // Verify masking
             saved.CccardCode.Should().Be("***"); // Verify masking
         }
 
@@ -786,7 +789,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Orders.Find("order-1");
-            saved.Total.Should().Be(9999999.99m);
+            saved.Should().NotBeNull();
+            saved!.Total.Should().Be(9999999.99m);
         }
 
         [Test]
@@ -800,7 +804,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Orders.Find("order-1");
-            saved.Total.Should().Be(0m);
+            saved.Should().NotBeNull();
+            saved!.Total.Should().Be(0m);
         }
 
         #endregion

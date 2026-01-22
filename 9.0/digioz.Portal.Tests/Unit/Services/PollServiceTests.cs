@@ -581,8 +581,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Polls.Find("poll-1");
-            updated.IsClosed.Should().BeTrue();
-            updated.Slug.Should().Be("Updated poll question?");
+            updated!.IsClosed.Should().BeTrue();
+            updated!.Slug.Should().Be("Updated poll question?");
         }
 
         [Test]
@@ -599,7 +599,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Polls.Find("poll-1");
-            updated.Featured.Should().BeTrue();
+            updated!.Featured.Should().BeTrue();
         }
 
         #endregion
@@ -711,8 +711,8 @@ namespace digioz.Portal.Tests.Unit.Services
             reassignedCount.Should().Be(2);
             var poll1 = _context.Polls.Find("poll-1");
             var poll2 = _context.Polls.Find("poll-2");
-            poll1.UserId.Should().Be("user-3");
-            poll2.UserId.Should().Be("user-3");
+            poll1!.UserId.Should().Be("user-3");
+            poll2!.UserId.Should().Be("user-3");
         }
 
         [Test]

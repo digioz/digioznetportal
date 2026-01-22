@@ -538,9 +538,10 @@ namespace digioz.Portal.Tests.Unit.Services
             // Act
             _service.Add(detail);
 
-            // Assert
+            // Assert - Verify Notes saved correctly
             var saved = _context.OrderDetails.Find("detail-1");
-            saved.Notes.Should().Be("Please gift wrap with blue ribbon");
+            saved.Should().NotBeNull();
+            saved!.Notes.Should().Be("Please gift wrap with blue ribbon");
         }
 
         [Test]
@@ -555,7 +556,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.OrderDetails.Find("detail-1");
-            saved.Notes.Should().BeEmpty();
+            saved.Should().NotBeNull();
+            saved!.Notes.Should().BeEmpty();
         }
 
         [Test]
@@ -570,7 +572,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.OrderDetails.Find("detail-1");
-            saved.Description.Should().Be("Premium Quality Extra Long Product Description with Multiple Features and Specifications");
+            saved.Should().NotBeNull();
+            saved!.Description.Should().Be("Premium Quality Extra Long Product Description with Multiple Features and Specifications");
         }
 
         #endregion
@@ -588,7 +591,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.OrderDetails.Find("detail-1");
-            saved.Quantity.Should().Be(10000);
+            saved.Should().NotBeNull();
+            saved!.Quantity.Should().Be(10000);
             var lineTotal = saved != null ? saved.Quantity * saved.UnitPrice : 0m;
             lineTotal.Should().Be(9900m);
         }
@@ -604,7 +608,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.OrderDetails.Find("detail-1");
-            saved.UnitPrice.Should().Be(0.05m);
+            saved.Should().NotBeNull();
+            saved!.UnitPrice.Should().Be(0.05m);
             var lineTotal = saved != null ? saved.Quantity * saved.UnitPrice : 0m;
             lineTotal.Should().Be(0.50m);
         }
@@ -620,7 +625,8 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.OrderDetails.Find("detail-1");
-            saved.UnitPrice.Should().Be(999999.99m);
+            saved.Should().NotBeNull();
+            saved!.UnitPrice.Should().Be(999999.99m);
         }
 
         #endregion
