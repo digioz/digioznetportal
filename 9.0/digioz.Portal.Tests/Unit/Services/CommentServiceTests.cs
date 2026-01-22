@@ -1,8 +1,6 @@
 using NUnit.Framework;
 using Moq;
 using FluentAssertions;
-using AutoFixture;
-using AutoFixture.NUnit3;
 using digioz.Portal.Dal;
 using digioz.Portal.Dal.Services;
 using digioz.Portal.Bo;
@@ -21,14 +19,12 @@ namespace digioz.Portal.Tests.Unit.Services
     {
         private digiozPortalContext _context;
         private CommentService _service;
-        private Fixture _fixture;
 
         [SetUp]
         public void Setup()
         {
             _context = TestDataHelper.CreateInMemoryContext();
             _service = new CommentService(_context);
-            _fixture = new Fixture();
         }
 
         [TearDown]
@@ -53,7 +49,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             result.Should().NotBeNull();
-            result.Id.Should().Be("1");
+            result!.Id.Should().Be("1");
             result.Body.Should().Be("Test comment");
         }
 
@@ -127,8 +123,10 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Comments.Find("new-comment");
+
             saved.Should().NotBeNull();
-            saved.Body.Should().Be("Test comment");
+            saved!.Should().NotBeNull();
+            saved!.Body.Should().Be("Test comment");
         }
 
         #endregion
@@ -149,7 +147,10 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updated = _context.Comments.Find("1");
-            updated.Body.Should().Be("Updated comment");
+
+            updated.Should().NotBeNull();
+            updated!.Should().NotBeNull();
+            updated!.Body.Should().Be("Updated comment");
         }
 
         #endregion

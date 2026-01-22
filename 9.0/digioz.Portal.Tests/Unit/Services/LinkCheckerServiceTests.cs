@@ -151,44 +151,26 @@ namespace digioz.Portal.Tests.Unit.Services
         [Test]
         public void LinkChecker_ExtractsMetaDescription()
         {
-            // Arrange
-            var html = @"
-                <html>
-                <head>
-                    <meta name='description' content='Test description from meta tag'>
-                    <title>Test Page</title>
-                </head>
-                <body>Content</body>
-                </html>";
-
-            // Act & Assert
             // The service should extract the meta description when available
+            // Example HTML structure:
+            // <html><head>
+            //   <meta name='description' content='Test description from meta tag'>
+            //   <title>Test Page</title>
+            // </head><body>Content</body></html>
+            
             Assert.Pass("Description extraction from meta tags is tested through integration tests");
         }
 
         [Test]
         public void LinkChecker_FallsBackToTitle_WhenNoDescription()
         {
-            // Arrange
-            var html = @"
-                <html>
-                <head>
-                    <title>Test Page Title</title>
-                </head>
-                <body>Content</body>
-                </html>";
-
-            // Act & Assert
             // When no meta description exists, should fall back to title
+            // Example HTML structure:
+            // <html><head>
+            //   <title>Test Page Title</title>
+            // </head><body>Content</body></html>
+            
             Assert.Pass("Title fallback is tested through integration tests");
-        }
-
-        [Test]
-        public void LinkChecker_LimitsHtmlReading_ToHeadSection()
-        {
-            // The service should only read up to 50KB or until </head> tag
-            // This prevents memory issues with large HTML pages
-            Assert.Pass("HTML reading optimization is implemented with 50KB limit");
         }
 
         #endregion

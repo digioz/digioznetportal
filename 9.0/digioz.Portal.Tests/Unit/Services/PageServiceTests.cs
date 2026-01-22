@@ -63,7 +63,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             result.Should().NotBeNull();
-            result.Title.Should().Be("Test Page");
+            result!.Title.Should().Be("Test Page");
             result.Body.Should().Be("Test Content");
             result.Visible.Should().BeTrue();
         }
@@ -133,7 +133,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             result.Should().NotBeNull();
-            result.Id.Should().Be(1);
+            result!.Id.Should().Be(1);
             result.Title.Should().Be("About Us");
         }
 
@@ -171,7 +171,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             result.Should().NotBeNull();
-            result.Id.Should().Be(1);
+            result!.Id.Should().Be(1);
             result.Url.Should().Be("test-page");
         }
 
@@ -207,7 +207,7 @@ namespace digioz.Portal.Tests.Unit.Services
             // Assert
             var savedPage = _context.Pages.FirstOrDefault(p => p.Title == "New Page");
             savedPage.Should().NotBeNull();
-            savedPage.Body.Should().Be("New Content");
+            savedPage!.Body.Should().Be("New Content");
         }
 
         #endregion
@@ -235,8 +235,9 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var updatedPage = _context.Pages.Find(1);
+
             updatedPage.Should().NotBeNull();
-            updatedPage.Title.Should().Be("Updated Title");
+            updatedPage!.Title.Should().Be("Updated Title");
             updatedPage.Body.Should().Be("Updated Content");
         }
 

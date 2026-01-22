@@ -28,6 +28,9 @@ digioz.Portal.Tests/
 ?   ?   ??? LinkCheckerServiceTests.cs # Documentation tests for LinkChecker
 ?   ?   ??? PollServiceTests.cs         # 50+ test cases for PollService
 ?   ?   ??? OrderServiceTests.cs       # 55+ test cases for OrderService
+?   ?   ??? OrderDetailServiceTests.cs # 40+ test cases for OrderDetailService
+?   ?   ??? ProfileServiceTests.cs     # 45+ test cases for ProfileService
+?   ?   ??? ProductServiceTests.cs     # 50+ test cases for ProductService
 ?   ??? Utilities/
 ?       ??? StringUtilsTests.cs        # 80+ test cases for StringUtils
 ?       ??? InputSanitizerTests.cs     # Security-focused sanitization tests
@@ -108,6 +111,30 @@ digioz.Portal.Tests/
 - ? DeleteOrder operations (existing/non-existing)
 - **Total: ~55 test cases**
 
+#### **OrderDetailService Tests** (Unit/Services/OrderDetailServiceTests.cs)
+- ? AddOrderDetail operations (valid/invalid data)
+- ? UpdateOrderDetail operations (valid/invalid data)
+- ? GetOrderDetailById operations (existing/non-existing)
+- ? DeleteOrderDetail operations (existing/non-existing)
+- **Total: ~40 test cases**
+
+#### **ProfileService Tests** (Unit/Services/ProfileServiceTests.cs)
+- ? Get operations (valid/invalid IDs)
+- ? Update operations (valid/invalid data)
+- ? Delete operations (existing/non-existing)
+- ? GDPR compliance checks
+- **Total: ~45 test cases**
+
+#### **ProductService Tests** (Unit/Services/ProductServiceTests.cs)
+- ? Get operations (valid/invalid IDs)
+- ? GetAll operations (empty and populated)
+- ? GetBySlug (existing/non-existing)
+- ? Add operations
+- ? Update operations
+- ? Delete operations (existing/non-existing)
+- ? Search with terms, pagination, empty results
+- **Total: ~50 test cases**
+
 ### 4. **Helper Classes**
 
 #### **TestDataHelper** (Helpers/TestDataHelper.cs)
@@ -119,6 +146,9 @@ Provides factory methods for creating test data:
 - ? `CreateTestPollAnswers()` - Poll answers factory
 - ? `CreateTestLink()` - Link factory
 - ? `CreateTestOrder()` - Order factory
+- ? `CreateTestOrderDetail()` - Order detail factory
+- ? `CreateTestProfile()` - Profile factory
+- ? `CreateTestProduct()` - Product factory
 - ? `SeedTestData()` - Seeds database with test data
 - ? `ClearTestData()` - Cleans up test data
 
@@ -154,11 +184,22 @@ Tests are organized with NUnit categories for selective execution:
 | PageService | 20+ | ? Complete |
 | PollService | 50+ | ? Complete |
 | OrderService | 55+ | ? Complete ?? CRITICAL |
+| OrderDetailService | 40+ | ? Complete ?? CRITICAL |
+| ProfileService | 45+ | ? Complete ?? CRITICAL |
+| ProductService | 50+ | ? Complete ?? CRITICAL |
 | StringUtils | 30+ | ? Complete |
 | InputSanitizer | 15+ | ? Complete |
 | CommentService | 10+ | ? Complete |
 | LinkCheckerService | 15+ | ? Documentation |
-| **Total** | **~195** | **? Building** |
+| **Total** | **~330** | **? Building** |
+
+### ?? **E-commerce Stack: COMPLETE** (145+ tests)
+- ? OrderService (55+ tests) - Order headers, payments, customers
+- ? OrderDetailService (40+ tests) - Line items, products, variants
+- ? ProductService (50+ tests) - Product catalog, inventory, pricing
+
+### ?? **User Management: COMPLETE** (45+ tests)
+- ? ProfileService (45+ tests) - User data, privacy, GDPR compliance
 
 ## ?? How to Use
 

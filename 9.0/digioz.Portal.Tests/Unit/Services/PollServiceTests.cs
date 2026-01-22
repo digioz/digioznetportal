@@ -51,7 +51,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             result.Should().NotBeNull();
-            result.Id.Should().Be("poll-1");
+            result!.Id.Should().Be("poll-1");
             result.Slug.Should().Contain("Test poll question");
         }
 
@@ -535,8 +535,9 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Polls.Find("new-poll");
+
             saved.Should().NotBeNull();
-            saved.UserId.Should().Be("user-1");
+            saved!.UserId.Should().Be("user-1");
         }
 
         [Test]
@@ -552,8 +553,9 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Polls.Find("poll-1");
+
             saved.Should().NotBeNull();
-            saved.Visible.Should().Be(true);
+            saved!.Visible.Should().Be(true);
             saved.Approved.Should().Be(true);
             saved.IsClosed.Should().BeFalse();
             saved.Featured.Should().BeTrue();

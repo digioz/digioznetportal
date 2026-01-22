@@ -152,6 +152,93 @@ namespace digioz.Portal.Tests.Helpers
         }
 
         /// <summary>
+        /// Creates a sample order detail (line item) for testing
+        /// </summary>
+        public static OrderDetail CreateTestOrderDetail(string id = "detail-1", string orderId = "order-1", string productId = "product-1", 
+            int quantity = 1, decimal unitPrice = 99.99m)
+        {
+            return new OrderDetail
+            {
+                Id = id,
+                OrderId = orderId,
+                ProductId = productId,
+                Quantity = quantity,
+                UnitPrice = unitPrice,
+                Description = $"Test Product {productId}",
+                Size = "Medium",
+                Color = "Blue",
+                MaterialType = "Cotton",
+                Notes = ""
+            };
+        }
+
+        /// <summary>
+        /// Creates a sample profile for testing
+        /// </summary>
+        public static Profile CreateTestProfile(int id = 1, string userId = "test-user", string email = "test@example.com", string displayName = "TestUser")
+        {
+            return new Profile
+            {
+                Id = id,
+                UserId = userId,
+                DisplayName = displayName,
+                Email = email,
+                FirstName = "Test",
+                MiddleName = "M",
+                LastName = "User",
+                Birthday = new DateTime(1990, 1, 1),
+                BirthdayVisible = true,
+                Address = "123 Test St",
+                Address2 = "",
+                City = "Test City",
+                State = "TS",
+                Zip = "12345",
+                Country = "Test Country",
+                Signature = "Test signature",
+                Avatar = "avatar.jpg",
+                ThemeId = null,
+                Views = 0
+            };
+        }
+
+        /// <summary>
+        /// Creates a sample product for testing
+        /// </summary>
+        public static Product CreateTestProduct(string id = "product-1", string name = "Test Product", decimal price = 99.99m, 
+            string? categoryId = null, bool visible = true)
+        {
+            return new Product
+            {
+                Id = id,
+                ProductCategoryId = categoryId,
+                Name = name,
+                Make = "Test Make",
+                Model = "Test Model",
+                Sku = $"SKU-{id}",
+                Image = "test-product.jpg",
+                Price = price,
+                Cost = price * 0.6m,
+                QuantityPerUnit = 1,
+                Weight = "1.5 lbs",
+                Dimensions = "10x8x2 inches",
+                Sizes = "Small,Medium,Large",
+                Colors = "Red,Blue,Black",
+                MaterialType = "Cotton,Polyester",
+                PartNumber = $"PN-{id}",
+                ShortDescription = "Test product short description",
+                Description = "Test product full description",
+                ManufacturerUrl = "https://example.com/manufacturer",
+                UnitsInStock = 100,
+                OutOfStock = false,
+                Notes = "Test notes",
+                Visible = visible,
+                DateCreated = DateTime.UtcNow,
+                DateModified = DateTime.UtcNow,
+                Views = 0
+            };
+        }
+
+        /// <summary>
         /// Seeds a database context with sample data for testing
         /// </summary>
         public static void SeedTestData(digiozPortalContext context)
@@ -189,6 +276,7 @@ namespace digioz.Portal.Tests.Helpers
             context.PollAnswers.RemoveRange(context.PollAnswers);
             context.Comments.RemoveRange(context.Comments);
             context.Orders.RemoveRange(context.Orders);
+            context.OrderDetails.RemoveRange(context.OrderDetails);
             context.SaveChanges();
         }
     }

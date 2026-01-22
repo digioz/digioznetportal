@@ -51,7 +51,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             result.Should().NotBeNull();
-            result.Id.Should().Be("order-1");
+            result!.Id.Should().Be("order-1");
             result.UserId.Should().Be("user-1");
             result.Total.Should().Be(99.99m);
         }
@@ -79,7 +79,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             result.Should().NotBeNull();
-            result.Email.Should().Be("test@example.com");
+            result!.Email.Should().Be("test@example.com");
             result.Phone.Should().Be("555-1234");
             result.BillingAddress.Should().Be("123 Test St");
             result.ShippingAddress.Should().Be("123 Test St");
@@ -269,8 +269,9 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Orders.Find("new-order");
+
             saved.Should().NotBeNull();
-            saved.UserId.Should().Be("user-1");
+            saved!.UserId.Should().Be("user-1");
             saved.Total.Should().Be(299.99m);
         }
 
@@ -287,8 +288,9 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Orders.Find("order-1");
+
             saved.Should().NotBeNull();
-            saved.InvoiceNumber.Should().Be("INV-001");
+            saved!.InvoiceNumber.Should().Be("INV-001");
             saved.OrderDate.Should().Be(new DateTime(2024, 1, 15));
             saved.FirstName.Should().Be("Test");
             saved.LastName.Should().Be("User");
@@ -311,8 +313,9 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Orders.Find("order-1");
+
             saved.Should().NotBeNull();
-            saved.TrxId.Should().Be("TRX-ABC123");
+            saved!.TrxId.Should().Be("TRX-ABC123");
             saved.TrxResponseCode.Should().Be("1");
             saved.TrxAuthorizationCode.Should().Be("AUTH789");
             saved.TrxMessage.Should().Be("Transaction Approved");
@@ -329,8 +332,9 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             var saved = _context.Orders.Find("order-1");
+
             saved.Should().NotBeNull();
-            saved.TrxApproved.Should().BeFalse();
+            saved!.TrxApproved.Should().BeFalse();
             saved.TrxMessage.Should().Be("Declined");
         }
 
@@ -596,7 +600,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             result.Should().NotBeNull();
-            result.Id.Should().Be("order-1");
+            result!.Id.Should().Be("order-1");
             result.TrxId.Should().Be("TOKEN-ABC123");
         }
 
@@ -620,7 +624,7 @@ namespace digioz.Portal.Tests.Unit.Services
 
             // Assert
             result.Should().NotBeNull();
-            result.Id.Should().Be("order-1");
+            result!.Id.Should().Be("order-1");
             result.TrxResponseCode.Should().Be("1");
         }
 
