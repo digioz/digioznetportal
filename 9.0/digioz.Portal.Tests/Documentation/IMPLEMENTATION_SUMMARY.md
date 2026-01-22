@@ -26,6 +26,8 @@ digioz.Portal.Tests/
 ?   ?   ??? PageServiceTests.cs        # 60+ test cases for PageService
 ?   ?   ??? CommentServiceTests.cs     # Comment management tests
 ?   ?   ??? LinkCheckerServiceTests.cs # Documentation tests for LinkChecker
+?   ?   ??? PollServiceTests.cs         # 50+ test cases for PollService
+?   ?   ??? OrderServiceTests.cs       # 55+ test cases for OrderService
 ?   ??? Utilities/
 ?       ??? StringUtilsTests.cs        # 80+ test cases for StringUtils
 ?       ??? InputSanitizerTests.cs     # Security-focused sanitization tests
@@ -90,6 +92,22 @@ digioz.Portal.Tests/
   - Resource management
 - **Total: ~15 documentation test cases**
 
+#### **PollService Tests** (Unit/Services/PollServiceTests.cs)
+- ? Vote operations (valid/invalid IDs)
+- ? Get operations (valid/invalid IDs)
+- ? GetByPollId operations (existing/non-existing)
+- ? Add operations
+- ? Update operations
+- ? Delete operations (existing/non-existing)
+- **Total: ~50 test cases**
+
+#### **OrderService Tests** (Unit/Services/OrderServiceTests.cs)
+- ? PlaceOrder operations (valid/invalid data)
+- ? GetOrderById operations (existing/non-existing)
+- ? UpdateOrder operations (valid/invalid data)
+- ? DeleteOrder operations (existing/non-existing)
+- **Total: ~55 test cases**
+
 ### 4. **Helper Classes**
 
 #### **TestDataHelper** (Helpers/TestDataHelper.cs)
@@ -134,11 +152,13 @@ Tests are organized with NUnit categories for selective execution:
 | Component | Test Cases | Status |
 |-----------|------------|--------|
 | PageService | 20+ | ? Complete |
+| PollService | 50+ | ? Complete |
+| OrderService | 55+ | ? Complete ?? CRITICAL |
 | StringUtils | 30+ | ? Complete |
 | InputSanitizer | 15+ | ? Complete |
 | CommentService | 10+ | ? Complete |
 | LinkCheckerService | 15+ | ? Documentation |
-| **Total** | **~90** | **? Building** |
+| **Total** | **~195** | **? Building** |
 
 ## ?? How to Use
 

@@ -59,17 +59,19 @@ namespace digioz.Portal.Tests.Helpers
         /// <summary>
         /// Creates a sample poll for testing
         /// </summary>
-        public static Poll CreateTestPoll(string id = "1", bool visible = true, bool approved = true)
+        public static Poll CreateTestPoll(string id = "1", string userId = "test-user", bool visible = true, bool approved = true, bool isClosed = false, bool featured = false)
         {
             return new Poll
             {
                 Id = id,
-                Slug = "Test poll question?",
-                UserId = "test-user",
+                Slug = $"Test poll question {id}?",
+                UserId = userId,
                 Visible = visible,
                 Approved = approved,
                 DateCreated = DateTime.UtcNow,
-                AllowMultipleOptionsVote = false
+                AllowMultipleOptionsVote = false,
+                IsClosed = isClosed,
+                Featured = featured
             };
         }
 
@@ -111,28 +113,41 @@ namespace digioz.Portal.Tests.Helpers
         /// <summary>
         /// Creates a sample order for testing
         /// </summary>
-        public static Order CreateTestOrder(string id = "1", string userId = "test-user")
+        public static Order CreateTestOrder(string id = "order-1", string userId = "test-user", decimal total = 99.99m, bool trxApproved = true)
         {
             return new Order
             {
                 Id = id,
                 UserId = userId,
+                InvoiceNumber = $"INV-{id}",
+                OrderDate = DateTime.UtcNow,
                 FirstName = "Test",
                 LastName = "User",
                 Email = "test@example.com",
                 Phone = "555-1234",
                 BillingAddress = "123 Test St",
+                BillingAddress2 = "",
                 BillingCity = "Test City",
                 BillingState = "TS",
                 BillingZip = "12345",
                 BillingCountry = "Test Country",
                 ShippingAddress = "123 Test St",
+                ShippingAddress2 = "",
                 ShippingCity = "Test City",
                 ShippingState = "TS",
                 ShippingZip = "12345",
                 ShippingCountry = "Test Country",
-                Total = 99.99m,
-                TrxApproved = true
+                Total = total,
+                Ccamount = total,
+                Ccnumber = "XXXXXXXXXXXX1234",
+                Ccexp = "12/25",
+                CccardCode = "***",
+                TrxApproved = trxApproved,
+                TrxId = $"TRX-{id}",
+                TrxResponseCode = trxApproved ? "1" : "0",
+                TrxAuthorizationCode = trxApproved ? "AUTH123" : null,
+                TrxMessage = trxApproved ? "Approved" : "Declined",
+                TrxDescription = "Test order transaction"
             };
         }
 
@@ -150,13 +165,13 @@ namespace digioz.Portal.Tests.Helpers
 
             // Add links
             context.Links.AddRange(
-                CreateTestLink(1, true, true),
-                CreateTestLink(2, true, false),
-                CreateTestLink(3, false, true)
+                CreateTestLink(1, true),
+                CreateTestLink(2, true),
+                CreateTestLink(3, false)
             );
 
             // Add polls
-            var poll = CreateTestPoll("poll-1", true, true);
+            var poll = CreateTestPoll("poll-1", "test-user", visible: true, approved: true);
             context.Polls.Add(poll);
             context.PollAnswers.AddRange(CreateTestPollAnswers("poll-1"));
 
