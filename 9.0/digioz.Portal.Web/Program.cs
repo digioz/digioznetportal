@@ -117,6 +117,10 @@ builder.Services.AddScoped<IThemeService, ThemeService>();
 
 // Register Web-specific services
 builder.Services.AddScoped<LinkCheckerService>();
+builder.Services.AddSingleton<digioz.Portal.Web.Services.BanManagementService>();
+
+// Register background services
+builder.Services.AddHostedService<RateLimitCleanupService>();
 
 // Register Email Provider Services
 builder.Services.AddEmailProviders();
@@ -296,6 +300,10 @@ app.UseSession();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// ADD RATE LIMITING MIDDLEWARE HERE - BEFORE Authentication/Authorization
+app.UseMiddleware<digioz.Portal.Web.Middleware.RateLimitingMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

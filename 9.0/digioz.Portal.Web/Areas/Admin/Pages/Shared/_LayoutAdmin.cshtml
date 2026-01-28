@@ -126,10 +126,11 @@
                     <!-- Users Dropdown -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarUsersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Users
+                            Security
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarUsersDropdown">
                             <li><a class="dropdown-item" asp-area="Admin" asp-page="/UserManager/Index">User Manager</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Security/BannedIps">Banned IPs</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -185,15 +186,16 @@
                         <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/LinkCategory/Index">Link Category</a>
                         <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Theme/Index">Themes</a>
 
+                        <!-- Security Category -->
+                        <div class="list-group-item list-group-item-dark fw-semibold small category">Security</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/UserManager/Index">User Manager</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Security/BannedIps">Banned IPs</a>
+
                         <!-- Monitoring Category -->
                         <div class="list-group-item list-group-item-dark fw-semibold small category">Monitoring</div>
                         <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Visitor/Index">Visitors</a>
                         <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Log/Index">Logs</a>
-                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/VisitorSession/Index">Sessions</a>
-
-                        <!-- Users Category -->
-                        <div class="list-group-item list-group-item-dark fw-semibold small category">Users</div>
-                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/UserManager/Index">User Manager</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/VisitorSession/Index">Sessions</a>                        
                     </div>
                 </div>
             </aside>
@@ -206,7 +208,7 @@
     </div>
 
     <footer class="text-center text-muted py-4">
-       <small><p>&copy; @DateTime.Now.Year - @(configDictionary?["SiteName"] ?? "Portal")</p></small>
+       <small>&copy; @DateTime.Now.Year - @(configDictionary?["SiteName"] ?? "Portal")</small>
     </footer>
 
     <!-- Bootstrap 5 Bundle JS (local) -->

@@ -49,16 +49,29 @@ namespace digioz.Portal.Dal.Services
 
         public void IncrementViews(string id)
         {
-            _context.Products
-                .Where(p => p.Id == id)
-                .ExecuteUpdate(setters => setters.SetProperty(p => p.Views, p => p.Views + 1));
+            var product = _context.Products.Find(id);
+            if (product != null)
+            {
+                product.Views++;
+                _context.SaveChanges();
+            }
         }
 
         public void ClearProductCategory(string categoryId)
         {
-            _context.Products
+            var products = _context.Products
                 .Where(p => p.ProductCategoryId == categoryId)
-                .ExecuteUpdate(setters => setters.SetProperty(p => p.ProductCategoryId, (string)null));
+                .ToList();
+            
+            foreach (var product in products)
+            {
+                product.ProductCategoryId = null;
+            }
+            
+            if (products.Any())
+            {
+                _context.SaveChanges();
+            }
         }
     }
 }
