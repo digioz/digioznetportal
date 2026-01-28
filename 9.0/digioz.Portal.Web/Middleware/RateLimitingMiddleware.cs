@@ -19,6 +19,7 @@ namespace digioz.Portal.Web.Middleware
     /// Middleware that implements IP-based rate limiting with automatic ban enforcement.
     /// Tracks requests per IP address and blocks excessive requests from bots or attackers.
     /// Uses both in-memory tracking (for performance) and database (for persistence).
+    /// Cleanup of expired data is handled by RateLimitCleanupService.
     /// </summary>
     public class RateLimitingMiddleware
     {
@@ -28,12 +29,6 @@ namespace digioz.Portal.Web.Middleware
         
         // In-memory concurrent dictionaries for fast request tracking
         private static readonly ConcurrentDictionary<string, RequestTracker> _requestTracking = new();
-        
-        // Cleanup timer to prevent memory leaks and sync with database
-        private static readonly Timer _cleanupTimer = new(CleanupOldEntries, null, 
-            TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
-
-        private static IServiceScopeFactory? _staticScopeFactory;
 
         public RateLimitingMiddleware(
             RequestDelegate next, 
@@ -43,7 +38,6 @@ namespace digioz.Portal.Web.Middleware
             _next = next;
             _logger = logger;
             _scopeFactory = scopeFactory;
-            _staticScopeFactory = scopeFactory; // Store for timer callback
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -209,52 +203,6 @@ namespace digioz.Portal.Web.Middleware
             };
             
             return legitimateBots.Any(bot => botName.Contains(bot, StringComparison.OrdinalIgnoreCase));
-        }
-        
-        private static void CleanupOldEntries(object? state)
-        {
-            var now = DateTime.UtcNow;
-            var cutoff = now.AddHours(-2); // Clean entries older than 2 hours
-            
-            // Clean in-memory tracking
-            foreach (var kvp in _requestTracking)
-            {
-                var tracker = kvp.Value;
-                lock (tracker)
-                {
-                    tracker.Requests.RemoveAll(r => r < cutoff);
-                    
-                    // Remove tracker if no recent activity and not banned
-                    if (tracker.Requests.Count == 0)
-                    {
-                        _requestTracking.TryRemove(kvp.Key, out _);
-                    }
-                }
-            }
-            
-            // Clean expired bans from database
-            if (_staticScopeFactory != null)
-            {
-                try
-                {
-                    using var scope = _staticScopeFactory.CreateScope();
-                    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    
-                    var expiredBans = dbContext.BannedIp
-                        .Where(b => b.BanExpiry < now && b.BanExpiry != DateTime.MaxValue)
-                        .ToList();
-                    
-                    if (expiredBans.Any())
-                    {
-                        dbContext.BannedIp.RemoveRange(expiredBans);
-                        dbContext.SaveChanges();
-                    }
-                }
-                catch
-                {
-                    // Ignore cleanup errors
-                }
-            }
         }
         
         private class RequestTracker

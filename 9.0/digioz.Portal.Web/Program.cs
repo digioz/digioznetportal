@@ -119,6 +119,9 @@ builder.Services.AddScoped<IThemeService, ThemeService>();
 builder.Services.AddScoped<LinkCheckerService>();
 builder.Services.AddSingleton<digioz.Portal.Web.Services.BanManagementService>();
 
+// Register background services
+builder.Services.AddHostedService<RateLimitCleanupService>();
+
 // Register Email Provider Services
 builder.Services.AddEmailProviders();
 builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>();
