@@ -13,10 +13,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using digioz.Portal.Dal.Services.Interfaces;
 using Microsoft.Extensions.Logging;
+using digioz.Portal.Web.Filters;
+using digioz.Portal.Utilities.Helpers;
 
 namespace digioz.Portal.Web.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
+    [PasswordResetRateLimit] // Apply rate limiting to this page
     public class ForgotPasswordModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -58,6 +61,19 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Check if rate limit was exceeded (set by attribute filter)
+            if (HttpContext.Items.ContainsKey("RateLimitExceeded"))
+            {
+                var email = HttpContext.Items["RateLimitEmail"] as string;
+                var ipAddress = IpAddressHelper.GetUserIPAddress(HttpContext);
+                
+                _logger.LogWarning("Password reset blocked due to rate limit for email: {Email} from IP: {IpAddress}", 
+                    email, ipAddress);
+                
+                // Still redirect to confirmation to prevent enumeration
+                return RedirectToPage("./ForgotPasswordConfirmation");
+            }
+
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(Input.Email);
@@ -65,7 +81,9 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account
                 // Always show success message for security (don't reveal if email exists)
                 if (user == null)
                 {
-                    _logger.LogWarning("Password reset requested for non-existent email: {Email}", Input.Email);
+                    var ipAddress = IpAddressHelper.GetUserIPAddress(HttpContext);
+                    _logger.LogWarning("Password reset requested for non-existent email: {Email} from IP: {IpAddress}", 
+                        Input.Email, ipAddress);
                     return RedirectToPage("./ForgotPasswordConfirmation");
                 }
 
