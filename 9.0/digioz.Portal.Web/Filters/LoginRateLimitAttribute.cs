@@ -10,11 +10,11 @@ using digioz.Portal.Web.Middleware;
 namespace digioz.Portal.Web.Filters
 {
     /// <summary>
-    /// Async page filter for password reset rate limiting.
-    /// Tracks attempts per email and IP to prevent enumeration attacks.
+    /// Async page filter for login rate limiting.
+    /// Tracks login attempts per email and IP to prevent brute force attacks.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
-    public class PasswordResetRateLimitAttribute : Attribute, IAsyncPageFilter
+    public class LoginRateLimitAttribute : Attribute, IAsyncPageFilter
     {
         public Task OnPageHandlerSelectionAsync(PageHandlerSelectedContext context)
         {
@@ -25,7 +25,7 @@ namespace digioz.Portal.Web.Filters
         {
             var ipAddress = IpAddressHelper.GetUserIPAddress(context.HttpContext);
             var logger = context.HttpContext.RequestServices
-                .GetService(typeof(ILogger<PasswordResetRateLimitAttribute>)) as ILogger<PasswordResetRateLimitAttribute>;
+                .GetService(typeof(ILogger<LoginRateLimitAttribute>)) as ILogger<LoginRateLimitAttribute>;
             
             // Get services
             var rateLimitService = context.HttpContext.RequestServices.GetRequiredService<RateLimitService>();
@@ -64,44 +64,48 @@ namespace digioz.Portal.Web.Filters
                 }
             }
             
-            // Track this password reset request (whether email found or not)
+            // Track this login request
             var userAgent = context.HttpContext.Request.Headers["User-Agent"].ToString();
-            await rateLimitService.TrackRequestAsync(ipAddress, "/Identity/Account/ForgotPassword", "ForgotPassword", email, userAgent);
+            await rateLimitService.TrackRequestAsync(ipAddress, "/Identity/Account/Login", "Login", email, userAgent);
             
             // Check IP-based rate limit (per hour)
-            if (!await rateLimitService.CheckPasswordResetLimitPerIpAsync(
+            if (!await rateLimitService.CheckLoginLimitPerIpAsync(
                 ipAddress, 
-                config.PasswordResetMaxAttemptsPerIpPerHour, 
+                config.LoginMaxAttemptsPerIpPerHour, 
                 1)) // 1 hour window
             {
-                logger?.LogWarning("Password reset limit exceeded (IP) - IP: {IP}, Max: {Max}/hour", 
-                    ipAddress, config.PasswordResetMaxAttemptsPerIpPerHour);
+                logger?.LogWarning("Login limit exceeded (IP) - IP: {IP}, Max: {Max}/hour", 
+                    ipAddress, config.LoginMaxAttemptsPerIpPerHour);
                 
-                // Ban the IP for exceeding password reset limit
+                // Ban the IP for exceeding login limit
                 var banService = context.HttpContext.RequestServices.GetRequiredService<Services.BanManagementService>();
-                var banExpiry = DateTime.UtcNow.AddHours(1); // 1 hour ban for password reset abuse
-                await banService.BanIpAsync(ipAddress, "Exceeded password reset limit", banExpiry, 1, userAgent ?? "", email ?? "");
+                var banExpiry = DateTime.UtcNow.AddHours(1); // 1 hour ban for login abuse
+                await banService.BanIpAsync(ipAddress, "Exceeded login limit", banExpiry, 1, userAgent, email ?? "");
                     
                 context.Result = new Microsoft.AspNetCore.Mvc.RedirectResult(
-                    $"/RateLimited?reason={Uri.EscapeDataString($"Too many password reset attempts (max {config.PasswordResetMaxAttemptsPerIpPerHour}/hour)")}&retryAfter=1%20hour");
+                    $"/RateLimited?reason={Uri.EscapeDataString($"Too many login attempts (max {config.LoginMaxAttemptsPerIpPerHour}/hour)")}&retryAfter=1%20hour");
                 return;
             }
             
             // Check email-based rate limit if email was provided
             if (!string.IsNullOrEmpty(email))
             {
-                if (!await rateLimitService.CheckPasswordResetLimitPerEmailAsync(
+                if (!await rateLimitService.CheckLoginLimitPerEmailAsync(
                     email, 
-                    config.PasswordResetMaxAttemptsPerEmailPerHour, 
+                    config.LoginMaxAttemptsPerEmailPerHour, 
                     1)) // 1 hour window
                 {
-                    logger?.LogWarning("Password reset limit exceeded (email) - Email: {Email}, Max: {Max}/hour", 
-                        email, config.PasswordResetMaxAttemptsPerEmailPerHour);
+                    logger?.LogWarning("Login limit exceeded (email) - Email: {Email}, Max: {Max}/hour", 
+                        email, config.LoginMaxAttemptsPerEmailPerHour);
                     
-                    // Don't block - prevents email enumeration
-                    // Just mark in context for logging
-                    context.HttpContext.Items["RateLimitExceeded"] = true;
-                    context.HttpContext.Items["RateLimitEmail"] = email;
+                    // Ban the IP for exceeding email-based login limit
+                    var banService = context.HttpContext.RequestServices.GetRequiredService<Services.BanManagementService>();
+                    var banExpiry = DateTime.UtcNow.AddHours(1); // 1 hour ban
+                    await banService.BanIpAsync(ipAddress, $"Exceeded login limit for email: {email}", banExpiry, 1, userAgent, email);
+                    
+                    context.Result = new Microsoft.AspNetCore.Mvc.RedirectResult(
+                        $"/RateLimited?reason={Uri.EscapeDataString($"Too many login attempts for this email (max {config.LoginMaxAttemptsPerEmailPerHour}/hour)")}&retryAfter=1%20hour");
+                    return;
                 }
             }
             

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using digioz.Portal.Bo;
@@ -14,6 +14,9 @@ namespace digioz.Portal.Web.Data
 
         // Add DbSet for BannedIp
         public DbSet<BannedIp> BannedIp { get; set; }
+        
+        // Add DbSet for BannedIpTracking
+        public DbSet<BannedIpTracking> BannedIpTracking { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -62,6 +65,42 @@ namespace digioz.Portal.Web.Data
                 // Index for cleanup queries
                 entity.HasIndex(e => e.BanExpiry)
                     .HasDatabaseName("IX_BannedIp_BanExpiry");
+            });
+
+            // Configure BannedIpTracking entity
+            builder.Entity<BannedIpTracking>(entity =>
+            {
+                entity.ToTable("BannedIpTracking");
+
+                entity.Property(e => e.IpAddress)
+                    .IsRequired()
+                    .HasMaxLength(64);
+
+                entity.Property(e => e.RequestPath)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.RequestType)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasDefaultValue("General");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(256);
+
+                entity.Property(e => e.UserAgent)
+                    .HasMaxLength(500);
+
+                // Indexes for query performance
+                entity.HasIndex(e => new { e.IpAddress, e.Timestamp })
+                    .HasDatabaseName("IX_BannedIpTracking_IpAddress_Timestamp");
+
+                entity.HasIndex(e => new { e.Email, e.Timestamp })
+                    .HasDatabaseName("IX_BannedIpTracking_Email_Timestamp")
+                    .HasFilter("[Email] IS NOT NULL");
+
+                entity.HasIndex(e => e.Timestamp)
+                    .HasDatabaseName("IX_BannedIpTracking_Timestamp");
             });
         }
     }

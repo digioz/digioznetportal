@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using digioz.Portal.Bo;
@@ -71,6 +71,8 @@ namespace digioz.Portal.Dal
         public virtual DbSet<VisitorSession> VisitorSessions { get; set; }
         public virtual DbSet<Zone> Zones { get; set; }
         public virtual DbSet<Theme> Themes { get; set; }
+        public virtual DbSet<BannedIpTracking> BannedIpTrackings { get; set; }
+        public virtual DbSet<BannedIp> BannedIps { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -791,6 +793,75 @@ namespace digioz.Portal.Dal
                 entity.Property(e => e.CreateDate).IsRequired();
 
                 entity.Property(e => e.IsDefault).IsRequired();
+            });
+
+            modelBuilder.Entity<BannedIpTracking>(entity =>
+            {
+                entity.ToTable("BannedIpTracking");
+
+                entity.Property(e => e.IpAddress)
+                    .IsRequired()
+                    .HasMaxLength(64);
+
+                entity.Property(e => e.RequestPath)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.RequestType)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasDefaultValue("General");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(256);
+
+                entity.Property(e => e.UserAgent)
+                    .HasMaxLength(500);
+
+                // Indexes for query performance
+                entity.HasIndex(e => new { e.IpAddress, e.Timestamp })
+                    .HasDatabaseName("IX_BannedIpTracking_IpAddress_Timestamp");
+
+                entity.HasIndex(e => new { e.Email, e.Timestamp })
+                    .HasDatabaseName("IX_BannedIpTracking_Email_Timestamp")
+                    .HasFilter("[Email] IS NOT NULL");
+
+                entity.HasIndex(e => e.Timestamp)
+                    .HasDatabaseName("IX_BannedIpTracking_Timestamp");
+            });
+
+            modelBuilder.Entity<BannedIp>(entity =>
+            {
+                entity.ToTable("BannedIp");
+
+                entity.Property(e => e.IpAddress)
+                    .IsRequired()
+                    .HasMaxLength(64);
+
+                entity.Property(e => e.Reason)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.BanCount)
+                    .IsRequired()
+                    .HasDefaultValue(1);
+
+                entity.Property(e => e.CreatedDate)
+                    .IsRequired()
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(e => e.UserAgent)
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.AttemptedEmail)
+                    .HasMaxLength(256);
+
+                // Indexes for query performance
+                entity.HasIndex(e => e.IpAddress)
+                    .HasDatabaseName("IX_BannedIp_IpAddress");
+
+                entity.HasIndex(e => e.BanExpiry)
+                    .HasDatabaseName("IX_BannedIp_BanExpiry");
             });
 
             OnModelCreatingPartial(modelBuilder);

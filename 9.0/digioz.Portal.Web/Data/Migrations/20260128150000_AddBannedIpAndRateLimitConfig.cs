@@ -44,12 +44,16 @@ namespace digioz.Portal.Web.Data.Migrations
             migrationBuilder.Sql(@"
                 INSERT INTO [Config] ([Id], [ConfigKey], [ConfigValue], [IsEncrypted])
                 VALUES 
-                    (NEWID(), 'RateLimit.MaxRequestsPerMinute', '20', 0),
-                    (NEWID(), 'RateLimit.MaxRequestsPer10Minutes', '60', 0),
+                    (NEWID(), 'RateLimit.MaxRequestsPerMinute', '600', 0),
+                    (NEWID(), 'RateLimit.MaxRequestsPer10Minutes', '2000', 0),
                     (NEWID(), 'RateLimit.BanDurationMinutes', '60', 0),
                     (NEWID(), 'RateLimit.PermanentBanThreshold', '5', 0),
                     (NEWID(), 'RateLimit.PasswordReset.MaxAttemptsPerIpPerHour', '10', 0),
-                    (NEWID(), 'RateLimit.PasswordReset.MaxAttemptsPerEmailPerHour', '3', 0)
+                    (NEWID(), 'RateLimit.PasswordReset.MaxAttemptsPerEmailPerHour', '3', 0),
+                    (NEWID(), 'RateLimit.Login.MaxAttemptsPerIpPerHour', '10', 0),
+                    (NEWID(), 'RateLimit.Login.MaxAttemptsPerEmailPerHour', '5', 0),
+                    (NEWID(), 'RateLimit.Registration.MaxAttemptsPerIpPerHour', '10', 0),
+                    (NEWID(), 'RateLimit.Registration.MaxAttemptsPerEmailPerHour', '5', 0)
             ");
 
             // Insert Plugin Record for Rate Limiting (Enabled by default)
@@ -57,7 +61,7 @@ namespace digioz.Portal.Web.Data.Migrations
                 IF NOT EXISTS (SELECT 1 FROM [Plugin] WHERE [Name] = 'Rate Limiting & Bot Protection')
                 BEGIN
                     INSERT INTO [Plugin] ([Name], [DLL], [IsEnabled])
-                    VALUES ('Rate Limiting & Bot Protection', 'digioz.Portal.Web.Middleware.RateLimitingMiddleware', 1)
+                    VALUES ('Rate Limiting & Bot Protection', 'digioz.Portal.Web.Middleware.RateLimitingMiddleware', 0)
                 END
             ");
         }

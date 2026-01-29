@@ -21,6 +21,10 @@ namespace digioz.Portal.Web.Middleware
         private const int DefaultPermanentBanThreshold = 5;
         private const int DefaultPasswordResetMaxAttemptsPerIpPerHour = 10;
         private const int DefaultPasswordResetMaxAttemptsPerEmailPerHour = 3;
+        private const int DefaultLoginMaxAttemptsPerIpPerHour = 10;
+        private const int DefaultLoginMaxAttemptsPerEmailPerHour = 5;
+        private const int DefaultRegistrationMaxAttemptsPerIpPerHour = 10;
+        private const int DefaultRegistrationMaxAttemptsPerEmailPerHour = 5;
 
         public RateLimitConfiguration(
             IConfigService configService, 
@@ -83,6 +87,26 @@ namespace digioz.Portal.Web.Middleware
         public int PasswordResetMaxAttemptsPerEmailPerHour => GetConfigInt("RateLimit.PasswordReset.MaxAttemptsPerEmailPerHour", DefaultPasswordResetMaxAttemptsPerEmailPerHour);
 
         /// <summary>
+        /// Maximum login attempts per IP per hour
+        /// </summary>
+        public int LoginMaxAttemptsPerIpPerHour => GetConfigInt("RateLimit.Login.MaxAttemptsPerIpPerHour", DefaultLoginMaxAttemptsPerIpPerHour);
+
+        /// <summary>
+        /// Maximum login attempts per email per hour
+        /// </summary>
+        public int LoginMaxAttemptsPerEmailPerHour => GetConfigInt("RateLimit.Login.MaxAttemptsPerEmailPerHour", DefaultLoginMaxAttemptsPerEmailPerHour);
+
+        /// <summary>
+        /// Maximum registration attempts per IP per hour
+        /// </summary>
+        public int RegistrationMaxAttemptsPerIpPerHour => GetConfigInt("RateLimit.Registration.MaxAttemptsPerIpPerHour", DefaultRegistrationMaxAttemptsPerIpPerHour);
+
+        /// <summary>
+        /// Maximum registration attempts per email per hour
+        /// </summary>
+        public int RegistrationMaxAttemptsPerEmailPerHour => GetConfigInt("RateLimit.Registration.MaxAttemptsPerEmailPerHour", DefaultRegistrationMaxAttemptsPerEmailPerHour);
+
+        /// <summary>
         /// Helper method to get integer config value
         /// </summary>
         private int GetConfigInt(string key, int defaultValue)
@@ -116,6 +140,10 @@ namespace digioz.Portal.Web.Middleware
             _ = PermanentBanThreshold;
             _ = PasswordResetMaxAttemptsPerIpPerHour;
             _ = PasswordResetMaxAttemptsPerEmailPerHour;
+            _ = LoginMaxAttemptsPerIpPerHour;
+            _ = LoginMaxAttemptsPerEmailPerHour;
+            _ = RegistrationMaxAttemptsPerIpPerHour;
+            _ = RegistrationMaxAttemptsPerEmailPerHour;
             
             _logger.LogInformation("Rate limiting configuration reloaded from database");
         }
