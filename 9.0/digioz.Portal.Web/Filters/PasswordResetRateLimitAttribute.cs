@@ -32,8 +32,9 @@ namespace digioz.Portal.Web.Filters
             var configService = context.HttpContext.RequestServices.GetRequiredService<Dal.Services.Interfaces.IConfigService>();
             var pluginService = context.HttpContext.RequestServices.GetRequiredService<Dal.Services.Interfaces.IPluginService>();
             var configLogger = context.HttpContext.RequestServices.GetRequiredService<ILogger<RateLimitConfiguration>>();
+            var cache = context.HttpContext.RequestServices.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
             
-            var config = new RateLimitConfiguration(configService, pluginService, configLogger);
+            var config = new RateLimitConfiguration(configService, pluginService, configLogger, cache);
             
             // Check if rate limiting is enabled
             if (!config.IsEnabled)

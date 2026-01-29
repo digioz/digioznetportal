@@ -52,8 +52,9 @@ namespace digioz.Portal.Web.Middleware
                 var configService = scope.ServiceProvider.GetRequiredService<Dal.Services.Interfaces.IConfigService>();
                 var pluginService = scope.ServiceProvider.GetRequiredService<Dal.Services.Interfaces.IPluginService>();
                 var configLogger = scope.ServiceProvider.GetRequiredService<ILogger<RateLimitConfiguration>>();
+                var cache = scope.ServiceProvider.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
                 
-                var config = new RateLimitConfiguration(configService, pluginService, configLogger);
+                var config = new RateLimitConfiguration(configService, pluginService, configLogger, cache);
                 
                 if (!config.IsEnabled)
                 {
