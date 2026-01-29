@@ -62,7 +62,7 @@ namespace digioz.Portal.Web.Middleware
                     return;
                 }
                 
-                _logger.LogWarning("Rate limiting is ENABLED - checking limits");
+                _logger.LogInformation("Rate limiting is ENABLED - checking limits");
                 
                 // Check if IP is banned FIRST (before any rate limit checks)
                 // This is important to block already-banned IPs immediately
@@ -126,16 +126,13 @@ namespace digioz.Portal.Web.Middleware
                 {
                     var botName = BotHelper.ExtractBotName(userAgent);
                     
-                    if (IsLegitimateBot(botName))
+                    if (!await rateLimitService.CheckRateLimitAsync(ipAddress, config.MaxRequestsPerMinute / 2, 1))
                     {
-                        if (!await rateLimitService.CheckRateLimitAsync(ipAddress, config.MaxRequestsPerMinute / 2, 1))
+                        _logger.LogWarning("Rate limit exceeded for legitimate bot: {BotName} from IP: {IpAddress}", 
+                            botName, ipAddress);
+                        if (!context.Response.HasStarted)
                         {
-                            _logger.LogWarning("Rate limit exceeded for legitimate bot: {BotName} from IP: {IpAddress}", 
-                                botName, ipAddress);
-                            if (!context.Response.HasStarted)
-                            {
-                                context.Response.Redirect("/RateLimited?reason=Rate%20limit%20exceeded%20for%20crawlers&retryAfter=1%20minute");
-                            }
+                            context.Response.Redirect("/RateLimited?reason=Rate%20limit%20exceeded%20for%20crawlers&retryAfter=1%20minute");
                             return;
                         }
                     }
@@ -287,17 +284,6 @@ namespace digioz.Portal.Web.Middleware
                 _logger.LogError(ex, "Failed to ban IP: {IP}", ipAddress);
                 throw;
             }
-        }
-        
-        private bool IsLegitimateBot(string botName)
-        {
-            var legitimateBots = new[] 
-            { 
-                "Google Bot", "Bing Bot", "Yahoo Bot", "DuckDuckGo Bot",
-                "Baidu Spider", "YandexBot", "Applebot", "Baiduspider"
-            };
-            
-            return legitimateBots.Any(bot => botName.Contains(bot, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
