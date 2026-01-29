@@ -32,13 +32,13 @@ namespace digioz.Portal.Web.Services
         public async Task<(bool IsBanned, BanInfo? BanInfo)> IsBannedAsync(string ipAddress)
         {
             using var scope = _scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<Dal.digiozPortalContext>();
             
             var now = DateTime.UtcNow;
             
             // Use database column BanExpiry instead of computed property IsActive
             // This allows EF Core to translate the query to SQL
-            var dbBan = await dbContext.BannedIp
+            var dbBan = await dbContext.BannedIps
                 .Where(b => b.IpAddress == ipAddress && b.BanExpiry > now)
                 .OrderByDescending(b => b.CreatedDate)
                 .FirstOrDefaultAsync();
@@ -69,7 +69,7 @@ namespace digioz.Portal.Web.Services
             string attemptedEmail = "")
         {
             using var scope = _scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<Dal.digiozPortalContext>();
             
             try
             {
@@ -84,7 +84,7 @@ namespace digioz.Portal.Web.Services
                     AttemptedEmail = attemptedEmail ?? string.Empty
                 };
                 
-                dbContext.BannedIp.Add(bannedIp);
+                dbContext.BannedIps.Add(bannedIp);
                 await dbContext.SaveChangesAsync();
                 
                 bool isPermanent = banExpiry == DateTime.MaxValue;
@@ -104,11 +104,10 @@ namespace digioz.Portal.Web.Services
         public async Task UnbanIpAsync(string ipAddress)
         {
             using var scope = _scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var dalContext = scope.ServiceProvider.GetRequiredService<Dal.digiozPortalContext>();
             
             // Remove ban records
-            var bans = await dbContext.BannedIp
+            var bans = await dalContext.BannedIps
                 .Where(b => b.IpAddress == ipAddress)
                 .ToListAsync();
             
@@ -121,17 +120,17 @@ namespace digioz.Portal.Web.Services
             {
                 if (bans.Any())
                 {
-                    dbContext.BannedIp.RemoveRange(bans);
-                    await dbContext.SaveChangesAsync();
-                    _logger.LogInformation("IP unbanned: {IP} - Removed {Count} ban record(s)", ipAddress, bans.Count);
+                    dalContext.BannedIps.RemoveRange(bans);
+                    _logger.LogInformation("IP unbanned: {IP} - Removing {Count} ban record(s)", ipAddress, bans.Count);
                 }
                 
                 if (trackingRecords.Any())
                 {
                     dalContext.BannedIpTrackings.RemoveRange(trackingRecords);
-                    await dalContext.SaveChangesAsync();
-                    _logger.LogInformation("Removed {Count} tracking record(s) for unbanned IP: {IP}", trackingRecords.Count, ipAddress);
+                    _logger.LogInformation("Removing {Count} tracking record(s) for unbanned IP: {IP}", trackingRecords.Count, ipAddress);
                 }
+
+                await dalContext.SaveChangesAsync();
             }
             else
             {
