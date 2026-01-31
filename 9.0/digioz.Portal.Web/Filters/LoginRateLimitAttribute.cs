@@ -80,8 +80,22 @@ namespace digioz.Portal.Web.Filters
                 
                 // Ban the IP for exceeding login limit
                 var banService = context.HttpContext.RequestServices.GetRequiredService<Services.BanManagementService>();
-                var banExpiry = DateTime.UtcNow.AddHours(1); // 1 hour ban for login abuse
-                await banService.BanIpAsync(ipAddress, "Exceeded login limit", banExpiry, 1, userAgent, email ?? "");
+                
+                // Get existing ban count to enable escalation
+                int currentBanCount = await banService.GetBanCountAsync(ipAddress);
+                int newBanCount = currentBanCount + 1;
+                
+                DateTime banExpiry;
+                if (newBanCount >= config.PermanentBanThreshold)
+                {
+                    banExpiry = DateTime.MaxValue; // Permanent ban
+                }
+                else
+                {
+                    banExpiry = DateTime.UtcNow.AddHours(1); // 1 hour ban for login abuse
+                }
+                
+                await banService.BanIpAsync(ipAddress, "Exceeded login limit", banExpiry, newBanCount, userAgent, email ?? "");
                     
                 context.Result = new Microsoft.AspNetCore.Mvc.RedirectResult(
                     $"/RateLimited?reason={Uri.EscapeDataString($"Too many login attempts (max {config.LoginMaxAttemptsPerIpPerHour}/hour)")}&retryAfter=1%20hour");
@@ -101,8 +115,22 @@ namespace digioz.Portal.Web.Filters
                     
                     // Ban the IP for exceeding email-based login limit
                     var banService = context.HttpContext.RequestServices.GetRequiredService<Services.BanManagementService>();
-                    var banExpiry = DateTime.UtcNow.AddHours(1); // 1 hour ban
-                    await banService.BanIpAsync(ipAddress, $"Exceeded login limit for email: {email}", banExpiry, 1, userAgent, email);
+                    
+                    // Get existing ban count to enable escalation
+                    int currentBanCount = await banService.GetBanCountAsync(ipAddress);
+                    int newBanCount = currentBanCount + 1;
+                    
+                    DateTime banExpiry;
+                    if (newBanCount >= config.PermanentBanThreshold)
+                    {
+                        banExpiry = DateTime.MaxValue; // Permanent ban
+                    }
+                    else
+                    {
+                        banExpiry = DateTime.UtcNow.AddHours(1); // 1 hour ban
+                    }
+                    
+                    await banService.BanIpAsync(ipAddress, $"Exceeded login limit for email: {email}", banExpiry, newBanCount, userAgent, email);
                     
                     context.Result = new Microsoft.AspNetCore.Mvc.RedirectResult(
                         $"/RateLimited?reason={Uri.EscapeDataString($"Too many login attempts for this email (max {config.LoginMaxAttemptsPerEmailPerHour}/hour)")}&retryAfter=1%20hour");

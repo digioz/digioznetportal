@@ -58,6 +58,22 @@ namespace digioz.Portal.Web.Services
         }
         
         /// <summary>
+        /// Get the current ban count for an IP from database history
+        /// </summary>
+        public async Task<int> GetBanCountAsync(string ipAddress)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<Dal.digiozPortalContext>();
+            
+            var lastBan = await dbContext.BannedIps
+                .Where(b => b.IpAddress == ipAddress)
+                .OrderByDescending(b => b.CreatedDate)
+                .FirstOrDefaultAsync();
+                
+            return lastBan?.BanCount ?? 0;
+        }
+
+        /// <summary>
         /// Ban an IP address
         /// </summary>
         public async Task BanIpAsync(
