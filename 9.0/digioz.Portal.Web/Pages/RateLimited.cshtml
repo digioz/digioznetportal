@@ -64,14 +64,17 @@
 @section Scripts {
     <script>
         // Auto-reload after retry period (optional)
-        var retryAfterText = '@Model.RetryAfter';
-        if (retryAfterText.includes('minute')) {
-            var minutes = parseInt(retryAfterText.match(/\d+/));
-            if (minutes && minutes <= 5) {
-                setTimeout(function() {
-                    window.location.href = '/';
-                }, minutes * 60 * 1000);
-            }
+        // Values are parsed server-side to ensure accuracy
+        var reloadSeconds = @(Model.AutoReloadSeconds?.ToString() ?? "null");
+        
+        // Limit auto-reload to 5 minutes (300 seconds)
+        // Longer bans shouldn't auto-reload to save resources
+        if (reloadSeconds !== null && reloadSeconds <= 300) {
+            setTimeout(function() {
+                window.location.href = '/';
+            }, reloadSeconds * 1000);
+            
+            console.log("Auto-reload scheduled in " + reloadSeconds + " seconds");
         }
     </script>
 }
