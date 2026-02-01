@@ -261,17 +261,10 @@ namespace digioz.Portal.Web.Middleware
                 
                 int banCount = existingBans?.BanCount + 1 ?? 1;
                 
-                DateTime banExpiry;
                 bool isPermanent = banCount >= config.PermanentBanThreshold;
-                
-                if (isPermanent)
-                {
-                    banExpiry = DateTime.MaxValue; // Permanent ban
-                }
-                else
-                {
-                    banExpiry = DateTime.UtcNow.AddMinutes(config.BanDurationMinutes);
-                }
+                DateTime banExpiry = isPermanent 
+                    ? DateTime.MaxValue 
+                    : DateTime.UtcNow.AddMinutes(config.BanDurationMinutes);
                 
                 await banService.BanIpAsync(
                     ipAddress,
