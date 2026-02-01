@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using digioz.Portal.Utilities.Helpers;
 using digioz.Portal.Web.Services;
@@ -47,19 +48,16 @@ namespace digioz.Portal.Web.Filters
             string? email = null;
             if (context.HandlerArguments != null && context.HandlerArguments.Count > 0)
             {
-                foreach (var arg in context.HandlerArguments.Values)
+                foreach (var arg in context.HandlerArguments.Values.OfType<object>())
                 {
-                    if (arg != null)
+                    var emailProperty = arg.GetType().GetProperty("Email");
+                    if (emailProperty != null)
                     {
-                        var emailProperty = arg.GetType().GetProperty("Email");
-                        if (emailProperty != null)
+                        email = emailProperty.GetValue(arg)?.ToString();
+                        if (!string.IsNullOrEmpty(email))
                         {
-                            email = emailProperty.GetValue(arg)?.ToString();
-                            if (!string.IsNullOrEmpty(email))
-                            {
-                                email = email.ToLowerInvariant();
-                                break;
-                            }
+                            email = email.ToLowerInvariant();
+                            break;
                         }
                     }
                 }
