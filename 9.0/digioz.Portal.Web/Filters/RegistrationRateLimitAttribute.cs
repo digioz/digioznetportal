@@ -50,15 +50,11 @@ namespace digioz.Portal.Web.Filters
             {
                 foreach (var arg in context.HandlerArguments.Values.OfType<object>())
                 {
-                    var emailProperty = arg.GetType().GetProperty("Email");
-                    if (emailProperty != null)
+                    if (arg.GetType().GetProperty("Email")?.GetValue(arg)?.ToString() is string extractedEmail && 
+                        !string.IsNullOrEmpty(extractedEmail))
                     {
-                        email = emailProperty.GetValue(arg)?.ToString();
-                        if (!string.IsNullOrEmpty(email))
-                        {
-                            email = email.ToLowerInvariant();
-                            break;
-                        }
+                        email = extractedEmail.ToLowerInvariant();
+                        break;
                     }
                 }
             }
