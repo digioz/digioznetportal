@@ -153,6 +153,8 @@ namespace digioz.Portal.Utilities
             { "yacybot", "YaCy Bot" }
         };
 
+        private static readonly HashSet<string> LegitimateSearchEngineBots = new(BotPatterns.Keys);
+
         public static bool IsBot(string userAgent)
         {
             if (string.IsNullOrEmpty(userAgent))
@@ -175,6 +177,18 @@ namespace digioz.Portal.Utilities
             }
 
             return "Unknown Bot";
+        }
+
+        public static bool IsLegitimateBot(string userAgent)
+        {
+            if (string.IsNullOrEmpty(userAgent))
+                return false;
+
+            var lowerUserAgent = userAgent.ToLowerInvariant();
+
+            // Check if the user agent matches any legitimate bot pattern from our BotPatterns dictionary
+            return BotPatterns.Keys.Any(key =>    
+                LegitimateSearchEngineBots.Contains(key) && lowerUserAgent.Contains(key));
         }
     }
 }

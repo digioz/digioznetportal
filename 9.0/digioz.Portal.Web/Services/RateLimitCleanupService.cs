@@ -71,52 +71,41 @@ namespace digioz.Portal.Web.Services
                 _logger.LogDebug("Starting rate limit cleanup cycle");
 
                 using var scope = _scopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                var banService = scope.ServiceProvider.GetRequiredService<BanManagementService>();
+                var dalCleanupService = scope.ServiceProvider.GetRequiredService<Dal.Services.IBannedIpTrackingCleanupService>();
 
-                var now = DateTime.UtcNow;
-
-                // Clean expired bans from database
-                var expiredBans = await dbContext.BannedIp
-                    .Where(b => b.BanExpiry < now && b.BanExpiry != DateTime.MaxValue)
-                    .ToListAsync(cancellationToken);
-
-                if (expiredBans.Any())
+                // Clean old BannedIpTracking records (older than 7 days)
+                var trackingRecordsRemoved = await dalCleanupService.CleanupOldRecordsAsync(7);
+                if (trackingRecordsRemoved > 0)
                 {
-                    _logger.LogInformation("Removing {Count} expired ban records from database", expiredBans.Count);
-                    
-                    dbContext.BannedIp.RemoveRange(expiredBans);
-                    var removedCount = await dbContext.SaveChangesAsync(cancellationToken);
-                    
-                    _logger.LogInformation("Successfully removed {Count} expired ban records", removedCount);
-                }
-                else
-                {
-                    _logger.LogDebug("No expired ban records to clean up");
+                    _logger.LogInformation("Removed {Count} old BannedIpTracking records", trackingRecordsRemoved);
                 }
 
-                // Clean expired entries from the ban management service cache
-                var cacheCleanedCount = banService.ClearExpiredFromCache();
-                
-                if (cacheCleanedCount > 0)
+                // Clean expired bans
+                var expiredBansRemoved = await dalCleanupService.CleanupExpiredBansAsync();
+                if (expiredBansRemoved > 0)
                 {
-                    _logger.LogInformation("Cleared {Count} expired bans from in-memory cache", cacheCleanedCount);
+                    _logger.LogInformation("Removed {Count} expired ban records", expiredBansRemoved);
+                }
+
+                if (trackingRecordsRemoved == 0 && expiredBansRemoved == 0)
+                {
+                    _logger.LogDebug("No records to clean up");
                 }
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Database error during ban cleanup. Error: {Message}", ex.Message);
-                throw; // Re-throw to be caught by ExecuteAsync's outer try-catch
+                _logger.LogError(ex, "Database error during cleanup");
+                throw;
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Cleanup operation cancelled");
-                throw; // Re-throw to stop the service
+                throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error during ban cleanup: {Message}", ex.Message);
-                throw; // Re-throw to be caught by ExecuteAsync's outer try-catch
+                _logger.LogError(ex, "Unexpected error during cleanup");
+                throw;
             }
         }
 

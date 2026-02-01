@@ -118,6 +118,10 @@ builder.Services.AddScoped<IThemeService, ThemeService>();
 // Register Web-specific services
 builder.Services.AddScoped<LinkCheckerService>();
 builder.Services.AddSingleton<digioz.Portal.Web.Services.BanManagementService>();
+builder.Services.AddScoped<RateLimitService>();
+
+// Register Dal cleanup service
+builder.Services.AddScoped<digioz.Portal.Dal.Services.IBannedIpTrackingCleanupService, digioz.Portal.Dal.Services.BannedIpTrackingCleanupService>();
 
 // Register background services
 builder.Services.AddHostedService<RateLimitCleanupService>();
@@ -301,7 +305,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// ADD RATE LIMITING MIDDLEWARE HERE - BEFORE Authentication/Authorization
+// Rate limiting middleware - tracks requests and enforces limits
 app.UseMiddleware<digioz.Portal.Web.Middleware.RateLimitingMiddleware>();
 
 app.UseAuthentication();

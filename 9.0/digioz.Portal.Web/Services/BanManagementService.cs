@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using digioz.Portal.Bo;
@@ -11,16 +10,13 @@ using Microsoft.Extensions.Logging;
 namespace digioz.Portal.Web.Services
 {
     /// <summary>
-    /// Centralized service for managing IP bans with both in-memory cache and database persistence.
-    /// Used by both RateLimitingMiddleware and Admin UI to ensure consistency.
+    /// Service for managing IP bans (database-only, no caching).
+    /// Used by both RateLimitingMiddleware and Admin UI.
     /// </summary>
     public class BanManagementService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<BanManagementService> _logger;
-        
-        // Shared in-memory cache for fast ban lookups (shared with middleware)
-        private static readonly ConcurrentDictionary<string, BanInfo> _bannedIpsCache = new();
         
         public BanManagementService(
             IServiceScopeFactory scopeFactory,
@@ -31,41 +27,30 @@ namespace digioz.Portal.Web.Services
         }
         
         /// <summary>
-        /// Check if an IP is currently banned (checks cache first, then database)
+        /// Check if an IP is currently banned
         /// </summary>
         public async Task<(bool IsBanned, BanInfo? BanInfo)> IsBannedAsync(string ipAddress)
         {
-            // Check memory cache first
-            if (_bannedIpsCache.TryGetValue(ipAddress, out var banInfo))
-            {
-                if (banInfo.IsPermanent || DateTime.UtcNow < banInfo.BanExpiry)
-                {
-                    return (true, banInfo);
-                }
-                
-                // Ban expired in cache, remove it
-                _bannedIpsCache.TryRemove(ipAddress, out _);
-            }
-            
-            // Check database
             using var scope = _scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<Dal.digiozPortalContext>();
             
-            var dbBan = await dbContext.BannedIp
-                .Where(b => b.IpAddress == ipAddress)
+            var now = DateTime.UtcNow;
+            
+            // Use database column BanExpiry instead of computed property IsActive
+            // This allows EF Core to translate the query to SQL
+            var dbBan = await dbContext.BannedIps
+                .Where(b => b.IpAddress == ipAddress && b.BanExpiry > now)
                 .OrderByDescending(b => b.CreatedDate)
                 .FirstOrDefaultAsync();
             
-            if (dbBan != null && dbBan.IsActive)
+            if (dbBan != null)
             {
-                // Add to cache for faster future lookups
-                banInfo = new BanInfo
+                var banInfo = new BanInfo
                 {
                     BanExpiry = dbBan.BanExpiry,
-                    IsPermanent = dbBan.IsPermanent,
+                    IsPermanent = dbBan.BanExpiry == DateTime.MaxValue,
                     Reason = dbBan.Reason
                 };
-                _bannedIpsCache.TryAdd(ipAddress, banInfo);
                 return (true, banInfo);
             }
             
@@ -73,7 +58,23 @@ namespace digioz.Portal.Web.Services
         }
         
         /// <summary>
-        /// Ban an IP address (adds to both cache and database)
+        /// Get the current ban count for an IP from database history
+        /// </summary>
+        public async Task<int> GetBanCountAsync(string ipAddress)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<Dal.digiozPortalContext>();
+            
+            var lastBan = await dbContext.BannedIps
+                .Where(b => b.IpAddress == ipAddress)
+                .OrderByDescending(b => b.CreatedDate)
+                .FirstOrDefaultAsync();
+                
+            return lastBan?.BanCount ?? 0;
+        }
+
+        /// <summary>
+        /// Ban an IP address
         /// </summary>
         public async Task BanIpAsync(
             string ipAddress, 
@@ -83,20 +84,8 @@ namespace digioz.Portal.Web.Services
             string userAgent = "",
             string attemptedEmail = "")
         {
-            bool isPermanent = banExpiry == DateTime.MaxValue;
-            
-            // Add to memory cache immediately
-            var banInfo = new BanInfo
-            {
-                BanExpiry = banExpiry,
-                IsPermanent = isPermanent,
-                Reason = reason
-            };
-            _bannedIpsCache.AddOrUpdate(ipAddress, banInfo, (key, oldValue) => banInfo);
-            
-            // Add to database for persistence
             using var scope = _scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<Dal.digiozPortalContext>();
             
             try
             {
@@ -111,83 +100,62 @@ namespace digioz.Portal.Web.Services
                     AttemptedEmail = attemptedEmail ?? string.Empty
                 };
                 
-                dbContext.BannedIp.Add(bannedIp);
+                dbContext.BannedIps.Add(bannedIp);
                 await dbContext.SaveChangesAsync();
                 
-                _logger.LogWarning(
-                    isPermanent 
-                        ? "PERMANENT BAN: IP {IpAddress} banned permanently. Reason: {Reason}" 
-                        : "TEMPORARY BAN: IP {IpAddress} banned until {Expiry}. Reason: {Reason}",
-                    ipAddress, banExpiry, reason);
+                bool isPermanent = banExpiry == DateTime.MaxValue;
+                _logger.LogWarning("IP banned - IP: {IP}, Reason: {Reason}, Expires: {Expiry}, Count: {Count}",
+                    ipAddress, reason, isPermanent ? "Permanent" : banExpiry.ToString("yyyy-MM-dd HH:mm"), banCount);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to save banned IP {IpAddress} to database", ipAddress);
+                _logger.LogError(ex, "Failed to ban IP: {IP}", ipAddress);
                 throw;
             }
         }
         
         /// <summary>
-        /// Unban an IP address (removes from both cache and database)
+        /// Unban an IP address and remove all associated tracking records
         /// </summary>
         public async Task UnbanIpAsync(string ipAddress)
         {
-            // Remove from cache
-            _bannedIpsCache.TryRemove(ipAddress, out _);
-            
-            // Remove from database
             using var scope = _scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var dalContext = scope.ServiceProvider.GetRequiredService<Dal.digiozPortalContext>();
             
-            var bans = await dbContext.BannedIp
+            // Remove ban records
+            var bans = await dalContext.BannedIps
                 .Where(b => b.IpAddress == ipAddress)
                 .ToListAsync();
             
-            if (bans.Any())
+            // Remove tracking records (cascade delete)
+            var trackingRecords = await dalContext.BannedIpTrackings
+                .Where(t => t.IpAddress == ipAddress)
+                .ToListAsync();
+            
+            if (bans.Any() || trackingRecords.Any())
             {
-                dbContext.BannedIp.RemoveRange(bans);
-                await dbContext.SaveChangesAsync();
+                if (bans.Any())
+                {
+                    dalContext.BannedIps.RemoveRange(bans);
+                    _logger.LogInformation("IP unbanned: {IP} - Removing {Count} ban record(s)", ipAddress, bans.Count);
+                }
                 
-                _logger.LogInformation("Unbanned IP: {IpAddress}", ipAddress);
+                if (trackingRecords.Any())
+                {
+                    dalContext.BannedIpTrackings.RemoveRange(trackingRecords);
+                    _logger.LogInformation("Removing {Count} tracking record(s) for unbanned IP: {IP}", trackingRecords.Count, ipAddress);
+                }
+
+                await dalContext.SaveChangesAsync();
             }
-        }
-        
-        /// <summary>
-        /// Get cache statistics (for monitoring/debugging)
-        /// </summary>
-        public (int TotalCached, int ActiveBans, int ExpiredBans) GetCacheStatistics()
-        {
-            var now = DateTime.UtcNow;
-            var total = _bannedIpsCache.Count;
-            var active = _bannedIpsCache.Count(kvp => 
-                kvp.Value.IsPermanent || kvp.Value.BanExpiry > now);
-            var expired = total - active;
-            
-            return (total, active, expired);
-        }
-        
-        /// <summary>
-        /// Clear expired bans from cache
-        /// </summary>
-        public int ClearExpiredFromCache()
-        {
-            var now = DateTime.UtcNow;
-            var expired = _bannedIpsCache
-                .Where(kvp => !kvp.Value.IsPermanent && kvp.Value.BanExpiry < now)
-                .Select(kvp => kvp.Key)
-                .ToList();
-            
-            foreach (var ip in expired)
+            else
             {
-                _bannedIpsCache.TryRemove(ip, out _);
+                _logger.LogWarning("No ban or tracking records found for IP: {IP}", ipAddress);
             }
-            
-            _logger.LogInformation("Cleared {Count} expired bans from cache", expired.Count);
-            return expired.Count;
         }
         
         /// <summary>
-        /// Ban info for caching
+        /// Ban info
         /// </summary>
         public class BanInfo
         {

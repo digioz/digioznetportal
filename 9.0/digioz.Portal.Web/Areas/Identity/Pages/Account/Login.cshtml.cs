@@ -14,9 +14,12 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using digioz.Portal.Web.Filters;
 
 namespace digioz.Portal.Web.Areas.Identity.Pages.Account
 {
+    [AllowAnonymous]
+    [LoginRateLimit]
     public class LoginModel : PageModel
     {
         private readonly SignInManager<IdentityUser> _signInManager;

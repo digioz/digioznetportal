@@ -20,9 +20,12 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Bo;
+using digioz.Portal.Web.Filters;
 
 namespace digioz.Portal.Web.Areas.Identity.Pages.Account
 {
+    [AllowAnonymous]
+    [RegistrationRateLimit]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<IdentityUser> _signInManager;
