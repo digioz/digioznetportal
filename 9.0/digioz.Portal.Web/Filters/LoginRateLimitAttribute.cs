@@ -65,10 +65,8 @@ namespace digioz.Portal.Web.Filters
                 }
             }
             
-            // Track this login request
             var userAgent = context.HttpContext.Request.Headers["User-Agent"].ToString();
-            await rateLimitService.TrackRequestAsync(ipAddress, "/Identity/Account/Login", "Login", email, userAgent);
-            
+
             // Check IP-based rate limit (per hour)
             if (!await rateLimitService.CheckLoginLimitPerIpAsync(
                 ipAddress, 
@@ -137,6 +135,9 @@ namespace digioz.Portal.Web.Filters
                     return;
                 }
             }
+
+            // Track this login request
+            await rateLimitService.TrackRequestAsync(ipAddress, "/Identity/Account/Login", "Login", email, userAgent);
             
             // Continue execution
             await next();
