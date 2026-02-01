@@ -65,7 +65,7 @@
     <script>
         // Auto-reload after retry period (optional)
         // Values are parsed server-side to ensure accuracy
-        var reloadSeconds = @(Model.AutoReloadSeconds?.ToString() ?? "null");
+        var reloadSeconds = @(Model.AutoReloadSeconds != null ? Model.AutoReloadSeconds.Value.ToString() : "null");
         
         // Limit auto-reload to 5 minutes (300 seconds)
         // Longer bans shouldn't auto-reload to save resources

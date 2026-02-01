@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using digioz.Portal.Utilities.Helpers;
 using digioz.Portal.Web.Services;
@@ -47,18 +48,27 @@ namespace digioz.Portal.Web.Filters
             string? email = null;
             if (context.HandlerArguments != null && context.HandlerArguments.Count > 0)
             {
-                foreach (var arg in context.HandlerArguments.Values)
+                // Fix for CS8602: Dereference of a possibly null reference.
+                // The GetType() call on 'arg' is safe because we already check 'arg != null'.
+                // The GetProperty("Email") call can return null, so we must check for null before using it.
+
+                foreach (var arg in context.HandlerArguments.Values.Where(arg => arg != null))
                 {
-                    if (arg != null)
+                    var argType = arg?.GetType();
+                    if (argType != null)
                     {
-                        var emailProperty = arg.GetType().GetProperty("Email");
+                        var emailProperty = argType.GetProperty("Email");
                         if (emailProperty != null)
                         {
-                            email = emailProperty.GetValue(arg)?.ToString();
-                            if (!string.IsNullOrEmpty(email))
+                            var emailValue = emailProperty.GetValue(arg);
+                            if (emailValue != null)
                             {
-                                email = email.ToLowerInvariant();
-                                break;
+                                email = emailValue.ToString();
+                                if (!string.IsNullOrEmpty(email))
+                                {
+                                    email = email.ToLowerInvariant();
+                                    break;
+                                }
                             }
                         }
                     }
