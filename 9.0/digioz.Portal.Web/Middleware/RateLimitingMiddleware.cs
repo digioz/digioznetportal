@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -253,10 +254,10 @@ namespace digioz.Portal.Web.Middleware
                 var banService = scope.ServiceProvider.GetRequiredService<BanManagementService>();
                 
                 // Get existing ban count from database
-                var existingBans = dbContext.BannedIp
+                var existingBans = await dbContext.BannedIp
                     .Where(b => b.IpAddress == ipAddress)
                     .OrderByDescending(b => b.CreatedDate)
-                    .FirstOrDefault();
+                    .FirstOrDefaultAsync();
                 
                 int banCount = existingBans?.BanCount + 1 ?? 1;
                 
