@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 
 namespace digioz.Portal.Bo
@@ -46,3 +48,5 @@ namespace digioz.Portal.Bo
         public string? UserAgent { get; set; }
     }
 }
+
+#nullable restore
