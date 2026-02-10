@@ -8,7 +8,9 @@ namespace digioz.Portal.Bo
 {
     public partial class Poll
     {
+        [MaxLength(128)]
         public string Id { get; set; }
+        [MaxLength(128)]
         public string UserId { get; set; }
         
         [Required(ErrorMessage = "Poll question is required.")]

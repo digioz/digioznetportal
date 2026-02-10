@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace digioz.Portal.Bo
 {
@@ -16,6 +17,7 @@ namespace digioz.Portal.Bo
         /// <summary>
         /// The banned IP address
         /// </summary>
+        [MaxLength(64)]
         public string IpAddress { get; set; } = string.Empty;
 
         /// <summary>
@@ -26,6 +28,7 @@ namespace digioz.Portal.Bo
         /// <summary>
         /// Reason for the ban (rate limit exceeded, bot activity, etc.)
         /// </summary>
+        [MaxLength(500)]
         public string Reason { get; set; } = string.Empty;
 
         /// <summary>
@@ -41,11 +44,13 @@ namespace digioz.Portal.Bo
         /// <summary>
         /// User agent string of the banned request (empty string if not available)
         /// </summary>
+        [MaxLength(500)]
         public string UserAgent { get; set; } = string.Empty;
 
         /// <summary>
         /// Email address that was being targeted (empty string if not applicable)
         /// </summary>
+        [MaxLength(256)]
         public string AttemptedEmail { get; set; } = string.Empty;
 
         /// <summary>

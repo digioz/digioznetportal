@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 #nullable disable
 
@@ -16,9 +17,13 @@ namespace digioz.Portal.Bo
         }
 
         public string Id { get; set; }
+        [MaxLength(256)]
         public string UserName { get; set; }
+        [MaxLength(256)]
         public string NormalizedUserName { get; set; }
+        [MaxLength(256)]
         public string Email { get; set; }
+        [MaxLength(256)]
         public string NormalizedEmail { get; set; }
         public bool EmailConfirmed { get; set; }
         public string PasswordHash { get; set; }

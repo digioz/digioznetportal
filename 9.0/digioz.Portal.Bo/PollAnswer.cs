@@ -8,7 +8,9 @@ namespace digioz.Portal.Bo
 {
     public partial class PollAnswer
     {
+        [MaxLength(128)]
         public string Id { get; set; }
+        [MaxLength(128)]
         public string PollId { get; set; }
         
         [Required(ErrorMessage = "Answer text is required.")]
