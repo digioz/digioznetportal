@@ -53,17 +53,25 @@ namespace digioz.Portal.Pages.Profile
             public string? DisplayName { get; set; }
             [Required, EmailAddress]
             public string? Email { get; set; }
+            [StringLength(50, ErrorMessage = "First name cannot exceed 50 characters.")]
             public string? FirstName { get; set; }
+            [StringLength(50, ErrorMessage = "Middle name cannot exceed 50 characters.")]
             public string? MiddleName { get; set; }
+            [StringLength(50, ErrorMessage = "Last name cannot exceed 50 characters.")]
             public string? LastName { get; set; }
             public DateTime? Birthday { get; set; }
             public bool? BirthdayVisible { get; set; }
             public string? Address { get; set; }
             public string? Address2 { get; set; }
+            [StringLength(50, ErrorMessage = "City cannot exceed 50 characters.")]
             public string? City { get; set; }
+            [StringLength(50, ErrorMessage = "State cannot exceed 50 characters.")]
             public string? State { get; set; }
+            [StringLength(20, ErrorMessage = "Zip code cannot exceed 20 characters.")]
             public string? Zip { get; set; }
+            [StringLength(50, ErrorMessage = "Country cannot exceed 50 characters.")]
             public string? Country { get; set; }
+            [StringLength(255, ErrorMessage = "Signature cannot exceed 255 characters.")]
             public string? Signature { get; set; }
             public string? Avatar { get; set; }
             

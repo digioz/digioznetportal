@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 #nullable disable
 
@@ -7,6 +8,7 @@ namespace digioz.Portal.Bo
 {
     public partial class CommentConfig
     {
+        [MaxLength(128)]
         public string Id { get; set; }
         public string ReferenceId { get; set; }
         public string ReferenceType { get; set; }

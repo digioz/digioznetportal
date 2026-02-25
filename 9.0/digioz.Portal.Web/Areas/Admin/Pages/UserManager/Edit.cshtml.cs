@@ -57,12 +57,15 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             [Display(Name = "Display Name")]
             public string? DisplayName { get; set; }
 
+            [StringLength(50, ErrorMessage = "First name cannot exceed 50 characters.")]
             [Display(Name = "First Name")]
             public string? FirstName { get; set; }
 
+            [StringLength(50, ErrorMessage = "Middle name cannot exceed 50 characters.")]
             [Display(Name = "Middle Name")]
             public string? MiddleName { get; set; }
 
+            [StringLength(50, ErrorMessage = "Last name cannot exceed 50 characters.")]
             [Display(Name = "Last Name")]
             public string? LastName { get; set; }
 
@@ -78,14 +81,19 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             [Display(Name = "Address 2")]
             public string? Address2 { get; set; }
 
+            [StringLength(50, ErrorMessage = "City cannot exceed 50 characters.")]
             public string? City { get; set; }
 
+            [StringLength(50, ErrorMessage = "State cannot exceed 50 characters.")]
             public string? State { get; set; }
 
+            [StringLength(20, ErrorMessage = "Zip code cannot exceed 20 characters.")]
             public string? Zip { get; set; }
 
+            [StringLength(50, ErrorMessage = "Country cannot exceed 50 characters.")]
             public string? Country { get; set; }
 
+            [StringLength(255, ErrorMessage = "Signature cannot exceed 255 characters.")]
             public string? Signature { get; set; }
         }
 
