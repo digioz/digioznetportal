@@ -149,9 +149,33 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             }
 
             // Update username and email
+            if (identityUser.Email != Input.Email)
+            {
+                identityUser.EmailConfirmed = false;
+            }
+
             identityUser.UserName = Input.UserName;
             identityUser.Email = Input.Email;
-            identityUser.EmailConfirmed = true;
+
+            // Update password if provided
+            if (!string.IsNullOrEmpty(Input.Password))
+            {
+                foreach (var validator in _userManager.PasswordValidators)
+                {
+                    var result = await validator.ValidateAsync(_userManager, identityUser, Input.Password);
+                    if (!result.Succeeded)
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return Page();
+                    }
+                }
+
+                identityUser.PasswordHash = _userManager.PasswordHasher.HashPassword(identityUser, Input.Password);
+                identityUser.SecurityStamp = Guid.NewGuid().ToString();
+            }
 
             var updateResult = await _userManager.UpdateAsync(identityUser);
             if (!updateResult.Succeeded)
@@ -161,33 +185,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
                 return Page();
-            }
-
-            // Update password if provided
-            if (!string.IsNullOrEmpty(Input.Password))
-            {
-                if (await _userManager.HasPasswordAsync(identityUser))
-                {
-                    var removeResult = await _userManager.RemovePasswordAsync(identityUser);
-                    if (!removeResult.Succeeded)
-                    {
-                        foreach (var error in removeResult.Errors)
-                        {
-                            ModelState.AddModelError(string.Empty, error.Description);
-                        }
-                        return Page();
-                    }
-                }
-
-                var addResult = await _userManager.AddPasswordAsync(identityUser, Input.Password);
-                if (!addResult.Succeeded)
-                {
-                    foreach (var error in addResult.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    return Page();
-                }
             }
 
             // Update or create profile
