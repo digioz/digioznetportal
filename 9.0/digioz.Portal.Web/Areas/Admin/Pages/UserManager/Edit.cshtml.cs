@@ -149,17 +149,34 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             }
 
             // Update username and email
+            if (identityUser.Email != Input.Email)
+            {
+                identityUser.EmailConfirmed = false;
+            }
+
             identityUser.UserName = Input.UserName;
             identityUser.Email = Input.Email;
 
             // Update password if provided
             if (!string.IsNullOrEmpty(Input.Password))
             {
-                var token = await _userManager.GeneratePasswordResetTokenAsync(identityUser);
-                var result = await _userManager.ResetPasswordAsync(identityUser, token, Input.Password);
-                if (!result.Succeeded)
+                if (await _userManager.HasPasswordAsync(identityUser))
                 {
-                    foreach (var error in result.Errors)
+                    var removeResult = await _userManager.RemovePasswordAsync(identityUser);
+                    if (!removeResult.Succeeded)
+                    {
+                        foreach (var error in removeResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return Page();
+                    }
+                }
+
+                var addResult = await _userManager.AddPasswordAsync(identityUser, Input.Password);
+                if (!addResult.Succeeded)
+                {
+                    foreach (var error in addResult.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
