@@ -160,12 +160,12 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             // Update password if provided
             if (!string.IsNullOrEmpty(Input.Password))
             {
-                foreach (var validator in _userManager.PasswordValidators)
+                if (await _userManager.HasPasswordAsync(identityUser))
                 {
-                    var result = await validator.ValidateAsync(_userManager, identityUser, Input.Password);
-                    if (!result.Succeeded)
+                    var removeResult = await _userManager.RemovePasswordAsync(identityUser);
+                    if (!removeResult.Succeeded)
                     {
-                        foreach (var error in result.Errors)
+                        foreach (var error in removeResult.Errors)
                         {
                             ModelState.AddModelError(string.Empty, error.Description);
                         }
@@ -173,8 +173,15 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                     }
                 }
 
-                identityUser.PasswordHash = _userManager.PasswordHasher.HashPassword(identityUser, Input.Password);
-                identityUser.SecurityStamp = Guid.NewGuid().ToString();
+                var addResult = await _userManager.AddPasswordAsync(identityUser, Input.Password);
+                if (!addResult.Succeeded)
+                {
+                    foreach (var error in addResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return Page();
+                }
             }
 
             var updateResult = await _userManager.UpdateAsync(identityUser);
