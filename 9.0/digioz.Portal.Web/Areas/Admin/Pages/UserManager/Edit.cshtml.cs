@@ -36,10 +36,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             public string Id { get; set; } = string.Empty;
 
             [Required]
-            [Display(Name = "Username")]
-            public string UserName { get; set; } = string.Empty;
-
-            [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; } = string.Empty;
@@ -115,7 +111,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             Input = new InputModel
             {
                 Id = user.Id,
-                UserName = user.UserName ?? string.Empty,
                 Email = user.Email ?? string.Empty,
                 DisplayName = profile?.DisplayName,
                 FirstName = profile?.FirstName,
@@ -154,8 +149,10 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                 identityUser.EmailConfirmed = false;
             }
 
-            identityUser.UserName = Input.UserName;
+            identityUser.UserName = Input.Email;
             identityUser.Email = Input.Email;
+            await _userManager.UpdateNormalizedUserNameAsync(identityUser);
+            await _userManager.UpdateNormalizedEmailAsync(identityUser);
 
             // Update password if provided
             if (!string.IsNullOrEmpty(Input.Password))

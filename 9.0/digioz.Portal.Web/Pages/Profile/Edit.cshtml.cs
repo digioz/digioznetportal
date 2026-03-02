@@ -165,6 +165,8 @@ namespace digioz.Portal.Pages.Profile
             {
                 user.Email = Input.Email;
                 user.UserName = Input.Email;
+                await _userManager.UpdateNormalizedUserNameAsync(user);
+                await _userManager.UpdateNormalizedEmailAsync(user);
                 var updateResult = await _userManager.UpdateAsync(user);
                 if (!updateResult.Succeeded)
                 {
