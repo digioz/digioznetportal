@@ -144,29 +144,29 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             }
 
             // Update username and email
-            if (identityUser.Email != Input.Email)
+            if (!string.Equals(identityUser.Email, Input.Email, StringComparison.OrdinalIgnoreCase))
             {
                 identityUser.EmailConfirmed = false;
-            }
 
-            var setUserNameResult = await _userManager.SetUserNameAsync(identityUser, Input.Email);
-            if (!setUserNameResult.Succeeded)
-            {
-                foreach (var error in setUserNameResult.Errors)
+                var setUserNameResult = await _userManager.SetUserNameAsync(identityUser, Input.Email);
+                if (!setUserNameResult.Succeeded)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    foreach (var error in setUserNameResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return Page();
                 }
-                return Page();
-            }
 
-            var setEmailResult = await _userManager.SetEmailAsync(identityUser, Input.Email);
-            if (!setEmailResult.Succeeded)
-            {
-                foreach (var error in setEmailResult.Errors)
+                var setEmailResult = await _userManager.SetEmailAsync(identityUser, Input.Email);
+                if (!setEmailResult.Succeeded)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    foreach (var error in setEmailResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return Page();
                 }
-                return Page();
             }
 
             // Update password if provided
