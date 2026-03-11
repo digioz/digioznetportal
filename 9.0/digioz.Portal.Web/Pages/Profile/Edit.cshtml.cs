@@ -163,14 +163,19 @@ namespace digioz.Portal.Pages.Profile
 
             if (!string.IsNullOrWhiteSpace(Input.Email) && !string.Equals(Input.Email, user.Email, StringComparison.OrdinalIgnoreCase))
             {
-                user.Email = Input.Email;
-                user.UserName = Input.Email;
-                await _userManager.UpdateNormalizedUserNameAsync(user);
-                await _userManager.UpdateNormalizedEmailAsync(user);
-                var updateResult = await _userManager.UpdateAsync(user);
-                if (!updateResult.Succeeded)
+                var setUserNameResult = await _userManager.SetUserNameAsync(user, Input.Email);
+                if (!setUserNameResult.Succeeded)
                 {
-                    foreach (var err in updateResult.Errors)
+                    foreach (var err in setUserNameResult.Errors)
+                        ModelState.AddModelError(string.Empty, err.Description);
+                    LoadThemes(Input.ThemeId);
+                    return Page();
+                }
+
+                var setEmailResult = await _userManager.SetEmailAsync(user, Input.Email);
+                if (!setEmailResult.Succeeded)
+                {
+                    foreach (var err in setEmailResult.Errors)
                         ModelState.AddModelError(string.Empty, err.Description);
                     LoadThemes(Input.ThemeId);
                     return Page();

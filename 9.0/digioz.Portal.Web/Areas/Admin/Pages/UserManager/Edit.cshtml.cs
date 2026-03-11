@@ -149,10 +149,25 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                 identityUser.EmailConfirmed = false;
             }
 
-            identityUser.UserName = Input.Email;
-            identityUser.Email = Input.Email;
-            await _userManager.UpdateNormalizedUserNameAsync(identityUser);
-            await _userManager.UpdateNormalizedEmailAsync(identityUser);
+            var setUserNameResult = await _userManager.SetUserNameAsync(identityUser, Input.Email);
+            if (!setUserNameResult.Succeeded)
+            {
+                foreach (var error in setUserNameResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return Page();
+            }
+
+            var setEmailResult = await _userManager.SetEmailAsync(identityUser, Input.Email);
+            if (!setEmailResult.Succeeded)
+            {
+                foreach (var error in setEmailResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return Page();
+            }
 
             // Update password if provided
             if (!string.IsNullOrEmpty(Input.Password))
