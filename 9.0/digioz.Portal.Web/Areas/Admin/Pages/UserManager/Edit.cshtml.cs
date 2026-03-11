@@ -36,10 +36,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             public string Id { get; set; } = string.Empty;
 
             [Required]
-            [Display(Name = "Username")]
-            public string UserName { get; set; } = string.Empty;
-
-            [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; } = string.Empty;
@@ -115,7 +111,6 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             Input = new InputModel
             {
                 Id = user.Id,
-                UserName = user.UserName ?? string.Empty,
                 Email = user.Email ?? string.Empty,
                 DisplayName = profile?.DisplayName,
                 FirstName = profile?.FirstName,
@@ -149,13 +144,30 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             }
 
             // Update username and email
-            if (identityUser.Email != Input.Email)
+            if (!string.Equals(identityUser.Email, Input.Email, StringComparison.OrdinalIgnoreCase))
             {
                 identityUser.EmailConfirmed = false;
-            }
 
-            identityUser.UserName = Input.UserName;
-            identityUser.Email = Input.Email;
+                var setUserNameResult = await _userManager.SetUserNameAsync(identityUser, Input.Email);
+                if (!setUserNameResult.Succeeded)
+                {
+                    foreach (var error in setUserNameResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return Page();
+                }
+
+                var setEmailResult = await _userManager.SetEmailAsync(identityUser, Input.Email);
+                if (!setEmailResult.Succeeded)
+                {
+                    foreach (var error in setEmailResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return Page();
+                }
+            }
 
             // Update password if provided
             if (!string.IsNullOrEmpty(Input.Password))
