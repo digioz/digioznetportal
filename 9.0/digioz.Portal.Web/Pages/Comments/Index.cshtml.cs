@@ -1,4 +1,4 @@
-using System;
+ using System;
 using System.Collections.Generic;
 using System.Linq;
 using digioz.Portal.Bo;
@@ -38,18 +38,15 @@ namespace digioz.Portal.Web.Pages.Comments
             // Validate page number
             PageNumber = pageNumber > 0 ? pageNumber : 1;
 
-            // Get all comments ordered by newest first
-            var allComments = _commentService.GetAll()
-                .OrderByDescending(c => c.CreatedDate)
-                .ToList();
+            var pagedComments = _commentService.GetPagedFiltered(
+                PageNumber,
+                PageSize,
+                true,
+                true,
+                string.Empty,
+                out var totalCount);
 
-            TotalCount = allComments.Count;
-
-            // Apply pagination
-            var pagedComments = allComments
-                .Skip((PageNumber - 1) * PageSize)
-                .Take(PageSize)
-                .ToList();
+            TotalCount = totalCount;
 
             // Batch load all related data to avoid N+1 queries
             var userIds = pagedComments
