@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
+using digioz.Portal.Utilities.Helpers;
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Memory;
@@ -118,6 +119,7 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             var pm = new PrivateMessage
             {
                 FromId = currentUserId,
+                FromIp = IpAddressHelper.GetUserIPAddress(HttpContext),
                 ToId = Input.ToId,
                 Subject = sanitizedSubject,
                 Message = sanitizedMessage

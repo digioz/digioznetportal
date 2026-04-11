@@ -16,5 +16,11 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void MarkReadIfUnread(int id);
         void Delete(int id, string userId); // only allow if owner (sender or receiver)
         bool DeleteIfOwnedByUser(int id, string userId);
+        int CountByUserId(string userId);
+        void DeleteByUserId(string userId);
+        void ReassignByUserId(string userId, string newUserId);
+        void Report(int id);
+        void RemoveReport(int id);
+        List<PrivateMessage> GetReported(int page, int pageSize, out int totalCount);
     }
 }

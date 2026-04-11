@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
+using digioz.Portal.Utilities.Helpers;
 
 namespace digioz.Portal.Web.Pages.PrivateMessages
 {
@@ -39,6 +40,7 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
         }
 
         public PrivateMessage? RootMessage { get; set; }
+        public bool IsRecipient { get; set; }
         public List<ThreadMessage> Thread { get; set; } = new();
 
         [BindProperty]
@@ -62,8 +64,10 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
                 return NotFound();
             }
             
+            IsRecipient = RootMessage.ToId == currentUserId;
+
             // Atomically mark as read if unread to avoid race condition.
-            if (RootMessage.ToId == currentUserId)
+            if (IsRecipient)
             {
                 _pmService.MarkReadIfUnread(id); // Ensure this is atomic in the service implementation.
             }
@@ -115,6 +119,7 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             var reply = new PrivateMessage
             {
                 FromId = currentUserId,
+                FromIp = IpAddressHelper.GetUserIPAddress(HttpContext),
                 ToId = currentUserId == root.FromId ? root.ToId : root.FromId,
                 Subject = sanitizedSubject,
                 Message = sanitizedMessage,
@@ -122,6 +127,19 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             };
             _pmService.Add(reply);
             return RedirectToPage("/PrivateMessages/Details", new { id = root.Id });
+        }
+
+        public IActionResult OnPostReport(int id)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+            var root = _pmService.Get(id);
+            if (root == null || root.ToId != currentUserId)
+            {
+                return NotFound();
+            }
+
+            _pmService.Report(id);
+            return RedirectToPage("/PrivateMessages/Details", new { id });
         }
     }
 }

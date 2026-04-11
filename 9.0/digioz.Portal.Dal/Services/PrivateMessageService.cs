@@ -141,6 +141,14 @@ namespace digioz.Portal.Dal.Services
             var pm = _context.PrivateMessages.Find(id);
             if (pm == null) return;
             if (pm.FromId != userId && pm.ToId != userId) return; // not authorized
+
+            // Nullify ParentId on child messages to avoid FK Restrict violation
+            var children = _context.PrivateMessages.Where(m => m.ParentId == id).ToList();
+            foreach (var child in children)
+            {
+                child.ParentId = null;
+            }
+
             _context.PrivateMessages.Remove(pm);
             _context.SaveChanges();
         }
@@ -152,9 +160,102 @@ namespace digioz.Portal.Dal.Services
             {
                 return false;
             }
+
+            // Nullify ParentId on child messages to avoid FK Restrict violation
+            var children = _context.PrivateMessages.Where(m => m.ParentId == id).ToList();
+            foreach (var child in children)
+            {
+                child.ParentId = null;
+            }
+
             _context.PrivateMessages.Remove(pm);
             _context.SaveChanges();
             return true;
+        }
+
+        public int CountByUserId(string userId)
+        {
+            return _context.PrivateMessages
+                .AsNoTracking()
+                .Count(pm => pm.FromId == userId || pm.ToId == userId);
+        }
+
+        public void DeleteByUserId(string userId)
+        {
+            var messages = _context.PrivateMessages
+                .Where(pm => pm.FromId == userId || pm.ToId == userId)
+                .ToList();
+
+            if (!messages.Any()) return;
+
+            var messageIds = messages.Select(m => m.Id).ToHashSet();
+
+            // Nullify ParentId on any messages that reference messages being deleted
+            var childrenToUpdate = _context.PrivateMessages
+                .Where(m => m.ParentId.HasValue && messageIds.Contains(m.ParentId.Value))
+                .ToList();
+            foreach (var child in childrenToUpdate)
+            {
+                child.ParentId = null;
+            }
+
+            _context.PrivateMessages.RemoveRange(messages);
+            _context.SaveChanges();
+        }
+
+        public void ReassignByUserId(string userId, string newUserId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                throw new ArgumentException("Value cannot be null or empty.", nameof(userId));
+            if (string.IsNullOrEmpty(newUserId))
+                throw new ArgumentException("Value cannot be null or empty.", nameof(newUserId));
+
+            var messages = _context.PrivateMessages
+                .Where(pm => pm.FromId == userId || pm.ToId == userId)
+                .ToList();
+
+            foreach (var pm in messages)
+            {
+                if (pm.FromId == userId) pm.FromId = newUserId;
+                if (pm.ToId == userId) pm.ToId = newUserId;
+            }
+
+            _context.SaveChanges();
+        }
+
+        public void Report(int id)
+        {
+            var pm = _context.PrivateMessages.Find(id);
+            if (pm != null && !pm.Reported)
+            {
+                pm.Reported = true;
+                _context.SaveChanges();
+            }
+        }
+
+        public void RemoveReport(int id)
+        {
+            var pm = _context.PrivateMessages.Find(id);
+            if (pm != null && pm.Reported)
+            {
+                pm.Reported = false;
+                _context.SaveChanges();
+            }
+        }
+
+        public List<PrivateMessage> GetReported(int page, int pageSize, out int totalCount)
+        {
+            var query = _context.PrivateMessages
+                .AsNoTracking()
+                .Where(pm => pm.Reported)
+                .OrderByDescending(pm => pm.SentDate);
+
+            totalCount = query.Count();
+
+            return query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
         }
     }
 }
