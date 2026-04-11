@@ -38,8 +38,9 @@ namespace digioz.Portal.Dal.Services.Interfaces
         /// <param name="approvedFilter">Filter by approved status: null=all, true=approved only, false=not approved only</param>
         /// <param name="referenceTypeFilter">Filter by reference type (null or empty for all)</param>
         /// <param name="totalCount">Output parameter for total matching count</param>
+        /// <param name="sortByCreatedDate">When true, orders by CreatedDate instead of ModifiedDate</param>
         /// <returns>Filtered and paginated list of comments</returns>
-        List<Comment> GetPagedFiltered(int pageNumber, int pageSize, bool? visibleFilter, bool? approvedFilter, string referenceTypeFilter, out int totalCount);
+        List<Comment> GetPagedFiltered(int pageNumber, int pageSize, bool? visibleFilter, bool? approvedFilter, string referenceTypeFilter, out int totalCount, bool sortByCreatedDate = false);
         
         /// <summary>
         /// Gets distinct reference types for filtering purposes.
