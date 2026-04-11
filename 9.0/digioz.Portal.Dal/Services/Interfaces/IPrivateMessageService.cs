@@ -19,5 +19,8 @@ namespace digioz.Portal.Dal.Services.Interfaces
         int CountByUserId(string userId);
         void DeleteByUserId(string userId);
         void ReassignByUserId(string userId, string newUserId);
+        void Report(int id);
+        void RemoveReport(int id);
+        List<PrivateMessage> GetReported(int page, int pageSize, out int totalCount);
     }
 }

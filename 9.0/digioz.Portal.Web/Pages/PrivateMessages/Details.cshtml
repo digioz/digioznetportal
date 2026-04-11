@@ -24,6 +24,21 @@
                 }
             </div>
         }
+        <div class="mb-3">
+            @if (Model.RootMessage != null && !Model.RootMessage.Reported && Model.IsRecipient)
+            {
+                <form method="post" asp-page-handler="Report" class="d-inline">
+                    <input type="hidden" name="id" value="@Model.RootMessage.Id" />
+                    <button type="submit" class="btn btn-warning btn-sm" title="Report this message">
+                        <i class="bi bi-flag"></i> Report
+                    </button>
+                </form>
+            }
+            else if (Model.RootMessage != null && Model.RootMessage.Reported && Model.IsRecipient)
+            {
+                <span class="badge bg-warning text-dark"><i class="bi bi-flag-fill"></i> Reported</span>
+            }
+        </div>
         <hr />
         <h3>Reply</h3>
         <form method="post">

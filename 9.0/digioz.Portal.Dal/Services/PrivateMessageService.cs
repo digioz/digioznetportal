@@ -217,5 +217,40 @@ namespace digioz.Portal.Dal.Services
 
             _context.SaveChanges();
         }
+
+        public void Report(int id)
+        {
+            var pm = _context.PrivateMessages.Find(id);
+            if (pm != null && !pm.Reported)
+            {
+                pm.Reported = true;
+                _context.SaveChanges();
+            }
+        }
+
+        public void RemoveReport(int id)
+        {
+            var pm = _context.PrivateMessages.Find(id);
+            if (pm != null && pm.Reported)
+            {
+                pm.Reported = false;
+                _context.SaveChanges();
+            }
+        }
+
+        public List<PrivateMessage> GetReported(int page, int pageSize, out int totalCount)
+        {
+            var query = _context.PrivateMessages
+                .AsNoTracking()
+                .Where(pm => pm.Reported)
+                .OrderByDescending(pm => pm.SentDate);
+
+            totalCount = query.Count();
+
+            return query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
     }
 }
