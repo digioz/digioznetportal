@@ -140,7 +140,7 @@ namespace digioz.Portal.Dal.Services
                 .ToList();
         }
 
-        public List<Comment> GetPagedFiltered(int pageNumber, int pageSize, bool? visibleFilter, bool? approvedFilter, string referenceTypeFilter, out int totalCount)
+        public List<Comment> GetPagedFiltered(int pageNumber, int pageSize, bool? visibleFilter, bool? approvedFilter, string referenceTypeFilter, out int totalCount, bool sortByCreatedDate = false)
         {
             var query = _context.Comments.AsNoTracking().AsQueryable();
 
@@ -176,8 +176,10 @@ namespace digioz.Portal.Dal.Services
                 query = query.Where(c => c.ReferenceType == referenceTypeFilter);
             }
 
-            // Order by modified date
-            query = query.OrderByDescending(c => c.ModifiedDate ?? c.CreatedDate);
+            // Order by date
+            query = sortByCreatedDate
+                ? query.OrderByDescending(c => c.CreatedDate)
+                : query.OrderByDescending(c => c.ModifiedDate ?? c.CreatedDate);
 
             // Get total count
             totalCount = query.Count();

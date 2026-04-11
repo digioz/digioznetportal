@@ -44,7 +44,8 @@ namespace digioz.Portal.Web.Pages.Comments
                 true,
                 true,
                 string.Empty,
-                out var totalCount);
+                out var totalCount,
+                sortByCreatedDate: true);
 
             TotalCount = totalCount;
 
