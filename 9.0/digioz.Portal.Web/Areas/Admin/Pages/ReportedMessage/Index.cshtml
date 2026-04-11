@@ -39,7 +39,7 @@
                                 <a asp-area="Admin" asp-page="/ReportedMessage/Details" asp-route-id="@m.Id" class="btn btn-sm btn-info" title="Details">
                                     <i class="bi bi-eye"></i> Details
                                 </a>
-                                <form method="post" asp-page-handler="RemoveReport" asp-route-id="@m.Id" class="d-inline">
+                                <form method="post" asp-page-handler="RemoveReport" asp-route-id="@m.Id" asp-route-pageNumber="@Model.PageNumber" asp-route-pageSize="@Model.PageSize" class="d-inline">
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="btn btn-sm btn-success" title="Remove Report">
                                         <i class="bi bi-flag-fill"></i> Remove Report
