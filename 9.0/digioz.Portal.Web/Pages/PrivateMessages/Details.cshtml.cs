@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
+using digioz.Portal.Utilities.Helpers;
 
 namespace digioz.Portal.Web.Pages.PrivateMessages
 {
@@ -115,6 +116,7 @@ namespace digioz.Portal.Web.Pages.PrivateMessages
             var reply = new PrivateMessage
             {
                 FromId = currentUserId,
+                FromIp = IpAddressHelper.GetUserIPAddress(HttpContext),
                 ToId = currentUserId == root.FromId ? root.ToId : root.FromId,
                 Subject = sanitizedSubject,
                 Message = sanitizedMessage,
