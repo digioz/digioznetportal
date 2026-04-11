@@ -205,6 +205,11 @@ namespace digioz.Portal.Dal.Services
 
         public void ReassignByUserId(string userId, string newUserId)
         {
+            if (string.IsNullOrEmpty(userId))
+                throw new ArgumentException("Value cannot be null or empty.", nameof(userId));
+            if (string.IsNullOrEmpty(newUserId))
+                throw new ArgumentException("Value cannot be null or empty.", nameof(newUserId));
+
             var messages = _context.PrivateMessages
                 .Where(pm => pm.FromId == userId || pm.ToId == userId)
                 .ToList();
