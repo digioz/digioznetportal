@@ -577,7 +577,7 @@ namespace digioz.Portal.Dal
                 entity.ToTable("PrivateMessage");
                 // entity.Property(e => e.Id).HasMaxLength(128);
                 entity.Property(e => e.FromId).HasMaxLength(128);
-                entity.Property(e => e.FromIp).HasMaxLength(25);
+                entity.Property(e => e.FromIp).HasMaxLength(64);
                 entity.Property(e => e.ToId).HasMaxLength(128);
                 entity.Property(e => e.Subject).HasMaxLength(255);
                 // ParentId relationship (self-referencing)
