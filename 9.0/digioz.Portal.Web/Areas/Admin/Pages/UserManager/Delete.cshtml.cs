@@ -72,6 +72,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             public bool DeleteChat { get; set; }
             public bool DeleteComments { get; set; }
             public bool DeleteOrders { get; set; }
+            public bool DeletePrivateMessages { get; set; }
         }
 
         public class UserRelatedData
@@ -82,6 +83,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             public int ChatCount { get; set; }
             public int CommentCount { get; set; }
             public int OrderCount { get; set; }
+            public int PrivateMessageCount { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -107,7 +109,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                 PollCount = _pollService.CountByUserId(id),
                 ChatCount = _chatService.CountByUserId(id),
                 CommentCount = _commentService.CountByUserId(id),
-                OrderCount = _orderService.CountByUserId(id)
+                OrderCount = _orderService.CountByUserId(id),
+                PrivateMessageCount = _privateMessageService.CountByUserId(id)
             };
 
             return Page();
@@ -140,7 +143,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                 // Check if admin wants to preserve any content (any checkbox unchecked)
                 bool wantsToPreserveContent = !Options.DeletePictures || !Options.DeleteVideos || 
                                              !Options.DeletePolls || !Options.DeleteChat || 
-                                             !Options.DeleteComments || !Options.DeleteOrders;
+                                             !Options.DeleteComments || !Options.DeleteOrders ||
+                                             !Options.DeletePrivateMessages;
 
                 // Get the System user ID for reassignment if needed
                 string? systemUserId = null;
@@ -218,6 +222,16 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                 else
                 {
                     _orderService.ReassignByUserId(id, systemUserId);
+                }
+
+                // Handle Private Messages - Delete or Reassign (using efficient bulk operations)
+                if (Options.DeletePrivateMessages)
+                {
+                    _privateMessageService.DeleteByUserId(id);
+                }
+                else
+                {
+                    _privateMessageService.ReassignByUserId(id, systemUserId);
                 }
 
                 // Get the user's identity to invalidate their session
@@ -300,7 +314,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
                     PollCount = _pollService.CountByUserId(userId),
                     ChatCount = _chatService.CountByUserId(userId),
                     CommentCount = _commentService.CountByUserId(userId),
-                    OrderCount = _orderService.CountByUserId(userId)
+                    OrderCount = _orderService.CountByUserId(userId),
+                    PrivateMessageCount = _privateMessageService.CountByUserId(userId)
                 };
             }
         }

@@ -162,6 +162,20 @@
                                     }
                                 </td>
                             </tr>
+                            <tr>
+                                <td><i class="bi bi-envelope"></i> Private Messages</td>
+                                <td class="text-end">@Model.RelatedData.PrivateMessageCount</td>
+                                <td class="text-center">
+                                    @if (Model.RelatedData.PrivateMessageCount > 0)
+                                    {
+                                        <span class="badge bg-info">Delete or Reassign</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">None</span>
+                                    }
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -212,6 +226,13 @@
                         <input asp-for="Options.DeleteOrders" class="form-check-input" />
                         <label asp-for="Options.DeleteOrders" class="form-check-label">
                             <strong>Delete</strong> all orders (@Model.RelatedData.OrderCount)
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input asp-for="Options.DeletePrivateMessages" class="form-check-input" />
+                        <label asp-for="Options.DeletePrivateMessages" class="form-check-label">
+                            <strong>Delete</strong> all private messages (@Model.RelatedData.PrivateMessageCount)
                         </label>
                     </div>
                 }
