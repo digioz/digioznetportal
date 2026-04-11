@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
@@ -26,6 +26,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
         private readonly IChatService _chatService;
         private readonly ICommentService _commentService;
         private readonly IOrderService _orderService;
+        private readonly IPrivateMessageService _privateMessageService;
         private readonly IProfileService _profileService;
 
         public DeletePersonalDataModel(
@@ -38,6 +39,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
             IChatService chatService,
             ICommentService commentService,
             IOrderService orderService,
+            IPrivateMessageService privateMessageService,
             IProfileService profileService)
         {
             _userManager = userManager;
@@ -49,6 +51,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
             _chatService = chatService;
             _commentService = commentService;
             _orderService = orderService;
+            _privateMessageService = privateMessageService;
             _profileService = profileService;
         }
 
@@ -73,6 +76,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
             public bool DeleteChat { get; set; }
             public bool DeleteComments { get; set; }
             public bool DeleteOrders { get; set; }
+            public bool DeletePrivateMessages { get; set; }
         }
 
         public class UserRelatedData
@@ -83,6 +87,7 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
             public int ChatCount { get; set; }
             public int CommentCount { get; set; }
             public int OrderCount { get; set; }
+            public int PrivateMessageCount { get; set; }
         }
 
         public bool RequirePassword { get; set; }
@@ -106,7 +111,8 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                 PollCount = _pollService.CountByUserId(user.Id),
                 ChatCount = _chatService.CountByUserId(user.Id),
                 CommentCount = _commentService.CountByUserId(user.Id),
-                OrderCount = _orderService.CountByUserId(user.Id)
+                OrderCount = _orderService.CountByUserId(user.Id),
+                PrivateMessageCount = _privateMessageService.CountByUserId(user.Id)
             };
 
             return Page();
@@ -135,7 +141,8 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                         PollCount = _pollService.CountByUserId(user.Id),
                         ChatCount = _chatService.CountByUserId(user.Id),
                         CommentCount = _commentService.CountByUserId(user.Id),
-                        OrderCount = _orderService.CountByUserId(user.Id)
+                        OrderCount = _orderService.CountByUserId(user.Id),
+                PrivateMessageCount = _privateMessageService.CountByUserId(user.Id)
                     };
                     
                     return Page();
@@ -149,7 +156,8 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                 // Check if user wants to preserve any content (any checkbox unchecked)
                 bool wantsToPreserveContent = !Options.DeletePictures || !Options.DeleteVideos || 
                                              !Options.DeletePolls || !Options.DeleteChat || 
-                                             !Options.DeleteComments || !Options.DeleteOrders;
+                                             !Options.DeleteComments || !Options.DeleteOrders ||
+                                             !Options.DeletePrivateMessages;
 
                 // Get the System user ID for reassignment if needed
                 string systemUserId = null;
@@ -174,7 +182,8 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                             PollCount = _pollService.CountByUserId(userId),
                             ChatCount = _chatService.CountByUserId(userId),
                             CommentCount = _commentService.CountByUserId(userId),
-                            OrderCount = _orderService.CountByUserId(userId)
+                            OrderCount = _orderService.CountByUserId(userId),
+                    PrivateMessageCount = _privateMessageService.CountByUserId(userId)
                         };
                         
                         return Page();
@@ -241,6 +250,18 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                     _orderService.ReassignByUserId(userId, systemUserId);
                 }
 
+
+
+                // Handle Private Messages - Delete or Reassign
+                if (Options.DeletePrivateMessages)
+                {
+                    _privateMessageService.DeleteByUserId(userId);
+                }
+                else
+                {
+                    _privateMessageService.ReassignByUserId(userId, systemUserId);
+                }
+
                 // Delete the user account first
                 var result = await _userManager.DeleteAsync(user);
                 if (!result.Succeeded)
@@ -284,7 +305,8 @@ namespace digioz.Portal.Web.Areas.Identity.Pages.Account.Manage
                     PollCount = _pollService.CountByUserId(userId),
                     ChatCount = _chatService.CountByUserId(userId),
                     CommentCount = _commentService.CountByUserId(userId),
-                    OrderCount = _orderService.CountByUserId(userId)
+                    OrderCount = _orderService.CountByUserId(userId),
+                    PrivateMessageCount = _privateMessageService.CountByUserId(userId)
                 };
                 
                 return Page();

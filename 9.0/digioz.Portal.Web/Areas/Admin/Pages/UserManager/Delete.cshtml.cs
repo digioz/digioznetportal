@@ -22,6 +22,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
         private readonly IVideoService _videoService;
         private readonly IPictureService _pictureService;
         private readonly IOrderService _orderService;
+        private readonly IPrivateMessageService _privateMessageService;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<DeleteModel> _logger;
@@ -35,6 +36,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             IVideoService videoService,
             IPictureService pictureService,
             IOrderService orderService,
+            IPrivateMessageService privateMessageService,
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<DeleteModel> logger)
@@ -47,6 +49,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.UserManager
             _videoService = videoService;
             _pictureService = pictureService;
             _orderService = orderService;
+            _privateMessageService = privateMessageService;
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
