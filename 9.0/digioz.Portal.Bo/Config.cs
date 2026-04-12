@@ -10,6 +10,7 @@ namespace digioz.Portal.Bo
     {
         [MaxLength(128)]
         public string Id { get; set; }
+        [Required]
         public string ConfigKey { get; set; }
         public string ConfigValue { get; set; }
         public bool IsEncrypted { get; set; }

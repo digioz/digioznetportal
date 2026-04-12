@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -54,6 +55,10 @@ namespace digioz.Portal.Pages.Links
                 LoadCategories();
                 return Page();
             }
+
+            // Sanitize text inputs
+            Item.Name = InputSanitizer.SanitizeText(Item.Name);
+            Item.Description = InputSanitizer.SanitizeText(Item.Description);
 
             // Set defaults for new user-submitted links
             Item.Timestamp = DateTime.UtcNow;

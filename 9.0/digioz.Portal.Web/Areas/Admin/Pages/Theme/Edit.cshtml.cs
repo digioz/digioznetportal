@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
 {
@@ -81,7 +82,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
                 _themeService.SetAsDefault(Input.Id);
             }
 
-            theme.Name = Input.Name;
+            theme.Name = InputSanitizer.SanitizeText(Input.Name);
             theme.Body = Input.Body ?? string.Empty;
             theme.IsDefault = Input.IsDefault;
 

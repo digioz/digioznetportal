@@ -40,6 +40,7 @@ namespace digioz.Portal.Bo
         [MaxLength(255)]
         public string ShortDescription { get; set; }
         public string Description { get; set; }
+        [Url]
         public string ManufacturerUrl { get; set; }
         public int? UnitsInStock { get; set; }
         public bool OutOfStock { get; set; }

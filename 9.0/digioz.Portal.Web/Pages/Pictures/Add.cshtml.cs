@@ -76,6 +76,7 @@ namespace digioz.Portal.Pages.Pictures {
             for (int i = 0; i < Files.Count; i++) {
                 var file = Files[i];
                 var description = (Descriptions != null && i < Descriptions.Count) ? Descriptions[i] : string.Empty;
+                description = InputSanitizer.SanitizeText(description);
 
                 if (file == null || file.Length == 0)
                     continue;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace digioz.Portal.Web.Pages.Store {
@@ -23,11 +24,12 @@ namespace digioz.Portal.Web.Pages.Store {
         public string? CategoryName { get; set; }
         public List<ProductOption> ProductOptions { get; set; } = new();
 
-        public void OnGet(string id) {
+        public IActionResult OnGet(string id) {
+            if (string.IsNullOrEmpty(id)) return NotFound();
             Product = _productService.Get(id);
 
             if (Product == null)
-                return;
+                return NotFound();
 
             // Get category
             if (!string.IsNullOrEmpty(Product.ProductCategoryId)) {
@@ -42,6 +44,8 @@ namespace digioz.Portal.Web.Pages.Store {
 
             // Increment view count
             _productService.IncrementViews(id);
+
+            return Page();
         }
     }
 }

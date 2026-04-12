@@ -1,5 +1,6 @@
 using System;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -24,6 +25,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.LinkCategory
             if (Item == null) return RedirectToPage("/LinkCategory/Index", new { area = "Admin" });
             if (string.IsNullOrWhiteSpace(Item.Name)) ModelState.AddModelError("Item.Name", "Name is required.");
             if (!ModelState.IsValid) return Page();
+            Item.Name = InputSanitizer.SanitizeText(Item.Name);
             Item.Timestamp = DateTime.UtcNow;
             _service.Update(Item);
             return RedirectToPage("/LinkCategory/Index", new { area = "Admin" });

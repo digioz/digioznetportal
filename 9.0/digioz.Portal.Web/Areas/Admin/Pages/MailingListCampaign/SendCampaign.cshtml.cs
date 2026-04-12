@@ -48,6 +48,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.MailingListCampaign
 
         public IActionResult OnGet(string id)
         {
+            if (string.IsNullOrEmpty(id)) return NotFound();
             Campaign = _campaignService.Get(id);
             if (Campaign == null) return RedirectToPage("/MailingListCampaign/Index", new { area = "Admin" });
 

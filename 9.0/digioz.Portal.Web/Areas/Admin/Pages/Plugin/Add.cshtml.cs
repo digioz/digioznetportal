@@ -1,5 +1,6 @@
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -17,6 +18,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Plugin
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid) return Page();
+            Item.Name = InputSanitizer.SanitizeText(Item.Name);
             _service.Add(Item);
             return RedirectToPage("/Plugin/Index", new { area = "Admin" });
         }

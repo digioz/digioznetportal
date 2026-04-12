@@ -20,6 +20,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.ProductCategory
 
         public IActionResult OnGet(string id)
         {
+            if (string.IsNullOrEmpty(id)) return NotFound();
             Item = _service.Get(id);
             if (Item == null) return RedirectToPage("/ProductCategory/Index", new { area = "Admin" });
             return Page();

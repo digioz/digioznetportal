@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -59,6 +60,10 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Product
             
             Item.DateCreated = DateTime.UtcNow;
             Item.DateModified = DateTime.UtcNow;
+
+            // Sanitize plain-text fields
+            Item.Name = InputSanitizer.SanitizeText(Item.Name);
+            Item.ShortDescription = InputSanitizer.SanitizeText(Item.ShortDescription);
 
             // Set unused fields to null
             Item.Sizes = null;

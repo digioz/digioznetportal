@@ -85,6 +85,17 @@ namespace digioz.Portal.Pages.Videos
 
             Albums = _albumService.GetAll().OrderBy(a => a.Name).ToList();
 
+            if (AlbumId <= 0)
+            {
+                ModelState.AddModelError("AlbumId", "Please select an album.");
+                StatusMessage = "Please select an album.";
+                IsSuccess = false;
+                return Page();
+            }
+
+            if (!ModelState.IsValid)
+                return Page();
+
             try
             {
                 if (Item != null)
@@ -171,9 +182,13 @@ namespace digioz.Portal.Pages.Videos
                         }
 
                         Item.Filename = videoFileName;
-                    }
+                        }
 
-                    _videoService.Update(Item);
+                        // Update metadata
+                        Item.Description = InputSanitizer.SanitizeText(Description);
+                        Item.AlbumId = AlbumId;
+
+                        _videoService.Update(Item);
                 }
 
                 StatusMessage = "Video updated successfully!";

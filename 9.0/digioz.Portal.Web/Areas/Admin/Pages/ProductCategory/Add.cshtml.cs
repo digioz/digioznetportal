@@ -1,6 +1,7 @@
 using System;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -18,6 +19,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.ProductCategory
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid) return Page();
+            Item.Name = InputSanitizer.SanitizeText(Item.Name);
+            Item.Description = InputSanitizer.SanitizeText(Item.Description);
             if (string.IsNullOrEmpty(Item.Id))
             {
                 Item.Id = Guid.NewGuid().ToString();

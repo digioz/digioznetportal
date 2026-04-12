@@ -35,6 +35,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
 
         public IActionResult OnGet(string id)
         {
+            if (string.IsNullOrEmpty(id)) return NotFound();
             Item = _configService.Get(id);
             if (Item == null) return RedirectToPage("/CommentConfig/Index", new { area = "Admin" });
 

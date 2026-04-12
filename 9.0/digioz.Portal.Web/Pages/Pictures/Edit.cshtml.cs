@@ -147,7 +147,7 @@ namespace digioz.Portal.Pages.Pictures
 
                 if (Item != null)
                 {
-                    Item.Description = Description ?? Item.Description;
+                    Item.Description = InputSanitizer.SanitizeText(Description ?? Item.Description);
                     Item.AlbumId = AlbumId;
                     Item.Timestamp = DateTime.UtcNow;
 

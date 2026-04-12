@@ -11,9 +11,11 @@ namespace digioz.Portal.Bo
         public int Id { get; set; }
         [MaxLength(128)]
         public string UserId { get; set; }
+        [Required]
         [MaxLength(255)]
         public string Name { get; set; }
-        [MaxLength(255)]
+        [Required]
+        [MaxLength(50)]
         public string Location { get; set; }
         [MaxLength(50)]
         public string Controller { get; set; }

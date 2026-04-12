@@ -1,5 +1,6 @@
 using System;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -17,6 +18,9 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.MailingList
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid) return Page();
+            Item.Name = InputSanitizer.SanitizeText(Item.Name);
+            Item.DefaultFromName = InputSanitizer.SanitizeText(Item.DefaultFromName);
+            Item.Description = InputSanitizer.SanitizeText(Item.Description);
             Item.Id = Guid.NewGuid().ToString();
             
             // Ensure Address is not null for database constraint

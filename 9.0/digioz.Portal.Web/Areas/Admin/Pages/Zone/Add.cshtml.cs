@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using ZoneEntity = digioz.Portal.Bo.Zone;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Zone
@@ -37,7 +38,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Zone
             if (!ModelState.IsValid) return Page();
             var zone = new ZoneEntity
             {
-                Name = Input.Name,
+                Name = InputSanitizer.SanitizeText(Input.Name),
                 Location = Input.Location,
                 Body = Input.Body,
                 Visible = Input.Visible,

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using digioz.Portal.Utilities.Helpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -76,6 +77,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.SlideShow
 
             Item.Id = Guid.NewGuid().ToString();
             Item.Image = fileName;
+            Item.Description = InputSanitizer.SanitizeText(Item.Description);
             Item.DateCreated = DateTime.UtcNow;
             Item.DateModified = DateTime.UtcNow;
 

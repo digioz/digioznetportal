@@ -28,6 +28,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Announcement
         {
             if (!ModelState.IsValid) return Page();
             if (Item == null) return RedirectToPage("/Announcement/Index", new { area = "Admin" });
+            Item.Title = InputSanitizer.SanitizeText(Item.Title);
             Item.Timestamp = DateTime.UtcNow;
             var email = User?.Identity?.Name;
             Item.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;

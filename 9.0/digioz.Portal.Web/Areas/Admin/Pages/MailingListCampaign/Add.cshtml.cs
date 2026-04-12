@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -41,6 +42,10 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.MailingListCampaign
             }
 
             Item.Id = Guid.NewGuid().ToString();
+            Item.Name = InputSanitizer.SanitizeText(Item.Name);
+            Item.Subject = InputSanitizer.SanitizeText(Item.Subject);
+            Item.FromName = InputSanitizer.SanitizeText(Item.FromName);
+            Item.Summary = InputSanitizer.SanitizeText(Item.Summary);
             Item.DateCreated = DateTime.UtcNow;
             _service.Add(Item);
 

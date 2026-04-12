@@ -1,5 +1,6 @@
 using System;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -22,6 +23,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.MailingListSubscriber
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid) return Page();
+            Item.FirstName = InputSanitizer.SanitizeText(Item.FirstName);
+            Item.LastName = InputSanitizer.SanitizeText(Item.LastName);
             Item.Id = Guid.NewGuid().ToString();
             Item.DateCreated = DateTime.UtcNow;
             Item.DateModified = DateTime.UtcNow;

@@ -11,6 +11,7 @@ namespace digioz.Portal.Bo
         public int Id { get; set; }
         [MaxLength(128)]
         public string Name { get; set; }
+        [Url]
         public string Url { get; set; }
         public int MaxCount { get; set; }
         public DateTime Timestamp { get; set; }

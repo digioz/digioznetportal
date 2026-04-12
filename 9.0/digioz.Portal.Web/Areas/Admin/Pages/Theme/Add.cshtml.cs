@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
 {
@@ -47,7 +48,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
 
             var theme = new Bo.Theme
             {
-                Name = Input.Name,
+                Name = InputSanitizer.SanitizeText(Input.Name),
                 Body = Input.Body ?? string.Empty,
                 IsDefault = Input.IsDefault,
                 CreateDate = DateTime.Now

@@ -24,6 +24,7 @@ namespace digioz.Portal.Web.Pages.Store
 
         public void OnGet(string orderId)
         {
+            if (string.IsNullOrEmpty(orderId)) return;
             Order = _orderService.Get(orderId);
             
             if (Order != null)

@@ -20,6 +20,7 @@ namespace digioz.Portal.Bo
         [StringLength(50)]
         public string LastName { get; set; }
         [StringLength(255)]
+        [EmailAddress]
         public string Email { get; set; }
         public DateTime? Birthday { get; set; }
         public bool? BirthdayVisible { get; set; }

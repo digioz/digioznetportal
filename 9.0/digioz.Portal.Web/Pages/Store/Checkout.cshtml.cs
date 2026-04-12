@@ -6,6 +6,7 @@ using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.PaymentProviders.Abstractions;
 using digioz.Portal.PaymentProviders.Models;
+using digioz.Portal.Utilities;
 using digioz.Portal.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -104,6 +105,23 @@ namespace digioz.Portal.Web.Pages.Store {
                     ModelState.IsValid, CartItems.Count);
                 return Page();
             }
+
+            // Sanitize text inputs
+            Order.FirstName = InputSanitizer.SanitizeText(Order.FirstName);
+            Order.LastName = InputSanitizer.SanitizeText(Order.LastName);
+            Order.Phone = InputSanitizer.SanitizeText(Order.Phone);
+            Order.BillingAddress = InputSanitizer.SanitizeText(Order.BillingAddress);
+            Order.BillingAddress2 = InputSanitizer.SanitizeText(Order.BillingAddress2);
+            Order.BillingCity = InputSanitizer.SanitizeText(Order.BillingCity);
+            Order.BillingState = InputSanitizer.SanitizeText(Order.BillingState);
+            Order.BillingZip = InputSanitizer.SanitizeText(Order.BillingZip);
+            Order.BillingCountry = InputSanitizer.SanitizeText(Order.BillingCountry);
+            Order.ShippingAddress = InputSanitizer.SanitizeText(Order.ShippingAddress);
+            Order.ShippingAddress2 = InputSanitizer.SanitizeText(Order.ShippingAddress2);
+            Order.ShippingCity = InputSanitizer.SanitizeText(Order.ShippingCity);
+            Order.ShippingState = InputSanitizer.SanitizeText(Order.ShippingState);
+            Order.ShippingZip = InputSanitizer.SanitizeText(Order.ShippingZip);
+            Order.ShippingCountry = InputSanitizer.SanitizeText(Order.ShippingCountry);
 
             var userId = User.FindFirst("sub")?.Value ?? User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
             

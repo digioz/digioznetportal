@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Product
 
         public IActionResult OnGet(string id)
         {
+            if (string.IsNullOrEmpty(id)) return NotFound();
             Item = _service.Get(id);
             if (Item == null) return RedirectToPage("/Product/Index", new { area = "Admin" });
             
@@ -65,6 +67,10 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Product
             if (Item == null) return RedirectToPage("/Product/Index", new { area = "Admin" });
             
             Item.DateModified = DateTime.UtcNow;
+
+            // Sanitize plain-text fields
+            Item.Name = InputSanitizer.SanitizeText(Item.Name);
+            Item.ShortDescription = InputSanitizer.SanitizeText(Item.ShortDescription);
 
             // Set unused fields to null
             Item.Sizes = null;

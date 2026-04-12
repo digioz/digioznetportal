@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using ZoneEntity = digioz.Portal.Bo.Zone;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Zone
@@ -52,7 +53,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Zone
             var zone = _zoneService.Get(Input.Id);
             if (zone == null) return RedirectToPage("/Zone/Index");
 
-            zone.Name = Input.Name;
+            zone.Name = InputSanitizer.SanitizeText(Input.Name);
             zone.Location = Input.Location;
             zone.Body = Input.Body;
             zone.Visible = Input.Visible;

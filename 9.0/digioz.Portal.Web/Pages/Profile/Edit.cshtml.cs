@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using digioz.Portal.Utilities.Helpers; // ImageHelper / Utility.IsImage
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -136,11 +137,18 @@ namespace digioz.Portal.Pages.Profile
                 return Page();
             }
 
-            // Trim DisplayName to remove leading and trailing whitespace
-            if (!string.IsNullOrEmpty(Input.DisplayName))
-            {
-                Input.DisplayName = Input.DisplayName.Trim();
-            }
+            // Sanitize text inputs
+            Input.DisplayName = InputSanitizer.SanitizeText(Input.DisplayName);
+            Input.FirstName = InputSanitizer.SanitizeText(Input.FirstName);
+            Input.MiddleName = InputSanitizer.SanitizeText(Input.MiddleName);
+            Input.LastName = InputSanitizer.SanitizeText(Input.LastName);
+            Input.Address = InputSanitizer.SanitizeText(Input.Address);
+            Input.Address2 = InputSanitizer.SanitizeText(Input.Address2);
+            Input.City = InputSanitizer.SanitizeText(Input.City);
+            Input.State = InputSanitizer.SanitizeText(Input.State);
+            Input.Zip = InputSanitizer.SanitizeText(Input.Zip);
+            Input.Country = InputSanitizer.SanitizeText(Input.Country);
+            Input.Signature = InputSanitizer.SanitizeText(Input.Signature);
 
             var profileToUpdate = _profileService.GetAll().FirstOrDefault(p => p.Id == Input.Id && p.UserId == user.Id);
             if (profileToUpdate == null)

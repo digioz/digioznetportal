@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -48,9 +49,9 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
             if (existingLink == null) return RedirectToPage("/Link/Index", new { area = "Admin" });
 
             // Update properties on the tracked entity
-            existingLink.Name = Item.Name;
+            existingLink.Name = InputSanitizer.SanitizeText(Item.Name);
             existingLink.Url = Item.Url;
-            existingLink.Description = Item.Description;
+            existingLink.Description = InputSanitizer.SanitizeText(Item.Description);
             existingLink.LinkCategory = Item.LinkCategory;
             existingLink.Visible = Item.Visible;
             existingLink.Approved = IsApproved;

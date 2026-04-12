@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -56,6 +57,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Link
 
             Item.Timestamp = DateTime.UtcNow;
             Item.Approved = IsApproved;
+            Item.Name = InputSanitizer.SanitizeText(Item.Name);
+            Item.Description = InputSanitizer.SanitizeText(Item.Description);
             _service.Add(Item);
             return RedirectToPage("/Link/Index", new { area = "Admin" });
         }

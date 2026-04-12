@@ -140,7 +140,7 @@ namespace digioz.Portal.Pages.Videos
                 {
                     Filename = videoFileName,
                     Thumbnail = thumbFileName,
-                    Description = Description ?? string.Empty,
+                    Description = InputSanitizer.SanitizeText(Description),
                     AlbumId = AlbumId,
                     UserId = GetUserId(),
                     Visible = false,

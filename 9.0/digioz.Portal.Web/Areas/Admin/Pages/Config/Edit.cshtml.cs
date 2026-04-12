@@ -23,6 +23,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Config
 
         public IActionResult OnGet(string id)
         {
+            if (string.IsNullOrEmpty(id)) return NotFound();
             Item = _service.Get(id);
             if (Item == null) return RedirectToPage("/Config/Index", new { area = "Admin" });
 

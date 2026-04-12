@@ -41,6 +41,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Menu
 
             if (!ModelState.IsValid) return Page();
 
+            Item.Name = InputSanitizer.SanitizeText(Item.Name);
             Item.Timestamp = DateTime.UtcNow;
             var email = User?.Identity?.Name;
             if (!string.IsNullOrEmpty(email))

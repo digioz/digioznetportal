@@ -1,5 +1,6 @@
 using System.Linq;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -29,6 +30,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.MailingListCampaign
 
         public IActionResult OnGet(string id)
         {
+            if (string.IsNullOrEmpty(id)) return NotFound();
             Item = _service.Get(id);
             if (Item == null) return RedirectToPage("/MailingListCampaign/Index", new { area = "Admin" });
 
@@ -52,6 +54,11 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.MailingListCampaign
             }
 
             if (Item == null) return RedirectToPage("/MailingListCampaign/Index", new { area = "Admin" });
+
+            Item.Name = InputSanitizer.SanitizeText(Item.Name);
+            Item.Subject = InputSanitizer.SanitizeText(Item.Subject);
+            Item.FromName = InputSanitizer.SanitizeText(Item.FromName);
+            Item.Summary = InputSanitizer.SanitizeText(Item.Summary);
 
             _service.Update(Item);
 

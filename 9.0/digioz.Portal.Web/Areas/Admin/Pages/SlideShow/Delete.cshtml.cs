@@ -22,6 +22,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.SlideShow
 
         public IActionResult OnGet(string id)
         {
+            if (string.IsNullOrEmpty(id)) return NotFound();
             Item = _service.Get(id);
             if (Item == null) return RedirectToPage("/SlideShow/Index", new { area = "Admin" });
             return Page();
@@ -29,6 +30,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.SlideShow
 
         public IActionResult OnPost()
         {
+            if (string.IsNullOrEmpty(Id)) return RedirectToPage("/SlideShow/Index", new { area = "Admin" });
             var item = _service.Get(Id);
             if (item != null)
             {

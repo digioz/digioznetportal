@@ -28,6 +28,7 @@ namespace digioz.Portal.Web.Pages.Store
 
         public void OnGet(string id, int pageNumber = 1)
         {
+            if (string.IsNullOrEmpty(id)) return;
             this.pageNumber = pageNumber < 1 ? 1 : pageNumber;
 
             // Get category

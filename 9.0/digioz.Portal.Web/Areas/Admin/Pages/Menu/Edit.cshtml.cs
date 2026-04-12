@@ -41,6 +41,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Menu
             // Keep existing SortOrder regardless of posted value
             var keepSort = existing.SortOrder;
             Item.Timestamp = DateTime.UtcNow;
+            Item.Name = InputSanitizer.SanitizeText(Item.Name);
             var email = User?.Identity?.Name;
             Item.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
             Item.SortOrder = keepSort;

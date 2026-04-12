@@ -14,13 +14,14 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.MailingListSubscriber
 
         public IActionResult OnGet(string id)
         {
+            if (string.IsNullOrEmpty(id)) return NotFound();
             Item = _service.Get(id);
-            if (Item == null) return RedirectToPage("/MailingListSubscriber/Index", new { area = "Admin" });
             return Page();
         }
 
         public IActionResult OnPost()
         {
+            if (string.IsNullOrEmpty(Id)) return RedirectToPage("/MailingListSubscriber/Index", new { area = "Admin" });
             _service.Delete(Id);
             return RedirectToPage("/MailingListSubscriber/Index", new { area = "Admin" });
         }

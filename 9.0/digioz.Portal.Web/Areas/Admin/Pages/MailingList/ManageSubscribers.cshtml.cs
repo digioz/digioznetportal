@@ -30,6 +30,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.MailingList
 
         public IActionResult OnGet(string id)
         {
+            if (string.IsNullOrEmpty(id)) return NotFound();
             var mailingList = _mailingListService.Get(id);
             if (mailingList == null) return RedirectToPage("/MailingList/Index", new { area = "Admin" });
 

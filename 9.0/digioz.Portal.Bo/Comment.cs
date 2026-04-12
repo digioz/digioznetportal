@@ -17,6 +17,7 @@ namespace digioz.Portal.Bo
         public string Username { get; set; }
         public string ReferenceId { get; set; }
         public string ReferenceType { get; set; }
+        [Required]
         public string Body { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }

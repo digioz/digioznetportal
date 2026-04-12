@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities;
 using digioz.Portal.Utilities.Helpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +28,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.SlideShow
 
         public IActionResult OnGet(string id)
         {
+            if (string.IsNullOrEmpty(id)) return NotFound();
             Item = _service.Get(id);
             if (Item == null) return RedirectToPage("/SlideShow/Index", new { area = "Admin" });
             return Page();
@@ -41,7 +43,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.SlideShow
             if (existingItem == null) return RedirectToPage("/SlideShow/Index", new { area = "Admin" });
 
             // Update description
-            existingItem.Description = Item.Description;
+            existingItem.Description = InputSanitizer.SanitizeText(Item.Description);
             existingItem.DateModified = DateTime.UtcNow;
 
             // If a new file is uploaded, process it

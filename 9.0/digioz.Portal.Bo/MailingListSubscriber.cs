@@ -10,10 +10,14 @@ namespace digioz.Portal.Bo
     {
         [MaxLength(128)]
         public string Id { get; set; }
+        [Required]
+        [EmailAddress]
         [MaxLength(50)]
         public string Email { get; set; }
+        [Required]
         [MaxLength(50)]
         public string FirstName { get; set; }
+        [Required]
         [MaxLength(50)]
         public string LastName { get; set; }
         public bool Status { get; set; }

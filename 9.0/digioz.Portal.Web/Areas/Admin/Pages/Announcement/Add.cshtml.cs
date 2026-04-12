@@ -24,6 +24,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Announcement
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid) return Page();
+            Item.Title = InputSanitizer.SanitizeText(Item.Title);
             Item.Timestamp = DateTime.UtcNow;
             var email = User?.Identity?.Name;
             Item.UserId = !string.IsNullOrEmpty(email) ? _userHelper.GetUserIdByEmail(email) : null;
