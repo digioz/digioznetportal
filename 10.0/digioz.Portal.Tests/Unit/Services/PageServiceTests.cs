@@ -51,6 +51,7 @@ namespace digioz.Portal.Tests.Unit.Services
             {
                 Id = 1,
                 Title = "Test Page",
+                Url = "test-page",
                 Body = "Test Content",
                 Visible = true,
                 Timestamp = DateTime.UtcNow
@@ -87,9 +88,9 @@ namespace digioz.Portal.Tests.Unit.Services
         {
             // Arrange
             _context.Pages.AddRange(
-                new Page { Id = 1, Title = "Page 1", Body = "Content 1", Visible = true },
-                new Page { Id = 2, Title = "Page 2", Body = "Content 2", Visible = true },
-                new Page { Id = 3, Title = "Page 3", Body = "Content 3", Visible = false }
+                new Page { Id = 1, Title = "Page 1", Url = "page-1", Body = "Content 1", Visible = true },
+                new Page { Id = 2, Title = "Page 2", Url = "page-2", Body = "Content 2", Visible = true },
+                new Page { Id = 3, Title = "Page 3", Url = "page-3", Body = "Content 3", Visible = false }
             );
             _context.SaveChanges();
 
@@ -122,6 +123,7 @@ namespace digioz.Portal.Tests.Unit.Services
             {
                 Id = 1,
                 Title = "About Us",
+                Url = "about-us",
                 Body = "Company information",
                 Visible = true
             };
@@ -196,6 +198,7 @@ namespace digioz.Portal.Tests.Unit.Services
             var page = new Page
             {
                 Title = "New Page",
+                Url = "new-page",
                 Body = "New Content",
                 Visible = true,
                 Timestamp = DateTime.UtcNow
@@ -222,6 +225,7 @@ namespace digioz.Portal.Tests.Unit.Services
             {
                 Id = 1,
                 Title = "Original Title",
+                Url = "original-title",
                 Body = "Original Content",
                 Visible = true
             };
@@ -253,6 +257,7 @@ namespace digioz.Portal.Tests.Unit.Services
             {
                 Id = 1,
                 Title = "Test Page",
+                Url = "test-page",
                 Body = "Test Content",
                 Visible = true
             };
@@ -284,9 +289,9 @@ namespace digioz.Portal.Tests.Unit.Services
         {
             // Arrange
             _context.Pages.AddRange(
-                new Page { Id = 1, Title = "About Us", Body = "Company info", Visible = true, Timestamp = DateTime.UtcNow.AddDays(-1) },
-                new Page { Id = 2, Title = "Contact", Body = "Contact details", Visible = true, Timestamp = DateTime.UtcNow },
-                new Page { Id = 3, Title = "Products", Body = "Product catalog", Visible = false }
+                new Page { Id = 1, Title = "About Us", Url = "about-us", Body = "Company info", Visible = true, Timestamp = DateTime.UtcNow.AddDays(-1) },
+                new Page { Id = 2, Title = "Contact", Url = "contact", Body = "Contact details", Visible = true, Timestamp = DateTime.UtcNow },
+                new Page { Id = 3, Title = "Products", Url = "products", Body = "Product catalog", Visible = false }
             );
             _context.SaveChanges();
 
@@ -304,9 +309,9 @@ namespace digioz.Portal.Tests.Unit.Services
         {
             // Arrange
             _context.Pages.AddRange(
-                new Page { Id = 1, Title = "Page 1", Body = "Content 1", Visible = true },
-                new Page { Id = 2, Title = "Page 2", Body = "Content 2", Visible = true },
-                new Page { Id = 3, Title = "Page 3", Body = "Content 3", Visible = false }
+                new Page { Id = 1, Title = "Page 1", Url = "page-1", Body = "Content 1", Visible = true },
+                new Page { Id = 2, Title = "Page 2", Url = "page-2", Body = "Content 2", Visible = true },
+                new Page { Id = 3, Title = "Page 3", Url = "page-3", Body = "Content 3", Visible = false }
             );
             _context.SaveChanges();
 
@@ -328,6 +333,7 @@ namespace digioz.Portal.Tests.Unit.Services
                 {
                     Id = i,
                     Title = $"Page {i}",
+                    Url = $"page-{i}",
                     Body = $"Content {i}",
                     Visible = true,
                     Timestamp = DateTime.UtcNow.AddDays(-i)
@@ -351,6 +357,7 @@ namespace digioz.Portal.Tests.Unit.Services
             {
                 Id = 1,
                 Title = "Test Page",
+                Url = "test-page",
                 Body = "Test Content",
                 Visible = true
             });
