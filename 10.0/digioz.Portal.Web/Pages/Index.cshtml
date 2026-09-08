@@ -1,0 +1,45 @@
+﻿@page
+@model IndexModel
+
+@{
+    ViewBag.Title = "Home";
+}
+
+@section keywords {
+    @if (Model.PageContent?.Keywords != null)
+    {
+        <meta name="keywords" content="@Model.PageContent.Keywords" />
+    }
+}
+
+@section description {
+    @if (Model.PageContent?.Description != null)
+    {
+        <meta name="description" content="@Model.PageContent.Description" />
+    }
+}
+
+@await Component.InvokeAsync("SlideShow")
+
+@await Component.InvokeAsync("Announcements")
+
+<div class="card bg-light mb-3">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        @{
+            if (Model.PageContent != null)
+            {
+                @Html.Raw(Model.PageContent.Body)
+            }
+
+            if (Model.AllowComments)
+            {
+                @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent?.Id.ToString() })
+            }
+        }
+    </div>
+</div>
+
+@await Component.InvokeAsync("LatestPictures")
+@await Component.InvokeAsync("LatestVideos")
+@await Component.InvokeAsync("RssFeed")

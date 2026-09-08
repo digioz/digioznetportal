@@ -1,0 +1,8 @@
+@model string
+
+@if (!string.IsNullOrWhiteSpace(Model))
+{
+    <style>
+        @Html.Raw(Model)
+    </style>
+}

@@ -1,0 +1,221 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Caching.Memory
+@using digioz.Portal.Bo
+@using digioz.Portal.Dal.Services.Interfaces
+@inject IConfigService ConfigService
+@inject Microsoft.Extensions.Caching.Memory.IMemoryCache MemoryCache
+
+@{
+    // Cache keys
+    var cacheKeyConfigDictionary = "ConfigDictionary";
+    Dictionary<string, string>? configDictionary;
+    var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
+    if (!MemoryCache.TryGetValue(cacheKeyConfigDictionary, out configDictionary) || configDictionary == null)
+    {
+        var config = ConfigService.GetAll();
+      configDictionary = config.ToDictionary(c => c.ConfigKey, c => c.ConfigValue);
+      MemoryCache.Set(cacheKeyConfigDictionary, configDictionary, cacheEntryOptions);
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard - @(configDictionary?["SiteName"] ?? "Portal") - @ViewBag.Title</title>
+    <!-- Bootstrap 5 CSS (local) -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true">
+    <link href="~/css/admin.css" rel="stylesheet" asp-append-version="true" />
+    <!-- Bootstrap Icons (local via libman) -->
+    <link href="~/lib/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" asp-append-version="true" />
+    @await Component.InvokeAsync("BootstrapOverride")
+</head>
+<body class="bg-light">
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-area="Admin" asp-page="/Index">Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="adminNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" asp-area="" asp-page="/Index">Site</a></li>
+                    
+                    <!-- Content Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarContentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Content
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarContentDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Announcement/Index">Announcements</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Page/Index">Pages</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Picture/Index">Pictures</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Video/Index">Videos</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Plugin/Index">Plugins</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Menu/Index">Menus</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Module/Index">Modules</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Zone/Index">Zones</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/RssManager/Index">RSS Manager</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/SlideShow/Index">Slide Show</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Communication Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarCommunicationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Communication
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarCommunicationDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Chat/Index">Chat</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Comment/Index">Comments</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/CommentConfig/Index">Comment Config</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/MailingList/Index">Mailing Lists</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/MailingListSubscriber/Index">Subscribers</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/ReportedMessage/Index">Reported Messages</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Commerce Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarCommerceDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Commerce
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarCommerceDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Product/Index">Products</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/ProductCategory/Index">Product Categories</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Order/Index">Orders</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Polls Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarPollsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Polls
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarPollsDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Poll/Index">Polls</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Configuration Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarConfigurationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Configuration
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarConfigurationDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Config/Index">Config</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Link/Index">Links</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/LinkCategory/Index">Link Category</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Theme/Index">Themes</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Monitoring Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarMonitoringDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Monitoring
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarMonitoringDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Visitor/Index">Visitors</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Log/Index">Logs</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/VisitorSession/Index">Sessions</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Users Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarUsersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Security
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarUsersDropdown">
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/UserManager/Index">User Manager</a></li>
+                            <li><a class="dropdown-item" asp-area="Admin" asp-page="/Security/BannedIps">Banned IPs</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <span class="navbar-text text-white-50">@DateTime.UtcNow.ToString("u")</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-3">
+        <div class="row g-3">
+            <!-- Sidebar - Hidden on mobile (< lg) -->
+            <aside class="col-lg-3 d-none d-lg-block">
+                <div class="card shadow-sm sidebar">
+                    <div class="card-header fw-semibold">Navigation</div>
+                    <div class="list-group list-group-flush">
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Index">Overview</a>
+
+                        <!-- Content Category -->
+                        <div class="list-group-item list-group-item-dark fw-semibold small category">Content</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Announcement/Index">Announcements</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Page/Index">Pages</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Picture/Index">Pictures</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Video/Index">Videos</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Plugin/Index">Plugins</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Menu/Index">Menus</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Module/Index">Modules</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Zone/Index">Zones</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/RssManager/Index">RSS Manager</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/SlideShow/Index">Slide Show</a>
+
+                        <!-- Communication Category -->
+                        <div class="list-group-item list-group-item-dark fw-semibold small category">Communication</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Chat/Index">Chat</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Comment/Index">Comments</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/CommentConfig/Index">Comment Config</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/MailingList/Index">Mailing Lists</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/MailingListSubscriber/Index">Subscribers</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/ReportedMessage/Index">Reported Messages</a>
+
+                        <!-- Commerce Category -->
+                        <div class="list-group-item list-group-item-dark fw-semibold small category">Commerce</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Product/Index">Products</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/ProductCategory/Index">Product Categories</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Order/Index">Orders</a>
+
+                        <!-- Polls Category -->
+                        <div class="list-group-item list-group-item-dark fw-semibold small category">Polls</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Poll/Index">Polls</a>
+
+                        <!-- Configuration Category -->
+                        <div class="list-group-item list-group-item-dark fw-semibold small category">Configuration</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Config/Index">Config</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Link/Index">Links</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/LinkCategory/Index">Link Category</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Theme/Index">Themes</a>
+
+                        <!-- Security Category -->
+                        <div class="list-group-item list-group-item-dark fw-semibold small category">Security</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/UserManager/Index">User Manager</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Security/BannedIps">Banned IPs</a>
+
+                        <!-- Monitoring Category -->
+                        <div class="list-group-item list-group-item-dark fw-semibold small category">Monitoring</div>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Visitor/Index">Visitors</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/Log/Index">Logs</a>
+                        <a class="list-group-item list-group-item-action" asp-area="Admin" asp-page="/VisitorSession/Index">Sessions</a>                        
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main content - Full width on mobile, 9 cols on desktop -->
+            <main class="col-12 col-lg-9">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <footer class="text-center text-muted py-4">
+       <small>&copy; @DateTime.Now.Year - @(configDictionary?["SiteName"] ?? "Portal")</small>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS (local) -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

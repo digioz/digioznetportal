@@ -1,0 +1,47 @@
+@page "{id}"
+@model digioz.Portal.Web.Areas.Admin.Pages.MailingListCampaign.DeleteModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Delete Campaign";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<partial name="../MailingList/_MailingListNav" />
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Delete Campaign</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/MailingListCampaign/Index">Back</a>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle"></i> Are you sure you want to delete this campaign?
+        </div>
+        <dl class="row">
+            <dt class="col-sm-3">Name</dt>
+            <dd class="col-sm-9">@Model.Item?.Name</dd>
+
+            <dt class="col-sm-3">Subject</dt>
+            <dd class="col-sm-9">@Model.Item?.Subject</dd>
+
+            <dt class="col-sm-3">From</dt>
+            <dd class="col-sm-9">@Model.Item?.FromName &lt;@Model.Item?.FromEmail&gt;</dd>
+
+            <dt class="col-sm-3">Summary</dt>
+            <dd class="col-sm-9">@Model.Item?.Summary</dd>
+
+            <dt class="col-sm-3">Visitor Count</dt>
+            <dd class="col-sm-9">@Model.Item?.VisitorCount</dd>
+
+            <dt class="col-sm-3">Date Created</dt>
+            <dd class="col-sm-9">@Model.Item?.DateCreated.ToString("yyyy-MM-dd HH:mm")</dd>
+        </dl>
+        <form method="post">
+            <input type="hidden" asp-for="Id" />
+            <div class="d-flex justify-content-end gap-2">
+                <a class="btn btn-secondary" asp-area="Admin" asp-page="/MailingListCampaign/Index">Cancel</a>
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </div>
+        </form>
+    </div>
+</div>

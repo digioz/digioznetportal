@@ -1,0 +1,104 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.Visitor.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+@{
+    ViewBag.Title = "Visitor";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Visitors</span>
+        <div>
+            <a class="btn btn-sm btn-outline-secondary me-2" asp-area="Admin" asp-page="/Visitor/Export">Export</a>
+            <a class="btn btn-sm btn-danger me-2" asp-area="Admin" asp-page="/Visitor/Purge">Purge</a>
+            <a asp-area="Admin" asp-page="/Index" class="btn btn-sm btn-outline-secondary">Back</a>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <form method="get" class="row g-2 align-items-center mb-3">
+            <div class="col-12 col-md-6">
+                <input asp-for="q" class="form-control" placeholder="Search user agent, href, referrer, or IP..." />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+            <div class="col-auto">
+                <a class="btn btn-outline-secondary" asp-area="Admin" asp-page="/Visitor/Index">Clear</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th style="width:80px;">Id</th>
+                        <th style="width:170px;">Timestamp</th>
+                        <th style="width:150px;">IP</th>
+                        <th>Href</th>
+                        <th>Referrer</th>
+                        <th>User Agent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items != null && Model.Items.Count > 0)
+                    {
+                        foreach (var v in Model.Items)
+                        {
+                            var time = v.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") ?? string.Empty;
+                            var href = v.Href ?? string.Empty;
+                            var referrer = v.Referrer ?? string.Empty;
+                            var ua = v.UserAgent ?? string.Empty;
+                            var uaPreview = ua.Length > 150 ? ua.Substring(0, 150) : ua;
+                            var uaHasMore = ua.Length > 150;
+                            <tr>
+                                <td>@v.Id</td>
+                                <td>@time</td>
+                                <td>@v.IpAddress</td>
+                                <td class="text-truncate" style="max-width:240px" title="@href">@href</td>
+                                <td class="text-truncate" style="max-width:240px" title="@referrer">@referrer</td>
+                                <td>
+                                    <span>@uaPreview</span>
+                                    @if (uaHasMore)
+                                    {
+                                        <details class="mt-1">
+                                            <summary>Show more</summary>
+                                            <pre class="mb-0">@ua.Substring(150)</pre>
+                                        </details>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" class="text-muted">No visitor records found.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <paging total-records="@Model.TotalCount"
+                page-no="@Model.pageNumber"
+                page-size="@Model.pageSize"
+                page-no-parameter-name="pageNumber"
+                query-string-key-page-no="pageNumber"
+                show-prev-next="true"
+                show-first-last="true"
+                class="pagination mb-0">
+            <route-values>
+                <rv key="q" value="@Model.q"></rv>
+                <rv key="pageSize" value="@Model.pageSize"></rv>
+            </route-values>
+        </paging>
+    </div>
+</div>

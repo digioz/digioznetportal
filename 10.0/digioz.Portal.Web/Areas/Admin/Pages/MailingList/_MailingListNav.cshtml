@@ -1,0 +1,32 @@
+@{
+    var area = "Admin";
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">Mailing List Management</span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mailingListNav" aria-controls="mailingListNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mailingListNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link @(currentPage.Contains("/MailingList/Index") ? "active" : "")" asp-area="@area" asp-page="/MailingList/Index">
+                        <i class="bi bi-envelope"></i> Mailing Lists
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentPage.Contains("/MailingListCampaign/Index") ? "active" : "")" asp-area="@area" asp-page="/MailingListCampaign/Index">
+                        <i class="bi bi-megaphone"></i> Campaigns
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentPage.Contains("/MailingListSubscriber/Index") ? "active" : "")" asp-area="@area" asp-page="/MailingListSubscriber/Index">
+                        <i class="bi bi-people"></i> Subscribers
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,32 @@
+@page "{id:int}"
+@model digioz.Portal.Web.Areas.Admin.Pages.Page.DetailsModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Page Details";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Details</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/Page/Index">Back</a>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Title</dt>
+            <dd class="col-sm-9">@Model.Item?.Title</dd>
+            <dt class="col-sm-3">Url</dt>
+            <dd class="col-sm-9">@Model.Item?.Url</dd>
+            <dt class="col-sm-3">Visible</dt>
+            <dd class="col-sm-9">@(Model.Item?.Visible == true ? "Yes" : "No")</dd>
+            <dt class="col-sm-3">Timestamp</dt>
+            <dd class="col-sm-9">@Model.Item?.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</dd>
+            <dt class="col-sm-3">Keywords</dt>
+            <dd class="col-sm-9">@Model.Item?.Keywords</dd>
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">@Model.Item?.Description</dd>
+            <dt class="col-sm-3">Body</dt>
+            <dd class="col-sm-9">@Html.Raw(Model.Item?.Body)</dd>
+        </dl>
+    </div>
+</div>

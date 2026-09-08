@@ -1,0 +1,44 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.Picture.PictureAddModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Add Picture";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header">Add Picture</div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label">Album</label>
+                <select asp-for="Item.AlbumId" class="form-select">
+                    @foreach (var a in Model.Albums)
+                    {
+                        <option value="@a.Id">@a.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea asp-for="Item.Description" class="form-control"></textarea>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" asp-for="Item.Approved" />
+                <label class="form-check-label" asp-for="Item.Approved">Approved</label>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" asp-for="Item.Visible" />
+                <label class="form-check-label" asp-for="Item.Visible">Visible</label>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Image file</label>
+                <input type="file" class="form-control" asp-for="File" />
+                <span class="text-muted">Allowed types: jpg, png, gif, bmp, tif, tiff</span>
+                <span asp-validation-for="File" class="text-danger"></span>
+            </div>
+            <button class="btn btn-primary" type="submit">Save</button>
+            <a class="btn btn-secondary" asp-area="Admin" asp-page="/Picture/PictureIndex">Cancel</a>
+        </form>
+    </div>
+</div>

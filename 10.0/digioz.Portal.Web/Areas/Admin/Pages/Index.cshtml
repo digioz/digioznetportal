@@ -1,0 +1,129 @@
+﻿@page
+@model digioz.Portal.Web.Areas.Admin.Pages.IndexModel
+@{
+    ViewData["Title"] = "Admin Home";
+    Layout = "~/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header fw-semibold">@ViewBag.Title</div>
+    <div class="card-body">
+        <h1>Admin Dashboard</h1>
+    </div>
+</div>
+
+<!-- Analytics and Logs Row -->
+<div class="row g-3">
+    <!-- Visitor Tracking Chart Area -->
+    <div class="col-12 col-xl-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>Visitor Tracking</span>
+                <small class="text-muted">Last 15 days</small>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(Model.VisitorChartBase64))
+                {
+                    <img src="data:image/png;base64,@Model.VisitorChartBase64"
+                         alt="Visitor Tracking Chart"
+                         class="img-fluid w-100" />
+                    <div class="text-center mt-2">
+                        <span style="display: inline-block;">
+                            <span style="display: inline-block; width: 20px; height: 12px; background-color: #0d6efd; margin-right: 5px; vertical-align: middle;"></span>
+                            <span style="vertical-align: middle; font-size: 12px; color: #212529;">Unique Visitors</span>
+                        </span>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-placeholder rounded" id="visitorsChart">
+                        <span>No chart data available</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest Visitor Logs Area -->
+    <div class="col-12 col-xl-7">
+        <div class="card shadow-sm h-100 mb-3">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>Latest Visitor Logs</span>
+                <a class="btn btn-sm btn-primary" href="@Url.Page("/Visitor/Index", new { area = "Admin" })">View All</a>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    @if (Model.LatestVisitorLogs != null && Model.LatestVisitorLogs.Count > 0)
+                    {
+                        foreach (var v in Model.LatestVisitorLogs)
+                        {
+                            var time = v.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "";
+                            var ua = v.UserAgent ?? string.Empty;
+                            var preview = ua.Length > 100 ? ua.Substring(0, 100) : ua;
+                            var hasMore = ua.Length > 100;
+                            <li class="list-group-item">
+                                <div class="small text-muted">Id: @v.Id • @time • IP: @v.IpAddress</div>
+                                <div class="fw-semibold">
+                                    <span>@preview</span>
+                                    @if (hasMore)
+                                    {
+                                        <details class="mt-1">
+                                            <summary>Show more</summary>
+                                            <pre class="mb-0">@ua.Substring(100)</pre>
+                                        </details>
+                                    }
+                                </div>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="list-group-item text-muted">No visitor logs found.</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest Logs Area -->
+    <div class="col-12 col-xl-12">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span>Latest Logs</span>
+                <a class="btn btn-sm btn-primary" href="@Url.Page("/Log/Index", new { area = "Admin" })">View all</a>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush" id="latestLogs">
+                    @if (Model.LatestLogs != null && Model.LatestLogs.Count > 0)
+                    {
+                        foreach (var log in Model.LatestLogs)
+                        {
+                            var level = (!string.IsNullOrEmpty(log.LogEvent) ? log.LogEvent.Split('|')[0] : (string.IsNullOrEmpty(log.Level) ? "Info" : log.Level));
+                            var time = log.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "";
+                            var msg = log.Message ?? string.Empty;
+                            var preview = msg.Length > 100 ? msg.Substring(0, 100) : msg;
+                            var hasMore = msg.Length > 100;
+                            <li class="list-group-item">
+                                <div class="small text-muted">[@level] • Id: @log.Id • @time • @log.LogEvent</div>
+                                <div class="fw-semibold">
+                                    <span>@preview</span>
+                                    @if (hasMore)
+                                    {
+                                        <details class="mt-1">
+                                            <summary>Show more</summary>
+                                            <pre class="mb-0">@msg.Substring(100)</pre>
+                                        </details>
+                                    }
+                                </div>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="list-group-item text-muted">No logs found.</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

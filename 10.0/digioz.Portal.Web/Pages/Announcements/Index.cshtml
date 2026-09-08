@@ -1,0 +1,53 @@
+@page
+@model digioz.Portal.Web.Pages.Announcements.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+@{
+    ViewData["Title"] = "Announcements";
+}
+
+<div class="container">
+    <h2 class="mb-4">Announcements</h2>
+
+    @if (Model.Items.Any())
+    {
+        @foreach (var announcement in Model.Items)
+        {
+            <div class="card shadow-sm mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">@announcement.Title</h5>
+                    @if (announcement.Timestamp.HasValue)
+                    {
+                        <small class="text-muted">@announcement.Timestamp.Value.ToLocalTime().ToString("MMMM dd, yyyy")</small>
+                    }
+                </div>
+                <div class="card-body">
+                    @Html.Raw(announcement.Body)
+                </div>
+                @if (Model.CommentsEnabledMap.TryGetValue(announcement.Id, out var commentsEnabled) && commentsEnabled)
+                {
+                    <div class="card-footer">
+                        @await Component.InvokeAsync("CommentsMenu", new { referenceId = announcement.Id.ToString(), referenceType = "/Announcements" })
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="card-footer d-flex justify-content-between align-items-center bg-white border-0 px-0">
+            <small class="text-muted">Page @Model.PageNumber of @Model.TotalPages (@Model.TotalCount total)</small>
+            <paging total-records="@Model.TotalCount"
+                    page-no="@Model.PageNumber"
+                    page-size="@Model.PageSize"
+                    show-prev-next="true"
+                    show-first-last="true"
+                    query-string-key-page-no="pageNumber"
+                    class="pagination mb-0"></paging>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <p class="mb-0">No announcements available at this time.</p>
+        </div>
+    }
+</div>

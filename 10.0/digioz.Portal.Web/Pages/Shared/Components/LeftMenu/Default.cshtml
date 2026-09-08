@@ -1,0 +1,59 @@
+@model List<digioz.Portal.Bo.Menu>
+
+<div class="card bg-light mb-3">
+    <div class="card-header">Menu</div>
+    <div class="card-body">
+        <ul>
+            @if (Model != null)
+            {
+                foreach (var item in Model)
+                {
+                    if (!string.IsNullOrEmpty(item.Controller))
+                    {
+                        if (!string.IsNullOrEmpty(item.Action))
+                        {
+                            <li><a href="/@item.Controller/@item.Action">@item.Name</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/Index">@item.Name</a></li>
+                        }
+                    }
+                    else
+                    {
+                        <li><a href="@item.Url" target="@item.Target">@item.Name</a></li>
+                    }
+                }
+
+                if ((bool)(ViewData["ShowPolls"] ?? false))
+                {
+                    <li><a href="/Polls/Index">Polls</a></li>
+                }
+                if ((bool)(ViewData["ShowRssFeed"] ?? false))
+                {
+                    <li><a href="/RssFeed/Index">RSS Feed</a></li>
+                }
+                if ((bool)(ViewData["ShowMailingList"] ?? false))
+                {
+                    <li><a href="/MailingList/Index">Mailing Lists</a></li>
+                }
+            }
+            else
+            {
+                <li><a href="/Index">Home</a></li>
+                if ((bool)(ViewData["ShowPolls"] ?? false))
+                {
+                    <li><a href="/Polls/Index">Polls</a></li>
+                }
+                if ((bool)(ViewData["ShowRssFeed"] ?? false))
+                {
+                    <li><a href="/RssFeed/Index">RSS Feed</a></li>
+                }
+                if ((bool)(ViewData["ShowMailingList"] ?? false))
+                {
+                    <li><a href="/MailingList/Index">Mailing Lists</a></li>
+                }
+            }
+        </ul>
+    </div>
+</div>

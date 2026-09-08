@@ -1,0 +1,120 @@
+﻿@using Microsoft.Extensions.Caching.Memory
+@using digioz.Portal.Bo
+@using digioz.Portal.Dal.Services.Interfaces
+@inject IConfigService ConfigService
+@inject Microsoft.Extensions.Caching.Memory.IMemoryCache MemoryCache
+
+@{
+    // Cache keys
+    var cacheKeyConfigDictionary = "ConfigDictionary";
+    Dictionary<string, string>? configDictionary;
+    var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
+    if (!MemoryCache.TryGetValue(cacheKeyConfigDictionary, out configDictionary) || configDictionary == null)
+    {
+        var config = ConfigService.GetAll();
+        configDictionary = config.ToDictionary(c => c.ConfigKey, c => c.ConfigValue);
+        MemoryCache.Set(cacheKeyConfigDictionary, configDictionary, cacheEntryOptions);
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - @(configDictionary?["SiteName"] ?? "Portal")</title>
+	@if (IsSectionDefined("keywords"))
+	{
+		@RenderSection("keywords")
+	}
+	@if (IsSectionDefined("description"))
+	{
+		@RenderSection("description")
+	}
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	@await Component.InvokeAsync("BootstrapOverride")
+	<link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/autocomplete.css" />
+	<link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
+	@RenderSection("Head", required: false)
+</head>
+<body>
+	<header class="site-header">
+		<div class="container">
+			<div class="d-flex align-items-center justify-content-between py-3">
+				<div class="logo-container">
+					<a href="/">
+						<img src="~/img/images/Logo_Small.png" 
+							 alt="@(configDictionary?["SiteName"] ?? "Portal")" 
+							 class="img-fluid" />
+					</a>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+        <div class="container px-3">
+            <a class="navbar-brand" href="/">@(configDictionary?["SiteName"] ?? "Portal")</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarCollapse">
+
+                @await Component.InvokeAsync("TopMenu")
+
+				<form class="d-flex mt-2 mt-md-0" action="/SearchPages">
+					<select class="form-select me-2" name="searchScope" aria-label="Search scope" style="max-width: 150px;">
+						<option value="All">All</option>
+						<option value="Page">Page</option>
+						<option value="Announcement">Announcement</option>
+						<option value="Comment">Comment</option>
+						<option value="Picture">Picture</option>
+						<option value="Video">Video</option>
+						<option value="Link">Link</option>
+					</select>
+					<input class="form-control me-2" type="text" placeholder="Search" aria-label="Search" name="searchString">
+					<button class="btn btn-primary my-2 my-md-0" type="submit">Search</button>
+				</form>
+			</div>
+        </div>
+	</nav>
+
+	<div class="container body-content">
+
+        @await Component.InvokeAsync("ZoneMenu", new { location = "Top" })
+
+		<div class="row">
+            <div class="col-md-3">
+				@await Component.InvokeAsync("LeftMenu")
+				@await Component.InvokeAsync("UserMenu")
+				@await Component.InvokeAsync("WhoIsOnlineMenu")
+				@await Component.InvokeAsync("StoreMenu")
+				@await Component.InvokeAsync("PollMenu")
+				@await Component.InvokeAsync("ZoneMenu", new { location = "Left" })
+				@await Component.InvokeAsync("ZoneMenu", new { location = "LeftMenu" })
+
+            </div>
+			<div class="col-md-9">
+				@await Component.InvokeAsync("ZoneMenu", new { location = "BodyTop" })
+				@RenderBody()
+				@await Component.InvokeAsync("ZoneMenu", new { location = "BodyBottom" })
+			</div>
+		</div>
+
+		@await Component.InvokeAsync("ZoneMenu", new { location = "Bottom" })
+
+	</div>
+	<hr />
+	<footer class="text-center py-2">
+		<p class="mb-0">&copy; @DateTime.Now.Year - @(configDictionary?["SiteName"] ?? "Portal")</p>
+	</footer>
+	<script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="~/js/autocomplete.js"></script>
+	<script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@RenderSection("Scripts", required: false)
+	@* <script src="~/lib/bowser/bowser.js"></script>
+	<script src="~/js/visitor.js"></script> *@
+</body>
+</html>
