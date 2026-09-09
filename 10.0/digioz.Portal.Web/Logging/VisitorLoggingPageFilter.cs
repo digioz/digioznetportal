@@ -94,8 +94,7 @@ namespace digioz.Portal.Web.Logging
             {
                 try
                 {
-                    var existingSession = _visitorSessionService.GetAll()
-                        .FirstOrDefault(x => x.SessionId == sessionId);
+                    var existingSession = _visitorSessionService.GetBySessionId(sessionId);
 
                     if (existingSession != null)
                     {

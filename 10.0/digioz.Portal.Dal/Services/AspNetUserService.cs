@@ -19,6 +19,16 @@ namespace digioz.Portal.Dal.Services
             return _context.AspNetUsers.Find(id);
         }
 
+        public string GetIdByEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return null;
+            var normalized = email.Trim().ToUpperInvariant();
+            return _context.AspNetUsers
+                .Where(u => u.NormalizedEmail == normalized)
+                .Select(u => u.Id)
+                .FirstOrDefault();
+        }
+
         public List<AspNetUser> GetAll()
         {
             return _context.AspNetUsers.ToList();

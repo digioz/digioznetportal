@@ -28,12 +28,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.LatestVideos
             var key = count == 6 ? CacheKey : $"LatestVideos:{count}";
             if (!_cache.TryGetValue(key, out List<Video>? latest) || latest == null)
             {
-                latest = _videoService.GetAll()
-                    .Where(v => v.Visible && v.Approved)
-                    .OrderByDescending(v => v.Timestamp ?? DateTime.MinValue)
-                    .ThenByDescending(v => v.Id)
-                    .Take(count)
-                    .ToList();
+                latest = _videoService.GetLatest(count);
                 _cache.Set(key, latest, CacheOptions);
             }
             return Task.FromResult<IViewComponentResult>(View(latest));

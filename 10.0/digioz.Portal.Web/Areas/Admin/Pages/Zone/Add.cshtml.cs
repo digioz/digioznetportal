@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
+using digioz.Portal.Web.Pages.Shared.Components.ZoneMenu;
+using Microsoft.Extensions.Caching.Memory;
 using ZoneEntity = digioz.Portal.Bo.Zone;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Zone
@@ -12,7 +14,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Zone
     public class AddModel : PageModel
     {
         private readonly IZoneService _zoneService;
-        public AddModel(IZoneService zoneService) { _zoneService = zoneService; }
+        private readonly IMemoryCache _cache;
+        public AddModel(IZoneService zoneService, IMemoryCache cache) { _zoneService = zoneService; _cache = cache; }
 
         [BindProperty]
         public InputModel Input { get; set; } = new();
@@ -45,6 +48,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Zone
                 Timestamp = DateTime.UtcNow
             };
             _zoneService.Add(zone);
+            _cache.Remove(ZoneMenuViewComponent.CacheKey);
             return RedirectToPage("/Zone/Index");
         }
 
