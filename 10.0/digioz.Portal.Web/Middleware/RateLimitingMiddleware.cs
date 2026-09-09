@@ -119,8 +119,8 @@ namespace digioz.Portal.Web.Middleware
                 
                 if (!isSpecialPage)
                 {
-                    // Track this request in BannedIpTracking table
-                    await rateLimitService.TrackRequestAsync(ipAddress, path, "General", null, userAgent);
+                    // Queue this request for tracking in BannedIpTracking table (written in background)
+                    rateLimitService.QueueTrackRequest(ipAddress, path, "General", null, userAgent);
                 }
                 
                 if (isBot)

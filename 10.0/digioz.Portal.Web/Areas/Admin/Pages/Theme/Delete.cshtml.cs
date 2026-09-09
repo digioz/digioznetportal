@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Web.Services;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
 {
@@ -10,11 +12,13 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
     {
         private readonly IThemeService _themeService;
         private readonly IProfileService _profileService;
+        private readonly IMemoryCache _cache;
 
-        public DeleteModel(IThemeService themeService, IProfileService profileService)
+        public DeleteModel(IThemeService themeService, IProfileService profileService, IMemoryCache cache)
         {
             _themeService = themeService;
             _profileService = profileService;
+            _cache = cache;
         }
 
         [BindProperty]
@@ -94,6 +98,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
 
             // Delete the theme
             _themeService.Delete(Theme.Id);
+            CacheKeys.InvalidateTheme(_cache, Theme.Id);
 
             var usersAffectedCount = affectedProfiles.Count;
             var message = $"Theme '{themeToDelete.Name}' has been deleted successfully.";

@@ -29,12 +29,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.LatestPictures
             var key = count == 6 ? CacheKey : $"LatestPictures:{count}";
             if (!_cache.TryGetValue(key, out List<Picture>? latest) || latest == null)
             {
-                latest = _pictureService.GetAll()
-                    .Where(p => p.Visible && p.Approved)
-                    .OrderByDescending(p => p.Timestamp ?? DateTime.MinValue)
-                    .ThenByDescending(p => p.Id)
-                    .Take(count)
-                    .ToList();
+                latest = _pictureService.GetLatest(count);
                 _cache.Set(key, latest, CacheOptions);
             }
             return Task.FromResult<IViewComponentResult>(View(latest));

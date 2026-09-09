@@ -6,16 +6,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
+using digioz.Portal.Web.Services;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
 {
     public class EditModel : PageModel
     {
         private readonly IThemeService _themeService;
+        private readonly IMemoryCache _cache;
 
-        public EditModel(IThemeService themeService)
+        public EditModel(IThemeService themeService, IMemoryCache cache)
         {
             _themeService = themeService;
+            _cache = cache;
         }
 
         [BindProperty]
@@ -87,6 +91,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
             theme.IsDefault = Input.IsDefault;
 
             _themeService.Update(theme);
+            CacheKeys.InvalidateTheme(_cache, theme.Id);
 
             TempData["StatusMessage"] = $"Theme '{theme.Name}' has been updated successfully.";
             return RedirectToPage("./Index");

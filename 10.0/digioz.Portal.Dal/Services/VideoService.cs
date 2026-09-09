@@ -29,6 +29,17 @@ namespace digioz.Portal.Dal.Services
             return _context.Videos.Where(v => ids.Contains(v.Id)).ToList();
         }
 
+        public List<Video> GetLatest(int count)
+        {
+            return _context.Videos
+                .AsNoTracking()
+                .Where(v => v.Visible && v.Approved)
+                .OrderByDescending(v => v.Timestamp)
+                .ThenByDescending(v => v.Id)
+                .Take(count)
+                .ToList();
+        }
+
         public List<Video> GetAll()
         {
             return _context.Videos.ToList();
