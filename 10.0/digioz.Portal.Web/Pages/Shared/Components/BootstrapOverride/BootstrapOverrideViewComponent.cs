@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using digioz.Portal.Dal.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -25,11 +26,11 @@ namespace digioz.Portal.Web.Pages.Shared.Components.BootstrapOverride
         public Task<IViewComponentResult> InvokeAsync()
         {
             string? customCss = null;
-            
+
             // Check if the user is logged in
             var user = _httpContextAccessor.HttpContext?.User;
             var isAuthenticated = user?.Identity?.IsAuthenticated ?? false;
-            
+
             if (isAuthenticated && user != null)
             {
                 // User is logged in - check for their theme preference
@@ -48,7 +49,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.BootstrapOverride
                     }
                 }
             }
-            
+
             // If not logged in, or logged in without theme preference, use default theme
             if (string.IsNullOrEmpty(customCss))
             {
@@ -59,7 +60,11 @@ namespace digioz.Portal.Web.Pages.Shared.Components.BootstrapOverride
                 }
             }
 
-            return Task.FromResult<IViewComponentResult>(View((object?)customCss));
+            var sanitizedCss = string.IsNullOrWhiteSpace(customCss)
+                ? customCss
+                : customCss.Replace("</style", "<\\/style", StringComparison.OrdinalIgnoreCase);
+
+            return Task.FromResult<IViewComponentResult>(View((object?)sanitizedCss));
         }
     }
 }
