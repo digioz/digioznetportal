@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using digioz.Portal.Bo;
 
 namespace digioz.Portal.Bo.ViewModels
