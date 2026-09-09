@@ -759,6 +759,10 @@ namespace digioz.Portal.Dal
             {
                 entity.ToTable("VisitorSession");
 
+                entity.HasIndex(e => e.SessionId, "IX_VisitorSession_SessionId");
+
+                entity.Property(e => e.SessionId).HasMaxLength(128);
+
                 entity.Property(e => e.IpAddress).HasMaxLength(64);
 
                 entity.Property(e => e.Username).HasMaxLength(255);

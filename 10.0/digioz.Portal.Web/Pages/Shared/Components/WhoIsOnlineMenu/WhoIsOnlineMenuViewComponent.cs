@@ -44,12 +44,17 @@ namespace digioz.Portal.Web.Pages.Shared.Components.WhoIsOnlineMenu
                 var visitorRegistered = latestVisitors.Where(x => x.Username != null).ToList();
                 visitorRegistered = System.Linq.Enumerable.DistinctBy(visitorRegistered, x => x.Username).ToList();
 
-                // Load profile DisplayName for each visitor and create a new list with enriched data
+                // Load profiles for all registered visitors in a single query
+                // (VisitorSession.Username contains the email)
+                var profilesByEmail = _profileService
+                    .GetByEmails(visitorRegistered.Select(x => x.Username).ToList())
+                    .GroupBy(p => p.Email)
+                    .ToDictionary(g => g.Key, g => g.First());
+
                 var enrichedVisitors = new List<VisitorSession>();
                 foreach (var visitor in visitorRegistered)
                 {
-                    // Load the profile by email (VisitorSession.Username contains the email)
-                    var profile = _profileService.GetByEmail(visitor.Username);
+                    profilesByEmail.TryGetValue(visitor.Username, out var profile);
                     
                     // Create a new VisitorSession object with the Profile data
                     var enrichedVisitor = new VisitorSession

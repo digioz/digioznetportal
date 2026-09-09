@@ -4,33 +4,57 @@ using System.Threading.Tasks;
 using digioz.Portal.Bo;
 using digioz.Portal.Web.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace digioz.Portal.Web.Services
 {
     /// <summary>
-    /// Service for managing IP bans (database-only, no caching).
+    /// Service for managing IP bans. Ban lookups are cached briefly in memory
+    /// to avoid a database round trip on every request.
     /// Used by both RateLimitingMiddleware and Admin UI.
     /// </summary>
     public class BanManagementService
     {
+        private static readonly TimeSpan BanCacheDuration = TimeSpan.FromSeconds(30);
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<BanManagementService> _logger;
-        
+        private readonly IMemoryCache _cache;
+
         public BanManagementService(
             IServiceScopeFactory scopeFactory,
-            ILogger<BanManagementService> logger)
+            ILogger<BanManagementService> logger,
+            IMemoryCache cache)
         {
             _scopeFactory = scopeFactory;
             _logger = logger;
+            _cache = cache;
         }
-        
+
+        private static string GetCacheKey(string ipAddress) => $"BanCheck_{ipAddress}";
+
         /// <summary>
         /// Check if an IP is currently banned
         /// </summary>
         public async Task<(bool IsBanned, BanInfo? BanInfo)> IsBannedAsync(string ipAddress)
         {
+            var cacheKey = GetCacheKey(ipAddress);
+            if (_cache.TryGetValue(cacheKey, out BanInfo? cachedBan))
+            {
+                if (cachedBan == null)
+                {
+                    return (false, null);
+                }
+
+                if (cachedBan.BanExpiry > DateTime.UtcNow)
+                {
+                    return (true, cachedBan);
+                }
+
+                _cache.Remove(cacheKey);
+            }
+
             using var scope = _scopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<Dal.digiozPortalContext>();
             
@@ -51,9 +75,11 @@ namespace digioz.Portal.Web.Services
                     IsPermanent = dbBan.BanExpiry == DateTime.MaxValue,
                     Reason = dbBan.Reason
                 };
+                _cache.Set(cacheKey, banInfo, BanCacheDuration);
                 return (true, banInfo);
             }
-            
+
+            _cache.Set(cacheKey, (BanInfo?)null, BanCacheDuration);
             return (false, null);
         }
         
@@ -102,6 +128,7 @@ namespace digioz.Portal.Web.Services
                 
                 dbContext.BannedIps.Add(bannedIp);
                 await dbContext.SaveChangesAsync();
+                _cache.Remove(GetCacheKey(ipAddress));
                 
                 bool isPermanent = banExpiry == DateTime.MaxValue;
                 _logger.LogWarning("IP banned - IP: {IP}, Reason: {Reason}, Expires: {Expiry}, Count: {Count}",
@@ -147,6 +174,7 @@ namespace digioz.Portal.Web.Services
                 }
 
                 await dalContext.SaveChangesAsync();
+                _cache.Remove(GetCacheKey(ipAddress));
             }
             else
             {

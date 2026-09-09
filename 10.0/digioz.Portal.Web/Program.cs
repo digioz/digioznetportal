@@ -264,8 +264,17 @@ using (var scope = app.Services.CreateScope())
         identityContext.Database.Migrate();
 
         // Main portal DB (digiozPortalContext)
+        // EnsureCreated builds the full model and probes the schema on every start,
+        // so only run it when the portal tables have not been created yet.
         var portalContext = services.GetRequiredService<digiozPortalContext>();
-        portalContext.Database.EnsureCreated();
+        var portalTablesExist = portalContext.Database
+            .SqlQueryRaw<int>("SELECT COUNT(*) AS [Value] FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Config'")
+            .AsEnumerable()
+            .FirstOrDefault() > 0;
+        if (!portalTablesExist)
+        {
+            portalContext.Database.EnsureCreated();
+        }
     }
     catch (SqlException ex)
     {

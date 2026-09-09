@@ -34,16 +34,12 @@ namespace digioz.Portal.Dal.Services
             {
                 var cutoffDate = DateTime.UtcNow.AddDays(-daysToKeep);
 
-                var oldRecords = _context.BannedIpTrackings
-                    .Where(t => t.Timestamp < cutoffDate);
-
-                int count = await oldRecords.CountAsync();
+                int count = await _context.BannedIpTrackings
+                    .Where(t => t.Timestamp < cutoffDate)
+                    .ExecuteDeleteAsync();
 
                 if (count > 0)
                 {
-                    _context.BannedIpTrackings.RemoveRange(oldRecords);
-                    await _context.SaveChangesAsync();
-
                     _logger.LogInformation(
                         "Cleaned up {Count} old BannedIpTracking records older than {CutoffDate}",
                         count, cutoffDate);
@@ -68,21 +64,17 @@ namespace digioz.Portal.Dal.Services
             {
                 var now = DateTime.UtcNow;
 
-                // Query expired bans (excluding permanent bans)
-                var expiredBans = await _context.BannedIps
+                // Delete expired bans (excluding permanent bans)
+                var deleted = await _context.BannedIps
                     .Where(b => b.BanExpiry < now && b.BanExpiry != DateTime.MaxValue)
-                    .ToListAsync();
+                    .ExecuteDeleteAsync();
 
-                if (expiredBans.Any())
+                if (deleted > 0)
                 {
-                    _context.BannedIps.RemoveRange(expiredBans);
-                    await _context.SaveChangesAsync();
-
-                    _logger.LogInformation("Cleaned up {Count} expired ban records", expiredBans.Count);
-                    return expiredBans.Count;
+                    _logger.LogInformation("Cleaned up {Count} expired ban records", deleted);
                 }
 
-                return 0;
+                return deleted;
             }
             catch (Exception ex)
             {

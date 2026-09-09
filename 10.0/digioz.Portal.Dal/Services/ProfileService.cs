@@ -52,6 +52,15 @@ namespace digioz.Portal.Dal.Services
             return _context.Profiles.Where(p => p.UserId != null && userIds.Contains(p.UserId)).ToList();
         }
 
+        public List<Profile> GetByEmails(List<string> emails)
+        {
+            if (emails == null || !emails.Any())
+            {
+                return new List<Profile>();
+            }
+            return _context.Profiles.Where(p => p.Email != null && emails.Contains(p.Email)).ToList();
+        }
+
         public void Add(Profile profile)
         {
             _context.Profiles.Add(profile);
