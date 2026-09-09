@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>aspnet-digioz.Portal-325da502-9452-43f5-9f3d-7d68887a775e</UserSecretsId>
+    <ScopedCssEnabled>false</ScopedCssEnabled>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Communication.Email" Version="1.1.0" />
+    <PackageReference Include="HtmlSanitizer" Version="9.1.973" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12-pre20260709125052" />
+    <PackageReference Include="NuGet.Protocol" Version="6.11.2" />
+    <PackageReference Include="LazZiya.TagHelpers" Version="6.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Build" Version="17.11.48" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.7" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
+    <PackageReference Include="ScottPlot" Version="5.1.57" />
+    <PackageReference Include="SendGrid" Version="9.29.3" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.7" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\digioz.Portal.Bo\digioz.Portal.Bo.csproj" />
+    <ProjectReference Include="..\digioz.Portal.Dal\digioz.Portal.Dal.csproj" />
+    <ProjectReference Include="..\digioz.Portal.EmailProviders\digioz.Portal.EmailProviders.csproj" />
+    <ProjectReference Include="..\digioz.Portal.PaymentProviders\digioz.Portal.PaymentProviders.csproj" />
+    <ProjectReference Include="..\digioz.Portal.Utilities\digioz.Portal.Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\css\overrides\bootstrap_5_3_3_brown_and_beige_override.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\overrides\bootstrap_5_3_3_dark_override.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\overrides\bootstrap_5_3_3_magic_purple_override.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\overrides\bootstrap_5_3_3_pastel_dark_override.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\css\overrides\bootstrap_5_3_3_pastel_override.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Api\Controllers\" />
+    <Folder Include="Models\AppStart\" />
+  </ItemGroup>
+
+</Project>

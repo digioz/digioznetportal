@@ -1,0 +1,45 @@
+@page "{id:int}"
+@model digioz.Portal.Web.Areas.Admin.Pages.Zone.EditModel
+@{
+	ViewBag.Title = "Edit Zone";
+	Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+	<div class="card-header fw-semibold">Edit Zone</div>
+	<div class="card-body">
+		<form method="post">
+			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<input type="hidden" asp-for="Input.Id" />
+			<div class="mb-3">
+				<label asp-for="Input.Name" class="form-label"></label>
+				<input asp-for="Input.Name" class="form-control" />
+				<span asp-validation-for="Input.Name" class="text-danger"></span>
+			</div>
+			<div class="mb-3">
+				<label asp-for="Input.Location" class="form-label"></label>
+				<select asp-for="Input.Location" class="form-select" asp-items="Model.LocationOptions"></select>
+				<span asp-validation-for="Input.Location" class="text-danger"></span>
+			</div>
+			<div class="mb-3">
+				<label asp-for="Input.Body" class="form-label"></label>
+				<textarea asp-for="Input.Body" class="form-control" rows="10" id="zoneBody"></textarea>
+			</div>
+			<div class="form-check mb-3">
+				<input class="form-check-input" asp-for="Input.Visible" />
+				<label class="form-check-label" asp-for="Input.Visible"></label>
+			</div>
+			<button type="submit" class="btn btn-primary">Save</button>
+			<a asp-area="Admin" asp-page="/Zone/Index" class="btn btn-secondary">Cancel</a>
+		</form>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+	<script src="~/lib/ckeditor/build/ckeditor.js"></script>
+	<script>
+		ClassicEditor.create(document.querySelector('#zoneBody'), { toolbar: ['heading','bold','italic','link','bulletedList','numberedList','blockQuote','undo','redo'] })
+			.catch(error => console.error(error));
+	</script>
+}

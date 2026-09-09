@@ -1,0 +1,66 @@
+@page
+@model AddModel
+@{
+    ViewData["Title"] = "Submit a Link";
+}
+
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">
+        Submit a New Link
+    </div>
+    <div class="card-body">
+        @if (!User.Identity?.IsAuthenticated ?? true)
+        {
+            <div class="alert alert-warning">
+                <p><strong>You must be logged in to submit a link.</strong></p>
+                <a href="/Identity/Account/Login?ReturnUrl=/Links/Add" class="btn btn-primary">Log In</a>
+                <a href="/Identity/Account/Register?ReturnUrl=/Links/Add" class="btn btn-secondary">Register</a>
+            </div>
+        }
+        else
+        {
+            <p class="mb-4">Share a great website with the community! Your submission will be reviewed before being published.</p>
+            
+            <form method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Item.Name" class="form-label">Link Name <span class="text-danger">*</span></label>
+                        <input asp-for="Item.Name" class="form-control" placeholder="Enter link name" required />
+                        <span asp-validation-for="Item.Name" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Item.Url" class="form-label">URL <span class="text-danger">*</span></label>
+                        <input asp-for="Item.Url" class="form-control" placeholder="https://example.com" required />
+                        <span asp-validation-for="Item.Url" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Item.LinkCategory" class="form-label">Category <span class="text-danger">*</span></label>
+                        <select asp-for="Item.LinkCategory" class="form-select" asp-items="Model.CategoryList" required>
+                            <option value="">-- Select Category --</option>
+                        </select>
+                        <span asp-validation-for="Item.LinkCategory" class="text-danger"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Item.Description" class="form-label">Description</label>
+                        <textarea asp-for="Item.Description" class="form-control" rows="5" placeholder="Describe this link (optional)"></textarea>
+                        <span asp-validation-for="Item.Description" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="mt-4 d-flex justify-content-between">
+                    <a href="/Links" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Submit Link</button>
+                </div>
+            </form>
+            
+            <div class="alert alert-info mt-4">
+                <i class="bi bi-info-circle"></i>
+                <strong>Note:</strong> Your link submission will be reviewed by administrators before it appears publicly.
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

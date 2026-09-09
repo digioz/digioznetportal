@@ -1,0 +1,38 @@
+@page
+@model AboutModel
+
+@{
+    ViewBag.Title = "About";
+}
+
+@section keywords {
+    @if (Model?.PageContent?.Keywords != null)
+    {
+        <meta name="keywords" content="@Model.PageContent.Keywords" />
+    }
+}
+
+@section description {
+    @if (Model?.PageContent?.Description != null)
+    {
+        <meta name="description" content="@Model.PageContent.Description" />
+    }
+}
+
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+            @{
+                if (Model?.PageContent != null)
+                {
+                    @Html.Raw(Model.PageContent.Body)
+                }
+
+                // Display comments if enabled for this page
+                if (Model?.AllowComments == true)
+                {
+                    @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent?.Id.ToString(), referenceType = "/Home/About" })
+                }
+            }
+    </div>
+</div>

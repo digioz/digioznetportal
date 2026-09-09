@@ -1,0 +1,40 @@
+# Test Coverage Configuration
+# This file can be used with reportgenerator to customize coverage reports
+
+# Filters for coverage analysis
+# Include all production code, exclude test projects and generated code
+
+-[digioz.Portal.Tests]*
+-[*.Tests]*
+-[*]*.Designer
+-[*]*.g.cs
+-[*]*.g.i.cs
+-[*]*Migrations.*
+
+# Risk hotspots thresholds
+# Identify areas of code that need more testing
+
+RiskHotspotMetricThresholds:
+  Cyclomatic: 15
+  CrapScore: 30
+
+# Assembly filters
+# Focus on core libraries
+
++[digioz.Portal.Web]*
++[digioz.Portal.Dal]*
++[digioz.Portal.Bo]*
++[digioz.Portal.Utilities]*
++[digioz.Portal.EmailProviders]*
++[digioz.Portal.PaymentProviders]*
+
+# Coverage goals
+# Minimum coverage percentages by project
+
+CoverageGoals:
+  - Project: digioz.Portal.Utilities
+    MinCoverage: 95
+  - Project: digioz.Portal.Dal
+    MinCoverage: 80
+  - Project: digioz.Portal.Web
+    MinCoverage: 60

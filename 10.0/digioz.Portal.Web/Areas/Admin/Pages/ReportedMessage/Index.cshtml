@@ -1,0 +1,72 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.ReportedMessage.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+@{
+    ViewBag.Title = "Reported Messages";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Reported Private Messages</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-sm align-middle">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Subject</th>
+                        <th>Preview</th>
+                        <th>Sent</th>
+                        <th style="width:150px" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var m in Model.Items)
+                    {
+                        <tr>
+                            <td>@m.Id</td>
+                            <td>@m.FromDisplayName</td>
+                            <td>@m.ToDisplayName</td>
+                            <td class="text-truncate" style="max-width:200px" title="@m.Subject">@m.Subject</td>
+                            <td class="text-truncate" style="max-width:250px" title="@m.Message">@m.Message</td>
+                            <td class="small">@m.SentDate?.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td class="text-end">
+                                <a asp-area="Admin" asp-page="/ReportedMessage/Details" asp-route-id="@m.Id" class="btn btn-sm btn-info" title="Details">
+                                    <i class="bi bi-eye"></i> Details
+                                </a>
+                                <form method="post" asp-page-handler="RemoveReport" asp-route-id="@m.Id" asp-route-pageNumber="@Model.PageNumber" asp-route-pageSize="@Model.PageSize" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-success" title="Remove Report">
+                                        <i class="bi bi-flag-fill"></i> Remove Report
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Items.Any())
+        {
+            <div class="alert alert-info">No reported messages found.</div>
+        }
+
+        <paging total-records="@Model.TotalCount"
+                page-no="@Model.PageNumber"
+                page-size="@Model.PageSize"
+                query-string-key-page-no="pageNumber"
+                show-prev-next="true"
+                show-first-last="true"
+                class="pagination justify-content-center">
+            <route-values>
+                <rv key="PageSize" value="@Model.PageSize"></rv>
+            </route-values>
+        </paging>
+    </div>
+</div>

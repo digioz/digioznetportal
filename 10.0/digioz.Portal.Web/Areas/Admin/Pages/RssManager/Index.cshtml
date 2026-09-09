@@ -1,0 +1,73 @@
+﻿@page
+@model digioz.Portal.Web.Areas.Admin.Pages.RssManager.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+@{
+    ViewBag.Title = "RSS Manager";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>RSS Feeds</span>
+        <a class="btn btn-sm btn-primary" asp-area="Admin" asp-page="/RssManager/Add">Add RSS</a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Url</th>
+                        <th>Max</th>
+                        <th>Timestamp</th>
+                        <th class="text-end" style="width:250px">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items.Any())
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>@item.Name</td>
+                                <td style="max-width:350px;" class="text-truncate">
+                                    <a href="@item.Url" target="_blank" rel="noopener noreferrer">@item.Url</a>
+                                </td>
+                                <td>@item.MaxCount</td>
+                                <td>@item.Timestamp</td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-secondary px-1 py-0 fs-6" asp-area="Admin" asp-page="/RssManager/Details" asp-route-id="@item.Id" title="Preview" aria-label="Preview">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-primary px-1 py-0 fs-6" asp-area="Admin" asp-page="/RssManager/Edit" asp-route-id="@item.Id" title="Edit" aria-label="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-danger px-1 py-0 fs-6" asp-area="Admin" asp-page="/RssManager/Delete" asp-route-id="@item.Id" title="Delete" aria-label="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">No RSS feeds found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <small class="text-muted">Page @Model.PageNumber of @Model.TotalPages (@Model.TotalCount total)</small>
+        <paging total-records="@Model.TotalCount"
+                page-no="@Model.PageNumber"
+                page-size="@Model.PageSize"
+                show-prev-next="true"
+                show-first-last="true"
+                query-string-key-page-no="pageNumber"
+                class="pagination mb-0"></paging>
+    </div>
+</div>

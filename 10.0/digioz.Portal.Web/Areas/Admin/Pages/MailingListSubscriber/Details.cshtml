@@ -1,0 +1,49 @@
+@page "{id}"
+@model digioz.Portal.Web.Areas.Admin.Pages.MailingListSubscriber.DetailsModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Subscriber Details";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<partial name="../MailingList/_MailingListNav" />
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Subscriber Details</span>
+        <div>
+            <a class="btn btn-sm btn-outline-primary" asp-area="Admin" asp-page="/MailingListSubscriber/Edit" asp-route-id="@Model.Item?.Id">Edit</a>
+            <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/MailingListSubscriber/Index">Back</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">@Model.Item?.Email</dd>
+
+            <dt class="col-sm-3">First Name</dt>
+            <dd class="col-sm-9">@Model.Item?.FirstName</dd>
+
+            <dt class="col-sm-3">Last Name</dt>
+            <dd class="col-sm-9">@Model.Item?.LastName</dd>
+
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">
+                @if (Model.Item?.Status == true)
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Inactive</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Date Created</dt>
+            <dd class="col-sm-9">@Model.Item?.DateCreated.ToString("yyyy-MM-dd HH:mm")</dd>
+
+            <dt class="col-sm-3">Date Modified</dt>
+            <dd class="col-sm-9">@Model.Item?.DateModified.ToString("yyyy-MM-dd HH:mm")</dd>
+        </dl>
+    </div>
+</div>

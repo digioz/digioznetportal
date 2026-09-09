@@ -1,0 +1,41 @@
+﻿body {
+    min-height: 100vh;
+}
+
+.sidebar {
+    min-height: calc(100vh - 56px);
+}
+/* On mobile/tablet, let sidebar height shrink to content to avoid empty space */
+@media (max-width: 991.98px) {
+    .sidebar {
+        min-height: auto;
+        height: auto;
+    }
+}
+
+.card-placeholder {
+    height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    background: repeating-linear-gradient(45deg, #f8f9fa, #f8f9fa 10px, #ffffff 10px, #ffffff 20px);
+}
+/* Tighter nav: smaller font and reduced vertical padding */
+.sidebar .list-group .list-group-item {
+    font-size: .9rem;
+    padding: .35rem .75rem;
+}
+
+.sidebar .category {
+    border: 0;
+    letter-spacing: .08em;
+    font-size: .75rem;
+    padding: .3rem .75rem;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+    /* Make category buttons look like headers but clickable on mobile */
+    .sidebar .category.btn {
+        text-align: left;
+    }

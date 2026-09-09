@@ -1,0 +1,31 @@
+@page "{id:int}"
+@model digioz.Portal.Web.Areas.Admin.Pages.Link.DeleteModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Delete Link";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Delete Link</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/Link/Index">Back</a>
+    </div>
+    <div class="card-body">
+        @if (Model.Item != null)
+        {
+            <form method="post">
+                <input type="hidden" asp-for="Id" />
+                <p>Are you sure you want to delete the link '<strong>@Model.Item.Name</strong>'?</p>
+                <div class="d-flex justify-content-end gap-2">
+                    <a class="btn btn-outline-secondary" asp-area="Admin" asp-page="/Link/Index">Cancel</a>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-warning">Link not found.</div>
+        }
+    </div>
+</div>

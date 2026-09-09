@@ -1,0 +1,205 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.Link.CheckLinksModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using digioz.Portal.Bo.ViewModels
+@{
+    ViewBag.Title = "Check Links";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Link Checker</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/Link/Index">Back to Links</a>
+    </div>
+    <div class="card-body">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (!Model.IsChecking && (Model.Results == null || !Model.Results.Any()))
+        {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle-fill"></i>
+                <strong>About Link Checker</strong>
+                <p class="mb-2 mt-2">This tool will check all links in your database and:</p>
+                <ul class="mb-0">
+                    <li>Mark dead links (404, 403, 400, network errors) as invisible with <code>[DEAD LINK]</code> tag</li>
+                    <li>Mark server error links (500, 503) as invisible with <code>[ERROR LINK]</code> tag</li>
+                    <li>Mark redirect links (301, 302, 307, 308) as invisible with <code>[REDIRECT LINK]</code> tag</li>
+                    <li>Extract and update descriptions for links that are missing them with <code>[DESCRIPTION UPDATED]</code> tag</li>
+                </ul>
+                <p class="mt-2 mb-0"><strong>Note:</strong> Links are checked in batches of 10 to prevent timeouts. This process may take several minutes depending on the number of links.</p>
+            </div>
+
+            <form method="post" id="checkLinksForm">
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg" id="checkButton">
+                        <i class="bi bi-search"></i> Start Link Check
+                    </button>
+                </div>
+            </form>
+        }
+
+        @if (Model.Results != null && Model.Results.Any())
+        {
+            <!-- Summary Statistics -->
+            <div class="row mb-4">
+                <div class="col-md-2">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="mb-0">@Model.TotalLinks</h3>
+                            <small class="text-muted">Total Checked</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center border-success">
+                        <div class="card-body">
+                            <h3 class="mb-0 text-success">@Model.SuccessfulLinks</h3>
+                            <small class="text-muted">Successful</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center border-danger">
+                        <div class="card-body">
+                            <h3 class="mb-0 text-danger">@Model.DeadLinks</h3>
+                            <small class="text-muted">Dead Links</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center border-warning">
+                        <div class="card-body">
+                            <h3 class="mb-0 text-warning">@Model.ErrorLinks</h3>
+                            <small class="text-muted">Server Errors</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center border-info">
+                        <div class="card-body">
+                            <h3 class="mb-0 text-info">@Model.RedirectLinks</h3>
+                            <small class="text-muted">Redirects</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center border-primary">
+                        <div class="card-body">
+                            <h3 class="mb-0 text-primary">@Model.UpdatedLinks</h3>
+                            <small class="text-muted">Updated</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Results -->
+            <h5 class="mb-3">Detailed Results</h5>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Link Name</th>
+                            <th>URL</th>
+                            <th>Status</th>
+                            <th>HTTP Code</th>
+                            <th>Message</th>
+                            <th class="text-center">Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var result in Model.Results)
+                        {
+                            var rowClass = result.Status switch
+                            {
+                                LinkCheckStatus.Success => "",
+                                LinkCheckStatus.DescriptionUpdated => "table-info",
+                                LinkCheckStatus.DeadLink => "table-danger",
+                                LinkCheckStatus.NetworkError => "table-danger",
+                                LinkCheckStatus.ErrorLink => "table-warning",
+                                LinkCheckStatus.RedirectLink => "table-info",
+                                LinkCheckStatus.Timeout => "table-secondary",
+                                _ => ""
+                            };
+
+                            var badgeClass = result.Status switch
+                            {
+                                LinkCheckStatus.Success => "bg-success",
+                                LinkCheckStatus.DescriptionUpdated => "bg-info",
+                                LinkCheckStatus.DeadLink => "bg-danger",
+                                LinkCheckStatus.NetworkError => "bg-danger",
+                                LinkCheckStatus.ErrorLink => "bg-warning",
+                                LinkCheckStatus.RedirectLink => "bg-info",
+                                LinkCheckStatus.Timeout => "bg-secondary",
+                                _ => "bg-secondary"
+                            };
+
+                            <tr class="@rowClass">
+                                <td>@result.LinkName</td>
+                                <td>
+                                    <a href="@result.Url" target="_blank" rel="noopener noreferrer" class="text-truncate d-inline-block" style="max-width: 300px;">
+                                        @result.Url
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge @badgeClass">@result.Status</span>
+                                </td>
+                                <td>
+                                    @if (result.HttpStatusCode.HasValue)
+                                    {
+                                        <span class="badge bg-secondary">@result.HttpStatusCode</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td><small>@result.Message</small></td>
+                                <td class="text-center">
+                                    @if (result.WasUpdated)
+                                    {
+                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-4">
+                <form method="post" class="d-inline">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-arrow-clockwise"></i> Run Check Again
+                    </button>
+                </form>
+                <a class="btn btn-outline-secondary" asp-area="Admin" asp-page="/Link/Index">
+                    <i class="bi bi-arrow-left"></i> Back to Links
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('checkLinksForm')?.addEventListener('submit', function(e) {
+            var button = document.getElementById('checkButton');
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Checking links... This may take several minutes...';
+            }
+        });
+    </script>
+}

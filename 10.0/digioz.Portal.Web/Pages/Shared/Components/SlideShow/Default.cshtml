@@ -1,0 +1,30 @@
+@model List<digioz.Portal.Bo.SlideShow>
+
+@if (Model != null && Model.Any())
+{
+    <div id="homeSlideShow" class="carousel slide mb-3" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                var item = Model[i];
+                <div class="carousel-item @(i == 0 ? "active" : null)">
+                    <img src="/img/Slides/Full/@item.Image" class="d-block w-100" alt="Slide @i" />
+                    @if (!string.IsNullOrWhiteSpace(item.Description))
+                    {
+                        <div class="carousel-caption d-none d-md-block">
+                            <p>@item.Description</p>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#homeSlideShow" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#homeSlideShow" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+}

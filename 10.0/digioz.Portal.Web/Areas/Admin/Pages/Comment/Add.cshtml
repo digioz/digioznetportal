@@ -1,0 +1,71 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.Comment.AddModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Add Comment";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header">Add Comment</div>
+    <div class="card-body">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="mb-3">
+                <label asp-for="Item.UserId" class="form-label">User</label>
+                <select asp-for="Item.UserId" asp-items="Model.UserList" class="form-select">
+                    <option value="">-- Select User --</option>
+                </select>
+                <span asp-validation-for="Item.UserId" class="text-danger"></span>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Item.ReferenceType" class="form-label"></label>
+                        <input asp-for="Item.ReferenceType" class="form-control" />
+                        <span asp-validation-for="Item.ReferenceType" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Item.ReferenceId" class="form-label"></label>
+                        <input asp-for="Item.ReferenceId" class="form-control" />
+                        <span asp-validation-for="Item.ReferenceId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="Item.Body" class="form-label"></label>
+                <textarea asp-for="Item.Body" rows="6" class="form-control"></textarea>
+                <span asp-validation-for="Item.Body" class="text-danger"></span>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3 form-check">
+                        <input asp-for="VisibleCheckbox" type="checkbox" class="form-check-input" />
+                        <label asp-for="VisibleCheckbox" class="form-check-label">Visible</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3 form-check">
+                        <input asp-for="ApprovedCheckbox" type="checkbox" class="form-check-input" />
+                        <label asp-for="ApprovedCheckbox" class="form-check-label">Approved</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a asp-area="Admin" asp-page="/Comment/Index" class="btn btn-secondary">Back</a>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

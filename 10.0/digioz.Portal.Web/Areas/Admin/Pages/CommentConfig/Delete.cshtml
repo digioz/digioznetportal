@@ -1,0 +1,30 @@
+@page "{id}"
+@model digioz.Portal.Web.Areas.Admin.Pages.CommentConfig.DeleteModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Delete Comment Config";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Delete Comment Config</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/CommentConfig/Index">Back</a>
+    </div>
+    <div class="card-body">
+        <p>Are you sure you want to delete this configuration?</p>
+        <dl class="row">
+            <dt class="col-sm-3">Reference Type</dt>
+            <dd class="col-sm-9">@Model.Item?.ReferenceType</dd>
+            <dt class="col-sm-3">Reference Id</dt>
+            <dd class="col-sm-9">@Model.Item?.ReferenceId</dd>
+            <dt class="col-sm-3">Reference Title</dt>
+            <dd class="col-sm-9">@Model.Item?.ReferenceTitle</dd>
+        </dl>
+        <form method="post">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a class="btn btn-secondary" asp-area="Admin" asp-page="/CommentConfig/Index">Cancel</a>
+        </form>
+    </div>
+</div>

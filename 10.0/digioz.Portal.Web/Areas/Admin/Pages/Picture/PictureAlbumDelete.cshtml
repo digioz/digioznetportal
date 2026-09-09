@@ -1,0 +1,21 @@
+@page "{id:int}"
+@model digioz.Portal.Web.Areas.Admin.Pages.Picture.PictureAlbumDeleteModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Delete Picture Album";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header">Delete Picture Album</div>
+    <div class="card-body">
+        <div class="alert alert-warning">
+            Are you sure you want to delete album <strong>@Model.Item?.Name</strong> and all its pictures?
+        </div>
+        <form method="post">
+            <input type="hidden" asp-for="Id" />
+            <button class="btn btn-danger" type="submit">Delete</button>
+            <a class="btn btn-secondary" asp-area="Admin" asp-page="/Picture/PictureAlbumIndex">Cancel</a>
+        </form>
+    </div>
+</div>

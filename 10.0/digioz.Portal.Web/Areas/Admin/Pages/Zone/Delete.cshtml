@@ -1,0 +1,18 @@
+@page "{id:int}"
+@model digioz.Portal.Web.Areas.Admin.Pages.Zone.DeleteModel
+@{
+	ViewBag.Title = "Delete Zone";
+	Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+	<div class="card-header fw-semibold">Delete Zone</div>
+	<div class="card-body">
+		<p>Are you sure you want to delete this zone?</p>
+		<form method="post">
+			<input type="hidden" asp-for="Id" />
+			<button type="submit" class="btn btn-danger">Delete</button>
+			<a asp-area="Admin" asp-page="/Zone/Index" class="btn btn-secondary">Cancel</a>
+		</form>
+	</div>
+</div>

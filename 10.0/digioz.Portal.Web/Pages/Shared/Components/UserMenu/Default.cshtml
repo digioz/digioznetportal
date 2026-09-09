@@ -1,0 +1,53 @@
+@using Microsoft.AspNetCore.Identity
+@{
+    var SignInManager = (SignInManager<IdentityUser>)ViewBag.SignInManager;
+    var UserManager = (UserManager<IdentityUser>)ViewBag.UserManager;
+    var displayName = (string)ViewBag.ProfileDisplayName;
+    var unreadCount = (int)ViewBag.UnreadMessageCount;
+}
+
+<div class="card bg-light mb-3">
+    <div class="card-header">User</div>
+    <div class="card-body">
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <ul>
+                <li>
+                    <form class="row g-1" action="/Identity/Account/Logout?returnUrl=/Index" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="nav-link btn btn-link p-0 text-start">Logout</button>
+                    </form>
+                </li>
+                <li><a href="/Identity/Account/Manage">My Account</a></li>
+                <li><a href="/Profile/Edit">My Profile</a></li>
+                <li><a href="/Profile/Pictures">My Pictures</a></li>
+                <li><a href="/Profile/Videos">My Videos</a></li>
+                <li>
+                    <a href="/PrivateMessages/Index">Private Messages</a>
+                    @if (unreadCount > 0)
+                    {
+                        <text>&nbsp;</text><span class="badge bg-danger">@unreadCount</span>
+                    }
+                </li> 
+                @if (User.IsInRole("Administrator"))
+                {
+                    <li><a href="/Admin/Index">Admin Dashboard</a></li>
+                }
+            </ul>
+            <br />
+            <p style="font-size:x-small;width:100%;text-align:center;">Logged in as <a href="/Identity/Account/Manage">@(displayName ?? User.Identity?.Name ?? "Unknown")</a>.</p>
+        }
+        else
+        {
+            <ul>
+                <li>
+                    <a href="/Identity/Account/Register">Register</a>
+                </li>
+                <li>
+                    <a href="/Identity/Account/Login">Login</a>
+                </li>
+                <li><a href="/Identity/Account/ForgotPassword">Forgot Password</a></li>
+            </ul>
+        }
+    </div>
+</div>

@@ -1,0 +1,57 @@
+@page "{id:int}"
+@model digioz.Portal.Web.Pages.PrivateMessages.DetailsModel
+@{
+    ViewData["Title"] = "Message Details";
+}
+
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title - @Model.RootMessage?.Subject</div>
+    <div class="card-body">
+        @if (Model.Thread.Any())
+        {
+            <div>
+                @foreach (var msg in Model.Thread)
+                {
+                    <div class="card mb-2 @(msg.Id == Model.RootMessage?.Id ? "border-primary" : "")">
+                        <div class="card-header">
+                            <strong>From:</strong> @msg.FromDisplayName to @msg.ToDisplayName
+                            <span class="float-end">@msg.SentDate?.ToLocalTime().ToString("g")</span>
+                        </div>
+                        <div class="card-body">
+                            <pre style="white-space:pre-wrap">@msg.Message</pre>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        <div class="mb-3">
+            @if (Model.RootMessage != null && !Model.RootMessage.Reported && Model.IsRecipient)
+            {
+                <form method="post" asp-page-handler="Report" class="d-inline">
+                    <input type="hidden" name="id" value="@Model.RootMessage.Id" />
+                    <button type="submit" class="btn btn-warning btn-sm" title="Report this message">
+                        <i class="bi bi-flag"></i> Report
+                    </button>
+                </form>
+            }
+            else if (Model.RootMessage != null && Model.RootMessage.Reported && Model.IsRecipient)
+            {
+                <span class="badge bg-warning text-dark"><i class="bi bi-flag-fill"></i> Reported</span>
+            }
+        </div>
+        <hr />
+        <h3>Reply</h3>
+        <form method="post">
+            <input type="hidden" asp-for="Reply.ParentId" value="@Model.RootMessage?.Id" />
+            <div class="mb-3">
+                <label asp-for="Reply.Subject" class="form-label"></label>
+                <input asp-for="Reply.Subject" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Reply.Message" class="form-label"></label>
+                <textarea asp-for="Reply.Message" rows="6" class="form-control"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Reply</button>
+        </form>
+    </div>
+</div>
