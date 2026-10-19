@@ -96,7 +96,18 @@ namespace digioz.Portal.Web.Services
                             "Error writing {Count} rate limit tracking records (attempt {Attempt}/{Max}); will retry",
                             buffer.Count, saveAttempts, MaxSaveAttemptsPerBatch);
                     }
-                    await Task.Delay(500, stoppingToken).ConfigureAwait(false);
+
+                    // Backoff before retrying. Swallow the cancellation here so a shutdown
+                    // during the delay does not bubble out of ExecuteAsync as an unhandled
+                    // exception; the while condition exits the loop on the next iteration.
+                    try
+                    {
+                        await Task.Delay(500, stoppingToken).ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                    {
+                        // shutdown
+                    }
                 }
             }
         }

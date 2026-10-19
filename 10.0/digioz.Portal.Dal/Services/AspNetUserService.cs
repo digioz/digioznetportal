@@ -19,7 +19,8 @@ namespace digioz.Portal.Dal.Services
             return _context.AspNetUsers.Find(id);
         }
 
-        public string GetIdByEmail(string email)
+        #nullable enable
+        public string? GetIdByEmail(string? email)
         {
             if (string.IsNullOrWhiteSpace(email)) return null;
             var normalized = email.Trim().ToUpperInvariant();
@@ -29,6 +30,7 @@ namespace digioz.Portal.Dal.Services
                 .Select(u => u.Id)
                 .FirstOrDefault();
         }
+#nullable restore
 
         public List<AspNetUser> GetAll()
         {
