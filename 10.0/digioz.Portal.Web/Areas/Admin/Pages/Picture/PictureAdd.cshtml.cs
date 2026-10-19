@@ -72,11 +72,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
                 await File.CopyToAsync(fs);
             }
 
-            // Create thumbnail (max150x150 crop) using ImageSharp
-            using (var image = SixLabors.ImageSharp.Image.Load(fullPath))
-            {
-                ImageHelper.SaveImageWithCrop(image, 150, 150, thumbPath);
-            }
+            // Create thumbnail (max150x150 crop)
+            ImageHelper.SaveImageWithCrop(fullPath, 150, 150, thumbPath);
 
             Item.Filename = fileName;
             Item.Thumbnail = fileName;

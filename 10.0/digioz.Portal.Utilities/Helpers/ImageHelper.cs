@@ -47,6 +47,22 @@ namespace digioz.Portal.Utilities.Helpers
             return false;
         }
 
+        public static bool SaveImageWithResize(byte[] imageData, int maxWidth, int maxHeight, string filePath)
+        {
+            try
+            {
+                using var encodedData = SKData.CreateCopy(imageData);
+                using var codec = SKCodec.Create(encodedData);
+                using var image = SKBitmap.Decode(imageData);
+                return codec != null && image != null &&
+                    SaveJigsawImage(image, maxWidth, maxHeight, filePath, codec.EncodedFormat);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         public static bool SaveJigsawImage(string imagePath, int maxWidth, int maxHeight, string filePath)
         {
             try
@@ -155,11 +171,16 @@ namespace digioz.Portal.Utilities.Helpers
             }
         }
 
-        private static bool SaveJigsawImage(SKBitmap image, int maxWidth, int maxHeight, string filePath)
+        private static bool SaveJigsawImage(
+            SKBitmap image,
+            int maxWidth,
+            int maxHeight,
+            string filePath,
+            SKEncodedImageFormat encodedFormat = SKEncodedImageFormat.Jpeg)
         {
             if (image.Width <= maxWidth && image.Height <= maxHeight)
             {
-                return SaveJpeg(image, filePath);
+                return SaveEncodedImage(image, filePath, encodedFormat);
             }
 
             double divisor;
@@ -183,13 +204,23 @@ namespace digioz.Portal.Utilities.Helpers
                 new SKImageInfo(newWidth, newHeight, image.ColorType, image.AlphaType),
                 new SKSamplingOptions(SKCubicResampler.Mitchell));
 
-            return resizedImage != null && SaveJpeg(resizedImage, filePath);
+            return resizedImage != null && SaveEncodedImage(resizedImage, filePath, encodedFormat);
         }
 
         private static bool SaveJpeg(SKBitmap image, string filePath)
         {
+            return SaveEncodedImage(image, filePath, SKEncodedImageFormat.Jpeg);
+        }
+
+        private static bool SaveEncodedImage(SKBitmap image, string filePath, SKEncodedImageFormat encodedFormat)
+        {
             using var outputImage = SKImage.FromBitmap(image);
-            using var encodedImage = outputImage.Encode(SKEncodedImageFormat.Jpeg, 100);
+            using var encodedImage = outputImage.Encode(encodedFormat, 100);
+            if (encodedImage == null)
+            {
+                return false;
+            }
+
             using var output = File.Create(filePath);
             encodedImage.SaveTo(output);
             return true;

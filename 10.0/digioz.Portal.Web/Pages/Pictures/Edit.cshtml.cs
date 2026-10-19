@@ -136,10 +136,7 @@ namespace digioz.Portal.Pages.Pictures
                     }
 
                     // Create thumbnail
-                    using (var image = SixLabors.ImageSharp.Image.Load(fullPath))
-                    {
-                        ImageHelper.SaveImageWithCrop(image, 150, 150, thumbPath);
-                    }
+                    ImageHelper.SaveImageWithCrop(fullPath, 150, 150, thumbPath);
 
                     Item.Filename = fileName;
                     Item.Thumbnail = fileName;

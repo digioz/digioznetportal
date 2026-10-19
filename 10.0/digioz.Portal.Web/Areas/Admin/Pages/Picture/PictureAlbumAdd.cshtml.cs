@@ -60,11 +60,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
                     {
                         await file.CopyToAsync(fs);
                     }
-                    // Create thumbnail using ImageSharp-based helper
-                    using (var image = SixLabors.ImageSharp.Image.Load(fullPath))
-                    {
-                        ImageHelper.SaveImageWithCrop(image, 150, 150, thumbPath);
-                    }
+                    // Create thumbnail
+                    ImageHelper.SaveImageWithCrop(fullPath, 150, 150, thumbPath);
                     var pic = new digioz.Portal.Bo.Picture
                     {
                         AlbumId = Item.Id,

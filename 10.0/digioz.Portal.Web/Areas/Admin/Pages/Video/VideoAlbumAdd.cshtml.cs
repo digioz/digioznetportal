@@ -65,11 +65,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Video
                             await t.CopyToAsync(fs);
                         }
 
-                        // Create thumbnail using ImageSharp
-                        using (var image = SixLabors.ImageSharp.Image.Load(tempPath))
-                        {
-                            digioz.Portal.Utilities.Helpers.ImageHelper.SaveImageWithCrop(image, 150, 150, thumbPath);
-                        }
+                        // Create thumbnail
+                        digioz.Portal.Utilities.Helpers.ImageHelper.SaveImageWithCrop(tempPath, 150, 150, thumbPath);
 
                         // Clean up temp file
                         if (System.IO.File.Exists(tempPath))
