@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Formats.Jpeg;
+using SkiaSharp;
 
 namespace digioz.Portal.Utilities.Helpers
 {
@@ -31,22 +29,13 @@ namespace digioz.Portal.Utilities.Helpers
                 string smallFilePath = Path.Combine(isd.SmallImageFolder, isd.FileName);
                 string tinyFilePath = Path.Combine(isd.TinyImageFolder, isd.FileName);
 
-                using (var image = Image.Load(isd.ImagePath))
+                if (SaveJigsawImage(isd.ImagePath, isd.FullMaxWidth, isd.FullMaxHeight, fullFilePath))
                 {
-                    if (SaveJigsawImage(image, isd.FullMaxWidth, isd.FullMaxHeight, fullFilePath))
+                    if (SaveJigsawImage(isd.ImagePath, isd.SmallMaxWidth, isd.SmallMaxHeight, smallFilePath))
                     {
-                        using (var smallImage = Image.Load(isd.ImagePath))
+                        if (SaveImageWithCrop(isd.ImagePath, isd.TinyMaxWidth, isd.TinyMaxHeight, tinyFilePath))
                         {
-                            if (SaveJigsawImage(smallImage, isd.SmallMaxWidth, isd.SmallMaxHeight, smallFilePath))
-                            {
-                                using (var tinyImage = Image.Load(isd.ImagePath))
-                                {
-                                    if (SaveImageWithCrop(tinyImage, isd.TinyMaxWidth, isd.TinyMaxHeight, tinyFilePath))
-                                    {
-                                        return true;
-                                    }
-                                }
-                            }
+                            return true;
                         }
                     }
                 }
@@ -58,34 +47,12 @@ namespace digioz.Portal.Utilities.Helpers
             return false;
         }
 
-        public static bool SaveJigsawImage(Image image, int maxWidth, int maxHeight, string filePath)
+        public static bool SaveJigsawImage(string imagePath, int maxWidth, int maxHeight, string filePath)
         {
             try
             {
-                if (image.Width > maxWidth || image.Height > maxHeight)
-                {
-                    double divisor;
-                    int newWidth, newHeight;
-
-                    if (image.Width >= image.Height)
-                    {
-                        divisor = (double)image.Width / maxWidth;
-                        newHeight = (int)Math.Round(image.Height / divisor);
-                        newWidth = maxWidth;
-                    }
-                    else
-                    {
-                        divisor = (double)image.Height / maxHeight;
-                        newWidth = (int)Math.Round(image.Width / divisor);
-                        newHeight = maxHeight;
-                    }
-
-                    image.Mutate(x => x.Resize(newWidth, newHeight));
-                }
-
-                var encoder = new JpegEncoder { Quality = 100 };
-                image.Save(filePath, encoder);
-                return true;
+                using var image = SKBitmap.Decode(imagePath);
+                return image != null && SaveJigsawImage(image, maxWidth, maxHeight, filePath);
             }
             catch (Exception)
             {
@@ -94,7 +61,46 @@ namespace digioz.Portal.Utilities.Helpers
             }
         }
 
-        public static bool SaveImageWithCrop(Image image, int maxWidth, int maxHeight, string filePath)
+        public static bool SaveJigsawImage(byte[] imageData, int maxWidth, int maxHeight, string filePath)
+        {
+            try
+            {
+                using var image = SKBitmap.Decode(imageData);
+                return image != null && SaveJigsawImage(image, maxWidth, maxHeight, filePath);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public static bool SaveImageWithCrop(string imagePath, int maxWidth, int maxHeight, string filePath)
+        {
+            try
+            {
+                using var image = SKBitmap.Decode(imagePath);
+                return image != null && SaveImageWithCrop(image, maxWidth, maxHeight, filePath);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public static bool SaveImageWithCrop(byte[] imageData, int maxWidth, int maxHeight, string filePath)
+        {
+            try
+            {
+                using var image = SKBitmap.Decode(imageData);
+                return image != null && SaveImageWithCrop(image, maxWidth, maxHeight, filePath);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        internal static bool SaveImageWithCrop(SKBitmap image, int maxWidth, int maxHeight, string filePath)
         {
             try
             {
@@ -133,19 +139,60 @@ namespace digioz.Portal.Utilities.Helpers
                     }
                 }
 
-                image.Mutate(x => x
-                    .Crop(new Rectangle(left, top, srcWidth, srcHeight))
-                    .Resize(maxWidth, maxHeight));
+                using var croppedImage = new SKBitmap(new SKImageInfo(maxWidth, maxHeight, image.ColorType, image.AlphaType));
+                using var canvas = new SKCanvas(croppedImage);
+                var source = new SKRect(left, top, left + srcWidth, top + srcHeight);
+                var destination = new SKRect(0, 0, maxWidth, maxHeight);
+                canvas.DrawBitmap(image, source, destination, new SKSamplingOptions(SKCubicResampler.Mitchell));
+                canvas.Flush();
 
-                var encoder = new JpegEncoder { Quality = 100 };
-                image.Save(filePath, encoder);
-                return true;
+                return SaveJpeg(croppedImage, filePath);
             }
             catch (Exception)
             {
                 // Log exception here if needed
                 return false;
             }
+        }
+
+        private static bool SaveJigsawImage(SKBitmap image, int maxWidth, int maxHeight, string filePath)
+        {
+            if (image.Width <= maxWidth && image.Height <= maxHeight)
+            {
+                return SaveJpeg(image, filePath);
+            }
+
+            double divisor;
+            int newWidth;
+            int newHeight;
+
+            if (image.Width >= image.Height)
+            {
+                divisor = (double)image.Width / maxWidth;
+                newHeight = (int)Math.Round(image.Height / divisor);
+                newWidth = maxWidth;
+            }
+            else
+            {
+                divisor = (double)image.Height / maxHeight;
+                newWidth = (int)Math.Round(image.Width / divisor);
+                newHeight = maxHeight;
+            }
+
+            using var resizedImage = image.Resize(
+                new SKImageInfo(newWidth, newHeight, image.ColorType, image.AlphaType),
+                new SKSamplingOptions(SKCubicResampler.Mitchell));
+
+            return resizedImage != null && SaveJpeg(resizedImage, filePath);
+        }
+
+        private static bool SaveJpeg(SKBitmap image, string filePath)
+        {
+            using var outputImage = SKImage.FromBitmap(image);
+            using var encodedImage = outputImage.Encode(SKEncodedImageFormat.Jpeg, 100);
+            using var output = File.Create(filePath);
+            encodedImage.SaveTo(output);
+            return true;
         }
     }
 }
