@@ -1,5 +1,6 @@
 ﻿using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,6 +18,11 @@ namespace digioz.Portal.Dal.Services
         public Menu Get(int id)
         {
             return _context.Menus.Find(id);
+        }
+
+        public Menu GetNoTracking(int id)
+        {
+            return _context.Menus.AsNoTracking().FirstOrDefault(m => m.Id == id);
         }
 
         public List<Menu> GetAll()

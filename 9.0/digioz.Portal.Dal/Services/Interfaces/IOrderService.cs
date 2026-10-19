@@ -7,8 +7,17 @@ namespace digioz.Portal.Dal.Services.Interfaces
     {
         Order Get(string id);
         List<Order> GetAll();
+        List<Order> GetByUserId(string userId);
+        int CountByUserId(string userId);
         void Add(Order order);
         void Update(Order order);
         void Delete(string id);
+        
+        // Bulk operations for performance
+        int DeleteByUserId(string userId);
+        int ReassignByUserId(string fromUserId, string toUserId);
+        
+        // Get order by PayPal token and user
+        Order GetByTokenAndUserId(string token, string userId, string responseCode = null);
     }
 }

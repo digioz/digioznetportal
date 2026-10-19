@@ -1,0 +1,283 @@
+using Microsoft.EntityFrameworkCore;
+using digioz.Portal.Dal;
+using digioz.Portal.Bo;
+using System;
+using System.Collections.Generic;
+
+namespace digioz.Portal.Tests.Helpers
+{
+    /// <summary>
+    /// Helper class for creating test data and managing test database contexts
+    /// </summary>
+    public static class TestDataHelper
+    {
+        /// <summary>
+        /// Creates an in-memory database context for testing
+        /// </summary>
+        public static digiozPortalContext CreateInMemoryContext()
+        {
+            var options = new DbContextOptionsBuilder<digiozPortalContext>()
+                .UseInMemoryDatabase(databaseName: $"TestDb_{Guid.NewGuid()}")
+                .Options;
+
+            return new digiozPortalContext(options);
+        }
+
+        /// <summary>
+        /// Creates a sample page for testing
+        /// </summary>
+        public static Page CreateTestPage(int id = 1, bool visible = true)
+        {
+            return new Page
+            {
+                Id = id,
+                Title = $"Test Page {id}",
+                Url = $"test-page-{id}",
+                Body = $"Test content for page {id}",
+                Visible = visible,
+                UserId = "test-user-id",
+                Timestamp = DateTime.UtcNow
+            };
+        }
+
+        /// <summary>
+        /// Creates a sample comment for testing
+        /// </summary>
+        public static Comment CreateTestComment(string id = "1", string userId = "test-user")
+        {
+            return new Comment
+            {
+                Id = id,
+                Body = "Test comment",
+                UserId = userId,
+                Username = "TestUser",
+                CreatedDate = DateTime.UtcNow,
+                ModifiedDate = DateTime.UtcNow
+            };
+        }
+
+        /// <summary>
+        /// Creates a sample poll for testing
+        /// </summary>
+        public static Poll CreateTestPoll(string id = "1", string userId = "test-user", bool visible = true, bool approved = true, bool isClosed = false, bool featured = false)
+        {
+            return new Poll
+            {
+                Id = id,
+                Slug = $"Test poll question {id}?",
+                UserId = userId,
+                Visible = visible,
+                Approved = approved,
+                DateCreated = DateTime.UtcNow,
+                AllowMultipleOptionsVote = false,
+                IsClosed = isClosed,
+                Featured = featured
+            };
+        }
+
+        /// <summary>
+        /// Creates sample poll answers for testing
+        /// </summary>
+        public static List<PollAnswer> CreateTestPollAnswers(string pollId, int count = 3)
+        {
+            var answers = new List<PollAnswer>();
+            for (int i = 1; i <= count; i++)
+            {
+                answers.Add(new PollAnswer
+                {
+                    Id = $"{pollId}-answer-{i}",
+                    PollId = pollId,
+                    Answer = $"Answer {i}"
+                });
+            }
+            return answers;
+        }
+
+        /// <summary>
+        /// Creates a sample link for testing
+        /// </summary>
+        public static Link CreateTestLink(int id = 1, bool visible = true, bool approved = false)
+        {
+            return new Link
+            {
+                Id = id,
+                Name = $"Test Link {id}",
+                Url = $"https://example.com/test-{id}",
+                Description = $"Test link description {id}",
+                Visible = visible,
+                LinkCategory = 1,
+                Timestamp = DateTime.UtcNow
+            };
+        }
+
+        /// <summary>
+        /// Creates a sample order for testing
+        /// </summary>
+        public static Order CreateTestOrder(string id = "order-1", string userId = "test-user", decimal total = 99.99m, bool trxApproved = true)
+        {
+            return new Order
+            {
+                Id = id,
+                UserId = userId,
+                InvoiceNumber = $"INV-{id}",
+                OrderDate = DateTime.UtcNow,
+                FirstName = "Test",
+                LastName = "User",
+                Email = "test@example.com",
+                Phone = "555-1234",
+                BillingAddress = "123 Test St",
+                BillingAddress2 = "",
+                BillingCity = "Test City",
+                BillingState = "TS",
+                BillingZip = "12345",
+                BillingCountry = "Test Country",
+                ShippingAddress = "123 Test St",
+                ShippingAddress2 = "",
+                ShippingCity = "Test City",
+                ShippingState = "TS",
+                ShippingZip = "12345",
+                ShippingCountry = "Test Country",
+                Total = total,
+                Ccamount = total,
+                Ccnumber = "XXXXXXXXXXXX1234",
+                Ccexp = "12/25",
+                CccardCode = "***",
+                TrxApproved = trxApproved,
+                TrxId = $"TRX-{id}",
+                TrxResponseCode = trxApproved ? "1" : "0",
+                TrxAuthorizationCode = trxApproved ? "AUTH123" : null,
+                TrxMessage = trxApproved ? "Approved" : "Declined",
+                TrxDescription = "Test order transaction"
+            };
+        }
+
+        /// <summary>
+        /// Creates a sample order detail (line item) for testing
+        /// </summary>
+        public static OrderDetail CreateTestOrderDetail(string id = "detail-1", string orderId = "order-1", string productId = "product-1", 
+            int quantity = 1, decimal unitPrice = 99.99m)
+        {
+            return new OrderDetail
+            {
+                Id = id,
+                OrderId = orderId,
+                ProductId = productId,
+                Quantity = quantity,
+                UnitPrice = unitPrice,
+                Description = $"Test Product {productId}",
+                Size = "Medium",
+                Color = "Blue",
+                MaterialType = "Cotton",
+                Notes = ""
+            };
+        }
+
+        /// <summary>
+        /// Creates a sample profile for testing
+        /// </summary>
+        public static Profile CreateTestProfile(int id = 1, string userId = "test-user", string email = "test@example.com", string displayName = "TestUser")
+        {
+            return new Profile
+            {
+                Id = id,
+                UserId = userId,
+                DisplayName = displayName,
+                Email = email,
+                FirstName = "Test",
+                MiddleName = "M",
+                LastName = "User",
+                Birthday = new DateTime(1990, 1, 1),
+                BirthdayVisible = true,
+                Address = "123 Test St",
+                Address2 = "",
+                City = "Test City",
+                State = "TS",
+                Zip = "12345",
+                Country = "Test Country",
+                Signature = "Test signature",
+                Avatar = "avatar.jpg",
+                ThemeId = null,
+                Views = 0
+            };
+        }
+
+        /// <summary>
+        /// Creates a sample product for testing
+        /// </summary>
+        public static Product CreateTestProduct(string id = "product-1", string name = "Test Product", decimal price = 99.99m, 
+            string? categoryId = null, bool visible = true)
+        {
+            return new Product
+            {
+                Id = id,
+                ProductCategoryId = categoryId,
+                Name = name,
+                Make = "Test Make",
+                Model = "Test Model",
+                Sku = $"SKU-{id}",
+                Image = "test-product.jpg",
+                Price = price,
+                Cost = price * 0.6m,
+                QuantityPerUnit = 1,
+                Weight = "1.5 lbs",
+                Dimensions = "10x8x2 inches",
+                Sizes = "Small,Medium,Large",
+                Colors = "Red,Blue,Black",
+                MaterialType = "Cotton,Polyester",
+                PartNumber = $"PN-{id}",
+                ShortDescription = "Test product short description",
+                Description = "Test product full description",
+                ManufacturerUrl = "https://example.com/manufacturer",
+                UnitsInStock = 100,
+                OutOfStock = false,
+                Notes = "Test notes",
+                Visible = visible,
+                DateCreated = DateTime.UtcNow,
+                DateModified = DateTime.UtcNow,
+                Views = 0
+            };
+        }
+
+        /// <summary>
+        /// Seeds a database context with sample data for testing
+        /// </summary>
+        public static void SeedTestData(digiozPortalContext context)
+        {
+            // Add pages
+            context.Pages.AddRange(
+                CreateTestPage(1, true),
+                CreateTestPage(2, true),
+                CreateTestPage(3, false)
+            );
+
+            // Add links
+            context.Links.AddRange(
+                CreateTestLink(1, true),
+                CreateTestLink(2, true),
+                CreateTestLink(3, false)
+            );
+
+            // Add polls
+            var poll = CreateTestPoll("poll-1", "test-user", visible: true, approved: true);
+            context.Polls.Add(poll);
+            context.PollAnswers.AddRange(CreateTestPollAnswers("poll-1"));
+
+            context.SaveChanges();
+        }
+
+        /// <summary>
+        /// Clears all data from a test database context
+        /// </summary>
+        public static void ClearTestData(digiozPortalContext context)
+        {
+            context.Pages.RemoveRange(context.Pages);
+            context.Links.RemoveRange(context.Links);
+            context.Polls.RemoveRange(context.Polls);
+            context.PollAnswers.RemoveRange(context.PollAnswers);
+            context.Comments.RemoveRange(context.Comments);
+            context.Orders.RemoveRange(context.Orders);
+            context.OrderDetails.RemoveRange(context.OrderDetails);
+            context.SaveChanges();
+        }
+    }
+}

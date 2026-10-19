@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using digioz.Portal.Bo;
@@ -57,6 +57,7 @@ namespace digioz.Portal.Dal
         public virtual DbSet<PollAnswer> PollAnswers { get; set; }
         public virtual DbSet<PollUsersVote> PollUsersVotes { get; set; }
         public virtual DbSet<PollVote> PollVotes { get; set; }
+        public virtual DbSet<PrivateMessage> PrivateMessages { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<ProductCategory> ProductCategories { get; set; }
         public virtual DbSet<ProductOption> ProductOptions { get; set; }
@@ -69,6 +70,9 @@ namespace digioz.Portal.Dal
         public virtual DbSet<VisitorInfo> VisitorInfos { get; set; }
         public virtual DbSet<VisitorSession> VisitorSessions { get; set; }
         public virtual DbSet<Zone> Zones { get; set; }
+        public virtual DbSet<Theme> Themes { get; set; }
+        public virtual DbSet<BannedIpTracking> BannedIpTrackings { get; set; }
+        public virtual DbSet<BannedIp> BannedIps { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -198,6 +202,12 @@ namespace digioz.Portal.Dal
                 entity.Property(e => e.ParentId).HasMaxLength(128);
 
                 entity.Property(e => e.UserId).HasMaxLength(128);
+
+                entity.Property(e => e.Visible)
+                    .HasDefaultValue(false);
+
+                entity.Property(e => e.Approved)
+                    .HasDefaultValue(false);
             });
 
             modelBuilder.Entity<CommentConfig>(entity =>
@@ -228,6 +238,9 @@ namespace digioz.Portal.Dal
             modelBuilder.Entity<Link>(entity =>
             {
                 entity.ToTable("Link");
+
+                entity.Property(e => e.Approved)
+                    .HasDefaultValue(false);
             });
 
             modelBuilder.Entity<LinkCategory>(entity =>
@@ -512,6 +525,12 @@ namespace digioz.Portal.Dal
                 entity.Property(e => e.Id).HasMaxLength(128);
 
                 entity.Property(e => e.UserId).HasMaxLength(128);
+
+                entity.Property(e => e.Visible)
+                    .HasDefaultValue(false);
+
+                entity.Property(e => e.Approved)
+                    .HasDefaultValue(false);
             });
 
             modelBuilder.Entity<PollAnswer>(entity =>
@@ -551,6 +570,21 @@ namespace digioz.Portal.Dal
                 entity.Property(e => e.UserId)
                     .IsRequired()
                     .HasMaxLength(128);
+            });
+
+            modelBuilder.Entity<PrivateMessage>(entity =>
+            {
+                entity.ToTable("PrivateMessage");
+                // entity.Property(e => e.Id).HasMaxLength(128);
+                entity.Property(e => e.FromId).HasMaxLength(128);
+                entity.Property(e => e.FromIp).HasMaxLength(64);
+                entity.Property(e => e.ToId).HasMaxLength(128);
+                entity.Property(e => e.Subject).HasMaxLength(255);
+                // ParentId relationship (self-referencing)
+                entity.HasOne<PrivateMessage>()
+                      .WithMany()
+                      .HasForeignKey(pm => pm.ParentId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Product>(entity =>
@@ -620,6 +654,12 @@ namespace digioz.Portal.Dal
             {
                 entity.ToTable("Profile");
 
+                entity.HasIndex(e => e.DisplayName, "IX_Profile_DisplayName")
+                    .IsUnique()
+                    .HasFilter("[DisplayName] IS NOT NULL");
+
+                entity.Property(e => e.DisplayName).HasMaxLength(50);
+
                 entity.Property(e => e.Avatar).HasMaxLength(50);
 
                 entity.Property(e => e.City).HasMaxLength(50);
@@ -641,6 +681,12 @@ namespace digioz.Portal.Dal
                 entity.Property(e => e.UserId).HasMaxLength(128);
 
                 entity.Property(e => e.Zip).HasMaxLength(20);
+
+                // Foreign key relationship with Theme
+                entity.HasOne(d => d.Theme)
+                    .WithMany()
+                    .HasForeignKey(d => d.ThemeId)
+                    .IsRequired(false);
             });
 
             modelBuilder.Entity<Rss>(entity =>
@@ -700,30 +746,29 @@ namespace digioz.Portal.Dal
             {
                 entity.ToTable("VisitorInfo");
 
-                entity.Property(e => e.Browser).HasMaxLength(25);
-
-                entity.Property(e => e.BrowserEngineName).HasMaxLength(25);
-
-                entity.Property(e => e.BrowserVersion).HasMaxLength(25);
-
-                entity.Property(e => e.IpAddress).HasMaxLength(25);
+                entity.Property(e => e.IpAddress).HasMaxLength(64);
 
                 entity.Property(e => e.Platform).HasMaxLength(25);
 
                 entity.Property(e => e.UserLanguage).HasMaxLength(25);
 
                 entity.Property(e => e.SessionId).HasMaxLength(128);
-
-                entity.Property(e => e.OperatingSystem).HasMaxLength(25);
             });
 
             modelBuilder.Entity<VisitorSession>(entity =>
             {
                 entity.ToTable("VisitorSession");
 
-                entity.Property(e => e.IpAddress).HasMaxLength(25);
+                entity.Property(e => e.IpAddress).HasMaxLength(64);
 
                 entity.Property(e => e.Username).HasMaxLength(255);
+
+                // Configure the relationship to Profile
+                entity.HasOne(d => d.Profile)
+                    .WithMany()
+                    .HasForeignKey(d => d.Username)
+                    .HasPrincipalKey(p => p.UserId)
+                    .IsRequired(false);
             });
 
             modelBuilder.Entity<Zone>(entity =>
@@ -732,7 +777,91 @@ namespace digioz.Portal.Dal
 
                 entity.Property(e => e.Name).IsRequired();
 
-                entity.Property(e => e.ZoneType).IsRequired();
+                entity.Property(e => e.Body).IsRequired();
+            });
+
+            modelBuilder.Entity<Theme>(entity =>
+            {
+                entity.ToTable("Theme");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.Body).IsRequired();
+
+                entity.Property(e => e.CreateDate).IsRequired();
+
+                entity.Property(e => e.IsDefault).IsRequired();
+            });
+
+            modelBuilder.Entity<BannedIpTracking>(entity =>
+            {
+                entity.ToTable("BannedIpTracking");
+
+                entity.Property(e => e.IpAddress)
+                    .IsRequired()
+                    .HasMaxLength(64);
+
+                entity.Property(e => e.RequestPath)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.RequestType)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasDefaultValue("General");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(256);
+
+                entity.Property(e => e.UserAgent)
+                    .HasMaxLength(500);
+
+                // Indexes for query performance
+                entity.HasIndex(e => new { e.IpAddress, e.Timestamp })
+                    .HasDatabaseName("IX_BannedIpTracking_IpAddress_Timestamp");
+
+                entity.HasIndex(e => new { e.Email, e.Timestamp })
+                    .HasDatabaseName("IX_BannedIpTracking_Email_Timestamp")
+                    .HasFilter("[Email] IS NOT NULL");
+
+                entity.HasIndex(e => e.Timestamp)
+                    .HasDatabaseName("IX_BannedIpTracking_Timestamp");
+            });
+
+            modelBuilder.Entity<BannedIp>(entity =>
+            {
+                entity.ToTable("BannedIp");
+
+                entity.Property(e => e.IpAddress)
+                    .IsRequired()
+                    .HasMaxLength(64);
+
+                entity.Property(e => e.Reason)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.BanCount)
+                    .IsRequired()
+                    .HasDefaultValue(1);
+
+                entity.Property(e => e.CreatedDate)
+                    .IsRequired()
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(e => e.UserAgent)
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.AttemptedEmail)
+                    .HasMaxLength(256);
+
+                // Indexes for query performance
+                entity.HasIndex(e => e.IpAddress)
+                    .HasDatabaseName("IX_BannedIp_IpAddress");
+
+                entity.HasIndex(e => e.BanExpiry)
+                    .HasDatabaseName("IX_BannedIp_BanExpiry");
             });
 
             OnModelCreatingPartial(modelBuilder);

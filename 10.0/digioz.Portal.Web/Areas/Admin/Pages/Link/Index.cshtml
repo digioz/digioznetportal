@@ -1,0 +1,172 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.Link.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+@using digioz.Portal.Utilities
+@{
+	ViewBag.Title = "Links";
+	Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+	<div class="card-header d-flex justify-content-between align-items-center">
+		<span>Links</span>
+		<div>
+			<a class="btn btn-sm btn-outline-secondary me-2" asp-area="Admin" asp-page="/Link/CheckLinks">
+				<i class="bi bi-search"></i> Check Links
+			</a>
+			<a class="btn btn-sm btn-primary" asp-area="Admin" asp-page="/Link/Add">Add Link</a>
+		</div>
+	</div>
+	<div class="card-body">
+		<form method="get" class="row g-3 mb-3">
+			<div class="col-md-3">
+				<label for="searchQuery" class="form-label">Search</label>
+				<input type="text" 
+					   id="searchQuery" 
+					   name="SearchQuery" 
+					   class="form-control" 
+					   placeholder="Search by name or URL..." 
+					   value="@Model.SearchQuery" />
+			</div>
+			<div class="col-md-2">
+				<label for="visibilityFilter" class="form-label">Visibility</label>
+				<select id="visibilityFilter" name="VisibilityFilter" class="form-select" onchange="this.form.submit()">
+					<option value="all" selected="@(Model.VisibilityFilter == "all" ? "selected" : null)">All</option>
+					<option value="visible" selected="@(Model.VisibilityFilter == "visible" ? "selected" : null)">Visible</option>
+					<option value="notvisible" selected="@(Model.VisibilityFilter == "notvisible" ? "selected" : null)">Not Visible</option>
+				</select>
+			</div>
+			<div class="col-md-2">
+				<label for="approvalFilter" class="form-label">Approval</label>
+				<select id="approvalFilter" name="ApprovalFilter" class="form-select" onchange="this.form.submit()">
+					<option value="all" selected="@(Model.ApprovalFilter == "all" ? "selected" : null)">All</option>
+					<option value="approved" selected="@(Model.ApprovalFilter == "approved" ? "selected" : null)">Approved</option>
+					<option value="notapproved" selected="@(Model.ApprovalFilter == "notapproved" ? "selected" : null)">Not Approved</option>
+				</select>
+			</div>
+			<div class="col-md-3">
+				<label for="categoryFilter" class="form-label">Category</label>
+				<select id="categoryFilter" name="CategoryFilter" class="form-select" onchange="this.form.submit()">
+					@foreach (var option in Model.CategoryFilterOptions)
+					{
+						<option value="@option.Value" selected="@(option.Selected ? "selected" : null)">@option.Text</option>
+					}
+				</select>
+			</div>
+			<div class="col-md-2 d-flex align-items-end gap-2">
+				<button type="submit" class="btn btn-primary flex-fill">
+					<i class="bi bi-search"></i>
+				</button>
+				<a asp-area="Admin" asp-page="/Link/Index" class="btn btn-outline-secondary flex-fill">
+					<i class="bi bi-x-circle"></i>
+				</a>
+			</div>
+			<input type="hidden" name="PageNumber" value="1" />
+		</form>
+		<div class="table-responsive">
+			<table class="table table-sm table-hover mb-0 align-middle">
+				<thead class="table-light">
+					<tr>
+						<th>Name</th>
+						<th>Category</th>
+						<th>Description</th>
+						<th class="text-center" style="width:80px">Link</th>
+						<th class="text-center">Visible</th>
+						<th class="text-center">Approved</th>
+						<th style="width:300px" class="text-end">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					@if (Model.Items.Any())
+					{
+						foreach (var item in Model.Items)
+						{
+							var strippedDescription = string.IsNullOrWhiteSpace(item.Description) ? "" : StringUtils.StripHtmlFromString(item.Description);
+							var description = strippedDescription.Length > 100 ? strippedDescription.Substring(0, 100) + "..." : strippedDescription;
+							<tr>
+								<td>@item.Name</td>
+								<td>@(Model.CategoryNames.TryGetValue(item.LinkCategory, out var cn) ? cn : "-")</td>
+								<td>
+									<span title="@strippedDescription">@description</span>
+								</td>
+								<td class="text-center">
+									<a href="@item.Url" 
+									   target="_blank" 
+									   rel="noopener noreferrer"
+									   class="btn btn-sm btn-outline-primary px-2 py-0"
+									   title="@item.Url">
+										<i class="bi bi-box-arrow-up-right"></i>
+									</a>
+								</td>
+								<td class="text-center">
+									<form method="post" asp-page-handler="ToggleVisibility" class="d-inline">
+										<input type="hidden" name="id" value="@item.Id" />
+										<input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+										<input type="hidden" name="visibilityFilter" value="@Model.VisibilityFilter" />
+										<input type="hidden" name="approvalFilter" value="@Model.ApprovalFilter" />
+										<input type="hidden" name="categoryFilter" value="@Model.CategoryFilter" />
+										<input type="hidden" name="searchQuery" value="@Model.SearchQuery" />
+										<button type="submit" 
+												class="btn btn-link p-0 text-decoration-none"
+												title="Click to toggle visibility">
+											@if (item.Visible)
+											{
+												<span class="badge bg-success" style="cursor: pointer;">Yes</span>
+											}
+											else
+											{
+												<span class="badge bg-secondary" style="cursor: pointer;">No</span>
+											}
+										</button>
+									</form>
+								</td>
+								<td class="text-center">
+									<form method="post" asp-page-handler="ToggleApproval" class="d-inline">
+										<input type="hidden" name="id" value="@item.Id" />
+										<input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+										<input type="hidden" name="visibilityFilter" value="@Model.VisibilityFilter" />
+										<input type="hidden" name="approvalFilter" value="@Model.ApprovalFilter" />
+										<input type="hidden" name="categoryFilter" value="@Model.CategoryFilter" />
+										<input type="hidden" name="searchQuery" value="@Model.SearchQuery" />
+										<button type="submit" 
+												class="btn btn-link p-0 text-decoration-none"
+												title="Click to toggle approval">
+											@if (item.Approved ?? false)
+											{
+												<span class="badge bg-success" style="cursor: pointer;">Yes</span>
+											}
+											else
+											{
+												<span class="badge bg-warning text-dark" style="cursor: pointer;">No</span>
+											}
+										</button>
+									</form>
+								</td>
+								<td class="text-end">
+									<a class="btn btn-sm btn-outline-secondary px-1 py-0 fs-6" asp-area="Admin" asp-page="/Link/Detail" asp-route-id="@item.Id" title="Detail" aria-label="Detail"><i class="bi bi-eye"></i></a>
+									<a class="btn btn-sm btn-outline-primary px-1 py-0 fs-6" asp-area="Admin" asp-page="/Link/Edit" asp-route-id="@item.Id" title="Edit" aria-label="Edit"><i class="bi bi-pencil"></i></a>
+									<a class="btn btn-sm btn-outline-danger px-1 py-0 fs-6" asp-area="Admin" asp-page="/Link/Delete" asp-route-id="@item.Id" title="Delete" aria-label="Delete"><i class="bi bi-trash"></i></a>
+								</td>
+							</tr>
+						}
+					}
+					else
+					{
+						<tr><td colspan="7" class="text-center text-muted py-4">No links found.</td></tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="card-footer d-flex justify-content-between align-items-center">
+		<small class="text-muted">Page @Model.PageNumber of @Model.TotalPages (@Model.TotalCount total)</small>
+		<paging total-records="@Model.TotalCount"
+				page-no="@Model.PageNumber"
+				page-size="@Model.PageSize"
+				show-prev-next="true"
+				show-first-last="true"
+				query-string-key-page-no="pageNumber"
+				class="pagination mb-0"></paging>
+	</div>
+</div>

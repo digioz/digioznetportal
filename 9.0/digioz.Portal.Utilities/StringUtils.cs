@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
-
+using Microsoft.AspNetCore.Http;
+//using Microsoft.Security.Application;
 
 namespace digioz.Portal.Utilities
 {
-    public static class StringUtils
+    public static partial class StringUtils
     {
 
         #region Extension Methods
@@ -63,6 +66,21 @@ namespace digioz.Portal.Utilities
         }
 
         /// <summary>
+        /// Converts line breaks (CR, LF, CRLF) in a string to HTML br tags.
+        /// Handles all line break variations consistently: \r\n, \n, and \r
+        /// </summary>
+        /// <param name="input">The input string containing line breaks</param>
+        /// <returns>String with line breaks replaced by &lt;br /&gt; tags</returns>
+        public static string ConvertLineBreaksToHtml(this string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+            
+            return input.Replace("\r\n", "<br />")
+                        .Replace("\n", "<br />")
+                        .Replace("\r", "<br />");
+        }
+
+        /// <summary>
         /// Does a case insensitive contains
         /// </summary>
         /// <param name="source"></param>
@@ -81,18 +99,12 @@ namespace digioz.Portal.Utilities
         #endregion
 
         public static string GetUniqueKey(int maxSize) {
-            char[] chars = new char[62];
-            chars =
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();
-            byte[] data = new byte[1];
-            RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider();
-            crypto.GetNonZeroBytes(data);
-            data = new byte[maxSize];
-            crypto.GetNonZeroBytes(data);
-            StringBuilder result = new StringBuilder(maxSize);
+            const string allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            byte[] data = RandomNumberGenerator.GetBytes(maxSize);
+            var result = new StringBuilder(maxSize);
 
             foreach (byte b in data) {
-                result.Append(chars[b % (chars.Length)]);
+                result.Append(allowed[b % allowed.Length]);
             }
 
             return result.ToString();
@@ -155,15 +167,25 @@ namespace digioz.Portal.Utilities
 
 
         /// <summary>
-        /// Downloads a web page and returns the HTML as a string
+        /// Downloads a web page and returns the HTML content as a string.
         /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        public static HttpWebResponse DownloadWebPage(string url) {
-            var ub = new UriBuilder(url);
-            var request = (HttpWebRequest)WebRequest.Create(ub.Uri);
-            request.Proxy = null;
-            return (HttpWebResponse)request.GetResponse();
+        /// <param name="url">The URL to download</param>
+        /// <returns>The HTML content as a string</returns>
+        public static async Task<string> DownloadWebPageAsync(string url)
+        {
+            using var client = new HttpClient();
+            return await client.GetStringAsync(url);
+        }
+
+        /// <summary>
+        /// Downloads a web page and returns the HTML content as a string (synchronous version).
+        /// </summary>
+        /// <param name="url">The URL to download</param>
+        /// <returns>The HTML content as a string</returns>
+        public static string DownloadWebPage(string url)
+        {
+            using var client = new HttpClient();
+            return client.GetStringAsync(url).GetAwaiter().GetResult();
         }
 
         #region Numeric Helpers
@@ -571,7 +593,9 @@ namespace digioz.Portal.Utilities
         }
 
         /// <summary>
-        /// Returns safe plain text using XSS library
+        /// Returns safe plain text using XSS library.
+        /// NOTE: This method uses regex-based HTML stripping. For more secure sanitization,
+        /// prefer using SanitizeToPlainText which uses HtmlAgilityPack for proper HTML parsing.
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -581,6 +605,94 @@ namespace digioz.Portal.Utilities
                 input = GetSafeHtml(input);
             }
             return input;
+        }
+
+        // Compiled regex for better performance in SanitizeUserInput
+        private static readonly Regex SanitizeWhitespaceRegex = new Regex("\\s+", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Sanitizes user input by extracting plain text only, removing all HTML tags, scripts, and attributes.
+        /// Collapses excessive whitespace for clean output. Use this for user-generated content to prevent XSS attacks.
+        /// </summary>
+        /// <param name="input">The user input string to sanitize, which may contain HTML or script content.</param>
+        /// <returns>A sanitized string containing only plain text with normalized whitespace, or empty string if input is null/whitespace.</returns>
+        public static string SanitizeUserInput(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+
+            try
+            {
+                // Parse HTML then extract plain text only; remove all tags, scripts, attributes.
+                var doc = new HtmlDocument();
+                doc.LoadHtml(input);
+                var text = doc.DocumentNode.InnerText ?? string.Empty;
+                // Collapse excessive whitespace/newlines using compiled regex for performance
+                text = SanitizeWhitespaceRegex.Replace(text, " ").Trim();
+                return text;
+            }
+            catch
+            {
+                // If HTML parsing fails, fall back to returning empty string for safety
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Sanitizes HTML input by extracting plain text only, removing all tags, scripts, and attributes.
+        /// Uses HtmlAgilityPack for secure HTML parsing and collapses excessive whitespace.
+        /// This is the recommended method for sanitizing user-generated content to prevent XSS attacks.
+        /// </summary>
+        /// <param name="input">The HTML input to sanitize</param>
+        /// <returns>Plain text with collapsed whitespace</returns>
+        public static string SanitizeToPlainText(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            // Parse HTML then extract plain text only; remove all tags, scripts, attributes.
+            var doc = new HtmlDocument();
+            doc.LoadHtml(input);
+            var text = doc.DocumentNode.InnerText ?? string.Empty;
+            // Collapse excessive whitespace/newlines
+            text = Regex.Replace(text, @"\s+", " ").Trim();
+            return text;
+        }
+
+        /// <summary>
+        /// Sanitizes comment text by removing HTML/scripts but preserving line breaks.
+        /// Use this for user comments where you want to maintain formatting with line breaks.
+        /// Limits excessive consecutive line breaks to prevent abuse.
+        /// </summary>
+        /// <param name="input">The comment text to sanitize, which may contain HTML or script content</param>
+        /// <returns>A sanitized string with HTML removed but line breaks preserved, or empty string if input is null/whitespace</returns>
+        public static string SanitizeCommentPreservingLineBreaks(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+
+            try
+            {
+                // Parse HTML and extract plain text only (removes all tags, scripts, attributes)
+                var doc = new HtmlDocument();
+                doc.LoadHtml(input);
+                var text = doc.DocumentNode.InnerText ?? string.Empty;
+
+                // Decode HTML entities (e.g., &lt; becomes <)
+                text = System.Net.WebUtility.HtmlDecode(text);
+
+                // Normalize line breaks to \n
+                text = text.Replace("\r\n", "\n").Replace("\r", "\n");
+
+                // Trim excessive consecutive line breaks (more than 2 in a row)
+                while (text.Contains("\n\n\n"))
+                {
+                    text = text.Replace("\n\n\n", "\n\n");
+                }
+
+                return text.Trim();
+            }
+            catch
+            {
+                // If HTML parsing fails, fall back to returning empty string for safety
+                return string.Empty;
+            }
         }
         #endregion
 
@@ -774,6 +886,34 @@ namespace digioz.Portal.Utilities
 
             return str;
         }
+        #endregion
+
+        #region Media Helpers
+
+        /// <summary>
+        /// Sanitizes media source parameter (e.g., "album" or "list") to only allow expected values.
+        /// Returns null if the value is not recognized to prevent injection attacks.
+        /// </summary>
+        /// <param name="source">The source parameter value to sanitize</param>
+        /// <returns>A sanitized source value ("album" or "list"), or null if invalid</returns>
+        public static string SanitizeMediaSource(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source))
+                return null;
+            
+            // Only allow specific, expected values
+            var normalized = source.Trim();
+            
+            if (normalized.Equals("album", StringComparison.OrdinalIgnoreCase))
+                return "album";
+            
+            if (normalized.Equals("list", StringComparison.OrdinalIgnoreCase))
+                return "list";
+            
+            // Return null for any other value to prevent injection
+            return null;
+        }
+
         #endregion
 
         /// <summary>

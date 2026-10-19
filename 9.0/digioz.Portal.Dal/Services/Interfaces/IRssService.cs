@@ -7,6 +7,7 @@ namespace digioz.Portal.Dal.Services.Interfaces
     {
         Rss Get(int id);
         List<Rss> GetAll();
+        List<Rss> GetPage(int pageNumber, int pageSize, out int totalCount);
         void Add(Rss rss);
         void Update(Rss rss);
         void Delete(int id);

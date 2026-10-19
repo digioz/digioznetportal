@@ -1,0 +1,42 @@
+@page "{id?}"
+@model digioz.Portal.Web.Pages.Page.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+	ViewData["Title"] = Model.PageContent?.Title ?? "Page";
+}
+
+@section keywords {
+	@if (Model.PageContent?.Keywords != null)
+	{
+		<meta name="keywords" content="@Model.PageContent.Keywords" />
+	}
+}
+
+@section description {
+	@if (Model.PageContent?.Description != null)
+	{
+		<meta name="description" content="@Model.PageContent.Description" />
+	}
+}
+
+<div class="card bg-light mb-5">
+	<div class="card-header bg-primary text-white">@ViewBag.Title</div>
+	<div class="card-body">
+        <div class="container">
+            @if (!string.IsNullOrWhiteSpace(Model.BodyHtml))
+            {
+                @Html.Raw(Model.BodyHtml)
+            }
+            else
+            {
+                <div class="alert alert-warning">Page not found.</div>
+            }
+
+            @if (Model.AllowComments && Model.PageContent != null)
+            {
+                @await Component.InvokeAsync("CommentsMenu", new { referenceId = Model.PageContent.Id.ToString(), referenceType = "/Page" })
+            }
+        </div>
+	</div>
+</div>

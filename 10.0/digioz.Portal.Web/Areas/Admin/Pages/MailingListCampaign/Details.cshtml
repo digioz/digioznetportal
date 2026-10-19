@@ -1,0 +1,58 @@
+@page "{id}"
+@model digioz.Portal.Web.Areas.Admin.Pages.MailingListCampaign.DetailsModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Campaign Details";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<partial name="../MailingList/_MailingListNav" />
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Campaign Details</span>
+        <div>
+            <a class="btn btn-sm btn-outline-primary" asp-area="Admin" asp-page="/MailingListCampaign/Edit" asp-route-id="@Model.Item?.Id">Edit</a>
+            <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/MailingListCampaign/Index">Back</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Name</dt>
+            <dd class="col-sm-9">@Model.Item?.Name</dd>
+
+            <dt class="col-sm-3">Subject</dt>
+            <dd class="col-sm-9">@Model.Item?.Subject</dd>
+
+            <dt class="col-sm-3">From Name</dt>
+            <dd class="col-sm-9">@Model.Item?.FromName</dd>
+
+            <dt class="col-sm-3">From Email</dt>
+            <dd class="col-sm-9">@Model.Item?.FromEmail</dd>
+
+            <dt class="col-sm-3">Summary</dt>
+            <dd class="col-sm-9">@Model.Item?.Summary</dd>
+
+            <dt class="col-sm-3">Banner</dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrEmpty(Model.Item?.Banner))
+                {
+                    <img src="@Model.Item.Banner" alt="Banner" class="img-fluid" style="max-height: 200px;" />
+                }
+                else
+                {
+                    <span class="text-muted">No banner</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Body</dt>
+            <dd class="col-sm-9">@Html.Raw(Model.Item?.Body)</dd>
+
+            <dt class="col-sm-3">Visitor Count</dt>
+            <dd class="col-sm-9">@Model.Item?.VisitorCount</dd>
+
+            <dt class="col-sm-3">Date Created</dt>
+            <dd class="col-sm-9">@Model.Item?.DateCreated.ToString("yyyy-MM-dd HH:mm")</dd>
+        </dl>
+    </div>
+</div>

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace digioz.Portal.Dal.Services
 {
@@ -42,6 +43,33 @@ namespace digioz.Portal.Dal.Services
             if (product != null)
             {
                 _context.Products.Remove(product);
+                _context.SaveChanges();
+            }
+        }
+
+        public void IncrementViews(string id)
+        {
+            var product = _context.Products.Find(id);
+            if (product != null)
+            {
+                product.Views++;
+                _context.SaveChanges();
+            }
+        }
+
+        public void ClearProductCategory(string categoryId)
+        {
+            var products = _context.Products
+                .Where(p => p.ProductCategoryId == categoryId)
+                .ToList();
+            
+            foreach (var product in products)
+            {
+                product.ProductCategoryId = null;
+            }
+            
+            if (products.Any())
+            {
                 _context.SaveChanges();
             }
         }

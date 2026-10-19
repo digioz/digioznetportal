@@ -1,0 +1,382 @@
+/* Pastel Bootstrap 5.3.3 Color Override */
+
+/* Pastel Color Variables */
+:root {
+    --bs-primary: #A8D5E2;
+    --bs-primary-rgb: 168, 213, 226;
+    --bs-secondary: #D4C5E2;
+    --bs-secondary-rgb: 212, 197, 226;
+    --bs-success: #B8E6B8;
+    --bs-success-rgb: 184, 230, 184;
+    --bs-info: #B8E0F6;
+    --bs-info-rgb: 184, 224, 246;
+    --bs-warning: #FFE4B3;
+    --bs-warning-rgb: 255, 228, 179;
+    --bs-danger: #FFB3B3;
+    --bs-danger-rgb: 255, 179, 179;
+    --bs-light: #F5F5F5;
+    --bs-light-rgb: 245, 245, 245;
+    --bs-dark: #8B9BA8;
+    --bs-dark-rgb: 139, 155, 168;
+    
+    /* Border colors */
+    --bs-border-color: #E0E0E0;
+    --bs-border-color-translucent: rgba(0, 0, 0, 0.08);
+    
+    /* Body colors */
+    --bs-body-bg: #FAFAFA;
+    --bs-body-color: #4A4A4A;
+    
+    /* Link colors */
+    --bs-link-color: #5FA8D3;
+    --bs-link-hover-color: #4A8CB8;
+}
+
+/* Primary Color Overrides */
+.btn-primary,
+.bg-primary {
+    background-color: #A8D5E2 !important;
+    border-color: #8FC4D6 !important;
+    color: #2C5F6F !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #8FC4D6 !important;
+    border-color: #76B3CA !important;
+    color: #1F4851 !important;
+}
+
+.text-primary {
+    color: #5FA8D3 !important;
+}
+
+/* Secondary Color Overrides */
+.btn-secondary,
+.bg-secondary {
+    background-color: #D4C5E2 !important;
+    border-color: #C1ACD4 !important;
+    color: #5A4A6F !important;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background-color: #C1ACD4 !important;
+    border-color: #AE93C6 !important;
+    color: #4A3A5F !important;
+}
+
+/* Success Color Overrides */
+.btn-success,
+.bg-success {
+    background-color: #B8E6B8 !important;
+    border-color: #9FD99F !important;
+    color: #3F7A3F !important;
+}
+
+.btn-success:hover,
+.btn-success:focus {
+    background-color: #9FD99F !important;
+    border-color: #86CC86 !important;
+    color: #2F5F2F !important;
+}
+
+.alert-success {
+    background-color: #D4F1D4 !important;
+    border-color: #B8E6B8 !important;
+    color: #3F7A3F !important;
+}
+
+/* Info Color Overrides */
+.btn-info,
+.bg-info {
+    background-color: #B8E0F6 !important;
+    border-color: #9FD1EB !important;
+    color: #2C5F8F !important;
+}
+
+.btn-info:hover,
+.btn-info:focus {
+    background-color: #9FD1EB !important;
+    border-color: #86C2E0 !important;
+    color: #1F4A6F !important;
+}
+
+.alert-info {
+    background-color: #D4EDFA !important;
+    border-color: #B8E0F6 !important;
+    color: #2C5F8F !important;
+}
+
+/* Warning Color Overrides */
+.btn-warning,
+.bg-warning {
+    background-color: #FFE4B3 !important;
+    border-color: #FFD699 !important;
+    color: #8F6F2C !important;
+}
+
+.btn-warning:hover,
+.btn-warning:focus {
+    background-color: #FFD699 !important;
+    border-color: #FFC880 !important;
+    color: #6F5F2C !important;
+}
+
+.alert-warning {
+    background-color: #FFF2D9 !important;
+    border-color: #FFE4B3 !important;
+    color: #8F6F2C !important;
+}
+
+/* Danger Color Overrides */
+.btn-danger,
+.bg-danger {
+    background-color: #FFB3B3 !important;
+    border-color: #FF9999 !important;
+    color: #8F2C2C !important;
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+    background-color: #FF9999 !important;
+    border-color: #FF8080 !important;
+    color: #6F1F1F !important;
+}
+
+.alert-danger {
+    background-color: #FFD9D9 !important;
+    border-color: #FFB3B3 !important;
+    color: #8F2C2C !important;
+}
+
+/* Dark Color Overrides */
+.navbar-dark,
+.bg-dark {
+    background-color: #8B9BA8 !important;
+    color: #FFFFFF !important;
+}
+
+.btn-dark {
+    background-color: #8B9BA8 !important;
+    border-color: #72828F !important;
+    color: #FFFFFF !important;
+}
+
+.btn-dark:hover,
+.btn-dark:focus {
+    background-color: #72828F !important;
+    border-color: #5F6F7A !important;
+    color: #FFFFFF !important;
+}
+
+/* Light Color Overrides */
+.bg-light {
+    background-color: #F5F5F5 !important;
+    color: #4A4A4A !important;
+}
+
+.btn-light {
+    background-color: #F5F5F5 !important;
+    border-color: #E0E0E0 !important;
+    color: #4A4A4A !important;
+}
+
+.btn-light:hover,
+.btn-light:focus {
+    background-color: #E0E0E0 !important;
+    border-color: #CCCCCC !important;
+}
+
+/* Card Overrides */
+.card {
+    border-color: #E0E0E0 !important;
+    background-color: #FFFFFF !important;
+}
+
+.card-header.bg-primary {
+    background-color: #A8D5E2 !important;
+    color: #2C5F6F !important;
+    border-bottom: 1px solid #8FC4D6 !important;
+}
+
+/* Form Controls */
+.form-control,
+.form-select {
+    border-color: #D0D0D0 !important;
+    background-color: #FAFAFA !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #A8D5E2 !important;
+    box-shadow: 0 0 0 0.25rem rgba(168, 213, 226, 0.25) !important;
+}
+
+/* Navbar */
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:focus {
+    color: rgba(255, 255, 255, 1) !important;
+}
+
+/* Badges */
+.badge.bg-primary {
+    background-color: #A8D5E2 !important;
+    color: #2C5F6F !important;
+}
+
+.badge.bg-secondary {
+    background-color: #D4C5E2 !important;
+    color: #5A4A6F !important;
+}
+
+.badge.bg-success {
+    background-color: #B8E6B8 !important;
+    color: #3F7A3F !important;
+}
+
+.badge.bg-danger {
+    background-color: #FFB3B3 !important;
+    color: #8F2C2C !important;
+}
+
+.badge.bg-warning {
+    background-color: #FFE4B3 !important;
+    color: #8F6F2C !important;
+}
+
+.badge.bg-info {
+    background-color: #B8E0F6 !important;
+    color: #2C5F8F !important;
+}
+
+/* Pagination */
+.pagination .page-link {
+    color: #5FA8D3 !important;
+    background-color: #FFFFFF !important;
+    border-color: #E0E0E0 !important;
+}
+
+.pagination .page-link:hover {
+    color: #4A8CB8 !important;
+    background-color: #F5F5F5 !important;
+    border-color: #D0D0D0 !important;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #A8D5E2 !important;
+    border-color: #8FC4D6 !important;
+    color: #2C5F6F !important;
+}
+
+/* Progress Bars */
+.progress {
+    background-color: #F0F0F0 !important;
+}
+
+.progress-bar {
+    background-color: #A8D5E2 !important;
+}
+
+.progress-bar.bg-success {
+    background-color: #B8E6B8 !important;
+}
+
+.progress-bar.bg-info {
+    background-color: #B8E0F6 !important;
+}
+
+.progress-bar.bg-warning {
+    background-color: #FFE4B3 !important;
+}
+
+.progress-bar.bg-danger {
+    background-color: #FFB3B3 !important;
+}
+
+/* Tables */
+.table-primary {
+    background-color: #E5F3F7 !important;
+    color: #2C5F6F !important;
+}
+
+.table-secondary {
+    background-color: #F0EBF5 !important;
+    color: #5A4A6F !important;
+}
+
+.table-success {
+    background-color: #E8F7E8 !important;
+    color: #3F7A3F !important;
+}
+
+.table-info {
+    background-color: #E8F5FB !important;
+    color: #2C5F8F !important;
+}
+
+.table-warning {
+    background-color: #FFF7E8 !important;
+    color: #8F6F2C !important;
+}
+
+.table-danger {
+    background-color: #FFE8E8 !important;
+    color: #8F2C2C !important;
+}
+
+/* List Groups */
+.list-group-item-primary {
+    background-color: #E5F3F7 !important;
+    color: #2C5F6F !important;
+}
+
+.list-group-item-success {
+    background-color: #E8F7E8 !important;
+    color: #3F7A3F !important;
+}
+
+.list-group-item-info {
+    background-color: #E8F5FB !important;
+    color: #2C5F8F !important;
+}
+
+.list-group-item-warning {
+    background-color: #FFF7E8 !important;
+    color: #8F6F2C !important;
+}
+
+.list-group-item-danger {
+    background-color: #FFE8E8 !important;
+    color: #8F2C2C !important;
+}
+
+/* Dropdowns */
+.dropdown-menu {
+    border-color: #E0E0E0 !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #F5F5F5 !important;
+    color: #4A4A4A !important;
+}
+
+/* Tooltips */
+.tooltip-inner {
+    background-color: #8B9BA8 !important;
+}
+
+/* Modals */
+.modal-header {
+    background-color: #F5F5F5 !important;
+    border-bottom-color: #E0E0E0 !important;
+}
+
+.modal-footer {
+    border-top-color: #E0E0E0 !important;
+}

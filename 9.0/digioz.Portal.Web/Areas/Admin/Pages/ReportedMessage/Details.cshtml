@@ -1,0 +1,76 @@
+@page "{id:int}"
+@model digioz.Portal.Web.Areas.Admin.Pages.ReportedMessage.DetailsModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Reported Message Details";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Reported Message Details</span>
+        <div>
+            <form method="post" asp-page-handler="RemoveReport" asp-route-id="@Model.RootMessage?.Id" class="d-inline">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-sm btn-success">
+                    <i class="bi bi-flag-fill"></i> Remove Report
+                </button>
+            </form>
+            <a asp-area="Admin" asp-page="/ReportedMessage/Index" class="btn btn-sm btn-secondary">Back</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Id</dt>
+            <dd class="col-sm-9">@Model.RootMessage?.Id</dd>
+
+            <dt class="col-sm-3">From</dt>
+            <dd class="col-sm-9">@Model.FromDisplayName</dd>
+
+            <dt class="col-sm-3">To</dt>
+            <dd class="col-sm-9">@Model.ToDisplayName</dd>
+
+            <dt class="col-sm-3">Subject</dt>
+            <dd class="col-sm-9">@Model.RootMessage?.Subject</dd>
+
+            <dt class="col-sm-3">Sent</dt>
+            <dd class="col-sm-9">@Model.RootMessage?.SentDate?.ToString("yyyy-MM-dd HH:mm:ss")</dd>
+
+            <dt class="col-sm-3">Reported</dt>
+            <dd class="col-sm-9">
+                <span class="badge bg-warning text-dark"><i class="bi bi-flag-fill"></i> Yes</span>
+            </dd>
+        </dl>
+
+        <hr />
+        <h5>Conversation Thread</h5>
+
+        @if (Model.Thread.Any())
+        {
+            @foreach (var msg in Model.Thread)
+            {
+                <div class="card mb-2 @(msg.IsRoot ? "border-warning" : "")">
+                    <div class="card-header">
+                        <strong>From:</strong> @msg.FromDisplayName &rarr; @msg.ToDisplayName
+                        <span class="float-end small">@msg.SentDate?.ToString("yyyy-MM-dd HH:mm")</span>
+                        @if (msg.IsRoot)
+                        {
+                            <span class="badge bg-warning text-dark ms-2">Reported</span>
+                        }
+                    </div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrWhiteSpace(msg.Subject))
+                        {
+                            <p class="mb-1"><strong>Subject:</strong> @msg.Subject</p>
+                        }
+                        <div style="white-space: pre-wrap; word-wrap: break-word;">@msg.Message</div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">No messages in thread.</div>
+        }
+    </div>
+</div>

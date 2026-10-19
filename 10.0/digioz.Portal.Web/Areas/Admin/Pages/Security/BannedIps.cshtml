@@ -1,0 +1,234 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.Security.BannedIpsModel
+@{
+    ViewData["Title"] = "Banned IPs Management";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Banned IPs Management</span>
+    </div>
+    <div class="card-body">
+        @if (!string.IsNullOrEmpty(Model.StatusMessage))
+        {
+            <div class="alert alert-@(Model.StatusMessage.StartsWith("Error") ? "danger" : "success") alert-dismissible fade show" role="alert">
+                @Model.StatusMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <p class="text-muted mb-4">Manage IP addresses that have been banned for suspicious activity or rate limit violations.</p>
+
+        <!-- Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Active Bans</h5>
+                        <h2 class="mb-0">@Model.ActiveBansCount</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-danger text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Permanent Bans</h5>
+                        <h2 class="mb-0">@Model.PermanentBansCount</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-secondary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Expired Bans</h5>
+                        <h2 class="mb-0">@Model.ExpiredBansCount</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Ban Form -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Manually Ban IP Address</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="BanIp">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="ipAddress" class="form-label">IP Address</label>
+                                <input type="text" class="form-control" id="ipAddress" name="ipAddress" required placeholder="192.168.1.1">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="durationMinutes" class="form-label">Duration</label>
+                                <select class="form-select" id="durationMinutes" name="durationMinutes">
+                                    <option value="60">1 Hour</option>
+                                    <option value="360">6 Hours</option>
+                                    <option value="1440">24 Hours</option>
+                                    <option value="10080">7 Days</option>
+                                    <option value="43200">30 Days</option>
+                                    <option value="-1">Permanent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="reason" class="form-label">Reason</label>
+                                <input type="text" class="form-control" id="reason" name="reason" placeholder="Manual ban by admin">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Ban IP Address</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="CleanupExpired" class="d-inline">
+                    <button type="submit" class="btn btn-warning" onclick="return confirm('Remove all expired bans from the database?');">
+                        <i class="bi bi-trash"></i> Cleanup Expired Bans
+                    </button>
+                </form>
+                <small class="text-muted ms-2">This will permanently remove expired bans from the database.</small>
+            </div>
+        </div>
+
+        <!-- Banned IPs List -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Banned IP Addresses (@Model.BannedIps.Count total)</h5>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.BannedIps.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>IP Address</th>
+                                    <th>Reason</th>
+                                    <th>Ban Count</th>
+                                    <th>Created</th>
+                                    <th>Expires</th>
+                                    <th>Status</th>
+                                    <th>User Agent</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var ban in Model.BannedIps)
+                                {
+                                    <tr class="@(ban.IsActive ? (ban.IsPermanent ? "table-danger" : "table-warning") : "table-secondary")">
+                                        <td><code>@ban.IpAddress</code></td>
+                                        <td>@ban.Reason</td>
+                                        <td>
+                                            <span class="badge bg-@(ban.BanCount >= 5 ? "danger" : ban.BanCount >= 3 ? "warning" : "info")">
+                                                @ban.BanCount
+                                            </span>
+                                        </td>
+                                        <td>@ban.CreatedDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                                        <td>
+                                            @if (ban.IsPermanent)
+                                            {
+                                                <span class="badge bg-danger">PERMANENT</span>
+                                            }
+                                            else
+                                            {
+                                                @ban.BanExpiry.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (ban.IsActive)
+                                            {
+                                                if (ban.IsPermanent)
+                                                {
+                                                    <span class="badge bg-danger">Permanent</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning">Active</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Expired</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(ban.UserAgent))
+                                            {
+                                                <small class="text-muted" title="@ban.UserAgent">
+                                                    @(ban.UserAgent.Length > 50 ? ban.UserAgent.Substring(0, 50) + "..." : ban.UserAgent)
+                                                </small>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <form method="post" asp-page-handler="Unban" asp-route-id="@ban.Id" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-primary px-1 py-0 fs-6" onclick="return confirm('Unban this IP address?');" title="Unban" aria-label="Unban">
+                                                    <i class="bi bi-unlock"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 text-center text-muted">
+                        <i class="bi bi-shield-check" style="font-size: 3rem;"></i>
+                        <p class="mt-2">No banned IPs found. Your system is clean!</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Status Legend</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <span class="badge bg-warning">Active</span> - Ban is currently in effect
+                    </div>
+                    <div class="col-md-4">
+                        <span class="badge bg-danger">Permanent</span> - Banned indefinitely
+                    </div>
+                    <div class="col-md-4">
+                        <span class="badge bg-secondary">Expired</span> - Ban has expired
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-hide success messages after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert-success');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+}

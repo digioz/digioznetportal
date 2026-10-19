@@ -1,0 +1,45 @@
+@page "{id:int}"
+@model digioz.Portal.Web.Areas.Admin.Pages.RssManager.DetailsModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "RSS Details";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>RSS Preview - @Model.Item?.Name</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/RssManager/Index">Back</a>
+    </div>
+    <div class="card-body">
+        @if (Model.Item != null)
+        {
+            <div class="mb-3">
+                <div><strong>URL:</strong> <a href="@Model.Item.Url" target="_blank" rel="noopener noreferrer">@Model.Item.Url</a></div>
+                <div><strong>Max:</strong> @Model.Item.MaxCount</div>
+            </div>
+        }
+
+        @if (Model.FeedItems.Any())
+        {
+            <div class="list-group">
+                @foreach (var it in Model.FeedItems)
+                {
+                    <a class="list-group-item list-group-item-action" href="@it.Link" target="_blank" rel="noopener noreferrer">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">@it.Title</h6>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(it.Summary))
+                        {
+                            <p class="mb-1 text-muted small">@it.Summary</p>
+                        }
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">No items to display.</div>
+        }
+    </div>
+</div>

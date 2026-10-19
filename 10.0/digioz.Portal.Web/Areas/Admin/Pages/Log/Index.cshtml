@@ -1,0 +1,103 @@
+@page
+@model digioz.Portal.Web.Areas.Admin.Pages.Log.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LazZiya.TagHelpers
+@{
+    ViewBag.Title = "Log";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Logs</span>
+        <div>
+            <a class="btn btn-sm btn-outline-secondary me-2" asp-area="Admin" asp-page="/Log/Export">Export</a>
+            <a class="btn btn-sm btn-danger me-2" asp-area="Admin" asp-page="/Log/Purge">Purge</a>
+            <a asp-area="Admin" asp-page="/Index" class="btn btn-sm btn-outline-secondary">Back</a>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <form method="get" class="row g-2 align-items-center mb-3">
+            <div class="col-12 col-md-8">
+                <input asp-for="q" class="form-control" placeholder="Search message, level, or event..." />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+            <div class="col-auto">
+                <a class="btn btn-outline-secondary" asp-area="Admin" asp-page="/Log/Index">Clear</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th style="width:70px;">Id</th>
+                        <th style="width:170px;">Timestamp</th>
+                        <th style="width:150px;">Level</th>
+                        <th>Event</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Logs != null && Model.Logs.Count > 0)
+                    {
+                        foreach (var l in Model.Logs)
+                        {
+                            var time = l.Timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") ?? string.Empty;
+                            var level = !string.IsNullOrEmpty(l.LogEvent) ? l.LogEvent.Split('|')[0] : (string.IsNullOrEmpty(l.Level) ? "Info" : l.Level);
+                            var msg = l.Message ?? string.Empty;
+                            var preview = msg.Length > 150 ? msg.Substring(0, 150) : msg;
+                            var hasMore = msg.Length > 150;
+                            <tr>
+                                <td>@l.Id</td>
+                                <td>@time</td>
+                                <td>@level</td>
+                                <td class="text-truncate" style="max-width:220px">@l.LogEvent</td>
+                                <td>
+                                    <span>@preview</span>
+                                    @if (hasMore)
+                                    {
+                                        <details class="mt-1">
+                                            <summary>Show more</summary>
+                                            <pre class="mb-0">@msg.Substring(150)</pre>
+                                        </details>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-muted">No logs found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <paging total-records="@Model.TotalCount"
+                page-no="@Model.pageNumber"
+                page-size="@Model.pageSize"
+                page-no-parameter-name="pageNumber"
+                query-string-key-page-no="pageNumber"
+                show-prev-next="true"
+                show-first-last="true"
+                class="pagination mb-0 mt-3">
+            <route-values>
+                <rv key="q" value="@Model.q"></rv>
+                <rv key="pageSize" value="@Model.pageSize"></rv>
+            </route-values>
+        </paging>
+    </div>
+</div>

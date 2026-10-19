@@ -1,3 +1,184 @@
 @page
-@model ListModel
-<h2>Store List</h2>
+@model digioz.Portal.Web.Pages.Store.ListModel
+@using System.Security.Claims
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Shopping Cart";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="card bg-light mb-5">
+    <div class="card-header bg-primary text-white">@ViewBag.Title</div>
+    <div class="card-body">
+        <div class="container mt-4">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h1>Shopping Cart</h1>
+                </div>
+            </div>
+
+            @if (!User.Identity?.IsAuthenticated == true)
+            {
+                <div class="alert alert-warning">
+                    <p>You need to <a asp-page="/Identity/Account/Login">log in</a> to view your shopping cart.</p>
+                </div>
+            }
+            else if (Model.CartItems.Any())
+            {
+                <div class="table-responsive mb-4">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Subtotal</th>
+                                <th style="width: 100px;" class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.CartItems)
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-page="Details" asp-route-id="@item.ProductId">@item.ProductName</a>
+                                    </td>
+                                    <td>@item.Price.ToString("C")</td>
+                                    <td>
+                                        <input type="number" min="1" value="@item.Quantity" class="form-control" style="width: 80px;" data-cart-id="@item.Id" onchange="updateQuantity(this)" />
+                                    </td>
+                                    <td>@((item.Price * item.Quantity).ToString("C"))</td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-cart-id="@item.Id" onclick="removeFromCart(this)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-light fw-bold">
+                                <td colspan="3" class="text-end">Cart Total:</td>
+                                <td>@Model.CartTotal.ToString("C")</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-12 d-flex justify-content-between">
+                        <div>
+                            <a asp-page="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Shopping
+                            </a>
+                            <button type="button" class="btn btn-outline-danger" onclick="emptyCart()">
+                                <i class="bi bi-trash"></i> Empty Cart
+                            </button>
+                        </div>
+                        <a asp-page="Checkout" class="btn btn-success btn-lg">
+                            <i class="bi bi-credit-card"></i> Checkout
+                        </a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <p>Your shopping cart is empty.</p>
+                </div>
+                <a asp-page="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Shopping
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function removeFromCart(button) {
+            const cartId = button.dataset.cartId;
+
+            if (!confirm('Are you sure you want to remove this item?')) {
+                return;
+            }
+
+            fetch(`/api/cart/remove/${cartId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Failed to remove item.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred.');
+                });
+        }
+
+        function updateQuantity(input) {
+            const cartId = input.dataset.cartId;
+            const quantity = parseInt(input.value);
+
+            if (quantity < 1) {
+                alert('Quantity must be at least 1.');
+                location.reload();
+                return;
+            }
+
+            fetch('/api/cart/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                },
+                body: JSON.stringify({
+                    id: cartId,
+                    quantity: quantity
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Failed to update quantity.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred.');
+                });
+        }
+
+        function emptyCart() {
+            if (!confirm('Are you sure you want to empty your cart?')) {
+                return;
+            }
+
+            fetch('/api/cart/empty', {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Failed to empty cart.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred.');
+                });
+        }
+    </script>
+}

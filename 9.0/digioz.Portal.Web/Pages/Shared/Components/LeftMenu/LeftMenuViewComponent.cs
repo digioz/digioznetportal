@@ -6,21 +6,16 @@ using System.Linq;
 
 namespace digioz.Portal.Web.Pages.Shared.Components.LeftMenu
 {
-    public class LeftMenuViewComponent : ViewComponent
+    public class LeftMenuViewComponent(IMenuService menuService, IMemoryCache cache, IPluginService pluginService) : ViewComponent
     {
-        private readonly IMenuService _menuService;
-        private readonly IMemoryCache _cache;
         private const string CacheKey = "LeftMenu";
+        private readonly IMenuService _menuService = menuService;
+        private readonly IMemoryCache _cache = cache;
+        private readonly IPluginService _pluginService = pluginService;
 
-        public LeftMenuViewComponent(IMenuService menuService, IMemoryCache cache)
+        public Task<IViewComponentResult> InvokeAsync()
         {
-            _menuService = menuService;
-            _cache = cache;
-        }
-
-        public async Task<IViewComponentResult> InvokeAsync()
-        {
-            if (!_cache.TryGetValue(CacheKey, out List<digioz.Portal.Bo.Menu> leftMenu))
+            if (!_cache.TryGetValue(CacheKey, out List<digioz.Portal.Bo.Menu>? leftMenu) || leftMenu == null)
             {
                 leftMenu = _menuService.GetAll()
                     .Where(x => x.Location == "LeftMenu" && x.Visible == true)
@@ -28,7 +23,16 @@ namespace digioz.Portal.Web.Pages.Shared.Components.LeftMenu
                     .ToList();
                 _cache.Set(CacheKey, leftMenu, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15)));
             }
-            return View(leftMenu);
+
+            // Single source of truth for plugin enablement flags
+            var rssPlugin = _pluginService.GetByName("RSSFeed");
+            var pollsPlugin = _pluginService.GetByName("Polls");
+            var mailingListPlugin = _pluginService.GetByName("MailingList");
+            ViewData["ShowRssFeed"] = rssPlugin?.IsEnabled == true;
+            ViewData["ShowPolls"] = pollsPlugin?.IsEnabled == true;
+            ViewData["ShowMailingList"] = mailingListPlugin?.IsEnabled == true;
+
+            return Task.FromResult<IViewComponentResult>(View(leftMenu));
         }
     }
 }

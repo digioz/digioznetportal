@@ -6,29 +6,23 @@ using System.Linq;
 
 namespace digioz.Portal.Web.Pages.Shared.Components.TopMenu
 {
-    public class TopMenuViewComponent : ViewComponent
+    public class TopMenuViewComponent(IMenuService menuService, IMemoryCache cache) : ViewComponent
     {
-        private readonly IMenuService _menuService;
-        private readonly IMemoryCache _cache;
+        private readonly IMenuService _menuService = menuService;
+        private readonly IMemoryCache _cache = cache;
         private const string CacheKey = "TopMenu";
 
-        public TopMenuViewComponent(IMenuService menuService, IMemoryCache cache)
+        public Task<IViewComponentResult> InvokeAsync()
         {
-            _menuService = menuService;
-            _cache = cache;
-        }
-
-        public async Task<IViewComponentResult> InvokeAsync()
-        {
-            if (!_cache.TryGetValue(CacheKey, out List<digioz.Portal.Bo.Menu> topMenu))
+            if (!_cache.TryGetValue(CacheKey, out List<digioz.Portal.Bo.Menu>? topMenu) || topMenu == null)
             {
                 topMenu = _menuService.GetAll()
-                    .Where(x => x.Location == "TopMenu" && x.Visible == true)
+                    .Where(x => x.Location == "TopMenu" && x.Visible)
                     .OrderBy(x => x.SortOrder)
                     .ToList();
-                _cache.Set(CacheKey, topMenu, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15)));
+                _cache.Set(CacheKey, topMenu, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(15) });
             }
-            return View(topMenu);
+            return Task.FromResult<IViewComponentResult>(View(topMenu));
         }
     }
 }

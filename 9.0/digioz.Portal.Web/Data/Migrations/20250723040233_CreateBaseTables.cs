@@ -63,7 +63,6 @@ namespace digioz.Portal.Web.Data.Migrations
                     table.PrimaryKey("PK_Comment", x => x.Id);
                 });
 
-
             migrationBuilder.CreateTable(
                 name: "CommentConfig",
                 columns: table => new
@@ -244,7 +243,7 @@ namespace digioz.Portal.Web.Data.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<string>(maxLength: 128, nullable: true),
                     Name = table.Column<string>(maxLength: 255, nullable: false),
-                    Location = table.Column<string>(maxLength: 255, nullable: false),
+                    Location = table.Column<string>(maxLength: 50, nullable: false),
                     Controller = table.Column<string>(maxLength: 50, nullable: true),
                     Action = table.Column<string>(maxLength: 50, nullable: true),
                     Url = table.Column<string>(nullable: true),
@@ -410,7 +409,6 @@ namespace digioz.Portal.Web.Data.Migrations
                     table.PrimaryKey("PK_Plugin", x => x.Id);
                 });
 
-
             migrationBuilder.CreateTable(
                 name: "Poll",
                 columns: table => new
@@ -467,6 +465,35 @@ namespace digioz.Portal.Web.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PollVote", x => x.Id);
+                });
+
+
+
+            migrationBuilder.CreateTable(
+                name: "PrivateMessage",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ParentId = table.Column<int>(nullable: true),
+                    FromId = table.Column<string>(maxLength: 128, nullable: false),
+                    FromIp = table.Column<string>(maxLength: 64, nullable: false),
+                    ToId = table.Column<string>(maxLength: 128, nullable: false),
+                    SentDate = table.Column<DateTime>(nullable: true),
+                    Subject = table.Column<string>(maxLength: 255, nullable: true),
+                    Message = table.Column<string>(nullable: true),
+                    IsRead = table.Column<bool>(nullable: false),
+                    Reported = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PrivateMessage", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PrivateMessage_Parent",
+                        column: x => x.ParentId,
+                        principalTable: "PrivateMessage",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -541,6 +568,7 @@ namespace digioz.Portal.Web.Data.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<string>(maxLength: 128, nullable: true),
+                    DisplayName = table.Column<string>(maxLength: 50, nullable: true),
                     FirstName = table.Column<string>(maxLength: 50, nullable: true),
                     MiddleName = table.Column<string>(maxLength: 50, nullable: true),
                     LastName = table.Column<string>(maxLength: 50, nullable: true),
@@ -560,6 +588,14 @@ namespace digioz.Portal.Web.Data.Migrations
                 {
                     table.PrimaryKey("PK_Profile", x => x.Id);
                 });
+
+            // Create unique index on DisplayName for uniqueness validation
+            migrationBuilder.CreateIndex(
+                name: "IX_Profile_DisplayName",
+                table: "Profile",
+                column: "DisplayName",
+                unique: true,
+                filter: "[DisplayName] IS NOT NULL");
 
             migrationBuilder.CreateTable(
                 name: "Rss",
@@ -654,23 +690,16 @@ namespace digioz.Portal.Web.Data.Migrations
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    JavaEnabled = table.Column<bool>(nullable: true),
                     Timestamp = table.Column<DateTime>(nullable: false),
-                    Browser = table.Column<string>(maxLength: 25, nullable: true),
-                    BrowserVersion = table.Column<string>(maxLength: 25, nullable: true),
-                    ScreenHeight = table.Column<int>(nullable: true),
-                    ScreenWidth = table.Column<int>(nullable: true),
-                    BrowserEngineName = table.Column<string>(maxLength: 25, nullable: true),
                     Host = table.Column<string>(nullable: true),
                     HostName = table.Column<string>(nullable: true),
-                    IpAddress = table.Column<string>(maxLength: 25, nullable: true),
+                    IpAddress = table.Column<string>(maxLength: 64, nullable: true),
                     Platform = table.Column<string>(maxLength: 25, nullable: true),
                     Referrer = table.Column<string>(nullable: true),
                     Href = table.Column<string>(nullable: true),
                     UserAgent = table.Column<string>(nullable: true),
                     UserLanguage = table.Column<string>(maxLength: 25, nullable: true),
-                    SessionId = table.Column<string>(maxLength: 128, nullable: true),
-                    OperatingSystem = table.Column<string>(maxLength: 25, nullable: true)
+                    SessionId = table.Column<string>(maxLength: 128, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -683,7 +712,7 @@ namespace digioz.Portal.Web.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    IpAddress = table.Column<string>(maxLength: 25, nullable: true),
+                    IpAddress = table.Column<string>(maxLength: 64, nullable: true),
                     PageUrl = table.Column<string>(nullable: true),
                     SessionId = table.Column<string>(nullable: true),
                     Username = table.Column<string>(maxLength: 255, nullable: true),
@@ -702,7 +731,10 @@ namespace digioz.Portal.Web.Data.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: false),
-                    ZoneType = table.Column<string>(nullable: false)
+                    Location = table.Column<string>(maxLength: 50, nullable: true),
+                    Body = table.Column<string>(nullable: true),
+                    Visible = table.Column<bool>(nullable: false),
+                    Timestamp = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -739,6 +771,7 @@ namespace digioz.Portal.Web.Data.Migrations
             migrationBuilder.DropTable(name: "PollAnswer");
             migrationBuilder.DropTable(name: "PollUsersVote");
             migrationBuilder.DropTable(name: "PollVote");
+            migrationBuilder.DropTable(name: "PrivateMessage");
             migrationBuilder.DropTable(name: "Product");
             migrationBuilder.DropTable(name: "ProductCategory");
             migrationBuilder.DropTable(name: "ProductOption");
@@ -751,7 +784,6 @@ namespace digioz.Portal.Web.Data.Migrations
             migrationBuilder.DropTable(name: "VisitorInfo");
             migrationBuilder.DropTable(name: "VisitorSession");
             migrationBuilder.DropTable(name: "Zone");
-
         }
     }
 }

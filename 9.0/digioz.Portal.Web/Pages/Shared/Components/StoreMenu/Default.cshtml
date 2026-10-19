@@ -1,0 +1,29 @@
+@model digioz.Portal.Bo.ViewModels.StoreMenuViewModel
+
+@if (Model != null && Model.IsEnabled)
+{
+    <div class="card bg-light mb-3">
+        <div class="card-header">Store</div>
+        <div class="card-body">
+            <ul>
+                <li>
+                    <a asp-page="/Store/History">Order History</a>
+                </li>
+                @foreach (var item in Model.ProductCategories)
+                {
+                    if (item.Visible)
+                    {
+                        <li>
+                            <a asp-page="/Store/ByCategory" asp-route-id="@item.Id">@item.Name</a>
+                        </li>
+                    }
+                }
+            </ul>
+            <div class="text-center">
+                <a asp-page="/Store/List">
+                    <img src="~/img/images/icons/64x64/shopping_cart.png" class="img-fluid" alt="Shopping Cart" />
+                </a>
+            </div>
+        </div>
+    </div>
+}

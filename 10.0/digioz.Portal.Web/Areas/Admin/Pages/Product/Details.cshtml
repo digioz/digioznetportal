@@ -1,0 +1,214 @@
+@page "{id}"
+@model digioz.Portal.Web.Areas.Admin.Pages.Product.DetailsModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewBag.Title = "Product Details";
+    Layout = "/Areas/Admin/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Product Details</span>
+        <a class="btn btn-sm btn-outline-secondary" asp-area="Admin" asp-page="/Product/Index">Back</a>
+    </div>
+    <div class="card-body">
+        @if (Model.Item != null)
+        {
+            <div class="row">
+                <div class="col-md-3">
+                    @if (!string.IsNullOrEmpty(Model.Item.Image))
+                    {
+                        <img src="/img/Products/Full/@Model.Item.Image" alt="@Model.Item.Name" class="img-fluid" />
+                    }
+                    else
+                    {
+                        <div class="bg-light p-5 text-center text-muted">No Image</div>
+                    }
+                </div>
+                <div class="col-md-9">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Name</h5>
+                            <p>@Model.Item.Name</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>SKU</h5>
+                            <p>@Model.Item.Sku</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Price</h5>
+                            <p>@Model.Item.Price.ToString("C")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Cost</h5>
+                            <p>@(Model.Item.Cost?.ToString("C") ?? "N/A")</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Category</h5>
+                            <p>@(Model.CategoryName ?? "None")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Status</h5>
+                            <p>
+                                @if (Model.Item.Visible)
+                                {
+                                    <span class="badge bg-success">Visible</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Hidden</span>
+                                }
+                                @if (Model.Item.OutOfStock)
+                                {
+                                    <span class="badge bg-warning">Out of Stock</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Make</h5>
+                            <p>@(Model.Item.Make ?? "N/A")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Model</h5>
+                            <p>@(Model.Item.Model ?? "N/A")</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Weight</h5>
+                            <p>@(Model.Item.Weight ?? "N/A")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Dimensions</h5>
+                            <p>@(Model.Item.Dimensions ?? "N/A")</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Units Per Unit</h5>
+                            <p>@(Model.Item.QuantityPerUnit ?? 0)</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Units In Stock</h5>
+                            <p>@(Model.Item.UnitsInStock ?? 0)</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Part Number</h5>
+                            <p>@(Model.Item.PartNumber ?? "N/A")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Manufacturer URL</h5>
+                            <p>
+                                @if (!string.IsNullOrEmpty(Model.Item.ManufacturerUrl))
+                                {
+                                    <a href="@Model.Item.ManufacturerUrl" target="_blank">@Model.Item.ManufacturerUrl</a>
+                                }
+                                else
+                                {
+                                    <text>N/A</text>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h5>Short Description</h5>
+                            <p>@(Model.Item.ShortDescription ?? "N/A")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h5>Description</h5>
+                    <div class="border p-3 bg-light">
+                        @Html.Raw(Model.Item.Description)
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h5>Notes</h5>
+                    <div class="border p-3 bg-light">
+                        @Html.Raw(Model.Item.Notes)
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.ProductOptions.Any())
+            {
+                <hr />
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h5>Product Options</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Option Type</th>
+                                        <th>Option Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var option in Model.ProductOptions)
+                                    {
+                                        <tr>
+                                            <td>@option.OptionType</td>
+                                            <td>@option.OptionValue</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="row">
+                <div class="col-12">
+                    <h5>Metadata</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tr>
+                                <th style="width: 150px;">ID</th>
+                                <td>@Model.Item.Id</td>
+                            </tr>
+                            <tr>
+                                <th>Created</th>
+                                <td>@Model.Item.DateCreated.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                            </tr>
+                            <tr>
+                                <th>Modified</th>
+                                <td>@Model.Item.DateModified.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                            </tr>
+                            <tr>
+                                <th>Views</th>
+                                <td>@Model.Item.Views</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3 d-flex justify-content-end gap-2">
+                <a asp-area="Admin" asp-page="/Product/Edit" asp-route-id="@Model.Item.Id" class="btn btn-primary">Edit</a>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">Product not found.</p>
+        }
+    </div>
+</div>

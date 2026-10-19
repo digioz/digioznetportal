@@ -1,0 +1,36 @@
+@model List<digioz.Portal.Bo.ViewModels.RssFeedPreviewViewModel>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@if (Model?.Any() == true)
+{
+    foreach (var feed in Model)
+    {
+        <div class="card bg-light mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>@feed.Rss.Name</span>
+                <a class="btn btn-sm btn-outline-secondary" asp-page="/RssFeed/Details" asp-route-id="@feed.Rss.Id">Details</a>
+            </div>
+            <div class="card-body">
+                @if (feed.Items.Any())
+                {
+                    <ul class="list-unstyled mb-0">
+                        @foreach (var item in feed.Items)
+                        {
+                            <li class="mb-2">
+                                <a href="@item.Link" target="_blank" rel="noopener noreferrer">@item.Title</a>
+                                @if (!string.IsNullOrWhiteSpace(item.Summary))
+                                {
+                                    <div class="text-muted small">@item.Summary</div>
+                                }
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="text-muted">No items.</div>
+                }
+            </div>
+        </div>
+    }
+}

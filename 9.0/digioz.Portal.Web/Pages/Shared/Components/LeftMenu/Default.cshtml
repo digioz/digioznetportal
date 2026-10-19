@@ -3,24 +3,56 @@
 <div class="card bg-light mb-3">
     <div class="card-header">Menu</div>
     <div class="card-body">
-        <ul class="list-unstyled">
+        <ul>
             @if (Model != null)
             {
                 foreach (var item in Model)
                 {
                     if (!string.IsNullOrEmpty(item.Controller))
                     {
-                        <li><a asp-action="@item.Action" asp-controller="@item.Controller" asp-area="">@item.Name</a></li>
+                        if (!string.IsNullOrEmpty(item.Action))
+                        {
+                            <li><a href="/@item.Controller/@item.Action">@item.Name</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/Index">@item.Name</a></li>
+                        }
                     }
                     else
                     {
                         <li><a href="@item.Url" target="@item.Target">@item.Name</a></li>
                     }
                 }
+
+                if ((bool)(ViewData["ShowPolls"] ?? false))
+                {
+                    <li><a href="/Polls/Index">Polls</a></li>
+                }
+                if ((bool)(ViewData["ShowRssFeed"] ?? false))
+                {
+                    <li><a href="/RssFeed/Index">RSS Feed</a></li>
+                }
+                if ((bool)(ViewData["ShowMailingList"] ?? false))
+                {
+                    <li><a href="/MailingList/Index">Mailing Lists</a></li>
+                }
             }
             else
             {
-                <li class="active"><a asp-action="Index" asp-controller="Home">Home</a></li>
+                <li><a href="/Index">Home</a></li>
+                if ((bool)(ViewData["ShowPolls"] ?? false))
+                {
+                    <li><a href="/Polls/Index">Polls</a></li>
+                }
+                if ((bool)(ViewData["ShowRssFeed"] ?? false))
+                {
+                    <li><a href="/RssFeed/Index">RSS Feed</a></li>
+                }
+                if ((bool)(ViewData["ShowMailingList"] ?? false))
+                {
+                    <li><a href="/MailingList/Index">Mailing Lists</a></li>
+                }
             }
         </ul>
     </div>

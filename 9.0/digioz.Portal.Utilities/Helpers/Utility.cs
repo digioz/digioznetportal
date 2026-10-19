@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -19,6 +16,9 @@ using digioz.Portal.Bo.ViewModels;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using System.Net.Http;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace digioz.Portal.Utilities.Helpers
 {
@@ -26,9 +26,7 @@ namespace digioz.Portal.Utilities.Helpers
     {
         public static bool IsImage(IFormFile postedFile)
         {
-            //-------------------------------------------
             //  Check the image mime types
-            //-------------------------------------------
             if (postedFile.ContentType.ToLower() != "image/jpg" &&
                         postedFile.ContentType.ToLower() != "image/jpeg" &&
                         postedFile.ContentType.ToLower() != "image/pjpeg" &&
@@ -55,7 +53,7 @@ namespace digioz.Portal.Utilities.Helpers
         {
             string result = string.Empty;
             result = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString();
-            
+
             return result;
         }
 
@@ -142,40 +140,46 @@ namespace digioz.Portal.Utilities.Helpers
             }
         }
 
-        public static Size SaveImageWithResize(Image image, int maxWidth, int maxHeight, string filePath)
+        public static SizeF SaveImageWithResize(string imagePath, int maxWidth, int maxHeight, string filePath)
         {
-            double resizeWidth = image.Width;
-            double resizeHeight = image.Height;
-
-            double aspect = resizeWidth / resizeHeight;
-
-            if (resizeWidth > maxWidth)
+            try
             {
-                resizeWidth = maxWidth;
-                resizeHeight = resizeWidth / aspect;
-            }
-            if (resizeHeight > maxHeight)
-            {
-                aspect = resizeWidth / resizeHeight;
-                resizeHeight = maxHeight;
-                resizeWidth = Convert.ToInt32(resizeHeight * aspect);
-            }
+                using (var image = Image.Load(imagePath))
+                {
+                    double resizeWidth = image.Width;
+                    double resizeHeight = image.Height;
 
-            return SaveImageWithCrop(image, Convert.ToInt32(resizeWidth), Convert.ToInt32(resizeHeight), filePath);
+                    double aspect = resizeWidth / resizeHeight;
+
+                    if (resizeWidth > maxWidth)
+                    {
+                        resizeWidth = maxWidth;
+                        resizeHeight = resizeWidth / aspect;
+                    }
+                    if (resizeHeight > maxHeight)
+                    {
+                        aspect = resizeWidth / resizeHeight;
+                        resizeHeight = maxHeight;
+                        resizeWidth = Convert.ToInt32(resizeHeight * aspect);
+                    }
+
+                    return SaveImageWithCrop(image, Convert.ToInt32(resizeWidth), Convert.ToInt32(resizeHeight), filePath);
+                }
+            }
+            catch
+            {
+                return SizeF.Empty;
+            }
         }
 
-        public static Size SaveImageWithCrop(Image image, int maxWidth, int maxHeight, string filePath)
+        public static SizeF SaveImageWithCrop(Image image, int maxWidth, int maxHeight, string filePath)
         {
-            //ImageCodecInfo jpgInfo = ImageCodecInfo.GetImageEncoders().Where(codecInfo => codecInfo.MimeType == "image/jpeg").First();
-            Image finalImage = image;
-            System.Drawing.Bitmap bitmap = null;
             try
             {
                 int left = 0;
                 int top = 0;
                 int srcWidth = maxWidth;
                 int srcHeight = maxHeight;
-                bitmap = new System.Drawing.Bitmap(maxWidth, maxHeight);
                 double croppedHeightToWidth = (double)maxHeight / maxWidth;
                 double croppedWidthToHeight = (double)maxWidth / maxHeight;
 
@@ -209,45 +213,20 @@ namespace digioz.Portal.Utilities.Helpers
                         left = (image.Width - srcWidth) / 2;
                     }
                 }
-                using (Graphics g = Graphics.FromImage(bitmap))
-                {
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    g.CompositingQuality = CompositingQuality.HighQuality;
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.DrawImage(image, new Rectangle(0, 0, bitmap.Width, bitmap.Height), new Rectangle(left, top, srcWidth, srcHeight), GraphicsUnit.Pixel);
-                }
-                finalImage = bitmap;
-            }
-            catch { }
-            try
-            {
-                using (EncoderParameters encParams = new EncoderParameters(1))
-                {
-                    //encParams.Param[0] = new EncoderParameter(Encoder.Quality, (long)100);
-                    //quality should be in the range [0..100] .. 100 for max, 0 for min (0 best compression)
-                    finalImage.Save(filePath);
-                    return new Size(finalImage.Width, finalImage.Height);
-                }
-            }
-            catch { }
-            if (bitmap != null)
-            {
-                bitmap.Dispose();
-            }
-            return Size.Empty;
-        }
-        //public static List<SelectListItem> GetPaymentGateways()
-        //{
-        //    List<SelectListItem> gateways = new List<SelectListItem>();
-        //    List<string> gatewayList = Enum.GetNames(typeof(PaymentType)).ToList();
-        //    foreach (var item in gatewayList)
-        //    {
-        //        gateways.Add(new SelectListItem { Text = item, Value = item });
-        //    }
 
-        //    return gateways;
-        //}
+                image.Mutate(x => x
+                    .Crop(new Rectangle(left, top, srcWidth, srcHeight))
+                     .Resize(maxWidth, maxHeight));
+
+                var encoder = new JpegEncoder { Quality = 100 };
+                image.Save(filePath, encoder);
+                return new SizeF(image.Width, image.Height);
+            }
+            catch
+            {
+                return SizeF.Empty;
+            }
+        }
 
         public static List<string> GetCountryList()
         {
@@ -892,45 +871,12 @@ namespace digioz.Portal.Utilities.Helpers
             countryCodes.Add("Zambia", "ZM");
             countryCodes.Add("Zimbabwe", "ZW");
             countryCodes.Add("Aland Islands", "AX");
-            if (countryCodes.TryGetValue(country, out var countryCode)) {
+            if (countryCodes.TryGetValue(country, out var countryCode))
+            {
                 return countryCode;
             }
             return string.Empty; // Return a default value if the key is not found
         }
-        //public static string GetCountryFromAPI(string ip, string[] languages)
-        //{
-        //    string response = string.Empty;
-        //    string result = string.Empty;
-        //    string path = AppDomain.CurrentDomain.GetData("DataDirectory") + "\\GeoLite2-Country.mmdb";
-
-        //    using (var reader = new Reader(path))
-        //    {
-        //        dynamic jsonResponse = reader.Find(ip);
-
-        //        try
-        //        {
-        //            string country_name = jsonResponse.country.names.en;
-
-        //            if (country_name != "")
-        //            {
-        //                result = jsonResponse.country.names.en;
-        //            }
-        //            else
-        //            {
-        //                RegionInfo regionInfo = Utility.ResolveCountry(languages);
-        //                result = regionInfo.EnglishName;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            result = string.Empty;
-        //        }
-        //    }
-
-        //    //string url = "http://freegeoip.net/json/" + ip;
-
-        //    return result;
-        //}
 
         // Hashes an email with MD5.  Suitable for use with Gravatar profile
         public static string HashEmailForGravatar(string email)
@@ -981,96 +927,45 @@ namespace digioz.Portal.Utilities.Helpers
             }
         }
 
-        public static string GetRemoteImageExtension(string url)
+        public static async Task<string> GetRemoteImageExtensionAsync(string url)
         {
             string ext = string.Empty;
 
-            WebRequest request = WebRequest.Create(url);
-            using (WebResponse response = request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
+            try
             {
-                string contentType = response.ContentType;
+                using (HttpClient client = new HttpClient())
+                {
+                    using (HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
+                    {
+                        response.EnsureSuccessStatusCode();
+                        string contentType = response.Content.Headers.ContentType?.MediaType ?? string.Empty;
 
-                if (contentType == "image/png")
-                {
-                    ext = "png";
+                        ext = contentType switch
+                        {
+                            "image/png" => "png",
+                            "image/gif" => "gif",
+                            "image/jpeg" => "jpg",
+                            "image/bmp" => "bmp",
+                            "image/tiff" => "tiff",
+                            _ => "jpg" // default
+                        };
+                    }
                 }
-                else if (contentType == "image/gif")
-                {
-                    ext = "gif";
-                }
-                else if (contentType == "image/jpeg")
-                {
-                    ext = "jpg";
-                }
-                else if (contentType == "image/bmp")
-                {
-                    ext = "bmp";
-                }
-                else if (contentType == "image/tiff")
-                {
-                    ext = "tiff";
-                }
-                else if (contentType == "image/gif")
-                {
-                    ext = "gif";
-                }
-                else
-                {
-                    ext = "jpg";
-                }
+            }
+            catch
+            {
+                ext = "jpg"; // default on error
             }
 
             return ext;
         }
 
-		//public static void WriteVisitorSession(ILogic<VisitorSession> visitorSessionLogic, string sessionId, string pageUrl, string userName, string ipAddress)
-		//{
-		//	try
-		//	{
-		//		var prevSession = visitorSessionLogic.GetGeneric(x => x.SessionId == sessionId).SingleOrDefault();
+        public static string GetRemoteImageExtension(string url)
+        {
+            return GetRemoteImageExtensionAsync(url).GetAwaiter().GetResult();
+        }
 
-		//		if (prevSession != null)
-		//		{
-		//			prevSession.PageUrl = pageUrl;
-
-		//			if (!string.IsNullOrEmpty(userName))
-		//			{
-		//				prevSession.Username = userName;
-		//			}
-
-		//			prevSession.DateModified = DateTime.Now;
-  //                  visitorSessionLogic.Edit(prevSession);
-		//		}
-		//		else
-		//		{
-		//			VisitorSession session = new VisitorSession();
-
-		//			if (ipAddress != null)
-		//			{
-		//				session.IpAddress = ipAddress;
-		//				session.PageUrl = pageUrl;
-		//				session.SessionId = sessionId;
-
-		//				if (!string.IsNullOrEmpty(userName))
-		//				{
-		//					session.Username = userName;
-		//				}
-
-		//				session.DateCreated = DateTime.Now;
-		//				session.DateModified = session.DateCreated;
-		//			}
-
-  //                  visitorSessionLogic.Add(session);
-		//		}
-		//	}
-		//	catch
-		//	{
-		//		// Ignore for now
-		//	}
-		//}
-
-		public static string ReadTextFile(string path)
+        public static string ReadTextFile(string path)
         {
             string content = File.ReadAllText(path);
 
@@ -1138,28 +1033,34 @@ namespace digioz.Portal.Utilities.Helpers
             {
                 switch (int.Parse(cardNumber.Substring(0, 2)))
                 {
-                    case 34 :
-                    case 37: 
+                    case 34:
+                    case 37:
                         cardType = "amex";
                         break;
                     case 36:
                         cardType = "Diners Club";
                         break;
-                    case 51: case 52: case 53: case 54: case 55:
+                    case 51:
+                    case 52:
+                    case 53:
+                    case 54:
+                    case 55:
                         cardType = "mastercard";
                         break;
                     default:
                         switch (int.Parse(cardNumber.Substring(0, 4)))
                         {
-                            case 2014: case 2149:
+                            case 2014:
+                            case 2149:
                                 cardType = "EnRoute";
                                 break;
-                            case 2131: case 1800:
+                            case 2131:
+                            case 1800:
                                 cardType = "JCB";
                                 break;
                             case 6011:
                                 cardType = "discover";
-                                break;                                
+                                break;
                             default:
                                 if (cardNumber.Substring(0, 1) == "4") cardType = "visa";
                                 break;
@@ -1279,7 +1180,7 @@ namespace digioz.Portal.Utilities.Helpers
         {
             var subFolders = new List<string>();
             List<string> folderList;
-            
+
             if (pattern == string.Empty)
             {
                 folderList = Directory.GetDirectories(path).ToList();
@@ -1310,46 +1211,6 @@ namespace digioz.Portal.Utilities.Helpers
             return subFolders;
         }
 
-        /// <summary>
-        /// Helper Class which reads RSS Feeds URL from the Database
-        /// and fetches the contents of them returning a List of Content Objects
-        /// </summary>
-        /// <returns></returns>
-        //public static List<RSSViewModel> GetRSSFeeds(List<Rss> rssList)
-        //{
-        //    //var rssLogic = new RssLogic();
-        //    //var rssList = rssLogic.GetAll();
-        //    var rssContentList = new List<RSSViewModel>();
-
-        //    foreach (var rss in rssList)
-        //    {
-        //        int feedCount = 0;
-        //        XmlReader reader = XmlReader.Create(rss.Url);
-        //        SyndicationFeed feed = SyndicationFeed.Load(reader);
-        //        reader.Close();
-
-        //        foreach (SyndicationItem item in feed.Items)
-        //        {
-        //            feedCount++;
-
-        //            var newsItem = new RSSViewModel()
-        //            {
-        //                Id = item.Id,
-        //                Title = item.Title.Text,
-        //                Body = item.Summary.Text,
-        //                Category = item.Categories.ToString()
-        //            };
-
-        //            if (feedCount <= rss.MaxCount)
-        //            {
-        //                rssContentList.Add(newsItem);
-        //            }
-        //        }
-        //    }
-
-        //    return rssContentList;
-        //}
-
         public static string DefaultOrValue(string value, string defaultValue)
         {
             string result = defaultValue;
@@ -1361,67 +1222,5 @@ namespace digioz.Portal.Utilities.Helpers
 
             return result;
         }
-
-        //public static bool AddLogEntry(string message, ILogic<Log> logLogic)
-        //{
-        //    try
-        //    {
-        //        Log log = new Log();
-        //        log.Message = message;
-        //        log.Timestamp = DateTime.Now;
-
-        //        logLogic.Add(log);
-        //    }
-        //    catch
-        //    {
-        //        // Do nothing
-        //    }
-
-        //    return true;
-        //}
-
-        //public static bool SubmitMail(EmailModel email, ILogic<Log> logLogic)
-        //{
-
-        //    bool result = false;
-
-        //    try
-        //    {
-        //        SmtpClient smtpClient = null;
-        //        MailMessage message = null;
-        //        System.Net.Mail.Attachment attachment = null;
-        //        smtpClient = new SmtpClient(email.SMTPServer);
-        //        smtpClient.Credentials = new NetworkCredential(email.SMTPUsername, email.SMTPPassword);
-
-        //        if (email.SMTPPort > 0)
-        //        {
-        //            smtpClient.Port = Convert.ToInt32(email.SMTPPort);
-        //        }
-
-        //        message = new MailMessage(email.FromEmail, email.ToEmail, email.Subject, email.Message);
-
-        //        message.BodyEncoding = Encoding.UTF8;
-        //        message.IsBodyHtml = true;
-        //        message.Priority = MailPriority.Normal;
-
-        //        if (!string.IsNullOrEmpty(email.Attachment))
-        //        {
-        //            attachment = new System.Net.Mail.Attachment(email.Attachment);
-        //            message.Attachments.Add(attachment);
-        //        }
-
-        //        smtpClient.Send(message);
-
-        //        result = true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        AddLogEntry(ex.Message + email.ToEmail + "|" + email.Message, logLogic);
-        //        string lsException = ex.Message;
-        //        result = false;
-        //    }
-
-        //    return result;
-        //}
     }
 }

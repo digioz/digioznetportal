@@ -10,5 +10,7 @@ namespace digioz.Portal.Dal.Services.Interfaces
         void Add(Product product);
         void Update(Product product);
         void Delete(string id);
+        void IncrementViews(string id);
+        void ClearProductCategory(string categoryId);
     }
 }

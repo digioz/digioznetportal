@@ -1,23 +1,10 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-//using digioz.Portal.Utilities.Helpers;
-//using Microsoft.AspNetCore.Mvc.Rendering;
-//using digioz.Portal.Payment;
 
 namespace digioz.Portal.Bo.ViewModels
 {
     public class CheckOutViewModel
     {
-        public CheckOutViewModel()
-        {
-            //BillingCountries = Utility.CCGetCountryList();
-            //ShippingCountries = Utility.CCGetCountryList();
-            //MonthList = Utility.CCGetMonthList();
-            //YearsList = Utility.CCGetYearList();
-            //PaymentGatewayList = Utility.GetPaymentGateways();
-        }
-
         [Required]
         [StringLength(50)]
         [DisplayName("First Name")]
@@ -112,17 +99,5 @@ namespace digioz.Portal.Bo.ViewModels
         [StringLength(10)]
         [DisplayName("Security Code")]
         public string CCCardCode { get; set; }
-
-        [Required]
-        [StringLength(40)]
-        [DisplayName("Payment Gateway")]
-        public string PaymentGateway { get; set; }
-
-
-        //public List<SelectListItem> BillingCountries { get; set; }
-        //public List<SelectListItem> ShippingCountries { get; set; }
-        //public List<SelectListItem> MonthList { get; set; }
-        //public List<SelectListItem> YearsList { get; set; }
-        //public List<SelectListItem> PaymentGatewayList { get; set; }
     }
 }

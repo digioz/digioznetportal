@@ -19,6 +19,11 @@ namespace digioz.Portal.Dal.Services
             return _context.Configs.Find(id);
         }
 
+        public Config GetByKey(string configKey)
+        {
+            return _context.Configs.FirstOrDefault(c => c.ConfigKey == configKey);
+        }
+
         public List<Config> GetAll()
         {
             return _context.Configs.ToList();

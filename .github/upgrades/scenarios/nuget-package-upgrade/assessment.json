@@ -1,0 +1,408 @@
+{
+  "settings": {
+    "components": {
+      "code": true,
+      "binaries": false
+    },
+    "targetId": ""
+  },
+  "analysisStartTime": "2026-10-19T15:21:59.1895509Z",
+  "analysisEndTime": "2026-10-19T15:21:59.2595475Z",
+  "privacyModeHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2270980",
+  "stats": {
+    "summary": {
+      "projects": 8,
+      "issues": 1,
+      "incidents": 5,
+      "effort": 0
+    },
+    "charts": {
+      "severity": {
+        "Mandatory": 0,
+        "Optional": 0,
+        "Potential": 0,
+        "Information": 5
+      },
+      "category": {
+        "Pkg": 5
+      }
+    }
+  },
+  "projects": [
+    {
+      "path": "digioz.Portal.Bo\\digioz.Portal.Bo.csproj",
+      "startingProject": true,
+      "issues": 0,
+      "storyPoints": 0,
+      "properties": {
+        "appName": "digioz.Portal.Bo",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 82,
+        "numberOfCodeFiles": 82,
+        "linesTotal": 1966,
+        "linesOfCode": 1966,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [],
+      "features": []
+    },
+    {
+      "path": "digioz.Portal.BulkMediaImport\\digioz.Portal.BulkMediaImport.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 0,
+      "properties": {
+        "appName": "digioz.Portal.BulkMediaImport",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 3,
+        "numberOfCodeFiles": 3,
+        "linesTotal": 734,
+        "linesOfCode": 734,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "b216304d-7d07-45f2-a3c3-6db0218781ad",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027SixLabors.ImageSharp\u0027 4.1.3 (included in this upgrade).",
+          "projectPath": "digioz.Portal.BulkMediaImport\\digioz.Portal.BulkMediaImport.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "SixLabors.ImageSharp, 4.1.3",
+              "protected": "SixLabors.ImageSharp, 4.1.3"
+            },
+            "kind": "File",
+            "path": "digioz.Portal.BulkMediaImport\\digioz.Portal.BulkMediaImport.csproj",
+            "snippet": "SixLabors.ImageSharp, 4.1.3",
+            "protectedSnippet": "SixLabors.ImageSharp, 4.1.3",
+            "label": "SixLabors.ImageSharp 4.1.3",
+            "properties": {
+              "PackageId": "SixLabors.ImageSharp",
+              "PackageVersion": "4.1.3",
+              "PackageNewVersion": "4.1.3",
+              "PackageReplacements": null
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "digioz.Portal.Dal\\digioz.Portal.Dal.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 0,
+      "properties": {
+        "appName": "digioz.Portal.Dal",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 97,
+        "numberOfCodeFiles": 97,
+        "linesTotal": 6481,
+        "linesOfCode": 6481,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "1a4439c8-0199-45e3-ad7b-e51c0642344f",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027SixLabors.ImageSharp\u0027 4.1.3 (included in this upgrade).",
+          "projectPath": "digioz.Portal.Dal\\digioz.Portal.Dal.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "SixLabors.ImageSharp, 4.1.3",
+              "protected": "SixLabors.ImageSharp, 4.1.3"
+            },
+            "kind": "File",
+            "path": "digioz.Portal.Dal\\digioz.Portal.Dal.csproj",
+            "snippet": "SixLabors.ImageSharp, 4.1.3",
+            "protectedSnippet": "SixLabors.ImageSharp, 4.1.3",
+            "label": "SixLabors.ImageSharp 4.1.3",
+            "properties": {
+              "PackageId": "SixLabors.ImageSharp",
+              "PackageVersion": "4.1.3",
+              "PackageNewVersion": "4.1.3",
+              "PackageReplacements": null
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "digioz.Portal.EmailProviders\\digioz.Portal.EmailProviders.csproj",
+      "startingProject": true,
+      "issues": 0,
+      "storyPoints": 0,
+      "properties": {
+        "appName": "digioz.Portal.EmailProviders",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 22,
+        "numberOfCodeFiles": 22,
+        "linesTotal": 1856,
+        "linesOfCode": 1856,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [],
+      "features": []
+    },
+    {
+      "path": "digioz.Portal.PaymentProviders\\digioz.Portal.PaymentProviders.csproj",
+      "startingProject": true,
+      "issues": 0,
+      "storyPoints": 0,
+      "properties": {
+        "appName": "digioz.Portal.PaymentProviders",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 13,
+        "numberOfCodeFiles": 13,
+        "linesTotal": 1693,
+        "linesOfCode": 1693,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [],
+      "features": []
+    },
+    {
+      "path": "digioz.Portal.Tests\\digioz.Portal.Tests.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 0,
+      "properties": {
+        "appName": "digioz.Portal.Tests",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": true,
+        "numberOfFiles": 54,
+        "numberOfCodeFiles": 52,
+        "linesTotal": 25749,
+        "linesOfCode": 23966,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "f6361050-789c-4c09-a8ee-4080e317fdc8",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027SixLabors.ImageSharp\u0027 4.1.3 (included in this upgrade).",
+          "projectPath": "digioz.Portal.Tests\\digioz.Portal.Tests.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "SixLabors.ImageSharp, 4.1.3",
+              "protected": "SixLabors.ImageSharp, 4.1.3"
+            },
+            "kind": "File",
+            "path": "digioz.Portal.Tests\\digioz.Portal.Tests.csproj",
+            "snippet": "SixLabors.ImageSharp, 4.1.3",
+            "protectedSnippet": "SixLabors.ImageSharp, 4.1.3",
+            "label": "SixLabors.ImageSharp 4.1.3",
+            "properties": {
+              "PackageId": "SixLabors.ImageSharp",
+              "PackageVersion": "4.1.3",
+              "PackageNewVersion": "4.1.3",
+              "PackageReplacements": null
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "digioz.Portal.Utilities\\digioz.Portal.Utilities.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 0,
+      "properties": {
+        "appName": "digioz.Portal.Utilities",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 20,
+        "numberOfCodeFiles": 20,
+        "linesTotal": 4311,
+        "linesOfCode": 4311,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "a57cf62b-479a-4196-a792-342372754ecc",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027SixLabors.ImageSharp\u0027 4.1.3 (included in this upgrade).",
+          "projectPath": "digioz.Portal.Utilities\\digioz.Portal.Utilities.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "SixLabors.ImageSharp, 4.1.3",
+              "protected": "SixLabors.ImageSharp, 4.1.3"
+            },
+            "kind": "File",
+            "path": "digioz.Portal.Utilities\\digioz.Portal.Utilities.csproj",
+            "snippet": "SixLabors.ImageSharp, 4.1.3",
+            "protectedSnippet": "SixLabors.ImageSharp, 4.1.3",
+            "label": "SixLabors.ImageSharp 4.1.3",
+            "properties": {
+              "PackageId": "SixLabors.ImageSharp",
+              "PackageVersion": "4.1.3",
+              "PackageNewVersion": "4.1.3",
+              "PackageReplacements": null
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "digioz.Portal.Web\\digioz.Portal.Web.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 0,
+      "properties": {
+        "appName": "digioz.Portal.Web",
+        "projectKind": "AspNetCore",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 1583,
+        "numberOfCodeFiles": 551,
+        "linesTotal": 73326,
+        "linesOfCode": 45253,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "8e7b434f-e665-4344-97b2-aa85556384fa",
+          "ruleId": "Pkg.0001",
+          "description": "Project references \u0027SixLabors.ImageSharp\u0027 4.1.3 (included in this upgrade).",
+          "projectPath": "digioz.Portal.Web\\digioz.Portal.Web.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "SixLabors.ImageSharp, 4.1.3",
+              "protected": "SixLabors.ImageSharp, 4.1.3"
+            },
+            "kind": "File",
+            "path": "digioz.Portal.Web\\digioz.Portal.Web.csproj",
+            "snippet": "SixLabors.ImageSharp, 4.1.3",
+            "protectedSnippet": "SixLabors.ImageSharp, 4.1.3",
+            "label": "SixLabors.ImageSharp 4.1.3",
+            "properties": {
+              "PackageId": "SixLabors.ImageSharp",
+              "PackageVersion": "4.1.3",
+              "PackageNewVersion": "4.1.3",
+              "PackageReplacements": null
+            }
+          }
+        }
+      ],
+      "features": []
+    }
+  ],
+  "rules": {
+    "Pkg.0001": {
+      "id": "Pkg.0001",
+      "isFeature": false,
+      "description": "Project references a package included in this upgrade.\n\nThe project references one of the packages being upgraded. This finding records the reference (current and proposed version) so the assessment lists every affected project even when no breaking API changes were detected.",
+      "label": "Project references an upgraded package",
+      "severity": "Information",
+      "effort": 0
+    }
+  }
+}
