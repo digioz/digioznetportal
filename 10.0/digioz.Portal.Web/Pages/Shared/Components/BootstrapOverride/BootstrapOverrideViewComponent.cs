@@ -1,59 +1,50 @@
 using System;
 using System.Threading.Tasks;
+using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Web.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace digioz.Portal.Web.Pages.Shared.Components.BootstrapOverride
 {
     public class BootstrapOverrideViewComponent : ViewComponent
     {
+        private static readonly TimeSpan ThemeCacheDuration = TimeSpan.FromMinutes(15);
+
         private readonly IThemeService _themeService;
-        private readonly IProfileService _profileService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICurrentProfileProvider _currentProfileProvider;
+        private readonly IMemoryCache _cache;
 
         public BootstrapOverrideViewComponent(
             IThemeService themeService,
-            IProfileService profileService,
-            IHttpContextAccessor httpContextAccessor)
+            ICurrentProfileProvider currentProfileProvider,
+            IMemoryCache cache)
         {
             _themeService = themeService;
-            _profileService = profileService;
-            _httpContextAccessor = httpContextAccessor;
+            _currentProfileProvider = currentProfileProvider;
+            _cache = cache;
         }
 
         public Task<IViewComponentResult> InvokeAsync()
         {
             string? customCss = null;
 
-            // Check if the user is logged in
-            var user = _httpContextAccessor.HttpContext?.User;
-            var isAuthenticated = user?.Identity?.IsAuthenticated ?? false;
-
-            if (isAuthenticated && user != null)
+            // Profile is resolved once per request and shared with the other view components
+            var profile = _currentProfileProvider.GetProfile();
+            if (profile?.ThemeId != null)
             {
-                // User is logged in - check for their theme preference
-                var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (!string.IsNullOrEmpty(userId))
+                var theme = GetTheme(profile.ThemeId.Value);
+                if (theme != null)
                 {
-                    var profile = _profileService.GetByUserId(userId);
-                    if (profile?.ThemeId != null)
-                    {
-                        // User has a theme preference
-                        var theme = _themeService.Get(profile.ThemeId.Value);
-                        if (theme != null)
-                        {
-                            customCss = theme.Body;
-                        }
-                    }
+                    customCss = theme.Body;
                 }
             }
 
             // If not logged in, or logged in without theme preference, use default theme
             if (string.IsNullOrEmpty(customCss))
             {
-                var defaultTheme = _themeService.GetDefault();
+                var defaultTheme = GetDefaultTheme();
                 if (defaultTheme != null)
                 {
                     customCss = defaultTheme.Body;
@@ -65,6 +56,24 @@ namespace digioz.Portal.Web.Pages.Shared.Components.BootstrapOverride
                 : customCss.Replace("</style", "<\\/style", StringComparison.OrdinalIgnoreCase);
 
             return Task.FromResult<IViewComponentResult>(View((object?)sanitizedCss));
+        }
+
+        private Theme? GetTheme(int id)
+        {
+            return _cache.GetOrCreate(CacheKeys.Theme(id), entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = ThemeCacheDuration;
+                return _themeService.Get(id);
+            });
+        }
+
+        private Theme? GetDefaultTheme()
+        {
+            return _cache.GetOrCreate(CacheKeys.DefaultTheme, entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = ThemeCacheDuration;
+                return _themeService.GetDefault();
+            });
         }
     }
 }

@@ -1,8 +1,10 @@
 using System.Linq;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
+using digioz.Portal.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Config
@@ -11,10 +13,12 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Config
     {
         private readonly IConfigService _service;
         private readonly IConfiguration _configuration;
-        public EditModel(IConfigService service, IConfiguration configuration)
+        private readonly IMemoryCache _cache;
+        public EditModel(IConfigService service, IConfiguration configuration, IMemoryCache cache)
         {
             _service = service;
             _configuration = configuration;
+            _cache = cache;
         }
 
         [BindProperty] public digioz.Portal.Bo.Config? Item { get; set; }
@@ -84,6 +88,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Config
             }
 
             _service.Update(Item);
+            CacheKeys.InvalidateConfig(_cache);
             return RedirectToPage("/Config/Index", new { area = "Admin" });
         }
 

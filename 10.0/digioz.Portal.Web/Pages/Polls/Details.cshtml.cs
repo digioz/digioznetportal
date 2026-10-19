@@ -4,8 +4,10 @@ using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Web.Pages.Shared.Components.PollMenu;
 using ScottPlot;
 
 namespace digioz.Portal.Pages.Polls
@@ -16,19 +18,22 @@ namespace digioz.Portal.Pages.Polls
         private readonly IPollAnswerService _answerService;
         private readonly IPollUsersVoteService _usersVoteService;
         private readonly IPollVoteService _voteService;
+        private readonly IMemoryCache _cache;
         private readonly ILogger<DetailsModel> _logger;
-        
+
         public DetailsModel(
             IPollService pollService, 
             IPollAnswerService answerService, 
             IPollUsersVoteService usersVoteService, 
             IPollVoteService voteService,
+            IMemoryCache cache,
             ILogger<DetailsModel> logger)
         {
             _pollService = pollService;
             _answerService = answerService;
             _usersVoteService = usersVoteService;
             _voteService = voteService;
+            _cache = cache;
             _logger = logger;
         }
 
@@ -107,7 +112,9 @@ namespace digioz.Portal.Pages.Polls
             {
                 _voteService.Add(new digioz.Portal.Bo.PollVote { Id = System.Guid.NewGuid().ToString(), UserId = userId, PollAnswerId = ans });
             }
-            
+
+            _cache.Remove(PollMenuViewComponent.GetPollCacheKey(id));
+
             return RedirectToPage(new { id });
         }
 

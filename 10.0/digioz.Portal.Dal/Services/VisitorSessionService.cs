@@ -34,6 +34,13 @@ namespace digioz.Portal.Dal.Services
                 .ToList();
         }
 
+        #nullable enable
+        public VisitorSession? GetBySessionId(string sessionId)
+        {
+            return _context.VisitorSessions.FirstOrDefault(x => x.SessionId == sessionId);
+        }
+#nullable restore
+
         public int CountAll() => _context.VisitorSessions.Count();
 
         public int CountSearch(string term)

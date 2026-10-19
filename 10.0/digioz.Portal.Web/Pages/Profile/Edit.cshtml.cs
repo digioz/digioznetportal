@@ -14,8 +14,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 
 namespace digioz.Portal.Pages.Profile
 {
@@ -205,14 +203,8 @@ namespace digioz.Portal.Pages.Profile
                 await AvatarFile.CopyToAsync(ms);
                 var bytes = ms.ToArray();
 
-                using (var imgFull = Image.Load(bytes))
-                {
-                    ImageHelper.SaveJigsawImage(imgFull, 800, 800, fullPath);
-                }
-                using (var imgThumb = Image.Load(bytes))
-                {
-                    ImageHelper.SaveImageWithCrop(imgThumb, 100, 100, thumbPath);
-                }
+                ImageHelper.SaveJigsawImage(bytes, 800, 800, fullPath);
+                ImageHelper.SaveImageWithCrop(bytes, 100, 100, thumbPath);
 
                 if (!string.IsNullOrEmpty(profileToUpdate.Avatar))
                 {

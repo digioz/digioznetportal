@@ -16,24 +16,21 @@ namespace digioz.Portal.Utilities
     }
 
     /// <summary>
-    /// Helper kept DAL-agnostic by accepting a delegate that returns the current user set.
+    /// Helper kept DAL-agnostic by accepting a delegate that resolves a user id from an email.
     /// </summary>
     public sealed class UserHelper : IUserHelper
     {
-        private readonly Func<IEnumerable<AspNetUser>> _getUsers;
+        private readonly Func<string, string?> _getUserIdByEmail;
 
-        public UserHelper(Func<IEnumerable<AspNetUser>> getUsers)
+        public UserHelper(Func<string, string?> getUserIdByEmail)
         {
-            _getUsers = getUsers ?? throw new ArgumentNullException(nameof(getUsers));
+            _getUserIdByEmail = getUserIdByEmail ?? throw new ArgumentNullException(nameof(getUserIdByEmail));
         }
 
         public string? GetUserIdByEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email)) return null;
-            var lookup = email.Trim().ToUpperInvariant();
-            var users = _getUsers() ?? Enumerable.Empty<AspNetUser>();
-            var match = users.FirstOrDefault(u => (u.NormalizedEmail ?? u.Email?.ToUpperInvariant()) == lookup);
-            return match?.Id;
+            return _getUserIdByEmail(email.Trim());
         }
     }
 }

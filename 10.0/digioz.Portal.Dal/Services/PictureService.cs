@@ -29,6 +29,17 @@ namespace digioz.Portal.Dal.Services
             return _context.Pictures.Where(p => ids.Contains(p.Id)).ToList();
         }
 
+        public List<Picture> GetLatest(int count)
+        {
+            return _context.Pictures
+                .AsNoTracking()
+                .Where(p => p.Visible && p.Approved)
+                .OrderByDescending(p => p.Timestamp)
+                .ThenByDescending(p => p.Id)
+                .Take(count)
+                .ToList();
+        }
+
         public List<Picture> GetAll()
         {
             return _context.Pictures.ToList();

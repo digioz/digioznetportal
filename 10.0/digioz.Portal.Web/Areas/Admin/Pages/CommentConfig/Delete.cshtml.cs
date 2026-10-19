@@ -1,13 +1,16 @@
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
 {
     public class DeleteModel : PageModel
     {
         private readonly ICommentConfigService _service;
-        public DeleteModel(ICommentConfigService service) { _service = service; }
+        private readonly IMemoryCache _cache;
+        public DeleteModel(ICommentConfigService service, IMemoryCache cache) { _service = service; _cache = cache; }
 
         [BindProperty(SupportsGet = true)] public string? Id { get; set; }
         public Bo.CommentConfig? Item { get; private set; }
@@ -23,6 +26,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
         {
             if (string.IsNullOrEmpty(Id)) return RedirectToPage("/CommentConfig/Index", new { area = "Admin" });
             _service.Delete(Id);
+            CacheKeys.InvalidateCommentConfig(_cache);
             return RedirectToPage("/CommentConfig/Index", new { area = "Admin" });
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -16,9 +17,7 @@ using digioz.Portal.Bo.ViewModels;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using System.Net.Http;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Formats.Jpeg;
+using SkiaSharp;
 
 namespace digioz.Portal.Utilities.Helpers
 {
@@ -144,8 +143,13 @@ namespace digioz.Portal.Utilities.Helpers
         {
             try
             {
-                using (var image = Image.Load(imagePath))
+                using (var image = SKBitmap.Decode(imagePath))
                 {
+                    if (image == null)
+                    {
+                        return SizeF.Empty;
+                    }
+
                     double resizeWidth = image.Width;
                     double resizeHeight = image.Height;
 
@@ -163,7 +167,11 @@ namespace digioz.Portal.Utilities.Helpers
                         resizeWidth = Convert.ToInt32(resizeHeight * aspect);
                     }
 
-                    return SaveImageWithCrop(image, Convert.ToInt32(resizeWidth), Convert.ToInt32(resizeHeight), filePath);
+                    int outputWidth = Convert.ToInt32(resizeWidth);
+                    int outputHeight = Convert.ToInt32(resizeHeight);
+                    return ImageHelper.SaveImageWithCrop(image, outputWidth, outputHeight, filePath)
+                        ? new SizeF(outputWidth, outputHeight)
+                        : SizeF.Empty;
                 }
             }
             catch
@@ -172,55 +180,13 @@ namespace digioz.Portal.Utilities.Helpers
             }
         }
 
-        public static SizeF SaveImageWithCrop(Image image, int maxWidth, int maxHeight, string filePath)
+        public static SizeF SaveImageWithCrop(string imagePath, int maxWidth, int maxHeight, string filePath)
         {
             try
             {
-                int left = 0;
-                int top = 0;
-                int srcWidth = maxWidth;
-                int srcHeight = maxHeight;
-                double croppedHeightToWidth = (double)maxHeight / maxWidth;
-                double croppedWidthToHeight = (double)maxWidth / maxHeight;
-
-                if (image.Width > image.Height)
-                {
-                    srcWidth = (int)(Math.Round(image.Height * croppedWidthToHeight));
-                    if (srcWidth < image.Width)
-                    {
-                        srcHeight = image.Height;
-                        left = (image.Width - srcWidth) / 2;
-                    }
-                    else
-                    {
-                        srcHeight = (int)Math.Round(image.Height * ((double)image.Width / srcWidth));
-                        srcWidth = image.Width;
-                        top = (image.Height - srcHeight) / 2;
-                    }
-                }
-                else
-                {
-                    srcHeight = (int)(Math.Round(image.Width * croppedHeightToWidth));
-                    if (srcHeight < image.Height)
-                    {
-                        srcWidth = image.Width;
-                        top = (image.Height - srcHeight) / 2;
-                    }
-                    else
-                    {
-                        srcWidth = (int)Math.Round(image.Width * ((double)image.Height / srcHeight));
-                        srcHeight = image.Height;
-                        left = (image.Width - srcWidth) / 2;
-                    }
-                }
-
-                image.Mutate(x => x
-                    .Crop(new Rectangle(left, top, srcWidth, srcHeight))
-                     .Resize(maxWidth, maxHeight));
-
-                var encoder = new JpegEncoder { Quality = 100 };
-                image.Save(filePath, encoder);
-                return new SizeF(image.Width, image.Height);
+                return ImageHelper.SaveImageWithCrop(imagePath, maxWidth, maxHeight, filePath)
+                    ? new SizeF(maxWidth, maxHeight)
+                    : SizeF.Empty;
             }
             catch
             {

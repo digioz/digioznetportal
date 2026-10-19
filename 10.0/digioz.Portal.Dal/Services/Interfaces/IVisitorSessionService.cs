@@ -9,6 +9,10 @@ namespace digioz.Portal.Dal.Services.Interfaces
         VisitorSession Get(int id);
         List<VisitorSession> GetAll();
         List<VisitorSession> GetAllGreaterThan(DateTime dateTime);
+#nullable enable
+        /// <summary>Returns the session with the given session id, or null when no session matches.</summary>
+        VisitorSession? GetBySessionId(string sessionId);
+#nullable restore
         void Add(VisitorSession session);
         void Update(VisitorSession session);
         void Delete(int id);

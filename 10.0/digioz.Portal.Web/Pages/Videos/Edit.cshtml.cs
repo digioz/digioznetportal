@@ -139,10 +139,7 @@ namespace digioz.Portal.Pages.Videos
                         }
 
                         // Create thumbnail (max150x150 crop)
-                        using (var image = SixLabors.ImageSharp.Image.Load(thumbPath))
-                        {
-                            ImageHelper.SaveImageWithCrop(image, 150, 150, thumbPath);
-                        }
+                        ImageHelper.SaveImageWithCrop(thumbPath, 150, 150, thumbPath);
 
                         Item.Thumbnail = thumbFileName;
                     }

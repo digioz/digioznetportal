@@ -48,28 +48,35 @@ namespace digioz.Portal.Web.Middleware
                     return;
                 }
 
+                // IMPORTANT: Skip rate limiting for static files to prevent false positives
+                // and avoid database round trips for assets
+                if (ShouldSkipRateLimiting(context))
+                {
+                    await _next(context);
+                    return;
+                }
+
                 // Check if rate limiting is enabled via Plugin configuration
                 using var scope = _scopeFactory.CreateScope();
                 var configService = scope.ServiceProvider.GetRequiredService<Dal.Services.Interfaces.IConfigService>();
                 var pluginService = scope.ServiceProvider.GetRequiredService<Dal.Services.Interfaces.IPluginService>();
                 var configLogger = scope.ServiceProvider.GetRequiredService<ILogger<RateLimitConfiguration>>();
                 var cache = scope.ServiceProvider.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
-                
+
                 var config = new RateLimitConfiguration(configService, pluginService, configLogger, cache);
-                
+
                 if (!config.IsEnabled)
                 {
                     // Rate limiting is disabled, skip all checks
                     await _next(context);
                     return;
                 }
-                
-                _logger.LogInformation("Rate limiting is ENABLED - checking limits");
-                
+
+                _logger.LogDebug("Rate limiting is ENABLED - checking limits");
+
                 // Check if IP is banned FIRST (before any rate limit checks)
                 // This is important to block already-banned IPs immediately
-                using var banScope = _scopeFactory.CreateScope();
-                var banService = banScope.ServiceProvider.GetRequiredService<BanManagementService>();
+                var banService = scope.ServiceProvider.GetRequiredService<BanManagementService>();
                 var banCheckResult = await banService.IsBannedAsync(ipAddress);
                 
                 if (banCheckResult.IsBanned && banCheckResult.BanInfo != null)
@@ -95,15 +102,7 @@ namespace digioz.Portal.Web.Middleware
                     }
                     return;
                 }
-                
-                // IMPORTANT: Skip rate limiting for static files to prevent false positives
-                // Only track dynamic requests (pages, API calls, form submissions)
-                if (ShouldSkipRateLimiting(context))
-                {
-                    await _next(context);
-                    return;
-                }
-                
+
                 // Check for bot and rate limit
                 var userAgent = context.Request.Headers["User-Agent"].ToString();
                 var isBot = BotHelper.IsBot(userAgent);
@@ -120,8 +119,8 @@ namespace digioz.Portal.Web.Middleware
                 
                 if (!isSpecialPage)
                 {
-                    // Track this request in BannedIpTracking table
-                    await rateLimitService.TrackRequestAsync(ipAddress, path, "General", null, userAgent);
+                    // Queue this request for tracking in BannedIpTracking table (written in background)
+                    rateLimitService.QueueTrackRequest(ipAddress, path, "General", null, userAgent);
                 }
                 
                 if (isBot)
@@ -199,23 +198,22 @@ namespace digioz.Portal.Web.Middleware
         /// Static files (CSS, JS, images, fonts) are not rate-limited to prevent
         /// false positives where normal page loads trigger bans.
         /// </summary>
+        private static readonly string[] StaticExtensions =
+        {
+            ".css", ".js", ".map",                          // Stylesheets and scripts
+            ".jpg", ".jpeg", ".png", ".gif", ".svg", ".ico", ".webp", // Images
+            ".woff", ".woff2", ".ttf", ".eot", ".otf",      // Fonts
+            ".mp4", ".webm", ".ogg",                        // Videos
+            ".mp3", ".wav",                                 // Audio
+            ".pdf", ".zip", ".txt",                         // Documents
+            ".xml", ".json"                                 // Data files (when served as static)
+        };
+
         private bool ShouldSkipRateLimiting(HttpContext context)
         {
             var path = context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
-            
-            // Skip static file extensions
-            var staticExtensions = new[]
-            {
-                ".css", ".js", ".map",                          // Stylesheets and scripts
-                ".jpg", ".jpeg", ".png", ".gif", ".svg", ".ico", ".webp", // Images
-                ".woff", ".woff2", ".ttf", ".eot", ".otf",      // Fonts
-                ".mp4", ".webm", ".ogg",                        // Videos
-                ".mp3", ".wav",                                 // Audio
-                ".pdf", ".zip", ".txt",                         // Documents
-                ".xml", ".json"                                 // Data files (when served as static)
-            };
-            
-            if (staticExtensions.Any(ext => path.EndsWith(ext)))
+
+            if (StaticExtensions.Any(ext => path.EndsWith(ext)))
             {
                 return true;
             }

@@ -124,11 +124,8 @@ namespace digioz.Portal.Pages.Videos
                     await ThumbnailFile.CopyToAsync(fs);
                 }
 
-                // Create thumbnail (max150x150 crop) using ImageSharp
-                using (var image = SixLabors.ImageSharp.Image.Load(thumbPath))
-                {
-                    ImageHelper.SaveImageWithCrop(image, 150, 150, thumbPath);
-                }
+                // Create thumbnail (max150x150 crop)
+                ImageHelper.SaveImageWithCrop(thumbPath, 150, 150, thumbPath);
 
                 // Save video file
                 using (var fs = System.IO.File.Create(videoPath))

@@ -81,11 +81,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Picture
                     await NewFile.CopyToAsync(fs);
                 }
 
-                // Create thumbnail using ImageSharp
-                using (var image = SixLabors.ImageSharp.Image.Load(fullPath))
-                {
-                    ImageHelper.SaveImageWithCrop(image, 150, 150, thumbPath);
-                }
+                // Create thumbnail
+                ImageHelper.SaveImageWithCrop(fullPath, 150, 150, thumbPath);
 
                 TryDeleteExistingFiles(existing);
 

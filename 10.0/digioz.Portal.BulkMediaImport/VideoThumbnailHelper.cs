@@ -2,9 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Formats.Jpeg;
+using digioz.Portal.Utilities.Helpers;
 using Xabe.FFmpeg;
 
 namespace digioz.Portal.BulkMediaImport
@@ -48,52 +46,9 @@ namespace digioz.Portal.BulkMediaImport
         {
             try
             {
-                using (var image = Image.Load(inputPath))
+                if (!ImageHelper.SaveImageWithCrop(inputPath, width, height, outputPath))
                 {
-                    int left = 0;
-                    int top = 0;
-                    int srcWidth = width;
-                    int srcHeight = height;
-                    double croppedHeightToWidth = (double)height / width;
-                    double croppedWidthToHeight = (double)width / height;
-
-                    if (image.Width > image.Height)
-                    {
-                        srcWidth = (int)(Math.Round(image.Height * croppedWidthToHeight));
-                        if (srcWidth < image.Width)
-                        {
-                            srcHeight = image.Height;
-                            left = (image.Width - srcWidth) / 2;
-                        }
-                        else
-                        {
-                            srcHeight = (int)Math.Round(image.Height * ((double)image.Width / srcWidth));
-                            srcWidth = image.Width;
-                            top = (image.Height - srcHeight) / 2;
-                        }
-                    }
-                    else
-                    {
-                        srcHeight = (int)(Math.Round(image.Width * croppedHeightToWidth));
-                        if (srcHeight < image.Height)
-                        {
-                            srcWidth = image.Width;
-                            top = (image.Height - srcHeight) / 2;
-                        }
-                        else
-                        {
-                            srcWidth = (int)Math.Round(image.Width * ((double)image.Height / srcHeight));
-                            srcHeight = image.Height;
-                            left = (image.Width - srcWidth) / 2;
-                        }
-                    }
-
-                    image.Mutate(x => x
-                        .Crop(new Rectangle(left, top, srcWidth, srcHeight))
-                        .Resize(width, height));
-
-                    var encoder = new JpegEncoder { Quality = 100 };
-                    image.Save(outputPath, encoder);
+                    throw new InvalidOperationException($"Could not resize thumbnail '{inputPath}'.");
                 }
             }
             catch (Exception ex)

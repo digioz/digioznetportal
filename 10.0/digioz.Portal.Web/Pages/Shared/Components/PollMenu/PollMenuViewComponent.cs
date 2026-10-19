@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using digioz.Portal.Dal.Services.Interfaces;
 using ScottPlot;
@@ -12,11 +13,28 @@ namespace digioz.Portal.Web.Pages.Shared.Components.PollMenu
 {
     public class PollMenuViewComponent : ViewComponent
     {
+        private const string PluginCacheKey = "PollMenu_PluginEnabled";
+        private const string FeaturedPollsCacheKey = "PollMenu_FeaturedPolls";
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(2);
+
+        /// <summary>
+        /// Cache key for a single poll's answers and rendered results chart.
+        /// Remove this key when votes are cast so results refresh immediately.
+        /// </summary>
+        public static string GetPollCacheKey(string pollId) => $"PollMenu_Poll_{pollId}";
+
+        private sealed class CachedPollData
+        {
+            public List<digioz.Portal.Bo.PollAnswer> Answers { get; init; } = new();
+            public string ChartBase64 { get; init; } = string.Empty;
+        }
+
         private readonly IPollService _pollService;
         private readonly IPollUsersVoteService _usersVoteService;
         private readonly IPollAnswerService _answerService;
         private readonly IPollVoteService _voteService;
         private readonly IPluginService _pluginService;
+        private readonly IMemoryCache _cache;
         private readonly ILogger<PollMenuViewComponent> _logger;
 
         public PollMenuViewComponent(
@@ -25,6 +43,7 @@ namespace digioz.Portal.Web.Pages.Shared.Components.PollMenu
             IPollAnswerService answerService, 
             IPollVoteService voteService, 
             IPluginService pluginService,
+            IMemoryCache cache,
             ILogger<PollMenuViewComponent> logger)
         {
             _pollService = pollService;
@@ -32,32 +51,55 @@ namespace digioz.Portal.Web.Pages.Shared.Components.PollMenu
             _answerService = answerService;
             _voteService = voteService;
             _pluginService = pluginService;
+            _cache = cache;
             _logger = logger;
         }
 
         public IViewComponentResult Invoke()
         {
-            var pollPlugin = _pluginService.GetByName("Polls");
-            if (pollPlugin == null || !pollPlugin.IsEnabled)
+            if (!_cache.TryGetValue(PluginCacheKey, out bool pluginEnabled))
+            {
+                var pollPlugin = _pluginService.GetByName("Polls");
+                pluginEnabled = pollPlugin != null && pollPlugin.IsEnabled;
+                _cache.Set(PluginCacheKey, pluginEnabled, CacheDuration);
+            }
+
+            if (!pluginEnabled)
             {
                 return View("Disabled");
             }
 
-            var polls = _pollService.GetLatestFeatured(2);
+            if (!_cache.TryGetValue(FeaturedPollsCacheKey, out List<digioz.Portal.Bo.Poll>? polls) || polls == null)
+            {
+                polls = _pollService.GetLatestFeatured(2);
+                _cache.Set(FeaturedPollsCacheKey, polls, CacheDuration);
+            }
+
             var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
             var model = new List<PollMenuItemViewModel>();
             foreach (var p in polls)
             {
-                var answers = _answerService.GetByPollId(p.Id);
+                // Answers and the rendered chart are shared by all users; only HasVoted is per-user.
+                var pollKey = GetPollCacheKey(p.Id);
+                if (!_cache.TryGetValue(pollKey, out CachedPollData? data) || data == null)
+                {
+                    var answers = _answerService.GetByPollId(p.Id);
+                    data = new CachedPollData
+                    {
+                        Answers = answers,
+                        ChartBase64 = GenerateResultsChart(p.Id, answers)
+                    };
+                    _cache.Set(pollKey, data, CacheDuration);
+                }
+
                 var hasVoted = !string.IsNullOrEmpty(userId) && _usersVoteService.Exists(p.Id, userId);
-                var chart = GenerateResultsChart(p.Id, answers);
                 model.Add(new PollMenuItemViewModel
                 {
                     Poll = p,
-                    Answers = answers,
+                    Answers = data.Answers,
                     HasVoted = hasVoted,
-                    ResultsChartBase64 = chart
+                    ResultsChartBase64 = data.ChartBase64
                 });
             }
 

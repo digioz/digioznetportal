@@ -8,6 +8,7 @@ using digioz.Portal.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using digioz.Portal.Web.Hubs;
 using digioz.Portal.EmailProviders.Extensions;
 using System.Net;
@@ -118,6 +119,7 @@ builder.Services.AddScoped<IThemeService, ThemeService>();
 // Register Web-specific services
 builder.Services.AddScoped<LinkCheckerService>();
 builder.Services.AddSingleton<digioz.Portal.Web.Services.BanManagementService>();
+builder.Services.AddSingleton<RateLimitTrackingQueue>();
 builder.Services.AddScoped<RateLimitService>();
 
 // Register Dal cleanup service
@@ -125,6 +127,7 @@ builder.Services.AddScoped<digioz.Portal.Dal.Services.IBannedIpTrackingCleanupSe
 
 // Register background services
 builder.Services.AddHostedService<RateLimitCleanupService>();
+builder.Services.AddHostedService<RateLimitTrackingWriterService>();
 
 // Register Email Provider Services
 builder.Services.AddEmailProviders();
@@ -191,6 +194,7 @@ builder.Services.AddHttpClient("LinkChecker", client =>
 
 // Add HttpContextAccessor for accessing HttpContext in view components
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentProfileProvider, CurrentProfileProvider>();
 
 // Session for capturing SessionId in visitor logs
 builder.Services.AddDistributedMemoryCache();
@@ -208,21 +212,24 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.None; // Allow HTTP in development
 });
 
-// Helpers: wire CommentsHelper with delegates to avoid Utilities->Dal reference
+// Helpers: wire CommentsHelper with delegates to avoid Utilities->Dal reference.
+// Config lists are small and change rarely, so they are cached briefly.
 builder.Services.AddScoped<ICommentsHelper>(sp =>
 {
     var configSvc = sp.GetRequiredService<IConfigService>();
     var commentConfigSvc = sp.GetRequiredService<ICommentConfigService>();
+    var cache = sp.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
+    var cacheOptions = new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(5) };
     return new CommentsHelper(
-        () => configSvc.GetAll(),
-        () => commentConfigSvc.GetAll());
+        () => cache.GetOrCreate(CacheKeys.CommentsHelperConfigs, e => { e.SetOptions(cacheOptions); return configSvc.GetAll(); })!,
+        () => cache.GetOrCreate(CacheKeys.CommentsHelperCommentConfigs, e => { e.SetOptions(cacheOptions); return commentConfigSvc.GetAll(); })!);
 });
 
-// UserHelper registration (delegate pulls from IAspNetUserService)
+// UserHelper registration (delegate resolves a single user id via IAspNetUserService)
 builder.Services.AddScoped<IUserHelper>(sp =>
 {
     var userSvc = sp.GetRequiredService<IAspNetUserService>();
-    return new UserHelper(() => userSvc.GetAll());
+    return new UserHelper(email => userSvc.GetIdByEmail(email));
 });
 
 // Razor Pages with convention to authorize entire Admin area
@@ -264,8 +271,33 @@ using (var scope = app.Services.CreateScope())
         identityContext.Database.Migrate();
 
         // Main portal DB (digiozPortalContext)
+        // EnsureCreated builds the full model and probes the schema on every start,
+        // so only run it when the portal tables have not been created yet.
+        // On a fresh deployment the database itself may not exist, so probe
+        // connectivity first; querying INFORMATION_SCHEMA against a missing
+        // database would throw and prevent startup.
         var portalContext = services.GetRequiredService<digiozPortalContext>();
-        portalContext.Database.EnsureCreated();
+        var portalTablesExist = portalContext.Database.CanConnect()
+            && portalContext.Database
+                .SqlQueryRaw<int>("SELECT COUNT(*) AS [Value] FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Config'")
+                .AsEnumerable()
+                .FirstOrDefault() > 0;
+        if (!portalTablesExist)
+        {
+            portalContext.Database.EnsureCreated();
+        }
+        else
+        {
+            // EnsureCreated does nothing on an existing database, so model-only schema
+            // additions must be applied explicitly. Create the VisitorSession SessionId
+            // index idempotently so previously deployed databases pick it up.
+            portalContext.Database.ExecuteSqlRaw(@"
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'VisitorSession')
+   AND NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_VisitorSession_SessionId' AND object_id = OBJECT_ID('dbo.VisitorSession'))
+BEGIN
+    CREATE INDEX [IX_VisitorSession_SessionId] ON [dbo].[VisitorSession] ([SessionId]);
+END");
+        }
     }
     catch (SqlException ex)
     {

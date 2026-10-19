@@ -63,17 +63,11 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.SlideShow
                 await File.CopyToAsync(fs);
             }
 
-            // Create full-size slide image using ImageSharp
-            using (var image = SixLabors.ImageSharp.Image.Load(fullPath))
-            {
-                ImageHelper.SaveImageWithCrop(image, 850, 450, fullPath);
-            }
+            // Create full-size slide image
+            ImageHelper.SaveImageWithCrop(fullPath, 850, 450, fullPath);
 
-            // Create thumbnail (120x120 crop) using ImageSharp
-            using (var thumbImage = SixLabors.ImageSharp.Image.Load(fullPath))
-            {
-                ImageHelper.SaveImageWithCrop(thumbImage, 120, 120, thumbPath);
-            }
+            // Create thumbnail (120x120 crop)
+            ImageHelper.SaveImageWithCrop(fullPath, 120, 120, thumbPath);
 
             Item.Id = Guid.NewGuid().ToString();
             Item.Image = fileName;

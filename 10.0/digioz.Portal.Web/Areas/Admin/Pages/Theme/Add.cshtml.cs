@@ -5,16 +5,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
+using digioz.Portal.Web.Services;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
 {
     public class AddModel : PageModel
     {
         private readonly IThemeService _themeService;
+        private readonly IMemoryCache _cache;
 
-        public AddModel(IThemeService themeService)
+        public AddModel(IThemeService themeService, IMemoryCache cache)
         {
             _themeService = themeService;
+            _cache = cache;
         }
 
         [BindProperty]
@@ -61,6 +65,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Theme
             {
                 _themeService.SetAsDefault(theme.Id);
             }
+
+            CacheKeys.InvalidateTheme(_cache, theme.Id);
 
             TempData["StatusMessage"] = $"Theme '{theme.Name}' has been created successfully.";
             return RedirectToPage("./Index");

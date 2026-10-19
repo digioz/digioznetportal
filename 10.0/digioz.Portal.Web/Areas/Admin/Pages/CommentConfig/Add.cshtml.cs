@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
 {
@@ -15,19 +17,22 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
         private readonly IAnnouncementService _announcementService;
         private readonly IPictureService _pictureService;
         private readonly IVideoService _videoService;
+        private readonly IMemoryCache _cache;
 
         public AddModel(
             ICommentConfigService configService, 
             IPageService pageService, 
             IAnnouncementService announcementService,
             IPictureService pictureService,
-            IVideoService videoService)
+            IVideoService videoService,
+            IMemoryCache cache)
         {
             _configService = configService;
             _pageService = pageService;
             _announcementService = announcementService;
             _pictureService = pictureService;
             _videoService = videoService;
+            _cache = cache;
         }
 
         [BindProperty] public Bo.CommentConfig Item { get; set; } = new Bo.CommentConfig { Visible = true };
@@ -69,6 +74,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.CommentConfig
             Item.Timestamp = DateTime.UtcNow;
 
             _configService.Add(Item);
+            CacheKeys.InvalidateCommentConfig(_cache);
             return RedirectToPage("/CommentConfig/Index", new { area = "Admin" });
         }
 

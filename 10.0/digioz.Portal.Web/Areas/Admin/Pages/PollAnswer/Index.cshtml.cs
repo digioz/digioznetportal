@@ -5,6 +5,8 @@ using System.Security.Claims;
 using digioz.Portal.Dal.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Caching.Memory;
+using digioz.Portal.Web.Pages.Shared.Components.PollMenu;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
 {
@@ -14,9 +16,10 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
         private readonly IPollService _pollService;
         private readonly IPollUsersVoteService _usersVoteService;
         private readonly IPollVoteService _voteService;
-        public IndexModel(IPollAnswerService service, IPollService pollService, IPollUsersVoteService usersVoteService, IPollVoteService voteService)
+        private readonly IMemoryCache _cache;
+        public IndexModel(IPollAnswerService service, IPollService pollService, IPollUsersVoteService usersVoteService, IPollVoteService voteService, IMemoryCache cache)
         {
-            _service = service; _pollService = pollService; _usersVoteService = usersVoteService; _voteService = voteService;
+            _service = service; _pollService = pollService; _usersVoteService = usersVoteService; _voteService = voteService; _cache = cache;
         }
 
         public IReadOnlyList<digioz.Portal.Bo.PollAnswer> Items { get; private set; } = Array.Empty<digioz.Portal.Bo.PollAnswer>();
@@ -97,6 +100,8 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
                     PollAnswerId = ansId
                 });
             }
+
+            _cache.Remove(PollMenuViewComponent.GetPollCacheKey(PollId));
 
             return RedirectToPage(new { PollId });
         }

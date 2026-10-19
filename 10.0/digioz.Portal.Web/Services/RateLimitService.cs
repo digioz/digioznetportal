@@ -15,14 +15,41 @@ namespace digioz.Portal.Web.Services
     public class RateLimitService
     {
         private readonly digiozPortalContext _context;
+        private readonly RateLimitTrackingQueue _trackingQueue;
         private readonly ILogger<RateLimitService> _logger;
 
         public RateLimitService(
             digiozPortalContext context,
+            RateLimitTrackingQueue trackingQueue,
             ILogger<RateLimitService> logger)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _trackingQueue = trackingQueue ?? throw new ArgumentNullException(nameof(trackingQueue));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <summary>
+        /// Queue a request for tracking without blocking the caller.
+        /// The record is written by a background service in batches.
+        /// Use for high-volume general traffic; security-sensitive flows should
+        /// use <see cref="TrackRequestAsync"/> so their counts are immediately accurate.
+        /// </summary>
+        public void QueueTrackRequest(string ipAddress, string path, string requestType = "General", string? email = null, string? userAgent = null)
+        {
+            var tracking = new BannedIpTracking
+            {
+                IpAddress = ipAddress,
+                Timestamp = DateTime.UtcNow,
+                RequestPath = path,
+                RequestType = requestType,
+                Email = email,
+                UserAgent = userAgent
+            };
+
+            if (!_trackingQueue.TryEnqueue(tracking))
+            {
+                _logger.LogWarning("Rate limit tracking queue is full; dropped record for IP: {IP}", ipAddress);
+            }
         }
 
         /// <summary>

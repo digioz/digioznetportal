@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
+using digioz.Portal.Utilities.Helpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.Product
 {
@@ -163,30 +162,17 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.Product
                 // Generate filename - use GUID only (will be under 50 chars)
                 string filename = $"{Guid.NewGuid()}{Path.GetExtension(ImageFile.FileName)}";
 
+                using var memoryStream = new MemoryStream();
+                await ImageFile.CopyToAsync(memoryStream);
+                var imageData = memoryStream.ToArray();
+
                 // Save full size image
                 string fullFilePath = Path.Combine(fullFolder, filename);
-                using (var stream = ImageFile.OpenReadStream())
-                {
-                    using (var image = await Image.LoadAsync(stream))
-                    {
-                        await image.SaveAsync(fullFilePath);
-                    }
-                }
+                await System.IO.File.WriteAllBytesAsync(fullFilePath, imageData);
 
                 // Create and save thumbnail (200x200)
                 string thumbFilePath = Path.Combine(thumbFolder, filename);
-                using (var stream = ImageFile.OpenReadStream())
-                {
-                    using (var image = await Image.LoadAsync(stream))
-                    {
-                        image.Mutate(x => x.Resize(new ResizeOptions
-                        {
-                            Size = new Size(200, 200),
-                            Mode = ResizeMode.Max
-                        }));
-                        await image.SaveAsync(thumbFilePath);
-                    }
-                }
+                ImageHelper.SaveImageWithResize(imageData, 200, 200, thumbFilePath);
 
                 // Store only the filename, not the full path
                 if (Item != null)

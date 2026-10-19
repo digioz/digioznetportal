@@ -4,6 +4,8 @@ using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Caching.Memory;
+using digioz.Portal.Web.Pages.Shared.Components.PollMenu;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
 {
@@ -11,10 +13,12 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
     {
         private readonly IPollService _pollService;
         private readonly IPollAnswerService _answerService;
-        public AddModel(IPollAnswerService answerService, IPollService pollService)
+        private readonly IMemoryCache _cache;
+        public AddModel(IPollAnswerService answerService, IPollService pollService, IMemoryCache cache)
         {
             _answerService = answerService;
             _pollService = pollService;
+            _cache = cache;
         }
 
         [BindProperty] public digioz.Portal.Bo.PollAnswer Item { get; set; } = new digioz.Portal.Bo.PollAnswer { Id = System.Guid.NewGuid().ToString() };
@@ -57,6 +61,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
             }
 
             _answerService.Add(Item);
+            _cache.Remove(PollMenuViewComponent.GetPollCacheKey(Item.PollId));
             return RedirectToPage("Index", new { PollId = Item.PollId });
         }
     }

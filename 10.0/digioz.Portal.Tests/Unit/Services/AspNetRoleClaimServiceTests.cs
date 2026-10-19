@@ -358,7 +358,6 @@ namespace digioz.Portal.Tests.Unit.Services
             var permissions = new[] { "manage-users", "manage-roles", "manage-content", "view-logs" };
 
             // Act - Assign permissions to admin role
-            int idx = 1;
             foreach (var permission in permissions)
             {
                 _service.Add(new AspNetRoleClaim

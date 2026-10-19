@@ -5,10 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using digioz.Portal.Bo;
 using digioz.Portal.Dal.Services.Interfaces;
+using digioz.Portal.Utilities.Helpers;
 using Microsoft.Extensions.Configuration;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Formats.Jpeg;
+using SkiaSharp;
 
 namespace digioz.Portal.BulkMediaImport
 {
@@ -84,10 +83,10 @@ namespace digioz.Portal.BulkMediaImport
                     // Copy original file
                     File.Copy(sourceFile, fullPath, overwrite: false);
 
-                    // Create thumbnail (150x150 crop) using ImageSharp
-                    using (var image = Image.Load(fullPath))
+                    // Create thumbnail (150x150 crop)
+                    if (!ImageHelper.SaveImageWithCrop(fullPath, 150, 150, thumbPath))
                     {
-                        SaveImageWithCrop(image, 150, 150, thumbPath);
+                        throw new InvalidOperationException($"Could not create thumbnail for '{sourceFile}'.");
                     }
 
                     // Get description
@@ -237,63 +236,15 @@ namespace digioz.Portal.BulkMediaImport
             return (successCount, errorCount);
         }
 
-        private void SaveImageWithCrop(Image image, int maxWidth, int maxHeight, string filePath)
-        {
-            int left = 0;
-            int top = 0;
-            int srcWidth = maxWidth;
-            int srcHeight = maxHeight;
-            double croppedHeightToWidth = (double)maxHeight / maxWidth;
-            double croppedWidthToHeight = (double)maxWidth / maxHeight;
-
-            if (image.Width > image.Height)
-            {
-                srcWidth = (int)(Math.Round(image.Height * croppedWidthToHeight));
-                if (srcWidth < image.Width)
-                {
-                    srcHeight = image.Height;
-                    left = (image.Width - srcWidth) / 2;
-                }
-                else
-                {
-                    srcHeight = (int)Math.Round(image.Height * ((double)image.Width / srcWidth));
-                    srcWidth = image.Width;
-                    top = (image.Height - srcHeight) / 2;
-                }
-            }
-            else
-            {
-                srcHeight = (int)(Math.Round(image.Width * croppedHeightToWidth));
-                if (srcHeight < image.Height)
-                {
-                    srcWidth = image.Width;
-                    top = (image.Height - srcHeight) / 2;
-                }
-                else
-                {
-                    srcWidth = (int)Math.Round(image.Width * ((double)image.Height / srcHeight));
-                    srcHeight = image.Height;
-                    left = (image.Width - srcWidth) / 2;
-                }
-            }
-
-            image.Mutate(x => x
-                .Crop(new Rectangle(left, top, srcWidth, srcHeight))
-                .Resize(maxWidth, maxHeight));
-
-            var encoder = new JpegEncoder { Quality = 100 };
-            image.Save(filePath, encoder);
-        }
-
         private void CreatePlaceholderThumbnail(string outputPath)
         {
             // Create a simple 150x150 black placeholder image
-            using (var image = new Image<SixLabors.ImageSharp.PixelFormats.Rgba32>(150, 150))
-            {
-                image.Mutate(x => x.BackgroundColor(SixLabors.ImageSharp.Color.Black));
-                var encoder = new JpegEncoder { Quality = 100 };
-                image.Save(outputPath, encoder);
-            }
+            using var bitmap = new SKBitmap(150, 150);
+            bitmap.Erase(SKColors.Black);
+            using var image = SKImage.FromBitmap(bitmap);
+            using var encodedImage = image.Encode(SKEncodedImageFormat.Jpeg, 100);
+            using var output = File.Create(outputPath);
+            encodedImage.SaveTo(output);
         }
     }
 }
