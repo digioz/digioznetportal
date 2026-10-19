@@ -3,6 +3,8 @@ using digioz.Portal.Dal.Services.Interfaces;
 using digioz.Portal.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Caching.Memory;
+using digioz.Portal.Web.Pages.Shared.Components.PollMenu;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
 {
@@ -10,10 +12,12 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
     {
         private readonly IPollAnswerService _answerService;
         private readonly IPollService _pollService;
-        public EditModel(IPollAnswerService service, IPollService pollService)
+        private readonly IMemoryCache _cache;
+        public EditModel(IPollAnswerService service, IPollService pollService, IMemoryCache cache)
         {
             _answerService = service;
             _pollService = pollService;
+            _cache = cache;
         }
 
         [BindProperty] public digioz.Portal.Bo.PollAnswer Item { get; set; } = new();
@@ -41,6 +45,7 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
             }
             
             _answerService.Update(Item);
+            _cache.Remove(PollMenuViewComponent.GetPollCacheKey(Item.PollId));
             return RedirectToPage("Index", new { PollId = Item.PollId });
         }
     }

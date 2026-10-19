@@ -273,14 +273,30 @@ using (var scope = app.Services.CreateScope())
         // Main portal DB (digiozPortalContext)
         // EnsureCreated builds the full model and probes the schema on every start,
         // so only run it when the portal tables have not been created yet.
+        // On a fresh deployment the database itself may not exist, so probe
+        // connectivity first; querying INFORMATION_SCHEMA against a missing
+        // database would throw and prevent startup.
         var portalContext = services.GetRequiredService<digiozPortalContext>();
-        var portalTablesExist = portalContext.Database
-            .SqlQueryRaw<int>("SELECT COUNT(*) AS [Value] FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Config'")
-            .AsEnumerable()
-            .FirstOrDefault() > 0;
+        var portalTablesExist = portalContext.Database.CanConnect()
+            && portalContext.Database
+                .SqlQueryRaw<int>("SELECT COUNT(*) AS [Value] FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Config'")
+                .AsEnumerable()
+                .FirstOrDefault() > 0;
         if (!portalTablesExist)
         {
             portalContext.Database.EnsureCreated();
+        }
+        else
+        {
+            // EnsureCreated does nothing on an existing database, so model-only schema
+            // additions must be applied explicitly. Create the VisitorSession SessionId
+            // index idempotently so previously deployed databases pick it up.
+            portalContext.Database.ExecuteSqlRaw(@"
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'VisitorSession')
+   AND NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_VisitorSession_SessionId' AND object_id = OBJECT_ID('dbo.VisitorSession'))
+BEGIN
+    CREATE INDEX [IX_VisitorSession_SessionId] ON [dbo].[VisitorSession] ([SessionId]);
+END");
         }
     }
     catch (SqlException ex)

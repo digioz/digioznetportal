@@ -2,6 +2,8 @@ using System.Linq;
 using digioz.Portal.Dal.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Caching.Memory;
+using digioz.Portal.Web.Pages.Shared.Components.PollMenu;
 
 namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
 {
@@ -10,11 +12,13 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
         private readonly IPollAnswerService _answerService;
         private readonly IPollUsersVoteService _usersVoteService;
         private readonly IPollVoteService _voteService;
-        public DeleteModel(IPollAnswerService answerService, IPollUsersVoteService usersVoteService, IPollVoteService voteService)
+        private readonly IMemoryCache _cache;
+        public DeleteModel(IPollAnswerService answerService, IPollUsersVoteService usersVoteService, IPollVoteService voteService, IMemoryCache cache)
         {
             _answerService = answerService;
             _usersVoteService = usersVoteService;
             _voteService = voteService;
+            _cache = cache;
         }
 
         [BindProperty(SupportsGet = true)] public string Id { get; set; } = string.Empty;
@@ -68,7 +72,9 @@ namespace digioz.Portal.Web.Areas.Admin.Pages.PollAnswer
 
             // Finally, delete the answer itself
             _answerService.Delete(ans.Id);
-            
+
+            _cache.Remove(PollMenuViewComponent.GetPollCacheKey(ans.PollId));
+
             return RedirectToPage("Index", new { PollId = ans.PollId });
         }
     }

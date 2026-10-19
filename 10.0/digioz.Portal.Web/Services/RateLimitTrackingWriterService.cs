@@ -17,6 +17,7 @@ namespace digioz.Portal.Web.Services
     public sealed class RateLimitTrackingWriterService : BackgroundService
     {
         private const int MaxBatchSize = 256;
+        private const int MaxSaveAttemptsPerBatch = 3;
         private static readonly TimeSpan MaxBatchDelay = TimeSpan.FromMilliseconds(500);
 
         private readonly IServiceScopeFactory _scopeFactory;
@@ -37,35 +38,43 @@ namespace digioz.Portal.Web.Services
         {
             var reader = _queue.Reader;
             var buffer = new List<BannedIpTracking>(MaxBatchSize);
+            var saveAttempts = 0;
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    if (!await reader.WaitToReadAsync(stoppingToken).ConfigureAwait(false))
-                    {
-                        continue;
-                    }
-
-                    // Give a short window for more items to arrive so we insert in batches
-                    // rather than one row per request under load.
-                    await Task.Delay(MaxBatchDelay, stoppingToken).ConfigureAwait(false);
-
-                    buffer.Clear();
-                    while (buffer.Count < MaxBatchSize && reader.TryRead(out var item))
-                    {
-                        buffer.Add(item);
-                    }
-
+                    // Only pull new work when the previous batch was persisted (or abandoned);
+                    // a failed batch is retried before reading more items.
                     if (buffer.Count == 0)
                     {
-                        continue;
+                        if (!await reader.WaitToReadAsync(stoppingToken).ConfigureAwait(false))
+                        {
+                            continue;
+                        }
+
+                        // Give a short window for more items to arrive so we insert in batches
+                        // rather than one row per request under load.
+                        await Task.Delay(MaxBatchDelay, stoppingToken).ConfigureAwait(false);
+
+                        while (buffer.Count < MaxBatchSize && reader.TryRead(out var item))
+                        {
+                            buffer.Add(item);
+                        }
+
+                        if (buffer.Count == 0)
+                        {
+                            continue;
+                        }
+
+                        saveAttempts = 0;
                     }
 
                     using var scope = _scopeFactory.CreateScope();
                     var context = scope.ServiceProvider.GetRequiredService<digiozPortalContext>();
                     context.BannedIpTrackings.AddRange(buffer);
                     await context.SaveChangesAsync(stoppingToken).ConfigureAwait(false);
+                    buffer.Clear();
                 }
                 catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                 {
@@ -73,7 +82,20 @@ namespace digioz.Portal.Web.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error writing {Count} rate limit tracking records", buffer.Count);
+                    saveAttempts++;
+                    if (saveAttempts >= MaxSaveAttemptsPerBatch)
+                    {
+                        _logger.LogError(ex,
+                            "Dropping {Count} rate limit tracking records after {Attempts} failed save attempts",
+                            buffer.Count, saveAttempts);
+                        buffer.Clear();
+                    }
+                    else
+                    {
+                        _logger.LogError(ex,
+                            "Error writing {Count} rate limit tracking records (attempt {Attempt}/{Max}); will retry",
+                            buffer.Count, saveAttempts, MaxSaveAttemptsPerBatch);
+                    }
                     await Task.Delay(500, stoppingToken).ConfigureAwait(false);
                 }
             }

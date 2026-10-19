@@ -128,7 +128,18 @@ namespace digioz.Portal.Web.Services
                 
                 dbContext.BannedIps.Add(bannedIp);
                 await dbContext.SaveChangesAsync();
-                _cache.Remove(GetCacheKey(ipAddress));
+
+                // Set the positive ban entry directly instead of just removing the key.
+                // A concurrent IsBannedAsync may have cached a negative (null) entry after
+                // reading the database but before this insert committed; overwriting the
+                // entry ensures the ban takes effect immediately rather than after the
+                // stale negative entry expires.
+                _cache.Set(GetCacheKey(ipAddress), new BanInfo
+                {
+                    BanExpiry = banExpiry,
+                    IsPermanent = banExpiry == DateTime.MaxValue,
+                    Reason = reason
+                }, BanCacheDuration);
                 
                 bool isPermanent = banExpiry == DateTime.MaxValue;
                 _logger.LogWarning("IP banned - IP: {IP}, Reason: {Reason}, Expires: {Expiry}, Count: {Count}",
