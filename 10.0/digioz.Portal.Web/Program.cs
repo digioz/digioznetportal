@@ -293,9 +293,19 @@ using (var scope = app.Services.CreateScope())
             // index idempotently so previously deployed databases pick it up.
             portalContext.Database.ExecuteSqlRaw(@"
 IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'VisitorSession')
-   AND NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_VisitorSession_SessionId' AND object_id = OBJECT_ID('dbo.VisitorSession'))
 BEGIN
-    CREATE INDEX [IX_VisitorSession_SessionId] ON [dbo].[VisitorSession] ([SessionId]);
+    -- SessionId was historically nvarchar(max), which cannot be an index key column.
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+               WHERE TABLE_NAME = 'VisitorSession' AND COLUMN_NAME = 'SessionId'
+                 AND CHARACTER_MAXIMUM_LENGTH = -1)
+    BEGIN
+        ALTER TABLE [dbo].[VisitorSession] ALTER COLUMN [SessionId] nvarchar(450) NULL;
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_VisitorSession_SessionId' AND object_id = OBJECT_ID('dbo.VisitorSession'))
+    BEGIN
+        CREATE INDEX [IX_VisitorSession_SessionId] ON [dbo].[VisitorSession] ([SessionId]);
+    END
 END");
         }
     }

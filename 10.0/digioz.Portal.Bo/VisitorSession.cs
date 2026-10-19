@@ -12,6 +12,7 @@ namespace digioz.Portal.Bo
         [MaxLength(25)]
         public string IpAddress { get; set; }
         public string PageUrl { get; set; }
+        [MaxLength(450)]
         public string SessionId { get; set; }
         [MaxLength(255)]
         public string Username { get; set; }
