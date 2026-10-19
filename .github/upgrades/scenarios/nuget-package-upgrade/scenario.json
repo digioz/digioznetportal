@@ -3,14 +3,15 @@
   "operationId": "9bebd11e-5dc9-4fd9-a6b3-43bb418fcbcb",
   "description": "Upgrade one or more NuGet packages from their current version to a target version across a project, several projects, a folder, a solution, or the whole repository. Use when the user wants to bump, update, or upgrade a specific NuGet package (or packages) to a given version or to the latest supported version, detect breaking API changes introduced by the new version, and fix the resulting code. User-initiated \u2014 match the user\u0027s stated package(s) and version intent.\n",
   "startTime": "2026-10-19T15:21:44.5194334Z",
-  "lastUpdateTime": "2026-10-19T15:44:50.1221876Z",
+  "lastUpdateTime": "2026-10-19T15:46:18.6460841Z",
   "properties": {
     "orphanedTaskIds": [],
     "taskStates": {
       "01-validate-imagesharp": "Failed",
       "01-migrate-images-to-skiasharp": "Completed",
       "01.01-shared-image-helpers": "Completed",
-      "02-razor-image-callers": "Completed"
+      "02-razor-image-callers": "Completed",
+      "03-bulk-media-images": "Completed"
     }
   },
   "folderPath": ""
